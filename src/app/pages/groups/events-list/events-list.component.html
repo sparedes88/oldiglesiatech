@@ -1,0 +1,365 @@
+<div class="container" style="min-height: 700px">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+            {{ totalEvents || 0 }}
+          </span>
+          <h4 class="col-12 card-title text-center text-citric span-number">Events</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/events_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Events</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_detail_loading">
+      <ng-template [ngIf]="show_detail_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+    <div class="row m-0">
+      <div class="btn-group col-12 mt-2">
+        <button
+          (click)="settings_obj.view_option = 'events'; getEvents()"
+          class="btn btn-sm col-6"
+          [ngClass]="{
+            active: settings_obj.view_option === 'events'
+          }"
+        >
+          Published Events
+        </button>
+        <button
+          (click)="
+            settings_obj.view_option = 'settings';
+            event_setting_list?.getEvents()
+          "
+          class="btn btn-sm col-6"
+          [ngClass]="{
+            active: settings_obj.view_option === 'settings'
+          }"
+        >
+          Events Generator
+        </button>
+      </div>
+    </div>
+    <div
+      class="col-12 mt-2 m-0 row"
+      [hidden]="settings_obj.view_option !== 'events'"
+    >
+      <div
+        class="col-xs-12 col-md-12 mt-2 table-responsive-sm"
+        [hidden]="selectedEvent || show_detail_loading"
+      >
+        <div class="row">
+          <div class="col-12">
+            <!-- <button
+              *ngIf="currentUser.isSuperUser || currentUser.idUserType === 1"
+              class="btn btn-sm btn-outline-success float-right"
+              (click)="openModalAddEvent(group_event_standalone_modal, group_event_form)"
+            >
+              New Event
+            </button> -->
+            <h5>To create a new Event please use the Events Generator tab.</h5>
+          </div>
+        </div>
+        <table style="width: 100%" class="table row-border hover mt-4">
+          <thead>
+            <tr>
+              <th colspan="3" style="text-align: right">Attendances</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="3" style="text-align: right">
+                {{ total_attendances.count }} /
+                {{ total_attendances.total }}
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div
+      class="col-12 mt-2 m-0 row"
+      [hidden]="settings_obj.view_option !== 'events'"
+    >
+      <div
+        class="col-xs-12 col-md-12 mt-2 table-responsive-sm"
+        [hidden]="selectedEvent || show_detail_loading"
+      >
+        <table
+          style="width: 100%"
+          datatable
+          [dtOptions]="dtOptions"
+          [dtTrigger]="dtTrigger"
+          class="table row-border hover mt-4"
+        >
+          <thead>
+            <tr>
+              <th width="100px"></th>
+              <th>Title</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Description.</th>
+              <th>Attendances</th>
+              <th>Settings</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let event of events">
+              <td [routerLink]="'/groups/events/detail/' + event.idGroupEvent">
+                <img
+                  [src]="fixUrl(event.picture)"
+                  [alt]="event.name"
+                  class="my-1 responsive"
+                  onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+                />
+              </td>
+              <td [routerLink]="'/groups/events/detail/' + event.idGroupEvent">
+                <b class="pl-1">{{ event.name }}</b>
+              </td>
+              <td [routerLink]="'/groups/events/detail/' + event.idGroupEvent">
+                <b>{{ event.start_date_format }}</b>
+              </td>
+              <td [routerLink]="'/groups/events/detail/' + event.idGroupEvent">
+                <b>{{ event.frequency | translate }}</b>
+              </td>
+              <td [routerLink]="'/groups/events/detail/' + event.idGroupEvent">
+                {{ event.description }}
+              </td>
+              <td [routerLink]="'/groups/events/detail/' + event.idGroupEvent">
+                {{ event.attendances_count }} /
+                {{ event.attendances_total }}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-sm btn-info"
+                    (click)="
+                      openModalUpdateEvent(
+                        group_event_standalone_modal,
+                        group_event_form,
+                        event
+                      )
+                    "
+                  >
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteEvent(event)"
+                  >
+                    <i class="fa fa-trash-alt"></i>
+                  </button>
+
+                  <button
+                    class="btn btn-sm btn-primary mr-1"
+                    (click)="
+                      selected_event_id = event.idGroupEvent; linkModal.open()
+                    "
+                  >
+                    <i class="fa fa-link"></i>
+                  </button>
+                  <!-- </div>
+
+              <div class="btn-group"> -->
+                  <button
+                    (click)="viewActivities(event, view_event_activities_form)"
+                    class="btn btn-sm btn-success"
+                  >
+                    <i class="fa fa-calendar-day"></i>
+                  </button>
+
+                  <button
+                    (click)="viewReviews(event, view_event_reviews_form)"
+                    class="btn btn-sm btn-success"
+                  >
+                    <i class="fa fa-star-half-alt"></i>
+                  </button>
+
+                  <button
+                    (click)="viewFinance(event, view_event_finances_form)"
+                    class="btn btn-sm btn-success"
+                  >
+                    <i class="fa fa-dollar-sign"></i>
+                  </button>
+
+                  <button
+                    (click)="viewAttendance(event, view_event_attendances_form)"
+                    class="btn btn-sm btn-success"
+                  >
+                    <i class="fa fa-user-check"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div
+      class="col-12 mt-2 m-0 row"
+      [hidden]="settings_obj.view_option !== 'settings'"
+    >
+      <div
+        class="col-xs-12 col-md-12 mt-2 table-responsive-sm"
+        [hidden]="selectedEvent || show_detail_loading"
+      >
+        <app-events-setting-list #event_setting_list></app-events-setting-list>
+      </div>
+    </div>
+
+    <app-view-event-activities
+      [hidden]="!selectedEvent || hide_activities"
+      #view_event_activities_form
+      (onDismiss)="closeViews()"
+    >
+    </app-view-event-activities>
+    <app-view-event-reviews
+      [hidden]="!selectedEvent || hide_reviews"
+      #view_event_reviews_form
+      (onDismiss)="closeViews()"
+    >
+    </app-view-event-reviews>
+
+    <app-view-event-finances
+      [hidden]="!selectedEvent || hide_finances"
+      #view_event_finances_form
+      (onDismiss)="closeViews()"
+    >
+    </app-view-event-finances>
+
+    <app-view-event-attendance
+      [hidden]="!selectedEvent || hide_attendance"
+      #view_event_attendances_form
+      (onDismiss)="closeViews($event)"
+    >
+    </app-view-event-attendance>
+
+    <div class="col-xs-12" [hidden]="settings_obj.view_option !== 'events'">
+      <button class="btn btn-primary mb-2" (click)="iframeCodeModal.open()">
+        Get iframe code
+      </button>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #group_event_standalone_modal
+  identifier="group_event_standalone_modal"
+  customClass="full-screen-modal"
+  [dismissable]="false"
+  [closable]="false"
+  (onAnyCloseEventFinished)="resetForm(group_event_form)"
+>
+  <app-group-event-form
+    #group_event_form
+    (submit)="reloadEvents(group_event_standalone_modal, $event)"
+  ></app-group-event-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal #iframeCodeModal identifier="iframeCodeModal">
+  <h4>Insert events on your page</h4>
+
+  <p>Entry Point</p>
+  <pre style="background-color: whitesmoke; padding: 8px">
+    {{ iframeCode.entry_point }}
+  </pre>
+  <p>Scripts</p>
+  <pre style="background-color: whitesmoke; padding: 8px">
+    {{ iframeCode.scripts }}
+  </pre>
+
+  <div class="form-group mt-1">
+    <label for="selectLang">Select language</label>
+    <select class="form-control" id="selectLang" [(ngModel)]="iframeLang">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+    </select>
+  </div>
+  <div class="form-group form-check">
+    <input
+    [checked]="display_v2"
+    [(ngModel)]="display_v2"
+      type="checkbox"
+      class="form-check-input"
+      id="display_v2"
+    />
+    <label class="form-check-label" for="display_v2">
+      Display as new version?
+    </label>
+  </div>
+
+  <div *ngIf="!display_v2" class="form-group mt-1">
+    <label for="iframeMode">Select Mode</label>
+    <select class="form-control" id="iframeMode" [(ngModel)]="iframeMode">
+      <option value="">Default</option>
+      <option value="-slider">Slider</option>
+    </select>
+  </div>
+
+  <div  *ngIf="!display_v2" class="form-group mt-1">
+    <label for="iframeMode">Display Mode</label>
+    <select class="form-control" id="displayMode" [(ngModel)]="displayMode">
+      <option value="false">Grid</option>
+      <option value="true">Horizontal list</option>
+    </select>
+  </div>
+
+  <p>Copy this code and paste it on your website</p>
+</ngx-smart-modal>
+
+<ngx-smart-modal #linkModal identifier="linkModal">
+  <h4>Register Link</h4>
+  <div class="row justify-content-center">
+    <div class="col-10 text-center">
+      <small class="text-secondary">
+        Share this QR with someone by clicking on it or ask to scan it using the
+        app to join to the event.
+      </small>
+    </div>
+    <div class="col-8 text-center">
+      <ngx-qrcode
+        #qr_code
+        class="col-2"
+        (click)="shareQR(qr_code)"
+        style="width: 50px; height: 50px"
+        [qrc-value]="iframeCode.event_link"
+        [qrc-class]="'qrItemResize-dash'"
+        qrc-errorCorrectionLevel="M"
+      >
+      </ngx-qrcode>
+      <button (click)="shareQR(qr_code)" class="btn btn-sm btn-citric">
+        Copy QR
+      </button>
+    </div>
+    <div class="col-12">
+      <h5 class="text-center my-3">Or</h5>
+      <small class="text-secondary mb-2">
+        Copy this url and paste use it on you website
+      </small>
+      <pre
+        class="mb-0"
+        style="background-color: #e2e2e2; padding: 8px; white-space: normal"
+      >
+        <a [href]="iframeCode.event_link" target="_blank">{{ iframeCode.event_link }}</a>
+      </pre>
+    </div>
+  </div>
+</ngx-smart-modal>

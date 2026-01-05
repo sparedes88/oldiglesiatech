@@ -1,0 +1,476 @@
+<section class="app-section" [ngStyle]="sectionStyle">
+  <!-- Controls -->
+  <div class="row mt-3" *ngIf="displayMode == 'edit'">
+    <div class="col-4">
+      <!-- <h3 [innerHTML]="section.title | safe: 'html'"></h3> -->
+    </div>
+    <div class="col-8 text-right">
+      <div
+        class="btn-group"
+        style="background-color: white; border-radius: 6px"
+      >
+        <button
+          class="btn btn-outline-success btn-sm"
+          (click)="togglePreview()"
+        >
+          <i class="fa fa-eye"></i>
+          Preview
+        </button>
+        <button
+          class="btn btn-outline-primary btn-sm"
+          (click)="emitChangeOrder()"
+        >
+          <i class="fa fa-list"></i>
+          Change order
+        </button>
+        <button
+          class="btn btn-outline-info btn-sm"
+          (click)="emitSelectUpdate()"
+        >
+          <i class="fa fa-edit"></i>
+          Update section
+        </button>
+        <button
+          class="btn btn-outline-warning btn-sm"
+          (click)="animationsModal.open()"
+        >
+          <i class="fa fa-video"></i>
+          Animations
+        </button>
+        <button class="btn btn-outline-danger btn-sm" (click)="emitDelete()">
+          <i class="fa fa-trash"></i>
+          Remove Section
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TItle -->
+  <div class="row mt-3" *ngIf="displayMode == 'prod' && section.title">
+    <div class="col-xs-12 col-md-12 text-center">
+      <!-- <h2 [innerHTML]="section.title | safe: 'html'"></h2> -->
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div
+    [ngClass]="{
+      container:
+        (displayMode == 'prod' && section?.section_type != 'custom-columns') ||
+        section?.container
+    }"
+  >
+    <!-- Iframes container -->
+    <ng-container *ngIf="section?.section_type == 'iframe'">
+      <!-- <iframe
+        [src]="section.section_content.value | safe: 'resourceUrl'"
+        frameborder="0"
+        style="width: 100%"
+        [ngStyle]="{
+          height: section.section_content.iframe_height
+            ? section.section_content.iframe_height + 'px'
+            : '1024px'
+        }"
+      ></iframe> -->
+    </ng-container>
+
+    <!-- Columns conainer -->
+    <ng-container *ngIf="section?.section_type == 'columns'">
+      <div class="row columns-container">
+        <!-- Column 1 -->
+        <div
+          class="col-xs-12 col-md-6 is-flex vh-centered"
+          style="flex-direction: column; overflow-wrap: anywhere"
+          [ngClass]="
+            section.columns_type == 'image-text' ? 'order-2' : 'order-1'
+          "
+        >
+          <!-- Edition first col -->
+          <ng-container *ngIf="columnViewMode == 'edit'">
+            <div class="text-left w-100">
+              <div class="form-group">
+                <label>Main Title</label>
+                <text-editor
+                  [(ngModel)]="section.section_content.main_title"
+                  [lite]="true"
+                  [identifier]="'title-' + section.title"
+                ></text-editor>
+              </div>
+              <div class="form-group">
+                <label>Description area</label>
+                <text-editor
+                  [(ngModel)]="section.section_content.description"
+                  [identifier]="'description-' + section.title"
+                ></text-editor>
+              </div>
+              <div class="form-group">
+                <label>Button text</label>
+                <text-editor
+                  [(ngModel)]="section.section_content.button_text"
+                  [lite]="true"
+                  [more_lite_options]="false"
+                ></text-editor>
+              </div>
+              <!-- Border radius photo -->
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <div class="font-group">
+                    <label>
+                      Button width
+                      {{ section.section_content.button_width || 0 }}%
+                    </label>
+                    <input
+                      [(ngModel)]="section.section_content.button_width"
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="100"
+                      step="1"
+                    />
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label>Button color text</label>
+                    <input
+                      type="color"
+                      class="form-control"
+                      placeholder="Button color"
+                      [(ngModel)]="section.section_content.button_text_color"
+                    />
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="font-group">
+                    <label>
+                      Border radius
+                      {{ section.section_content.button_border_radius || 0 }}px
+                    </label>
+                    <input
+                      [(ngModel)]="section.section_content.button_border_radius"
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="20"
+                      step="1"
+                    />
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label>Button color</label>
+                    <input
+                      type="color"
+                      class="form-control"
+                      placeholder="Button color"
+                      [(ngModel)]="section.section_content.button_color"
+                    />
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="font-group">
+                    <label>
+                      Border width
+                      {{ section.section_content.button_border_width || 0 }}px
+                    </label>
+                    <input
+                      [(ngModel)]="section.section_content.button_border_width"
+                      type="range"
+                      class="custom-range"
+                      min="1"
+                      max="5"
+                      step="1"
+                    />
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label>Border color</label>
+                    <input
+                      type="color"
+                      class="form-control"
+                      placeholder="Button color"
+                      [(ngModel)]="section.section_content.button_border_color"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-group">
+                    <label>Button action</label>
+                    <input
+                      type="url"
+                      class="form-control"
+                      placeholder="Button action"
+                      [(ngModel)]="section.section_content.button_action"
+                    />
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label>Button example</label>
+                  <div class="text-center w-100">
+                    <!-- <a
+                      class="btn btn-primary"
+                      [ngStyle]="{
+                        color: section.section_content?.button_text_color,
+                        width: section.section_content?.button_width + '%',
+                        'background-color':
+                          section.section_content?.button_color,
+                        'border-color':
+                          section.section_content?.button_border_color,
+                        'border-radius':
+                          (section.section_content?.button_border_radius
+                            ? section.section_content?.button_border_radius
+                            : 0) + 'px',
+                        'border-width':
+                          section.section_content?.button_border_width + 'px'
+                      }"
+                      [innerHTML]="
+                        section.section_content.button_text | safe: 'html'
+                      "
+                      style="pointer-events: none"
+                    ></a> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <div
+            *ngIf="columnViewMode == 'preview'"
+            class="is-flex flex-column vh-centered"
+          >
+            <!-- <h2 class="col-12"
+              [innerHTML]="section.section_content?.main_title | safe: 'html'"
+            ></h2> -->
+            <!-- <div
+              class="ql-content"
+              [innerHTML]="
+                desanityze(section.section_content?.description) | safe: 'html'
+              "
+            ></div> -->
+            <!-- <a
+              target="_blank"
+              [href]="section.section_content.button_action"
+              class="btn btn-primary"
+              [ngStyle]="{
+                color: section.section_content?.button_text_color,
+                width: section.section_content?.button_width + '%',
+                'background-color': section.section_content?.button_color,
+                'border-color': section.section_content?.button_border_color,
+                'border-radius':
+                  (section.section_content?.button_border_radius
+                    ? section.section_content?.button_border_radius
+                    : 0) + 'px',
+                'border-width':
+                  section.section_content?.button_border_width + 'px'
+              }"
+              [innerHTML]="section.section_content.button_text | safe: 'html'"
+            ></a> -->
+          </div>
+        </div>
+
+        <!-- Column 2 -->
+        <div
+          class="col-xs-12 col-md-6 is-flex vh-centered"
+          [ngClass]="{
+            'order-1': section.columns_type == 'image-text',
+            'order-2': section.columns_type != 'image-text'
+          }"
+        >
+          <ng-container *ngIf="columnViewMode == 'edit'">
+            <div class="text-center">
+              <img
+                [src]="section.section_content?.image"
+                alt="Section image"
+                class="responsive-img"
+                [ngStyle]="{ width: section.section_content.image_size + '%' }"
+              />
+              <div class="custom-file">
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="custom-file-input"
+                  (change)="addColImage($event.target.files[0])"
+                />
+                <label class="custom-file-label">Choose file...</label>
+              </div>
+              <!-- Resize columns -->
+              <div class="font-group" [hidden]="true">
+                <label>Resize Columns</label>
+                <input
+                  [(ngModel)]="section.section_content.column_size"
+                  type="range"
+                  class="custom-range"
+                  min="1"
+                  max="6"
+                />
+              </div>
+              <!-- Resize photo -->
+              <div class="font-group" [hidden]="false">
+                <label>Resize Photo</label>
+                <input
+                  [(ngModel)]="section.section_content.image_size"
+                  type="range"
+                  class="custom-range"
+                  min="10"
+                />
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="columnViewMode == 'preview'">
+            <div class="is-flex vh-centered" style="padding: 0px 24px">
+              <img
+                [src]="section.section_content?.image"
+                alt="Section image"
+                class="responsive-img"
+                [ngStyle]="{ width: section.section_content.image_size + '%' }"
+              />
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Custom columns -->
+    <ng-container *ngIf="section?.section_type == 'custom-columns'">
+      <div class="row" *ngIf="columnViewMode != 'preview'">
+        <div class="col-12">
+          <div class="btn-group">
+            <button
+              class="btn btn-outline-success btn-sm"
+              (click)="insertCustomRow()"
+            >
+              <i class="fa fa-plus"></i>
+              Add column
+            </button>
+          </div>
+        </div>
+        <div
+          class="col-xs-12"
+          [ngClass]="customRowsClasses"
+          *ngFor="let row of section?.section_content?.rows; let idx = index"
+        >
+          <text-editor
+            [(ngModel)]="row.content"
+            [identifier]="'custom-col-' + idx"
+          ></text-editor>
+          <div class="text-center">
+            <button
+              class="btn btn-outline-danger btn-sm"
+              (click)="removeCustomRow(idx)"
+            >
+              <i class="fa fa-trash"></i>
+              Delete column
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="columnViewMode == 'preview'">
+        <!-- <div
+          class="col-xs-12 custom-column ql-content"
+          [ngClass]="customRowsClasses"
+          *ngFor="let row of section?.section_content?.rows"
+          [innerHTML]="desanityze(row.content) | safe: 'html'"
+        ></div> -->
+      </div>
+    </ng-container>
+
+    <!-- Gallery -->
+    <ng-container *ngIf="section?.section_type == 'gallery'">
+      <!-- <app-gallery [idGallery]="section?.gallery_id"></app-gallery> -->
+    </ng-container>
+  </div>
+</section>
+
+<ngx-smart-modal #animationsModal identifier="animationsModal">
+  <h3>Animations</h3>
+  <div class="row" *ngIf="section.animation">
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="animationName">Animation</label>
+        <select
+          class="form-control"
+          id="animationName"
+          name="name"
+          [(ngModel)]="section.animation.name"
+        >
+          <option *ngFor="let animation of animations" [value]="animation">
+            {{ animation }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="animationEeasing">Easing</label>
+        <select
+          class="form-control"
+          id="animationEeasing"
+          name="easing"
+          [(ngModel)]="section.animation.easing"
+        >
+          <option *ngFor="let easing of easings" [value]="easing">
+            {{ easing }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label>Duration</label>
+        <input
+          type="number"
+          name="duration"
+          class="form-control"
+          [(ngModel)]="section.animation.duration"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label>Delay</label>
+        <input
+          type="number"
+          name="delay"
+          class="form-control"
+          [(ngModel)]="section.animation.delay"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label>Offset</label>
+        <input
+          type="number"
+          name="offset"
+          class="form-control"
+          [(ngModel)]="section.animation.offset"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="onceCheckBox">Once</label>
+        <input
+          id="onceCheckBox"
+          type="checkbox"
+          name="once"
+          [(ngModel)]="section.animation.once"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-12">
+      <button class="btn btn-success" (click)="animationsModal.close()">
+        <i class="fa fa-save"></i>
+        Save
+      </button>
+    </div>
+  </div>
+</ngx-smart-modal>

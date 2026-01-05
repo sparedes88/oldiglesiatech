@@ -1,0 +1,38 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">Make Push Notification</h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+    <div class="row col-12 justify-content-center">
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="name">Title (optional)</label>
+          <input class="form-control" [(ngModel)]="message.title" type="text" />
+        </div>
+      </div>
+    </div>
+    <div class="row col-12 justify-content-center">
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="name">Body:*</label>
+          <textarea
+            class="form-control"
+            name="body"
+            cols="30"
+            rows="10"
+            [(ngModel)]="message.body"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+      <button class="btn btn-citric" (click)="submit()">
+        Send Notification
+      </button>
+    </div>
+  </div>
+</div>

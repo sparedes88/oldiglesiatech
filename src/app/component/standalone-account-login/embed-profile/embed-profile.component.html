@@ -1,0 +1,15 @@
+<app-standalone-account-login
+  *ngIf="!current_user"
+  [idOrganization]="idOrganization"
+  [handle_as_template]="true"
+  (on_login_success)="setUser($event)"
+></app-standalone-account-login>
+
+<app-account-profile
+  *ngIf="current_user"
+  [memberId]="current_user.idUsuario"
+  [idOrganization]="idOrganization"
+  [handle_logout]="true"
+  (logout)="handleLogOff()"
+>
+</app-account-profile>

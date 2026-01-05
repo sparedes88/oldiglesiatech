@@ -1,0 +1,602 @@
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<div
+  [ngClass]="getClass()"
+  class="row m-0 p-0 justify-content-center"
+  [ngStyle]="{ 'background-image': getImages() }"
+  style="
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+  "
+>
+  <!-- height: 100vh;
+overflow-y: scroll;
+overflow-x: hidden; -->
+  <div
+    [hidden]="serverBusy"
+    class="col-12 col-md-10 col-lg-8 col-xl-7 align-self-center"
+    style="top: 5%"
+  >
+    <div class="row justify-content-center">
+      <h1
+        style="margin-top: 120px !important"
+        class="col-12 m-0 text-center text-citric mb-2"
+      >
+        <span class="fix-bold-thin"> FIND YOUR </span>
+        <b (click)="activateShowAll()">{{ organization_type | uppercase }} </b>.
+      </h1>
+      <div class="col-12 col-md-8">
+        <div class="form-group">
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            [placeholder]="
+              (settings_obj.menu_option == 'organizations'
+                ? 'Iglesias_Search'
+                : 'Eventos_Search'
+              ) | translate
+            "
+            [(ngModel)]="search_input"
+            (keydown.enter)="iglesiasInput(search_input)"
+          />
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <select
+            (change)="getStates($event)"
+            class="form-control"
+            [(ngModel)]="country_name"
+          >
+            <option value="">-- Country --</option>
+            <option [value]="country.name" *ngFor="let country of countries">
+              {{ country.name }}
+            </option>
+          </select>
+        </div>
+        <div
+          *ngIf="selected_country"
+          (change)="iglesiasInput(search_input)"
+          class="form-group"
+        >
+          <select class="form-control" [(ngModel)]="state_input">
+            <option value="">-- Search by state --</option>
+            <option
+              [value]="state.abbreviation"
+              *ngFor="let state of selected_country?.states"
+            >
+              {{ state.state }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-12 text-center">
+        <button
+          class="btn btn-small btn-citric"
+          round
+          (click)="iglesiasInput(search_input)"
+        >
+          Search
+        </button>
+      </div>
+
+      <h6 class="col-12 col-md-8 px-2 mt-4">
+        Want to register your Organization?.
+        <span class="text-citric" routerLink="/register"> Start here </span>
+      </h6>
+
+      <div class="col-12 row">
+        <div class="btn-group col-12">
+          <button
+            (click)="setView('organizations')"
+            class="btn btn-sm col-6"
+            [ngClass]="{
+              active: settings_obj.menu_option === 'organizations'
+            }"
+          >
+            Organizations
+          </button>
+          <button
+            (click)="setView('events')"
+            class="btn btn-sm col-6"
+            [ngClass]="{
+              active: settings_obj.menu_option === 'events'
+            }"
+          >
+            Events
+          </button>
+        </div>
+      </div>
+
+      <div
+        *ngIf="
+          featured_iglesias.length > 0 &&
+          settings_obj.menu_option === 'organizations'
+        "
+        class="card col-12 mt-4"
+      >
+        <h1 class="my-3 text-secondary fix-bold-thin">Featured</h1>
+        <hr />
+
+        <div
+          class="row justify-content-center"
+          *ngFor="let iglesia of featured_iglesias"
+        >
+          <div class="col-md-3 clickable" (click)="selectIglesia(iglesia)">
+            <div class="imgContainer">
+              <img
+                (click)="selectIglesia(iglesia)"
+                class="imgLogo"
+                [src]="iglesia.Logo || 'assets/img/favicon.png'"
+                alt=""
+              />
+            </div>
+          </div>
+          <div class="col-md-9">
+            <h2
+              (click)="selectIglesia(iglesia)"
+              class="clickable fix-bold-thin"
+            >
+              {{ iglesia.Nombre }}
+            </h2>
+            <h6
+              class="clickable"
+              (click)="selectIglesia(iglesia)"
+              [innerHTML]="iglesia.profile?.bienvenida || '' | keepHtml"
+            ></h6>
+            <div class="row">
+              <div
+                (click)="selectIglesia(iglesia)"
+                class="col-6 clickable align-self-end"
+              >
+                <small class="card-text">
+                  {{ iglesia.Calle }} {{ iglesia.Ciudad }},
+                  {{ iglesia.Provincia }},
+                  {{ iglesia.ZIP }}
+                </small>
+              </div>
+              <div class="col-6" *ngIf="checkRedes(iglesia.profile)">
+                <h4 class="fix-bold-thin-2">Links</h4>
+                <div class="scroll-buttons">
+                  <a
+                    [href]="iglesia.profile?.facebook"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.facebook"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a
+                      [href]="iglesia.profile?.facebook"
+                      target="_blank"
+                      class="fa fa-facebook"
+                    ></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.twitter"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.twitter"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-twitter"></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.instagram"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.instagram"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-instagram"></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.youtube"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.youtube"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-youtube"></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.whatsapp"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.whatsapp"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-whatsapp"></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.website"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.website"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-internet-explorer"></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.google"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.google"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-google"></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.android_url"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.android_url"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-android"></a>
+                  </a>
+                  <a
+                    [href]="iglesia.profile?.ios_url"
+                    target="_blank"
+                    *ngIf="iglesia.profile?.ios_url"
+                    type="button"
+                    class="btn btn-sm btn-light"
+                  >
+                    <a class="fa fa-apple"></a>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="col-10" />
+        </div>
+      </div>
+
+      <div [hidden]="serverBusy" class="card col-12 mt-2" style="height: 90%">
+        <h3
+          *ngIf="selected_country || selected_state"
+          class="my-3 text-secondary fix-bold-thin"
+        >
+          <span *ngIf="selected_country">
+            <b>
+              {{ selected_country.name }}
+            </b>
+          </span>
+          <span *ngIf="selected_state"> - {{ selected_state.state }} </span>
+        </h3>
+        <hr />
+
+        <div
+          class="col-12 mt-2 m-0 row"
+          [hidden]="settings_obj.menu_option !== 'organizations'"
+        >
+          <div class="row justify-content-center hide-scroll-bar">
+            <!-- style="height: 400px; overflow-y: scroll" -->
+            <div
+              class="col-11 row justify-content-center"
+              [ngClass]="{ clickable: iglesia.idCatalogoPlan != 16 }"
+              *ngFor="let iglesia of iglesias"
+              (click)="closeModal(); selectIglesia(iglesia)"
+            >
+              <div class="col-3">
+                <div class="imgContainer text-center">
+                  <img
+                    class="imgLogo"
+                    [ngClass]="{ imgLogoReduced: iglesia.idCatalogoPlan == 16 }"
+                    [src]="iglesia.Logo || 'assets/img/favicon.png'"
+                    alt=""
+                  />
+                </div>
+              </div>
+              <div class="col-9 row">
+                <div
+                  class="p-0"
+                  [ngClass]="{
+                    'col-11': iglesia.is_featured,
+                    'col-12': !iglesia.is_featured
+                  }"
+                >
+                  <h4 class="fix-bold-thin">
+                    {{ iglesia.Nombre }}
+                  </h4>
+                </div>
+                <div class="p-0 col-1" *ngIf="iglesia.is_featured">
+                  <div class="text-right">
+                    <i class="fa fa-star text-warning"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <small class="card-text">
+                  <p ion-text color="gray">
+                    <b>
+                      {{ iglesia.Calle }}, {{ iglesia.Ciudad }}
+                      <br />
+                      {{ iglesia.Provincia }} {{ iglesia.ZIP }}
+                    </b>
+                  </p>
+                  <div *ngIf="iglesia.idCatalogoPlan != 16" class="text-right">
+                    <button
+                      (click)="goToSite($event, iglesia)"
+                      class="btn btn-sm btn-outline-secondary"
+                    >
+                      Go to site
+                    </button>
+                  </div>
+                </small>
+              </div>
+              <hr class="col-12" />
+            </div>
+
+            <div
+              *ngIf="searched && loaded.organizations"
+              class="col-8 text-center"
+            >
+              <h4
+                *ngIf="selected_country && iglesias.length === 0"
+                class="text-danger"
+              >
+                There are no organizations in this area. Would you like your
+                church to be the first?
+                <a routerLink="/register">Sign up here</a>.
+              </h4>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="col-12 mt-2 m-0 row"
+          [hidden]="settings_obj.menu_option !== 'events'"
+        >
+          <!-- style="height: 420px; overflow-y: scroll" -->
+          <div
+            class="row col-12 justify-content-center justify-content-md-start hide-scroll-bar"
+          >
+            <div class="col-12 col-md-6" *ngFor="let event of events">
+              <!-- [routerLink]="getRouterForEvent(event.meta)" -->
+              <div class="card" style="height: calc(100% - 15px)">
+                <img
+                  class="card-cover"
+                  [src]="fixUrl(event.meta.picture)"
+                  onError="this.src='assets/img/default-image.jpg'"
+                />
+                <div class="card-body">
+                  <h6 class="mb-0">{{ event.name }}</h6>
+                  <small class="d-block mb-2 text-secondary">
+                    {{ event.organization_name }}
+                  </small>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="card-sub-title bold">
+                        <!-- {{ getCategoriesList(event.categories) }} -->
+                        <span class="text-citric">
+                          {{ event.meta.start_date }}
+                          <span
+                            *ngIf="
+                              event.meta.end_date && !event.meta.is_same_date
+                            "
+                          >
+                            -
+                            {{ event.meta.end_date }}</span
+                          >
+                          <br />
+                          {{ event.meta.start_time }}
+                          <span *ngIf="event.meta.end_time">
+                            - {{ event.meta.end_time }}</span
+                          >
+                        </span>
+                      </div>
+                      <div class="card-title medium-text row">
+                        <small
+                          class="col-12 col-md-8 d-block mb-2 pr-0 text-secondary"
+                        >
+                          {{ getAddress(event) }}
+                        </small>
+                        <div class="col-12 col-md-4 pr-0 text-right">
+                          <a
+                            [href]="
+                              '/group/events/detail/' +
+                              event.idGroupEvent +
+                              '?action=register'
+                            "
+                            target="_blank"
+                          >
+                            <button class="btn btn-sm btn-outline-info">
+                              Register
+                            </button>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="searched && loaded.events" class="col-12 text-center">
+              <h4
+                class="text-danger"
+                *ngIf="selected_country && events.length === 0"
+              >
+                There are no events in this area. Would you like your church to
+                be the first? <a routerLink="/register">Sign up here</a>.
+              </h4>
+            </div>
+
+            <!-- <div
+              class="col-11 row justify-content-center"
+              *ngFor="let event of events"
+            >
+              <div class="col-3">
+                <div class="imgContainer">
+                  <img
+                    class="imgLogo"
+                    [src]="event.picture || 'assets/img/favicon.png'"
+                    alt=""
+                  />
+                </div>
+              </div>
+              <div class="col-9">
+                <h4 class="fix-bold-thin">{{ event.name }}</h4>
+                <div class="row">
+                  <div class="col-12">
+                    <small class="card-text">
+                      <p ion-text color="gray">
+                        <b>
+                          {{ event.street }}, {{ event.city }}
+                          <br />
+                          {{ event.state }} {{ event.zip_code }}
+                        </b>
+                      </p>
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <hr class="col-10" />
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-9" [hidden]="!serverBusy">
+    <ng-template [ngIf]="serverBusy">
+      <div class="d-flex justify-content-center" style="margin: 140px">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<ngx-smart-modal
+  identifier="select_your_church"
+  [closable]="false"
+  [dismissable]="false"
+  [escapable]="true"
+  [customClass]="'fix-padding'"
+>
+  <div
+    [ngClass]="getClass()"
+    class="row m-0 p-0 justify-content-center"
+    [ngStyle]="{ 'background-image': getImages() }"
+    style="
+      height: 100vh;
+      background-repeat: no-repeat;
+      background-size: cover;
+      overflow-y: hidden;
+      overflow-x: hidden;
+    "
+  >
+    <div
+      class="row m-0 justify-content-center"
+      style="position: sticky; top: 2%; height: 28%"
+    >
+      <div class="col-11 text-right">
+        <button
+          (click)="closeModal()"
+          class="btn btn-sm btn-citric col-3 col-md-2"
+        >
+          Close
+        </button>
+      </div>
+      <h1
+        style="margin-top: 120px !important"
+        class="col-12 m-0 text-center text-citric mb-2"
+      >
+        <span class="fix-bold-thin"> FIND YOUR </span>
+        <b (click)="activateShowAll()">{{ organization_type | uppercase }} </b>.
+      </h1>
+      <div class="col-12">
+        <div class="form-group">
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            [placeholder]="'generals.search' | translate"
+            [(ngModel)]="search_input"
+            (keydown.enter)="iglesiasInput(search_input)"
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <select
+            (change)="getStates($event)"
+            class="form-control"
+            [(ngModel)]="country_name"
+          >
+            <option value="">-- Country --</option>
+            <option [value]="country.name" *ngFor="let country of countries">
+              {{ country.name }}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="selected_country" class="form-group">
+          <select
+            (change)="iglesiasInput(search_input)"
+            class="form-control"
+            [(ngModel)]="state_input"
+          >
+            <option value="">-- Search by state --</option>
+            <option
+              [value]="state.abbreviation"
+              *ngFor="let state of selected_country?.states"
+            >
+              {{ state.state }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div
+      [hidden]="serverBusy"
+      class="col-12"
+      style="top: 2%; overflow: scroll; height: 70%"
+    >
+      <div class="row justify-content-center">
+        <div
+          style="background: #fafafa"
+          class="col-11 row justify-content-center"
+          *ngFor="let iglesia of iglesias"
+          (click)="closeModal(); selectIglesia(iglesia)"
+        >
+          <div class="col-3">
+            <div class="imgContainer">
+              <img
+                class="imgLogo"
+                [src]="iglesia.Logo || 'assets/img/favicon.png'"
+                alt=""
+              />
+            </div>
+          </div>
+          <div class="col-9">
+            <h4 class="fix-bold-thin">{{ iglesia.Nombre }}</h4>
+            <div class="row">
+              <div class="col-12">
+                <small class="card-text">
+                  <p ion-text color="gray">
+                    <b>
+                      {{ iglesia.Calle }}, {{ iglesia.Ciudad }}
+                      <br />
+                      {{ iglesia.Provincia }} {{ iglesia.ZIP }}
+                    </b>
+                  </p>
+                </small>
+              </div>
+            </div>
+          </div>
+          <hr class="col-10" />
+        </div>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>

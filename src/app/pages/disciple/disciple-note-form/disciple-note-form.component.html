@@ -1,0 +1,42 @@
+<div class="row">
+  <div class="col-12 col-md-8 align-self-center">
+    <h1 class="text-secondary">Add a note </h1>
+  </div>
+  <div class="col-12 col-md-4 text-right align-self-center">
+    <div class="btn-group">
+      <button class="btn btn-sm btn-outline-citric" (click)="close.emit()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<form class="row" [formGroup]="note_form">
+  <div class="col-12 col-md-3">
+    <div class="form-group">
+      <label>
+        <small class="text-secondary"> Select type of note </small>
+      </label>
+      <ng-multiselect-dropdown
+        placeholder="Select type of note"
+        [data]="categories"
+        [settings]="selectCatOptions"
+        formControlName="selected_category"
+      ></ng-multiselect-dropdown>
+    </div>
+  </div>
+
+  <div class="col-12" style="min-height: 350px; height: fit-content">
+    <quill-editor
+      (onEditorCreated)="onEditorCreated($event)"
+      [modules]="modules"
+      class="quill"
+      [styles]="{ background: 'white', height: '300px' }"
+      formControlName="content"
+    >
+    </quill-editor>
+  </div>
+  <div class="col-12 text-right">
+    <button class="btn btn-sm btn-success" (click)="submit()">Submit</button>
+  </div>
+</form>

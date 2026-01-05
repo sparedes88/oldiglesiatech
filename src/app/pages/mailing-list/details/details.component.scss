@@ -1,0 +1,175 @@
+@media (min-width: 1300px) {
+    .container {
+        min-width: 1400px;
+    }
+}
+/* Tooltip container */
+.tooltip_ {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip_ .tooltiptext {
+    visibility: hidden;
+    width: 180px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -90px;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.tooltip_ .tooltiptextBottom {
+    top: 125%;
+    bottom: unset;
+}
+
+/* Tooltip arrow */
+.tooltip_ .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+.tooltip_ .tooltiptextBottom::after {
+    bottom: 100%;
+    top: unset;
+    border-color: transparent transparent #555 transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip_:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.table {
+    min-width: 1700px;
+}
+
+.table-bordered {
+    thead {
+        background-color: rgb(43, 75, 134);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    tbody {
+        tr:nth-child(even) {
+            background: rgb(238, 238, 238);
+            td {
+                background: rgb(238, 238, 238);
+            }
+        }
+        tr:nth-child(odd) {
+            background: white;
+            td {
+                background: white;
+            }
+        }
+        tr {
+            td:first-child {
+                position: sticky;
+                left: 0;
+                z-index: 1;
+            }
+        }
+    }
+    tr {
+        th,
+        td {
+            border: 1px solid lightgray;
+            padding-left: 6px;
+            padding-right: 6px;
+        }
+    }
+}
+
+.italic {
+    font-style: italic;
+}
+.table.table-bordered {
+    thead th:first-child {
+        position: sticky;
+        left: 0;
+        top: 0;
+        z-index: 2;
+        background: #2b4b86;
+    }
+    tbody th {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 1;
+    }
+    tbody tr {
+    }
+}
+
+.scroll-y {
+    overflow-y: scroll;
+    max-height: 600px;
+}
+.is-loading {
+    color: transparent !important;
+    pointer-events: none;
+    // .tooltip_ {
+    //   display: none !important;
+    // }
+}
+.is-loading::after {
+    position: absolute;
+    left: calc(50% - (1em / 2));
+    top: calc(50% - (1em / 2));
+    position: absolute !important;
+}
+.is-loading::after,
+.control.is-loading::after,
+.loader,
+.is-loading::after {
+    -webkit-animation: spinAround 0.5s infinite linear;
+    animation: spinAround 0.5s infinite linear;
+    border: 2px solid #dbdbdb;
+    border-radius: 290486px;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    content: "";
+    display: block;
+    height: 1em;
+    position: relative;
+    width: 1em;
+    top: 5px;
+}
+@-webkit-keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+@keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}

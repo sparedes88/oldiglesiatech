@@ -1,0 +1,37 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+.e-grid {
+  display: block;
+}
+.e-grid .e-rowcell {
+  font-size: 16px;
+  white-space: initial;
+  width: min-content;
+  min-width: min-content;
+}
+
+.fixed-multi-size {
+  .dropdown-btn {
+    height: 60px !important;
+    span,
+    .dropdown-multiselect__caret {
+      line-height: 30px !important;
+    }
+    .dropdown-multiselect__caret {
+      line-height: 30px !important;
+    }
+  }
+}
+
+.multiselect-dropdown[_ngcontent-kgx-c7]
+  .dropdown-btn[_ngcontent-kgx-c7]
+  .dropdown-multiselect__caret[_ngcontent-kgx-c7] {
+}

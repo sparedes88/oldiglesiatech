@@ -1,0 +1,392 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      <i class="fa fa-dollar-sign"></i> Finances | Event:
+      <i>{{ group_event?.name }} </i>
+    </h4>
+    <div *ngIf="show_dismiss" class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+
+    <div class="col-12 row">
+      <div class="col-3 offset-9">
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success mt-3 mb-3"
+          (click)="activateForm()"
+          [disabled]="show_editable"
+        >
+          Add Finance
+        </button>
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+          (click)="print()"
+          [disabled]="show_editable || finances.length === 0"
+        >
+          Print
+        </button>
+      </div>
+      <div *ngIf="show_editable" class="col-12">
+        <form
+          #activity_form="ngForm"
+          [formGroup]="financeForm"
+          style="width: 100%;"
+          class="row"
+        >
+          <div class="col-8">
+            <div class="form-group">
+              <label for="estimated">Item Name *</label>
+              <input
+                class="form-control"
+                placeholder="Please type the item name."
+                type="text"
+                formControlName="description"
+                required
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-group">
+              <label for="estimated">Budget:</label>
+              <input
+                class="form-control"
+                placeholder="$ budget"
+                type="number"
+                formControlName="budget"
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-group">
+              <label for="estimated">Amount:</label>
+              <input
+                class="form-control"
+                placeholder="$ amount"
+                type="number"
+                formControlName="amount"
+              />
+            </div>
+          </div>
+
+          <div class="col-4 mb-3">
+            <label>Category: *</label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select a category"
+              [data]="finance_categories"
+              [settings]="selectTeamOptions"
+              (onSelect)="fixIdCategory($event)"
+              (onDeSelect)="
+                financeForm.patchValue({
+                  idGroupEventFinanceCategory: undefined
+                })
+              "
+            ></ng-multiselect-dropdown>
+          </div>
+
+          <div class="col-4 mb-3">
+            <label>Type: *</label>
+            <select formControlName="is_spent" class="form-control mb-1">
+              <option [value]="true">
+                Spent
+              </option>
+              <option [value]="false">
+                Giving
+              </option>
+            </select>
+          </div>
+
+          <div class="col-8">
+            <div class="form-group">
+              <label for="estimated">Notes</label>
+              <textarea
+                class="form-control"
+                placeholder="Notes about this activity"
+                type="text"
+                formControlName="notes"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="col-4 align-self-center" *ngIf="!getPermissions()">
+            <button
+              class="btn btn-sm btn-light"
+              (click)="uploadPicture(input_file)"
+            >
+              Attach documents
+            </button>
+          </div>
+
+          <div class="col-4" [hidden]="true">
+            <div class="custom-file mb-4">
+              <input
+                #input_file
+                type="file"
+                class="custom-file-input"
+                id="customFile"
+                multiple
+              />
+              <label class="custom-file-label" for="customFile"
+                >Choose file</label
+              >
+            </div>
+          </div>
+        </form>
+        <span
+          style="display: block; text-align: right; width: 100%;"
+          class="mb-2"
+        >
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            class="btn btn-sm btn-muted"
+            (click)="deactivateForm()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            [disabled]="financeForm.invalid && !getPermissions()"
+            (click)="addFinance(financeForm)"
+            class="btn btn-sm btn-success"
+          >
+            Save
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem;"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div [hidden]="show_loading" class="col-12 p-0" style="min-height: 500px;">
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="financeStatusForm"
+        style="width: 100%;"
+      >
+        <div formArrayName="statuses" class="col-12 p-0">
+          <table class="table row-border hover table-striped">
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Notes</th>
+                <th>Category</th>
+                <th style="min-width: 100px;">Type</th>
+                <th>Receipts</th>
+                <th>Budget</th>
+                <th>Givings</th>
+                <th>Spent</th>
+                <th *ngIf="!getPermissions()">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let finance of finances; let i = index"
+                [formGroupName]="i"
+              >
+                <td>
+                  {{ finance.description }}
+                </td>
+                <td>
+                  {{ finance.notes }}
+                </td>
+                <td>
+                  {{ finance.category_name }}
+                </td>
+                <td>
+                  <div *ngIf="!getPermissions()" class="form-group">
+                    <select
+                      (change)="
+                        checkChange(
+                          cost_type_on_form.controls[i].get('is_spent'),
+                          finance
+                        )
+                      "
+                      formControlName="is_spent"
+                      class="form-control mb-1"
+                    >
+                      <option [value]="true">
+                        Spent
+                      </option>
+                      <option [value]="false">
+                        Giving
+                      </option>
+                    </select>
+                    <span style="display: block; text-align: right;">
+                      <button
+                        type="button"
+                        *ngIf="
+                          cost_type_on_form.controls[i].get('is_spent').dirty &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="
+                          resetFinanceStatusForm(
+                            cost_type_on_form.controls[i],
+                            finance
+                          )
+                        "
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          cost_type_on_form.controls[i].get('is_spent').dirty &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        [disabled]="
+                          cost_type_on_form.controls[i].get('is_spent')
+                            .invalid &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        (click)="
+                          updateSpentType(
+                            cost_type_on_form.controls[i],
+                            finance
+                          )
+                        "
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span>
+                  </div>
+                  <div *ngIf="getPermissions()">
+                    {{ finance.is_spent ? "Spent" : "Giving" }}
+                  </div>
+                </td>
+                <td>
+                  <li *ngFor="let file of finance.receipt_files">
+                    <a [href]="getUrl(file.url)" target="_blank">
+                      {{ file.name }}
+                    </a>
+                  </li>
+                </td>
+                <td class="display_as_number">
+                  <span *ngIf="finance.budget" class="text-muted">
+                    {{ finance.budget | currency }}
+                  </span>
+                </td>
+                <td class="display_as_number">
+                  <span *ngIf="!finance.is_spent" class="text-success">
+                    {{ finance.amount | currency }}
+                  </span>
+                </td>
+                <td class="display_as_number">
+                  <span *ngIf="finance.is_spent" class="text-danger">
+                    {{ finance.amount | currency }}
+                  </span>
+                </td>
+                <td *ngIf="!getPermissions()">
+                  <div class="btn-group">
+                    <button
+                      (click)="updateFinance(finance)"
+                      [disabled]="show_editable"
+                      class="btn btn-sm btn-info fixed-padding"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger fixed-padding"
+                      (click)="deleteFinance(finance)"
+                      [disabled]="show_editable"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot *ngIf="finances.length > 0">
+              <tr>
+                <td colspan="5" class="text-right">
+                  <h5>
+                    <b>
+                      Totals
+                    </b>
+                  </h5>
+                </td>
+                <td>
+                  <span class="text-muted">
+                    {{ summary.total_budget | currency }}
+                  </span>
+                </td>
+                <td>
+                  <span class="text-success">
+                    {{ summary.total_giving | currency }}
+                  </span>
+                </td>
+                <td>
+                  <span class="text-danger">
+                    {{ summary.total_spent | currency }}
+                  </span>
+                </td>
+                <!-- Fixed table border -->
+                <td *ngIf="!getPermissions()"></td>
+              </tr>
+              <tr>
+                <td colspan="7" class="text-right">
+                  <h5>
+                    <b>
+                      Over the budget
+                    </b>
+                  </h5>
+                </td>
+                <td>
+                  <span
+                    [ngClass]="
+                      summary.total_budget - summary.total_spent < 0
+                        ? 'text-danger'
+                        : 'text-success'
+                    "
+                  >
+                    {{ summary.total_budget - summary.total_spent | currency }}
+                  </span>
+                </td>
+                <!-- Fixed table border -->
+                <td *ngIf="!getPermissions()"></td>
+              </tr>
+              <tr>
+                <td colspan="7" class="text-right">
+                  <h5>
+                    <b>
+                      Total
+                    </b>
+                  </h5>
+                </td>
+                <td>
+                  {{ summary.total_summary | currency }}
+                </td>
+                <!-- Fixed table border -->
+                <td *ngIf="!getPermissions()"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

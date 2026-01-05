@@ -1,0 +1,194 @@
+<app-event-calendar-v2
+  *ngIf="params?.module === 'events'"
+  class="col-12"
+  [show_options]="false"
+  [idOrganization]="params?.idOrganization"
+  [show_view_type]="true"
+  view_type="list"
+  [event_template_settings]="style"
+  [style_settings]="{}"
+  [language]="params?.language"
+>
+</app-event-calendar-v2>
+
+<app-groups-embed
+  #groups_embed
+  *ngIf="params?.module === 'groups'"
+  [idOrganization]="params?.idOrganization"
+  [style_settings]="style"
+  [group_type_id]="style.idGroupType"
+  [group_category_id]="style.idGroupCategory"
+  [title]="style.name"
+  [language]="style.language"
+  [title_style_settings]="style"
+  [make_request]="true"
+>
+  <!-- [style_s   le_settings]="style_settings" -->
+</app-groups-embed>
+
+<app-donations-v2
+  *ngIf="params?.module === 'donations'"
+  [idOrganization]="params?.idOrganization"
+>
+</app-donations-v2>
+
+<!--
+[grid_info_settings]="
+  settings_form?.get('grid_info')?.value
+" -->
+<div *ngIf="params?.module === 'articles'" class="page">
+  <div class="row" [ngClass]="{ 'container-fw': params?.is_full_width }">
+    <app-profile-articles-display
+      *ngIf="params?.module === 'articles' && !idArticle"
+      #sub_articles_display
+      class="col-12 articles-display"
+      [is_main_page]="true"
+      [load_all]="style?.load_all"
+      [left_section_is_hide]="true"
+      [idOrganization]="params?.idOrganization"
+      [view_mode]="'detail'"
+      [categories]="[
+        {
+          idCategoriaArticulo: params?.id,
+          idCategoryArticle: params?.id,
+          view_as: 'load_more',
+
+          col_size: style?.col_size || 6
+        }
+      ]"
+      style
+      [categories_tab]="[
+        {
+          idCategoriaArticulo: params?.id,
+          idCategoryArticle: params?.id,
+          view_as: 'load_more',
+          col_size: style?.col_size || 6
+        }
+      ]"
+      [grid_info_settings]="style"
+      [show_action_buttons]="false"
+      [direct_redirection]="true"
+      (onOpenArticle)="openArticle($event)"
+    >
+    </app-profile-articles-display>
+  </div>
+
+  <app-article
+    *ngIf="idArticle"
+    (dismiss)="dismissAndRedirect($event)"
+    #page_articulo
+    [skip_id_as_param]="true"
+    [id]="idArticle"
+    [iglesia]="params?.idOrganization"
+  ></app-article>
+</div>
+
+<div
+  *ngIf="params?.module === 'media'"
+  [ngClass]="params?.is_full_width ? '' : 'container'"
+>
+  <app-playlist-embed
+    #playlist_embed
+    [idPlaylist]="params?.id"
+    [idOrganization]="params?.idOrganization"
+    [sort_type]="params?.sort_type"
+    [profile_tab_id]="params?.tab_id"
+    [is_full_width]="params?.is_full_width"
+  ></app-playlist-embed>
+</div>
+
+<app-networks-profile-form
+  *ngIf="params?.module === 'networks'"
+  #networks_profile
+  [idOrganization]="params?.idOrganization"
+  [view_mode]="'detail'"
+  [type]="'profile'"
+  [view_style]="style?.view_style"
+  [icon_only]="style?.icon_only"
+></app-networks-profile-form>
+
+<!-- [hidden]="!show_detail" -->
+<app-meetings-manager
+  *ngIf="params?.module === 'meetings'"
+  #meetings_manager
+  [idOrganization]="params?.idOrganization"
+  [view_mode]="'detail'"
+  class="col-12 p-0 form-fixed"
+  [show_as_minimal]="true"
+>
+</app-meetings-manager>
+<!-- (refresh_meetings)="refresh_meetings.emit()" -->
+
+<div
+  style="display: inline-block; max-width: 320px"
+  *ngIf="params?.module === 'locations'"
+>
+  <app-map
+    *ngIf="
+      address_manager.first_item?.value.show_map &&
+      address_manager.first_item?.value.lat &&
+      address_manager.first_item?.value.lng
+    "
+    [locations]="[organization_location]"
+    [height]="300"
+    [allow_street_view]="false"
+    [disable_scroll]="true"
+  ></app-map>
+
+  <!-- [hidden]="!show_detail" -->
+  <app-address-manager
+    #address_manager
+    [idOrganization]="params?.idOrganization"
+    [view_mode]="'detail'"
+    class="col-12 p-0 form-fixed"
+    [show_as_minimal]="true"
+  >
+  </app-address-manager>
+</div>
+
+<app-contact-inbox-embed
+  *ngIf="params?.module === 'forms'"
+  [idMailingList]="params?.id"
+  [idOrganization]="params?.idOrganization"
+  [extra_display_settings]="mailing_extra_params"
+  [language]="params?.language"
+></app-contact-inbox-embed>
+
+<app-profile-text-container
+  *ngIf="params?.module === 'containers'"
+  [can_edit]="false"
+  [id]="params?.id"
+  [make_request]="true"
+  [idOrganization]="params?.idOrganization"
+  [style_settings]="style"
+></app-profile-text-container>
+
+<app-gallery-v2
+  *ngIf="
+    params?.module === 'galleries' &&
+    (!style?.view_type || style?.view_type == 'gallery')
+  "
+  #gallery_embed
+  [idGallery]="params?.id"
+  [style_settings]="style"
+></app-gallery-v2>
+
+<app-gallery-album-view
+  #gallery_album_embed
+  *ngIf="params?.module === 'galleries' && style?.view_type == 'album'"
+  [idGalleryAlbum]="params?.id"
+  [idOrganization]="params?.idOrganization"
+  [style_settings]="style"
+></app-gallery-album-view>
+
+<app-view
+  *ngIf="params?.module === 'directories'"
+  #community_box_embed
+  [communityId]="params?.id"
+  [display_new_style]="params?.v2"
+></app-view>
+
+<app-embed-profile
+  *ngIf="params?.module === 'account'"
+  [idOrganization]="params?.idOrganization"
+></app-embed-profile>

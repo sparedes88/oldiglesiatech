@@ -1,0 +1,94 @@
+.img-contact-foto {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+.colorletra
+{
+  color:  #ffff;
+}
+
+.colorCNumber
+{
+  background-color: #1dbcd2;
+  height: 80px;
+}
+.ColorPrimero
+{
+  background-color: #d8b700;
+}
+.ColorSegundo
+{
+  background-color: #1a00a0;
+}
+.ColorTres
+{
+  background-color: #f53d3d;
+}
+
+.brIz
+{
+  border-radius: 5px 0px  0px 5px;
+}
+.brDe
+{
+  border-radius: 0px  5px 5px  0px ;
+}
+
+.status {
+  padding: 5px;
+  color: #ffffff;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.summary {
+  display: inline-block;
+  width: 90%;
+  font-weight: 600;
+  font-size: 50px;
+}
+
+.card-img-top-fixed {
+  object-fit: cover;
+  object-position: center bottom;
+  height: 200px;
+}
+
+.card-fixed-text {
+  height: 200px;
+}
+
+.card {
+  border: none !important;
+}
+
+.btn-group.col-6{
+padding-right: 0;
+}
+
+.e-grid .e-rowcell{
+  font-size: 16px;
+}
+
+.image {
+  display: inline-block;
+  overflow: hidden;
+  outline: 2px solid gainsboro;
+  border-radius: 50%;
+  top: 10%;
+  /* width: 80%;
+  height: 80%; */
+  height: 70px;
+  width: 70px;
+  position: relative;
+}
+
+
+.responsive-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border: 2px solid gainsboro;
+}

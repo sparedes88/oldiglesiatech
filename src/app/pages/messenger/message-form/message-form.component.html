@@ -1,0 +1,274 @@
+<form [formGroup]="messageForm" (submit)="submitForm(messageForm)">
+  <div class="row">
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label>Send to</label>
+        <select
+          formControlName="send_to"
+          required
+          class="form-control"
+          (change)="resetSelection()"
+        >
+          <option value="contacts">Contacts</option>
+          <option value="groups">Groups</option>
+          <option value="mailing_lists">Contact Inboxes</option>
+        </select>
+      </div>
+    </div>
+
+    <div
+      class="col-xs-12 col-md-6"
+      *ngIf="messageForm.value?.send_to == 'groups'"
+    >
+      <label>Select Groups</label>
+      <ng-select
+        [items]="groups"
+        [multiple]="true"
+        [closeOnSelect]="false"
+        [searchable]="true"
+        bindLabel="title"
+        placeholder="Select groups"
+        bindValue="idGroup"
+        formControlName="groups"
+        [selectableGroup]="true"
+        groupBy="group"
+        (change)="getGroupMembers($event)"
+      >
+      </ng-select>
+    </div>
+
+    <div
+      class="col-xs-12 col-md-6"
+      *ngIf="messageForm.value?.send_to == 'mailing_lists'"
+    >
+      <label>Select Contact Inboxes</label>
+      <ng-select
+        [items]="mailingLists"
+        [multiple]="true"
+        [closeOnSelect]="false"
+        [searchable]="true"
+        bindLabel="name"
+        placeholder="Select Contact Inboxes"
+        bindValue="id"
+        formControlName="mailingLists"
+        (change)="getMailingListContacts($event)"
+      >
+      </ng-select>
+    </div>
+
+    <div class="col-6">
+      <div class="form-group">
+        <label>Send by</label>
+        <select formControlName="messageType" required class="form-control">
+          <option value="email">Email</option>
+          <option value="sms">SMS</option>
+          <!-- <option value="chat">Chat</option> -->
+        </select>
+      </div>
+    </div>
+
+    <div
+      class="col-xs-12 col-md-6"
+      *ngIf="messageForm.value?.send_to == 'contacts'"
+    >
+      <label>Select contacts</label>
+      <ng-select
+        [items]="contacts"
+        [multiple]="true"
+        [closeOnSelect]="false"
+        [searchable]="true"
+        bindLabel="name"
+        placeholder="Select contact"
+        bindValue="idUsuario"
+        formControlName="users"
+        [selectableGroup]="true"
+        groupBy="group"
+      >
+      </ng-select>
+    </div>
+
+    <div class="col-12"></div>
+
+    <div
+      class="col-12"
+      *ngIf="
+        messageForm.value?.send_to == 'mailing_lists' &&
+        messageForm.get('mailingLists').value?.length > 0
+      "
+    >
+      <div class="row" [formGroup]="contact_filters_form">
+        <div class="col-12">
+          <h5 class="text-citric">Filter contacts</h5>
+        </div>
+        <div class="col-4">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idUserType"> Status </label>
+            <ng-multiselect-dropdown
+              #multi_user_type_select
+              placeholder="Select an status"
+              [data]="mailing_filters.statuses"
+              [settings]="selectStatusOption"
+              formControlName="status"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idUserType"> Dates <small>(MM-DD, YYYY)</small></label>
+            <ng-multiselect-dropdown
+              #multi_user_type_select
+              placeholder="Select a date"
+              [data]="mailing_filters.dates"
+              [settings]="selectUserTypeOptions"
+              formControlName="dates"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idUserType"> Assigned to </label>
+            <ng-multiselect-dropdown
+              #multi_user_type_select
+              placeholder="Select an user"
+              [data]="mailing_filters.assigned_to"
+              [settings]="selectUserTypeOptions"
+              formControlName="assigned"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-12"
+      *ngIf="
+        messageForm.value?.send_to == 'mailing_lists' &&
+        messageForm.get('mailingLists').value?.length > 0
+      "
+    >
+      <label>Select contacts <small *ngIf="mailing_contacts_filtered.length > 0"> ({{mailing_contacts_filtered.length}}) </small></label>
+      <ng-select
+        [items]="mailing_contacts_filtered"
+        [multiple]="true"
+        [closeOnSelect]="false"
+        [searchable]="true"
+        bindLabel="full_name"
+        placeholder="Select contact"
+        formControlName="contact_items"
+        bindValue="id"
+        [selectableGroup]="true"
+        groupBy="group"
+      >
+      </ng-select>
+    </div>
+
+    <div class="col-6" *ngIf="messageForm.value?.messageType == 'chat'">
+      <div class="form-group">
+        <input
+          type="checkbox"
+          formControlName="isGroup"
+          class="form-check-input"
+          id="exampleCheck1"
+        />
+        <label class="form-check-label" for="exampleCheck1"
+          >Create as a group?</label
+        >
+      </div>
+      <div class="form-group" *ngIf="messageForm.value?.isGroup == true">
+        <input
+          type="text"
+          *ngIf="messageForm.value?.isGroup == true"
+          class="form-control"
+          [attr.required]="messageForm.value?.isGroup == true"
+          formControlName="groupName"
+          placeholder="Group name"
+        />
+      </div>
+    </div>
+    <div class="col-12">
+      <div
+        class="form-group"
+        [hidden]="messageForm.value?.messageType != 'email'"
+      >
+        <label>Subject</label>
+        <input
+          [required]="messageForm.value?.messageType == 'email'"
+          formControlName="subject"
+          class="form-control"
+        />
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="form-group">
+        <label>Message*</label>
+        <textarea
+          rows="5"
+          required
+          formControlName="message"
+          class="form-control"
+          [maxlength]="getMaxLength()"
+        ></textarea>
+        <div class="row mt-2">
+          <div class="col-6">
+            <small
+              [ngClass]="{
+                'text-danger': messageForm.value.message.length > 160
+              }"
+            >
+              {{ messageForm.value.message.length }}/{{ getMaxLength() }}
+              <span *ngIf="messageForm.value?.messageType == 'sms'">
+                <br />
+                <span *ngIf="messageForm.value.message.length <= 160">
+                  SMS only support 160 characters.
+                </span>
+                <span *ngIf="messageForm.value.message.length > 160">
+                  SMS could support to 300 characters.
+                </span>
+              </span>
+            </small>
+          </div>
+          <div class="col-6" *ngIf="messageForm.value?.messageType == 'sms'">
+            <div class="row">
+              <input
+                hidden
+                #input
+                type="file"
+                name="photo"
+                class="form-control"
+                accept="image/*"
+                (change)="addDefaultEntryPhoto($event.target.files[0])"
+              />
+              <div class="col-12 col-md-9 text-right">
+                <div class="img-container">
+                  <img class="img-cover" #img_tag src="" alt="" />
+                </div>
+              </div>
+              <div class=" col-12 col-md-3 col-md-2 text-center">
+                <button
+                  (click)="input.click()"
+                  type="button"
+                  class="btn btn-sm btn-success"
+                >
+                  Add image
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mt-1">
+      <button
+        type="submit"
+        class="btn btn-success mr-1"
+        [disabled]="messageForm.invalid || sending"
+      >
+        {{ sending ? "Please wait..." : "Send message" }}
+      </button>
+      <button class="btn btn-danger" type="reset" (click)="closeForm()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</form>

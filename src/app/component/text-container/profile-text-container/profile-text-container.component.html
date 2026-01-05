@@ -1,0 +1,195 @@
+<div class="property-box-list" *ngIf="!loading">
+  <ng-container>
+    <div class="card mb-2 text-left border-0" *ngIf="!can_edit">
+      <div
+        class="row mx-0"
+        [ngStyle]="{
+          'text-align': style_settings?.home_title_text_align || 'left'
+        }"
+      >
+        <h5
+          *ngIf="text_editor_form.get('display_title').value"
+          class="col-12"
+          [ngStyle]="{
+            color: style_settings?.home_title_text_color || '#000000',
+            'font-weight': style_settings?.home_title_text_bold || 'bolder'
+          }"
+        >
+          {{ text_editor_form.get("title").value }}
+        </h5>
+      </div>
+      <img
+        *ngIf="text_editor_form.get('display_picture').value"
+        class="card-img-top"
+        [src]="fixUrl()"
+        loading="lazy"
+      />
+      <div class="card-body p-0 mt-3">
+        <h6
+          *ngIf="text_editor_form.get('display_label').value"
+          class="card-subtitle mb-2 text-dark"
+        >
+          {{ text_editor_form.get("label").value }}
+        </h6>
+        <p
+          class="card-text card-content-fixed fix-frame"
+          [innerHtml]="getInfo()"
+        ></p>
+      </div>
+    </div>
+    <div
+      class="card mb-2 border-0"
+      *ngIf="can_edit"
+      [formGroup]="text_editor_form"
+    >
+      <div class="tools">
+        <div class="btn-group">
+          <button
+            type="button"
+            class="btn btn-warning btn-sm"
+            (click)="cancelEdit()"
+          >
+            Cancel
+          </button>
+          <button (click)="saveContainer()" class="btn btn-success btn-sm">
+            <i class="fa fa-save" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="btn-group">
+          <button
+            (click)="deleteContainer()"
+            class="btn btn-danger btn-sm ml-2"
+          >
+            <i class="fa fa-trash" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body p-0 mt-3">
+        <div class="form-group form-check mb-2 text-left">
+          <input
+            formControlName="display_title"
+            type="checkbox"
+            class="form-check-input"
+            id="shadow_check"
+          />
+          <label class="form-check-label" for="shadow_check">
+            Show title?
+          </label>
+        </div>
+
+        <mat-form-field
+          *ngIf="text_editor_form.get('display_title').value"
+          appearance="outline"
+          class="no-padding w-100"
+        >
+          <mat-label
+            [ngClass]="{
+              'text-danger': text_editor_form.get('title').invalid
+            }"
+          >
+            Title
+          </mat-label>
+          <input type="text" formControlName="title" matInput />
+        </mat-form-field>
+
+        <div class="form-group form-check mb-2 text-left">
+          <input
+            formControlName="display_picture"
+            type="checkbox"
+            class="form-check-input"
+            id="shadow_check"
+          />
+          <label class="form-check-label" for="shadow_check">
+            Show picture?
+          </label>
+        </div>
+
+        <img
+          *ngIf="text_editor_form.get('display_picture').value"
+          #img_tag
+          class="card-img-top"
+          [src]="fixUrl()"
+        />
+
+        <div
+          *ngIf="text_editor_form.get('display_picture').value"
+          class="form-group"
+        >
+          <input
+            class="form-control"
+            type="file"
+            accept="image/*"
+            id="file"
+            (change)="addDefaultEntryPhoto($event.target.files[0])"
+          />
+        </div>
+
+        <div class="form-group form-check mb-2 text-left">
+          <input
+            formControlName="display_label"
+            type="checkbox"
+            class="form-check-input"
+            id="shadow_check"
+          />
+          <label class="form-check-label" for="shadow_check">
+            Show label?
+          </label>
+        </div>
+
+        <mat-form-field
+          *ngIf="text_editor_form.get('display_label').value"
+          appearance="outline"
+          class="no-padding w-100"
+        >
+          <mat-label
+            [ngClass]="{
+              'text-danger': text_editor_form.get('label').invalid
+            }"
+          >
+            Label
+          </mat-label>
+          <input type="text" formControlName="label" matInput />
+        </mat-form-field>
+
+        <h6
+          class="card-subtitle mb-2"
+          [ngClass]="{
+            'text-danger': text_editor_form.get('description').invalid,
+            'text-dark': text_editor_form.get('description').valid
+          }"
+        >
+          Descripción&nbsp;
+          <i
+            *ngIf="text_editor_form.get('description').invalid"
+            class="fa fa-times"
+            aria-hidden="true"
+          ></i>
+        </h6>
+        <text-editor
+          *ngIf="can_edit"
+          [id]="container.identifier"
+          #pastor_description_editor
+          [identifier]="container.identifier"
+          [hide_font_buttons]="true"
+          [height]="'100%'"
+          formControlName="description"
+          (change)="updateSanitizeContent()"
+        ></text-editor>
+
+        <div class="text-center my-2">
+          <button
+            *ngIf="can_edit"
+            class="btn btn-sm btn-success"
+            (click)="openButtonModal()"
+          >
+            Insert button
+          </button>
+        </div>
+
+        <hr />
+      </div>
+    </div>
+  </ng-container>
+  <!-- AQUI COMIENZA -->
+  <!-- If edit mode -->
+</div>

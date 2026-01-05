@@ -1,0 +1,911 @@
+<div class="container page">
+  <ng-template [ngIf]="wait_for_response || loading">
+    <div
+      class="d-flex justify-content-center"
+      style="margin-top: 15%; margin-bottom: 15%"
+    >
+      <div
+        style="
+          height: 120px;
+          width: 120px;
+          font-size: 15px;
+          border-width: 0.45em;
+        "
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div
+    [hidden]="wait_for_response || loading"
+    class="row mt-3"
+    [formGroup]="form_group"
+  >
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12 col-md-4 text-right order-md-2">
+              <button
+                *ngIf="!show_package_form"
+                class="btn btn-sm btn-outline-citric"
+                routerLink="/admin/versions"
+              >
+                <i class="fa fa-chevron-left"></i> Back
+              </button>
+            </div>
+            <h4 class="col-12 col-md-8 text-secondary order-md-1 mt-3 mt-md-0">
+              About this app_package
+              <span class="ml-3">
+                <button
+                  *ngIf="!show_package_form"
+                  class="btn btn-sm btn-clear"
+                  (click)="show_package_form = true"
+                >
+                  <i class="fa fa-edit text-info"></i>
+                </button>
+              </span>
+            </h4>
+          </div>
+
+          <div class="row" *ngIf="!show_package_form">
+            <div
+              class="col-12 col-md-4"
+              (click)="copyValue(app_package?.app_package)"
+            >
+              <h5>Identifier:</h5>
+              <span class="text-citric">
+                {{ app_package?.app_package }}
+              </span>
+            </div>
+            <div class="col-12 col-md-4">
+              <h5>Apple ID:</h5>
+              <a
+                *ngIf="app_package?.apple_id"
+                [href]="'https://apps.apple.com/app/id' + app_package?.apple_id"
+                target="_blank"
+                class="text-citric"
+              >
+                {{ app_package?.apple_id }}
+              </a>
+              <span class="text-italic" *ngIf="!app_package?.apple_id">
+                Not provided
+              </span>
+            </div>
+            <div class="col-12 col-md-4">
+              <h5>Android ID:</h5>
+              <a
+                *ngIf="app_package?.android_id"
+                [href]="
+                  'https://play.google.com/store/apps/details?id=' +
+                  app_package?.android_id
+                "
+                target="_blank"
+                class="text-citric"
+              >
+                {{ app_package?.android_id }}
+              </a>
+              <span class="text-italic" *ngIf="!app_package?.android_id">
+                Not provided
+              </span>
+            </div>
+
+            <div
+              class="col-12"
+              *ngIf="currentUser.idUsuario == 78"
+              (click)="copyValue(app_package?.branch)"
+            >
+              <h5>Branch:</h5>
+              <span class="text-citric">
+                {{ app_package?.branch }}
+              </span>
+            </div>
+            <div class="col-12">
+              <button
+                *ngIf="currentUser.idUsuario === 78"
+                (click)="copyDescription(app_package, true)"
+                class="btn btn-sm p-0 ml-5"
+              >
+                <i
+                  style="background: #000000; color: white"
+                  class="fa fa-align-justify bigIcon rounded-circle"
+                ></i>
+              </button>
+              <button
+                *ngIf="currentUser.idUsuario === 78"
+                (click)="copyDescription(app_package)"
+                class="btn btn-sm p-0"
+              >
+                <i
+                  style="background: #000000; color: white"
+                  class="fa fa-compress bigIcon rounded-circle"
+                ></i>
+              </button>
+
+              <button
+                *ngIf="currentUser.idUsuario === 78"
+                (click)="
+                  copyValue(app_package.sequencer + ' ' + app_package.organization?.name)
+                "
+                class="btn btn-sm p-0"
+              >
+                <i
+                  style="background: #4d4d4d; color: white"
+                  class="fa fa-hashtag bigIcon rounded-circle"
+                ></i>
+              </button>
+
+              <button
+                *ngIf="
+                  app_package?.android_id &&
+                  !app_package.is_cancelled &&
+                  currentUser.idUsuario == 78
+                "
+                (click)="copyValue(app_package?.android_id)"
+                class="btn btn-sm p-0"
+              >
+                <i
+                  style="background: rgb(164, 198, 57); color: white"
+                  class="fab fa-android bigIcon rounded-circle"
+                ></i>
+              </button>
+
+              <button
+                *ngIf="
+                  app_package?.apple_id &&
+                  !app_package.is_cancelled &&
+                  currentUser.idUsuario == 78
+                "
+                (click)="copyValue(app_package?.apple_id)"
+                class="btn btn-sm p-0"
+              >
+                <i
+                  style="background: #000000; color: white"
+                  class="fab fa-apple bigIcon rounded-circle"
+                ></i>
+              </button>
+
+              <span
+                *ngIf="currentUser.idUsuario == 78 && !app_package?.project_name"
+                class="text-danger"
+                (click)="copyValue(app_package.idIdentificadorIglesia)"
+              >
+                <br />
+                WARNING: THIS PACKAGE IS NOT SETUP FOR PUSH NOTIF.
+                <br />
+                Use this ID => {{ app_package?.idIdentificadorIglesia }} with this
+                last project ID: {{ app_package?.last_firebase_project_id }}
+              </span>
+            </div>
+            <div class="col-12">
+              <hr />
+            </div>
+            <h4 class="col-12 text-secondary">Statuses</h4>
+            <div class="col-12 col-md-4 text-center align-self-end">
+              <button
+                (click)="setLock()"
+                class="btn btn-sm"
+                [ngClass]="
+                  app_package?.configuration.isLocked
+                    ? 'btn-success'
+                    : 'btn-secondary'
+                "
+              >
+                {{ app_package?.configuration.isLocked ? "Unlock" : "Lock" }}
+              </button>
+            </div>
+            <div class="col-12 col-md-4 text-center">
+              <div class="mb-2">
+                <b>
+                  Your app is
+                  <span
+                    [ngClass]="
+                      app_package?.configuration.isCancelled
+                        ? 'text-danger'
+                        : 'text-success'
+                    "
+                  >
+                    {{
+                      app_package?.configuration.isCancelled
+                        ? "Canceled"
+                        : "Active"
+                    }}
+                  </span>
+                </b>
+              </div>
+              <button
+                (click)="setState('cancel')"
+                class="btn btn-sm"
+                [ngClass]="
+                  app_package?.configuration.isCancelled
+                    ? 'btn-success'
+                    : 'btn-danger'
+                "
+              >
+                {{
+                  app_package?.configuration.isCancelled
+                    ? "Activate app"
+                    : "Cancel app"
+                }}
+              </button>
+            </div>
+            <div class="col-12 col-md-4 text-center">
+              <div class="mb-2">
+                <b>
+                  Your app is
+                  <span
+                    [ngClass]="
+                      app_package?.configuration.isMaintained
+                        ? 'text-danger'
+                        : 'text-success'
+                    "
+                  >
+                    {{
+                      app_package?.configuration.isMaintained
+                        ? "In Maintainance"
+                        : "Active"
+                    }}
+                  </span>
+                </b>
+              </div>
+              <button
+                (click)="setState('maintainance')"
+                class="btn btn-sm"
+                [ngClass]="
+                  app_package?.configuration.isMaintained
+                    ? 'btn-success'
+                    : 'btn-danger'
+                "
+              >
+                {{
+                  app_package?.configuration.isMaintained
+                    ? "Finish"
+                    : "Start Maintainance"
+                }}
+              </button>
+            </div>
+
+            <div class="col-12">
+              <hr />
+            </div>
+
+            <div
+              class="col-12 mt-3"
+              *ngIf="app_package?.organization"
+              (click)="copyValue(app_package?.organization?.name)"
+            >
+              <h5>Organization:</h5>
+              <p class="text-citric">
+                <img
+                  class="organization-picture"
+                  [src]="getPicture(app_package?.organization.picture)"
+                  [alt]="app_package?.organization.name"
+                />
+                {{ app_package?.organization.name }}
+              </p>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="show_package_form" [formGroup]="form_group">
+            <div class="col-12 col-md-6" *ngIf="!handle_as_lock">
+              <div class="form-group">
+                <label>Apple ID <small>(Optional)</small></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="apple_id"
+                />
+                <small>
+                  If you already know your apple Id write it (without 'id'
+                  prefix).
+                </small>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="form-group">
+                <label>
+                  Organization
+                  <small *ngIf="!handle_as_lock"> (Optional) </small>
+                </label>
+                <ng-multiselect-dropdown
+                  placeholder="Select the organization to link this identifier"
+                  [data]="iglesias"
+                  [settings]="selectCatOptions"
+                  [formControlName]="
+                    handle_as_lock ? 'lockOrganizations' : 'organizations'
+                  "
+                  (onSelect)="setOrganization()"
+                  (onSelectAll)="setOrganization()"
+                  (onDeSelect)="setOrganization()"
+                  (onDeSelectAll)="setOrganization()"
+                ></ng-multiselect-dropdown>
+              </div>
+            </div>
+
+            <div class="col-12 text-right">
+              <button
+                class="btn btn-sm btn-success mr-2"
+                (click)="handleSaveClick()"
+              >
+                <i class="fa fa-save"></i> Save
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="cancelForm()"
+              >
+                <i class="fa fa-close text-danger"></i> Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 my-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <h4 class="text-secondary col-12">Latest versions published</h4>
+            <div class="col-4">
+              <h5>Apple</h5>
+              <h6
+                class="text-citric"
+                [ngClass]="{
+                  'font-italic': !app_package?.last_version_ready_for_apple
+                }"
+              >
+                {{ app_package?.last_version_ready_for_apple || "None yet" }}
+              </h6>
+            </div>
+            <div class="col-4">
+              <h5>Android</h5>
+              <h6
+                class="text-citric"
+                [ngClass]="{
+                  'font-italic': !app_package?.last_version_ready_for_android
+                }"
+              >
+                {{ app_package?.last_version_ready_for_android || "None yet" }}
+              </h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 my-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12 col-md-4">
+              <h4 class="text-secondary mb-0">Resources</h4>
+              <small class="text-secondary" *ngIf="!app_package?.resources"
+                >To attach new icons and resources, please click on Add
+                Resources.
+              </small>
+            </div>
+            <div class="col-12 col-md-8 text-right align-self-center">
+              <button
+                [disabled]="wait_for_response || is_incomplete"
+                *ngIf="app_package?.resources"
+                (click)="checkAsSent()"
+                class="btn btn-sm btn-info mr-2"
+              >
+                Sent to store? <i class="fa fa-check"></i>
+              </button>
+              <button
+                [disabled]="
+                  wait_for_response || !app_package?.resources?.partial_ready
+                "
+                *ngIf="
+                  app_package?.resources &&
+                  app_package?.resources?.partial_ready
+                "
+                (click)="downloadFiles(true)"
+                class="btn btn-sm btn-secondary mr-2"
+              >
+                Partial Download <i class="fa fa-download"></i>
+              </button>
+              <button
+                [disabled]="
+                  wait_for_response || !app_package?.resources?.is_ready
+                "
+                *ngIf="app_package?.resources"
+                (click)="downloadFiles()"
+                class="btn btn-sm btn-secondary mr-2"
+              >
+                Download <i class="fa fa-download"></i>
+              </button>
+              <button
+                [disabled]="wait_for_response || is_incomplete || is_ready"
+                *ngIf="app_package?.resources"
+                (click)="checkAsReady()"
+                [ngClass]="{
+                  'btn-success': is_incomplete || !is_ready,
+                  'btn-outline-success': !is_incomplete && is_ready
+                }"
+                class="btn btn-sm btn-success mr-2"
+              >
+                <span
+                  [ngClass]="{
+                    tooltip_: is_incomplete,
+                    tooltip_hide: !is_incomplete
+                  }"
+                >
+                  <span class="tooltiptext">
+                    This buttons is disabled because you need to fill the next
+                    info: <br />
+                    <li>{{ first_reason }}</li>
+                  </span>
+                  {{ !is_incomplete && is_ready ? "Icons are" : "Check as" }}
+                  ready
+                </span>
+              </button>
+              <button
+                [disabled]="wait_for_response"
+                *ngIf="app_package?.resources"
+                (click)="submitImages()"
+                class="btn btn-sm btn-success"
+              >
+                Save
+              </button>
+              <button
+                [disabled]="wait_for_response"
+                *ngIf="!app_package?.resources"
+                (click)="createResourcesCall()"
+                class="btn btn-sm btn-success"
+              >
+                Add resources
+              </button>
+            </div>
+
+            <ul
+              *ngIf="app_package?.resources"
+              class="col-12 nav nav-tabs"
+              id="myTab"
+              role="tablist"
+            >
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="general-tab"
+                  data-toggle="tab"
+                  data-target="#general"
+                  type="button"
+                  role="tab"
+                  aria-controls="general"
+                  aria-selected="true"
+                >
+                  General
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="iphone-65-tab"
+                  data-toggle="tab"
+                  data-target="#iphone-65"
+                  type="button"
+                  role="tab"
+                  aria-controls="iphone-65"
+                  aria-selected="false"
+                >
+                  iPhone (6.5'')
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="iphone-55-tab"
+                  data-toggle="tab"
+                  data-target="#iphone-55"
+                  type="button"
+                  role="tab"
+                  aria-controls="iphone-55"
+                  aria-selected="false"
+                >
+                  iPhone (5.5'')
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="ipad-tab"
+                  data-toggle="tab"
+                  data-target="#ipad"
+                  type="button"
+                  role="tab"
+                  aria-controls="ipad"
+                  aria-selected="false"
+                >
+                  iPad (12.9'')
+                </button>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div
+                class="tab-pane fade show active"
+                id="general"
+                role="tabpanel"
+                aria-labelledby="general-tab"
+              >
+                <div
+                  *ngIf="app_package?.resources"
+                  class="row justify-content-center mt-3"
+                >
+                  <div class="col-12 col-md-4 mb-2 text-center">
+                    <div
+                      [multiple]="false"
+                      class="square"
+                      [ngClass]="{
+                        'error-dropzone': errors.splash
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="onSelectResources('splash', $event)"
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <small class="m-0"> PNG 2732x2732 </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        *ngIf="splash"
+                        ngProjectAs="ngx-dropzone-preview"
+                        [file]="splash"
+                        [removable]="true"
+                        (removed)="removeResource('splash')"
+                      >
+                      </ngx-dropzone-image-preview>
+                    </div>
+                    <small> Splash (2732x2732) </small>
+                  </div>
+                  <div class="col-12 col-md-4 mb-2 text-center">
+                    <div
+                      [multiple]="false"
+                      class="square"
+                      [ngClass]="{
+                        'error-dropzone': errors.icon
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="onSelectResources('icon', $event)"
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <small class="m-0"> PNG 1024x1024 </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        ngProjectAs="ngx-dropzone-preview"
+                        *ngIf="icon"
+                        [file]="icon"
+                        [removable]="true"
+                        (removed)="removeResource('icon')"
+                      >
+                        <!-- <ngx-dropzone-label>
+                        {{ f.name }} ({{ f.type }})
+                      </ngx-dropzone-label> -->
+                      </ngx-dropzone-image-preview>
+                    </div>
+                    <small> Icon (1024x1024) </small>
+                  </div>
+                  <div class="col-12 col-md-4 mb-2 text-center">
+                    <div
+                      [multiple]="false"
+                      class="square"
+                      [ngClass]="{
+                        'error-dropzone': errors.icon_512
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="onSelectResources('icon_512', $event)"
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <small class="m-0"> PNG 512x512 </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        ngProjectAs="ngx-dropzone-preview"
+                        *ngIf="icon_512"
+                        [file]="icon_512"
+                        [removable]="true"
+                        (removed)="removeResource('icon_512')"
+                      >
+                        <!-- <ngx-dropzone-label>
+                        {{ f.name }} ({{ f.type }})
+                      </ngx-dropzone-label> -->
+                      </ngx-dropzone-image-preview>
+                    </div>
+                    <small> Icon (512x512) </small>
+                  </div>
+                  <div class="col-12 col-md-4 mb-2 text-center">
+                    <!-- <ngx-dropzone #drop></ngx-dropzone> -->
+                    <ngx-dropzone
+                      #drop_112
+                      [multiple]="false"
+                      class="square"
+                      [ngClass]="{
+                        'error-dropzone': errors.icon_112
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="
+                        onSelectResources('icon_112', $event, drop_112, preview)
+                      "
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <small class="m-0"> PNG 112x112 </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        #preview
+                        ngProjectAs="ngx-dropzone-preview"
+                        *ngIf="icon_112"
+                        [file]="icon_112"
+                        [removable]="true"
+                        (removed)="removeResource('icon_112')"
+                      >
+                        <!-- <ngx-dropzone-label>
+                        {{ f.name }} ({{ f.type }})
+                      </ngx-dropzone-label> -->
+                      </ngx-dropzone-image-preview>
+                    </ngx-dropzone>
+                    <small> Icon (112x112) </small>
+                  </div>
+                  <div class="col-12 col-md-4 mb-2 text-center">
+                    <div
+                      [multiple]="false"
+                      class="rectangle"
+                      [ngClass]="{
+                        'error-dropzone': errors.android_graph
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="onSelectResources('android_graph', $event)"
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <small class="m-0"> PNG 1024x500 </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        ngProjectAs="ngx-dropzone-preview"
+                        *ngIf="android_graph"
+                        [file]="android_graph"
+                        [removable]="true"
+                        (removed)="removeResource('android_graph')"
+                      >
+                        <!-- <ngx-dropzone-label>
+                        {{ f.name }} ({{ f.type }})
+                      </ngx-dropzone-label> -->
+                      </ngx-dropzone-image-preview>
+                    </div>
+                    <small> Android Graph (1024x500) </small>
+                  </div>
+                </div>
+              </div>
+              <!-- 6.5 => 1284 × 2778 -->
+              <div
+                class="tab-pane fade"
+                id="iphone-65"
+                role="tabpanel"
+                aria-labelledby="iphone-65-tab"
+              >
+                iPhone 6.5
+                <div *ngIf="app_package?.resources" class="row">
+                  <div class="col-12">
+                    <div
+                      [ngClass]="{
+                        'error-dropzone': errors.iphone_65
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="onSelect(1, $event)"
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <h6 class="m-0">
+                            Arrastra aquí hasta 3 vistas previas de la app.
+                          </h6>
+                          <small class="m-0">
+                            (Usa una resolución de 1284 x 2778)
+                          </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        ngProjectAs="ngx-dropzone-preview"
+                        *ngFor="let f of getFiles(1)"
+                        [file]="f"
+                        [removable]="true"
+                        (removed)="onRemove(1, f)"
+                      >
+                        <!-- <ngx-dropzone-label>
+                          {{ f.name }} ({{ f.type }})
+                        </ngx-dropzone-label> -->
+                      </ngx-dropzone-image-preview>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 5.5 => 1242 × 2208 -->
+              <div
+                class="tab-pane fade"
+                id="iphone-55"
+                role="tabpanel"
+                aria-labelledby="iphone-55-tab"
+              >
+                iPhone 5.5
+
+                <div *ngIf="app_package?.resources" class="row">
+                  <div class="col-12">
+                    <div
+                      [ngClass]="{
+                        'error-dropzone': errors.iphone_55
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="onSelect(2, $event)"
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <h6 class="m-0">
+                            Arrastra aquí hasta 3 vistas previas de la app.
+                          </h6>
+                          <small class="m-0">
+                            (Usa una resolución de 1242 x 2208)
+                          </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        ngProjectAs="ngx-dropzone-preview"
+                        *ngFor="let f of getFiles(2)"
+                        [file]="f"
+                        [removable]="true"
+                        (removed)="onRemove(2, f)"
+                      >
+                        <!-- <ngx-dropzone-label>
+                          {{ f.name }} ({{ f.type }})
+                        </ngx-dropzone-label> -->
+                      </ngx-dropzone-image-preview>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 12.9 => 2048 × 2732 -->
+              <div
+                class="tab-pane fade"
+                id="ipad"
+                role="tabpanel"
+                aria-labelledby="ipad-tab"
+              >
+                iPad
+
+                <div *ngIf="app_package?.resources" class="row">
+                  <div class="col-12">
+                    <div
+                      [ngClass]="{
+                        'error-dropzone': errors.ipad
+                      }"
+                      ngx-dropzone
+                      [accept]="'image/png'"
+                      (change)="onSelect(3, $event)"
+                    >
+                      <ngx-dropzone-label>
+                        <div>
+                          <h6 class="m-0">
+                            Arrastra aquí hasta 3 vistas previas de la app.
+                          </h6>
+                          <small class="m-0">
+                            (Usa una resolución de 2048 x 2732)
+                          </small>
+                        </div>
+                      </ngx-dropzone-label>
+                      <ngx-dropzone-image-preview
+                        ngProjectAs="ngx-dropzone-preview"
+                        *ngFor="let f of getFiles(3)"
+                        [file]="f"
+                        [removable]="true"
+                        (removed)="onRemove(3, f)"
+                      >
+                        <!-- <ngx-dropzone-label>
+                          {{ f.name }} ({{ f.type }})
+                        </ngx-dropzone-label> -->
+                      </ngx-dropzone-image-preview>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <h4 class="text-secondary">Last 10 versions available</h4>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Notes</th>
+            <th>Is ready for Apple?</th>
+            <th>Is ready for Android?</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="versions">
+          <tr
+            *ngFor="let record of versions_array.controls; let i = index"
+            [formGroupName]="i"
+          >
+            <td>
+              {{ record.value.version }}
+              <span class="ml-3">
+                <button
+                  class="btn btn-sm btn-clear"
+                  (click)="openNoteModal(record, i)"
+                >
+                  <i class="fa fa-edit text-info"></i>
+                </button>
+              </span>
+            </td>
+            <td>
+              <p [innerHtml]="record.value.change_log"></p>
+            </td>
+            <td>
+              <input
+                [readonly]="wait_for_response"
+                class="form-check"
+                type="checkbox"
+                formControlName="ready_for_apple"
+                (change)="toggle('apple', record, i)"
+              />
+            </td>
+            <td>
+              <input
+                [readonly]="wait_for_response"
+                class="form-check"
+                type="checkbox"
+                formControlName="ready_for_android"
+                (change)="toggle('android', record, i)"
+              />
+            </td>
+            <!-- <td>
+            <div class="btn-group">
+              <button
+                class="btn btn-sm btn-info"
+                (click)="openEditForm(record)"
+              >
+                <i class="fa fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteItem(record)"
+              >
+                <i class="fa fa-trash-alt"></i>
+              </button>
+            </div>
+          </td> -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <ngx-smart-modal
+    #form_note_edit_modal
+    identifier="form_note_edit_modal"
+    [dismissable]="false"
+    [closable]="false"
+    customClass="large-modal"
+  >
+    <app-version-form
+      (on_close)="closeModal($event)"
+      [trigger_event]="true"
+      *ngIf="show_note_form"
+      #version_form
+    ></app-version-form>
+  </ngx-smart-modal>
+</div>

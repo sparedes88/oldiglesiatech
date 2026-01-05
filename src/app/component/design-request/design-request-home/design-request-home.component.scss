@@ -1,0 +1,50 @@
+.page {
+  padding: 10px;
+}
+.status {
+  padding: 5px;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+}
+
+.summary {
+  display: inline-block;
+  width: 90%;
+  font-weight: 600;
+  font-size: 35px;
+}
+
+.card-img-top-fixed {
+  object-fit: cover;
+  object-position: left center;
+  height: 200px;
+}
+
+.card-fixed-text {
+  height: 200px;
+}
+
+.card {
+  border: none !important;
+}
+.active {
+  .summary {
+    background: rgb(240, 240, 240);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  .status {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+
+.in-red {
+  background: #ffc7cf;
+}
+.in-green {
+  background: #c6efce;
+}

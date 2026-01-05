@@ -1,0 +1,137 @@
+ion-content {
+    background-color: #f6f6f6 !important;
+}
+.main-dashboard {
+    min-height: 100vh;
+
+    /** BANNER AREA */
+    .banner-container {
+        background-image: url("/assets/img/default-cover-image.jpg");
+        background-color: white;
+        background-position: center;
+        background-size: cover;
+
+        height: 300px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        position: relative;
+        // filter: blur(10px);
+        text-align: center;
+        overflow: hidden;
+        .original {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 10;
+            object-fit: contain;
+        }
+        .blurred {
+            width: calc(100% + 20px);
+            position: absolute;
+            height: calc(100% + 20px);
+            left: -10px;
+            z-index: 0;
+            -webkit-filter: blur(10px) brightness(0.9);
+            filter: blur(10px) brightness(0.9);
+            top: -10px;
+            -o-object-fit: cover;
+            object-fit: cover;
+            -o-object-position: center center;
+            object-position: center center;
+        }
+
+        .edit-cover-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border-radius: 50%;
+            border: 1px dotted gainsboro;
+            height: 40px;
+            width: 40px;
+            z-index: 20;
+        }
+
+        .logo-container {
+            background-color: white;
+            position: absolute;
+            bottom: -40px;
+            // padding: 8px;
+            // border-radius: 8px;
+            box-shadow: 0px 0px 5px 0px #00000036;
+            border-radius: 50%;
+            border: 5px solid lightgrey;
+            left: 3%;
+
+            .logo-container-overflow {
+                overflow: hidden;
+                border-radius: 50%;
+                img {
+                    // min-width: 180px;
+                    // max-width: 210px;
+                    // min-height: 180px;
+                    // max-height: 210px;
+                    min-width: 170px;
+                    max-width: 170px;
+                    min-height: 170px;
+                    max-height: 170px;
+                    height: auto;
+                    object-fit: contain;
+                    object-position: center center;
+                    padding: 8px;
+                }
+            }
+
+            .edit-logo-btn {
+                position: absolute;
+                right: 0px;
+                border-radius: 50%;
+                border: 1px dotted gainsboro;
+                height: 40px;
+                width: 40px;
+            }
+        }
+    }
+
+    .general_info {
+        // margin-top: 10px;
+        &.no-margin {
+            margin-top: 45px;
+            margin-bottom: 2em;
+        }
+    }
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: text-bottom;
+    border: 0.25em solid #e65100;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: spinner-border 0.75s linear infinite;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+.card {
+    border-radius: 12px !important;
+    // margin-top: 14px;
+}
+
+.organization-name-h2 {
+    color: white;
+    position: absolute;
+    //   left: calc(3% + 196px);
+    margin-left: 20px;
+    bottom: 0;
+    text-shadow: 2px 2px 8px #000000;
+    z-index: 11;
+}

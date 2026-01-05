@@ -1,0 +1,623 @@
+<div class="container page">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+          {{ totalGroups || 0 }}
+        </span>
+        <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/all_users_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a routerLink="/home">Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/contact">Contacts</a>
+      </li>
+      <li class="breadcrumb-item active">
+        All Users
+      </li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <h3 class="col-6 col-md-3 text-citric">
+      User Management
+    </h3>
+    <div class="col-3 col-md-3">
+      <button
+        class="btn btn-outline-citric"
+        (click)="addUser(formAddModal, user_form)"
+      >
+        Add User
+      </button>
+    </div>
+    <!-- <div
+      class="col-2"
+      *ngIf="
+        currentUser.idUsuario === 78 ||
+        currentUser.idUsuario === 152 ||
+        currentUser.idUsuario === 2352 ||
+        currentUser.idUsuario === 276
+      "
+    >
+      <button class="btn btn-outline-citric" routerLink="planning">
+        View Planning
+      </button>
+    </div> -->
+
+    <div class="col-3 col-md-3">
+      <button class="btn btn-outline-citric" (click)="clearFilters()">
+        Clean filters
+      </button>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="row col-12">
+    <br />
+    <form #filters_form="ngForm" [formGroup]="filtersForm" style="width: 100%;">
+      <div class="row">
+        <div class="col-6 col-md-3">
+          <div class="form-group">
+            <label for="marital">User Type</label>
+            <select formControlName="isSuperUser" class="form-control mb-1">
+              <option [value]="null">
+                All
+              </option>
+              <option [value]="true">
+                Super Users
+              </option>
+              <option [value]="false">
+                Normal Users
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <!-- <div class="form-group">
+        <label for="marital">Organization</label>
+        <select
+          formControlName="idOrganization"
+          class="form-control mb-1"
+        >
+          <option [value]="0">
+            All
+          </option>
+        </select>
+      </div> -->
+          <div
+            class="form-group"
+            style="display: flex; flex-direction: column;"
+          >
+            <label for="idOrganization"> Organization </label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select an organization"
+              [data]="iglesias"
+              [settings]="selectOptions"
+              formControlName="idOrganization"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="form-group">
+            <label for="marital">User Organization Type</label>
+            <select formControlName="idUserType" class="form-control mb-1">
+              <option [value]="0">
+                All
+              </option>
+              <option [value]="1">
+                Organization Admin
+              </option>
+              <option [value]="2">
+                Member
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3 text-center align-self-center">
+          <button
+            class="col-9 btn btn-outline-citric"
+            (click)="searchWithFilters()"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+    </form>
+    <!-- <div class="col-6 col-md-3 text-center" *ngFor="let item of c">
+      <span class="text-citric summary">
+        {{ item.summary }}
+      </span>
+      <br />
+      <span
+        class="status text-center"
+        [ngStyle]="{
+          background: item.color ? '#' + item.color : '#6c757d'
+        }"
+        style="width: 90%;
+      display: inline-block;"
+      >
+        {{ item.name }}
+      </span>
+    </div> -->
+    <br />
+    <br />
+  </div>
+
+  <hr />
+
+  <div [hidden]="filtered" class="row mt-5 mb-5">
+    <h3 class="text-citric">
+      Please apply any filter and the click on Search
+    </h3>
+  </div>
+
+  <ng-template [ngIf]="filtered && loading">
+    <div class="d-flex justify-content-center" style="margin: 15%;">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem;"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div [hidden]="!filtered || loading" class="row mt-5 mb-5">
+    <div class="col-md-12 table-responsive-sm">
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="membertTypeForm"
+        style="width: 100%;"
+      >
+        <table
+          datatable
+          [dtOptions]="dtOptions"
+          [dtTrigger]="dtTrigger"
+          class="table table-striped"
+        >
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Name</th>
+              <th>E-Mail</th>
+              <th style="min-width: 360px;">Organizations</th>
+              <th>Configurations</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let contact of contacts; let i = index">
+              <td>
+                <img
+                  class="img-contact-foto"
+                  [src]="getPhoto(contact.picture)"
+                  onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'"
+                />
+              </td>
+              <td>{{ contact.name }} {{ contact.lastName }}</td>
+              <td>
+                <div class="col-12 fixed-span">
+                  <strong>
+                    {{ contact.email }}
+                  </strong>
+                </div>
+                <div
+                  formArrayName="members"
+                  class="col-12"
+                  style="padding-top: 5px;"
+                >
+                  <div [formGroupName]="i">
+                    <div *ngIf="currentUser.isSuperUser" class="row">
+                      <div class="col-6">
+                        <span class="span-for-select">
+                          User Type
+                        </span>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <select
+                            (change)="
+                              checkChangeWithTag(
+                                members_on_form.controls[i].get('isSuperUser'),
+                                contact,
+                                'isSuperUser'
+                              )
+                            "
+                            formControlName="isSuperUser"
+                            class="form-control mb-1"
+                          >
+                            <option [value]="true">
+                              Super User
+                            </option>
+                            <option [value]="false">
+                              Normal User
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <span
+                        class="col-12"
+                        style="display: block; text-align: right;"
+                      >
+                        <button
+                          type="button"
+                          *ngIf="
+                            members_on_form.controls[i].get('isSuperUser')
+                              .dirty && currentUser.isSuperUser
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="
+                            resetMemberFormWithTag(
+                              members_on_form.controls[i],
+                              contact,
+                              'isSuperUser'
+                            )
+                          "
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            members_on_form.controls[i].get('isSuperUser')
+                              .dirty && currentUser.isSuperUser
+                          "
+                          [disabled]="
+                            members_on_form.controls[i].get('isSuperUser')
+                              .invalid && currentUser.isSuperUser
+                          "
+                          (click)="
+                            updateMemberWithTag(
+                              members_on_form.controls[i],
+                              contact,
+                              'isSuperUser'
+                            )
+                          "
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-6">
+                        <span class="span-for-select">
+                          Status
+                        </span>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <select
+                            (change)="
+                              checkChangeWithTag(
+                                members_on_form.controls[i].get('status'),
+                                contact,
+                                'status'
+                              )
+                            "
+                            formControlName="status"
+                            class="form-control mb-1"
+                            [ngClass]="
+                              parseStatus(
+                                members_on_form.controls[i].get('status').value
+                              )
+                                ? 'active_user'
+                                : 'deleted_user'
+                            "
+                          >
+                            <option [value]="true">
+                              Active
+                            </option>
+                            <option [value]="false">
+                              Deleted
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <span
+                        class="col-12"
+                        style="display: block; text-align: right;"
+                      >
+                        <button
+                          type="button"
+                          *ngIf="
+                            members_on_form.controls[i].get('status').dirty &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="
+                            resetMemberFormWithTag(
+                              members_on_form.controls[i],
+                              contact,
+                              'status'
+                            )
+                          "
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            members_on_form.controls[i].get('status').dirty &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          [disabled]="
+                            members_on_form.controls[i].get('status').invalid &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          (click)="
+                            updateMemberWithTag(
+                              members_on_form.controls[i],
+                              contact,
+                              'status'
+                            )
+                          "
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div formArrayName="members" class="col-12">
+                  <div [formGroupName]="i">
+                    <div
+                      class="row row-for-select"
+                      [ngClass]="{ deleted: !item.status }"
+                      *ngFor="let item of contact.organizations; let j = index"
+                      formArrayName="organizations"
+                    >
+                      <div class="col-6">
+                        <span class="span-for-select">
+                          {{ item.name }}
+                          <span *ngIf="!item.status">
+                            <br />
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-info mb-1"
+                              (click)="
+                                reAddMember(
+                                  get_organization_in_member(i).controls[j],
+                                  item
+                                )
+                              "
+                            >
+                              Reactivate
+                            </button>
+                          </span>
+                        </span>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group" [formGroupName]="j">
+                          <select
+                            (change)="
+                              checkChange(
+                                get_organization_in_member(i).controls[j].get(
+                                  'idUserType'
+                                ),
+                                item
+                              )
+                            "
+                            formControlName="idUserType"
+                            class="form-control mb-1"
+                          >
+                            <option [value]="1">
+                              Organization Admin
+                            </option>
+                            <option [value]="2">
+                              Member
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <span
+                        class="col-12"
+                        style="display: block; text-align: right;"
+                      >
+                        <button
+                          type="button"
+                          *ngIf="
+                            get_organization_in_member(i).controls[j].get(
+                              'idUserType'
+                            ).dirty && currentUser.isSuperUser
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="
+                            resetMemberForm(
+                              get_organization_in_member(i).controls[j],
+                              item
+                            )
+                          "
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            get_organization_in_member(i).controls[j].get(
+                              'idUserType'
+                            ).dirty && currentUser.isSuperUser
+                          "
+                          [disabled]="
+                            get_organization_in_member(i).controls[j].get(
+                              'idUserType'
+                            ).invalid && currentUser.isSuperUser
+                          "
+                          (click)="
+                            updateMemberType(
+                              get_organization_in_member(i).controls[j],
+                              item
+                            )
+                          "
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+
+                    <div
+                      *ngIf="
+                        !members_on_form.controls[i].get('show_organization')
+                          .value
+                      "
+                      class="col-12 text-right"
+                    >
+                      <!-- new_organization: new FormControl('') -->
+                      <button
+                        *ngIf="currentUser.isSuperUser"
+                        type="button"
+                        (click)="
+                          showNewOrganization(
+                            members_on_form.controls[i],
+                            contact
+                          )
+                        "
+                        class="btn btn-sm btn-success"
+                      >
+                        Add organization
+                      </button>
+                    </div>
+
+                    <div
+                      *ngIf="
+                        members_on_form.controls[i].get('show_organization')
+                          .value
+                      "
+                      class="row row-for-select"
+                    >
+                      <div class="col-12 col-md-4">
+                        <span class="span-for-select">
+                          Select Organization:
+                        </span>
+                      </div>
+                      <div class="col-12 col-md-8">
+                        <div
+                          class="form-group"
+                          style="display: flex; flex-direction: column;"
+                        >
+                          <ng-multiselect-dropdown
+                            class="form-control mb-1"
+                            placeholder="Select an organization"
+                            [data]="
+                              members_on_form.controls[i].get(
+                                'organizations_unused'
+                              ).value
+                            "
+                            [settings]="selectOptions"
+                            formControlName="new_organization"
+                          ></ng-multiselect-dropdown>
+                          <span class="text-muted fixed-span-size">
+                            *This user will be saved as Member</span
+                          >
+                        </div>
+                      </div>
+                      <div
+                        *ngIf="
+                          members_on_form.controls[i].get('show_organization')
+                            .value
+                        "
+                        class="col-12"
+                        style="text-align: right;"
+                      >
+                        <button
+                          type="button"
+                          *ngIf="currentUser.isSuperUser"
+                          (click)="
+                            resetNewOrganizationForm(
+                              members_on_form.controls[i]
+                            )
+                          "
+                          class="btn btn-sm btn-muted"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="currentUser.isSuperUser"
+                          [disabled]="
+                            members_on_form.controls[i].get('new_organization')
+                              .invalid && currentUser.isSuperUser
+                          "
+                          (click)="
+                            registerInOrganization(
+                              members_on_form.controls[i],
+                              contact
+                            )
+                          "
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <!-- <button
+                    routerLink="/contact/details/{{ contact.idUser }}"
+                    [queryParams]="{ telefono: contact.telefono }"
+                    class="btn btn-sm btn-primary"
+                  >
+                    <i class="fa fa-eye"> </i>
+                  </button> -->
+                  <button
+                    class="btn btn-sm btn-primary"
+                    (click)="updateUsuario(contact, formAddModal, user_form)"
+                  >
+                    <i class="fa fa-edit"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #formAddModal
+  identifier="formAddModal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-simple-member-form
+    #user_form
+    [iglesias]="iglesias"
+    (onDismiss)="onModalEditDidDismiss(formAddModal, $event)"
+  >
+  </app-simple-member-form>
+</ngx-smart-modal>

@@ -1,0 +1,225 @@
+<div class="container mt-2">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+          {{ totalGroups || 0 }}
+        </span>
+        <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/report_builder_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="builder-container">
+    <h2>Report builder</h2>
+    <hr />
+
+    <mat-slide-toggle color="primary" [(ngModel)]="livePreview">
+      Toggle Live Preview
+    </mat-slide-toggle>
+    <hr />
+
+    <div class="mt-2 report-preview-container" *ngIf="livePreview">
+      <preview [report]="reportPreview"></preview>
+    </div>
+
+    <div class="">
+      <div class="row center-xs">
+        <div class="col-xs-6 col-md-3 builder-scroll">
+          <ul class="list-group">
+            <li class="list-group-item list-title">Templates</li>
+            <li
+              class="list-group-item disabled"
+              *ngIf="!reportTemplates?.length && !globalTemplates?.length"
+            >
+              No templates available
+            </li>
+
+            <!-- Templates by organization -->
+            <li
+              class="list-group-item list-group-item-secondary"
+              *ngIf="reportTemplates?.length"
+            >
+              Organization's Templates
+            </li>
+            <li
+              class="list-group-item list-group-item-action"
+              *ngFor="let template of reportTemplates; let i = index"
+              (click)="setTemplate(template)"
+            >
+              {{ template.jsonData?.title }} >
+              {{ template?.jsonData?.templateName }}
+
+              <button
+                class="btn btn-light float-right"
+                (click)="deleteTemplate(template)"
+                *ngIf="canDeleteTemplate(template)"
+              >
+                <i class="red fa fa-trash"></i>
+              </button>
+            </li>
+
+            <!-- Global templates -->
+            <li
+              class="list-group-item list-group-item-secondary"
+              *ngIf="globalTemplates?.length"
+            >
+              Global Templates
+            </li>
+            <li
+              class="list-group-item list-group-item-action"
+              *ngFor="let template of globalTemplates; let i = index"
+              (click)="setTemplate(template)"
+            >
+              {{ template.jsonData?.title }} >
+              {{ template?.jsonData?.templateName }}
+
+              <button
+                class="btn btn-light float-right"
+                (click)="deleteTemplate(template)"
+                *ngIf="canDeleteTemplate(template)"
+              >
+                <i class="red fa fa-trash"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="col-xs-6 col-md-3 builder-scroll">
+          <ul class="list-group">
+            <li class="list-group-item list-title">Module</li>
+            <!-- LIst module available -->
+            <li
+              class="list-group-item list-group-item-action"
+              *ngFor="let module of reportModules; let i = index"
+              (click)="changeModule(i)"
+              [ngClass]="{ active: availableModule?.title == module.title }"
+            >
+              {{ module.title }}
+            </li>
+          </ul>
+        </div>
+        <div class="col-xs-6 col-md-3 builder-scroll">
+          <ul
+            class="list-group"
+            cdkDropList
+            #fieldsList="cdkDropList"
+            [cdkDropListData]="availableModule.fields"
+            (cdkDropListDropped)="dropField($event)"
+            [cdkDropListConnectedTo]="[selectedFielsList]"
+          >
+            <li class="list-group-item list-title">
+              Fields available
+            </li>
+            <!-- Selected Module fields -->
+            <ng-container *ngIf="availableModule?.fields?.length">
+              <li
+                class="list-group-item list-group-item-action"
+                cdkDrag
+                *ngFor="let moduleField of availableModule.fields"
+                [ngClass]="{ disabled: moduleField.disabled }"
+              >
+                {{ moduleField.title }}
+              </li>
+            </ng-container>
+
+            <ng-container *ngIf="selectedModule == -1">
+              <li class="list-group-item disabled">
+                Please select a Module to display available fields
+              </li>
+            </ng-container>
+          </ul>
+        </div>
+        <div class="col-xs-6 col-md-3 builder-scroll">
+          <ul
+            cdkDropList
+            #selectedFielsList="cdkDropList"
+            [cdkDropListData]="selectedFields"
+            [cdkDropListConnectedTo]="[fieldsList]"
+            class="list-group"
+            (cdkDropListDropped)="dropField($event)"
+          >
+            <li class="list-group-item list-title">
+              Fields selected
+            </li>
+
+            <li
+              class="list-group-item disabled"
+              *ngIf="!selectedFields?.length"
+            >
+              Drop fields here
+            </li>
+
+            <li
+              class="list-group-item list-group-item-action"
+              *ngFor="let item of selectedFields"
+              cdkDrag
+            >
+              {{ item.title }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-toolbar mb-2">
+      <div class="btn-group mr-1">
+        <button
+          class="btn btn-success"
+          [disabled]="printing || !selectedFields?.length"
+          (click)="buildReport()"
+        >
+          {{ printing ? "Please wait..." : "Print report" }}
+        </button>
+      </div>
+
+      <div class="btn-group">
+        <button
+          class="btn btn-primary"
+          [disabled]="printing || !selectedFields?.length"
+          (click)="saveTemplateModal.open()"
+        >
+          Save template
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #saveTemplateModal identifier="saveTemplateModal">
+  <h4>Save report template</h4>
+
+  <div class="form-group">
+    <label for="reportTile">Report Template Name</label>
+    <input
+      required
+      class="form-control"
+      placeholder="Report Template Name"
+      [(ngModel)]="templateForm.templateName"
+    />
+  </div>
+
+  <div class="form-check" *ngIf="currentUser?.isSuperUser">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      [(ngModel)]="templateForm.isGlobal"
+    />
+    <label class="form-check-label">
+      This template is global
+    </label>
+  </div>
+
+  <button class="btn btn-success" (click)="saveTemplate()">
+    Save template
+  </button>
+</ngx-smart-modal>

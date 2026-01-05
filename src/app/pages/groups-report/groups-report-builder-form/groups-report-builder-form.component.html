@@ -1,0 +1,141 @@
+<div class="row" *ngIf="has_templates && !show_save && !show_select_templates">
+  <div class="col">
+    <button class="btn btn-sm btn-citric mr-2" (click)="goToSelectTemplate()">
+      Select template
+    </button>
+    <button class="btn btn-sm btn-citric" (click)="startFormAsNew()">
+      Create as new
+    </button>
+  </div>
+</div>
+
+<div *ngIf="show_select_templates && !show_save" class="row">
+  <div class="col-12 col-md-4" [formGroup]="template_form">
+    <h5>Select a template:</h5>
+    <div class="form-check" *ngFor="let template of templates">
+      <input
+        formControlName="idGroupReportTemplate"
+        (change)="onGroupTemplateSelected($event)"
+        class="form-check-input"
+        type="radio"
+        [id]="template.id"
+        [value]="template.id"
+        checked
+      />
+      <label class="form-check-label" [for]="template.id">
+        {{ template.name }}
+      </label>
+    </div>
+  </div>
+  <div class="col-12 col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5>Preview</h5>
+      </div>
+      <div
+        [ngClass]="{
+          'card-body': !template_form.get('idGroupReportTemplate').value
+        }"
+      >
+        <app-group-report-records-table
+          [loading]="loading_preview"
+          [columns]="columns"
+          [is_simulated]="true"
+          [idGroupReport]="template_form.get('idGroupReportTemplate').value"
+          [record_size]="6"
+          [organization]="organization"
+        >
+        </app-group-report-records-table>
+      </div>
+    </div>
+  </div>
+</div>
+<form
+  *ngIf="form_group"
+  [formGroup]="form_group"
+  style="width: 100%"
+  class="row"
+>
+  <div class="col-12 col-md-8">
+    <div class="form-group">
+      <label for="estimated">
+        Name
+        <span class="text-danger"> * </span>
+      </label>
+      <input
+        class="form-control"
+        placeholder="Report Name."
+        type="text"
+        formControlName="name"
+        required
+      />
+    </div>
+  </div>
+  <div class="col-12 col-md-8" *ngIf="groups.length > 0 && !idGroup">
+    <div class="form-group">
+      <label for="estimated"> Group </label>
+      <select class="form-control" formControlName="idGroup" required>
+        <option [value]="null">-- Select an option --</option>
+        <option *ngFor="let group of groups" [value]="group.idGroup">
+          {{ group.title }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-8">
+    <div class="form-group">
+      <label> Description (optional) </label>
+      <textarea
+        class="form-control"
+        placeholder="Place here the description for this optional field."
+        type="text"
+        formControlName="description"
+      >
+      </textarea>
+    </div>
+  </div>
+  <div class="col-12 col-md-8">
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        formControlName="is_template"
+      />
+      <label class="form-check-label"> Is a template </label>
+    </div>
+  </div>
+</form>
+
+<hr />
+
+<span style="display: block; text-align: right; width: 100%" class="mb-2">
+  <button
+    type="button"
+    *ngIf="!getPermissions()"
+    class="btn btn-sm btn-muted"
+    (click)="deactivateForm()"
+  >
+    Cancel
+  </button>
+
+  <button
+    type="button"
+    *ngIf="!getPermissions() && show_save"
+    [disabled]="form_group?.invalid && !getPermissions()"
+    (click)="addOptionalField()"
+    class="btn btn-sm btn-success"
+  >
+    Save
+  </button>
+
+  <button
+    type="button"
+    *ngIf="!getPermissions() && show_select_templates && !show_save"
+    [disabled]="template_form.invalid && !getPermissions()"
+    (click)="goToFormGroup()"
+    class="btn btn-sm btn-citric"
+  >
+    Next
+  </button>
+</span>

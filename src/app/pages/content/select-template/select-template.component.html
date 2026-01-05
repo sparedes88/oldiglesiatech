@@ -1,0 +1,1511 @@
+<div class="container page">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <h4 class="col-11" style="color: white">Select a template</h4>
+          <div class="col-1">
+            <button class="btn btn-outline-citric btn-sm" (click)="dismiss()">
+              X
+            </button>
+          </div>
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/content_banner_new.png"
+        />
+      </div>
+    </div>
+
+    <div class="col-5 col-md-9">
+      <div *ngFor="let item of templates" class="custom-control custom-radio">
+        <input
+          type="radio"
+          [id]="item.idTemplate"
+          name="customRadio"
+          class="custom-control-input"
+          [checked]="item.idTemplate === template_selected?.idTemplate"
+          (click)="changeTab(tabSelected, item.idTemplate)"
+        />
+        <label class="custom-control-label" [for]="item.idTemplate">
+          {{ item.nombre }}
+        </label>
+      </div>
+
+      <h6
+        *ngIf="template_selected?.require_extra_info"
+        class="col-12 text-danger py-2 px-0"
+      >
+        Note: This template won't show your articles. But we will keep them.
+      </h6>
+
+      <div class="row" *ngIf="template?.idTemplate === 10">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+        <div class="col-12">
+          <div
+            [formGroup]="groups_template_form"
+            class="form-group"
+            style="display: flex; flex-direction: column"
+          >
+            <label for="idOrganization">
+              Select the categories groups to display on template.
+            </label>
+            <ng-multiselect-dropdown
+              #multi_select
+              formControlName="selected_items"
+              placeholder="Nothing select, the template will be empty"
+              [data]="categories"
+              [settings]="select_community_options"
+              (onSelect)="fixGroups($event)"
+              (onSelectAll)="fixGroups($event)"
+              (onDeSelect)="fixGroups($event)"
+              (onDeSelectAll)="fixGroups($event)"
+            ></ng-multiselect-dropdown>
+
+            <!-- <ng-multiselect-dropdown
+              #multi_select_playlists
+              formControlName="selected_items"
+              placeholder="Nothing select... None playlist will be opened as default"
+              [data]="playlists"
+              [settings]="select_community_options"
+              (onSelect)="fixPlaylist($event)"
+              (onSelectAll)="fixPlaylist($event)"
+              (onDeSelect)="fixPlaylist($event)"
+              (onDeSelectAll)="fixPlaylist($event)"
+            ></ng-multiselect-dropdown> -->
+            <small class="text-danger">
+              This template only will show tabs with items set them up.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 11">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="playlist_template_form"
+          class="row"
+        >
+          <div class="col-12">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization"> Select the playlist's tabs. </label>
+              <ng-multiselect-dropdown
+                #multi_select_playlists
+                formControlName="selected_items"
+                placeholder="Nothing select... None playlist will be opened as default"
+                [data]="playlists"
+                [settings]="select_community_options"
+                (onSelect)="fixPlaylist($event)"
+                (onSelectAll)="fixPlaylist($event)"
+                (onDeSelect)="fixPlaylist($event)"
+                (onDeSelectAll)="fixPlaylist($event)"
+              ></ng-multiselect-dropdown>
+              <small class="text-danger">
+                This template only will show tabs with items set them up.
+              </small>
+            </div>
+          </div>
+
+          <h5 class="col-12 text-muted">General Settings</h5>
+          <div class="ws-100"></div>
+
+          <div style="margin-left: 28px !important" class="col-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_description"
+                name="display_description_radio"
+                class="custom-control-input"
+                formControlName="display_description"
+                [checked]="
+                  playlist_template_form.get('display_description').value
+                "
+                (click)="
+                  toggleAcceptace(playlist_template_form, 'display_description')
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(playlist_template_form, 'display_description')
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_description"
+              >
+                Display description and speaker?
+              </label>
+            </div>
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_tab_searchbar"
+                name="show_tab_searchbar_radio"
+                class="custom-control-input"
+                formControlName="show_tab_searchbar"
+                [checked]="
+                  playlist_template_form.get('show_tab_searchbar').value
+                "
+                (click)="
+                  toggleAcceptace(playlist_template_form, 'show_tab_searchbar')
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(playlist_template_form, 'show_tab_searchbar')
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_tab_searchbar"
+              >
+                Display searchbar?
+              </label>
+            </div>
+          </div>
+
+          <div class="ws-100"></div>
+          <h5 class="col-12 text-muted">Square Settings</h5>
+          <div class="ws-100"></div>
+          <div class="col-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="button_border_radius_range" color="gray">
+                Button Border Radius
+                {{ playlist_template_form.get("button_border_radius").value }}px
+              </label>
+              <input
+                type="range"
+                class="custom-range"
+                min="0"
+                max="50"
+                step="1"
+                id="button_border_radius_range"
+                formControlName="button_border_radius"
+              />
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="button_spacing_range" color="gray">
+                Button Spacing
+                {{ playlist_template_form.get("button_spacing").value }}
+              </label>
+              <input
+                type="range"
+                class="custom-range"
+                min="0"
+                max="20"
+                step="0.25"
+                id="button_spacing_range"
+                formControlName="button_spacing"
+              />
+            </div>
+          </div>
+
+          <div class="ws-100"></div>
+          <h5 class="col-12 text-muted">Shadow Settings</h5>
+          <div class="ws-100"></div>
+          <div class="col-1">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label>Color</label>
+              <input
+                type="color"
+                formControlName="shadow_color"
+                class="form-control"
+                style="width: 50px; height: 40px"
+                (change)="print($event)"
+              />
+              <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+            </div>
+          </div>
+
+          <div class="col-5">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="shadow_spread_range" color="gray">
+                Spread {{ playlist_template_form.get("shadow_spread").value }}
+              </label>
+              <input
+                type="range"
+                class="custom-range"
+                min="0"
+                max="1"
+                step="0.05"
+                id="shadow_spread_range"
+                formControlName="shadow_spread"
+              />
+            </div>
+          </div>
+
+          <div class="col-5">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="shadow_blur_range" color="gray">
+                Blur {{ playlist_template_form.get("shadow_blur").value }}
+              </label>
+              <input
+                type="range"
+                class="custom-range"
+                min="0"
+                max="3"
+                step="0.05"
+                id="shadow_blur_range"
+                formControlName="shadow_blur"
+              />
+            </div>
+          </div>
+
+          <div class="ws-100"></div>
+          <h5 class="col-12 text-muted">Title Settings</h5>
+          <div class="ws-100"></div>
+          <div class="col-1">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label>Color</label>
+              <input
+                type="color"
+                formControlName="title_text_color"
+                class="form-control"
+                style="width: 50px; height: 40px"
+                (change)="print($event)"
+              />
+              <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+            </div>
+          </div>
+
+          <div class="col-5">
+            <div class="form-group">
+              <label for="title_text_align" color="gray"> Align </label>
+              <select
+                class="form-control"
+                id="title_text_align"
+                formControlName="title_text_align"
+              >
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+                <option value="justify">Justify</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-5">
+            <div class="form-group">
+              <label for="title_text_bold" color="gray"> Bold </label>
+              <select
+                class="form-control"
+                id="title_text_bold"
+                formControlName="title_text_bold"
+              >
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="300">300</option>
+                <option value="400">400</option>
+                <option value="500">500</option>
+                <option value="600">600</option>
+                <option value="700">700</option>
+                <option value="800">800</option>
+                <option value="900">900</option>
+                <option value="bold">Bold</option>
+                <option value="bolder">Bolder</option>
+                <option value="lighter">Lighter</option>
+                <option value="normal">Normal</option>
+              </select>
+            </div>
+          </div>
+
+          <!--  -->
+
+          <div
+            class="ws-100"
+            [hidden]="!show_display_description_on_playlist"
+          ></div>
+          <h5
+            class="col-12 text-muted"
+            [hidden]="!show_display_description_on_playlist"
+          >
+            Text Settings
+          </h5>
+          <div
+            class="ws-100"
+            [hidden]="!show_display_description_on_playlist"
+          ></div>
+
+          <div class="col-3" [hidden]="!show_display_description_on_playlist">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label>Description Text Color</label>
+              <input
+                type="color"
+                formControlName="description_text_color"
+                class="form-control"
+                style="width: 50px; height: 40px"
+                (change)="print($event)"
+              />
+              <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 12">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="events_template_form"
+          class="row"
+        >
+          <div style="margin-left: 28px !important" class="col-2">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_register_button"
+                name="display_register_button_radio"
+                class="custom-control-input"
+                formControlName="display_register_button"
+                [checked]="
+                  events_template_form.get('display_register_button').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    events_template_form,
+                    'display_register_button'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    events_template_form,
+                    'display_register_button'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_register_button"
+              >
+                Display register button?
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 13">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="giving_template_form"
+          class="row"
+        >
+          <div style="margin-left: 28px !important" class="col-2">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_header_text"
+                name="display_header_text_radio"
+                class="custom-control-input"
+                formControlName="display_header_text"
+                [checked]="
+                  giving_template_form.get('display_header_text').value
+                "
+                (click)="
+                  toggleAcceptace(giving_template_form, 'display_header_text')
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(giving_template_form, 'display_header_text')
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_header_text"
+              >
+                Display header?
+              </label>
+            </div>
+          </div>
+          <div [hidden]="!show_header_text_on_giving" class="col-9">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label stacked color="gray"> Header text </label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Place the text which will show at the top of screen."
+                formControlName="header_text"
+              />
+            </div>
+          </div>
+          <div class="w-100"></div>
+          <div style="margin-left: 28px !important" class="col-2">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_subheader_text"
+                name="display_subheader_text_radio"
+                class="custom-control-input"
+                formControlName="display_subheader_text"
+                [checked]="
+                  giving_template_form.get('display_subheader_text').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    giving_template_form,
+                    'display_subheader_text'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    giving_template_form,
+                    'display_subheader_text'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_subheader_text"
+              >
+                Display subheader?
+              </label>
+            </div>
+          </div>
+          <div [hidden]="!show_subheader_text_on_giving" class="col-9">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label stacked color="gray"> Subheader text </label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Place the text which will show at center of screen."
+                formControlName="subheader_text"
+              />
+            </div>
+          </div>
+          <div class="col-12">
+            <button
+              [disabled]="giving_buttons.controls.length > 3"
+              (click)="addButton(giving_buttons)"
+              class="btn btn-sm btn-success float-right"
+            >
+              Add button
+            </button>
+          </div>
+          <div class="col-12" formArrayName="giving_buttons">
+            <div
+              class="row"
+              *ngFor="let control of giving_buttons.controls; let i = index"
+            >
+              <div [formGroupName]="i" class="col-4">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label stacked color="gray"> Button {{ i + 1 }} text </label>
+                  <input
+                    type="text"
+                    required
+                    class="form-control"
+                    placeholder="Place the text of the giving button."
+                    formControlName="button_text"
+                  />
+                </div>
+              </div>
+
+              <div [formGroupName]="i" class="col-4">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label stacked color="gray"> Giving site url </label>
+                  <input
+                    type="text"
+                    required
+                    class="form-control"
+                    placeholder="Paste here the url of your donations site."
+                    formControlName="donation_url"
+                  />
+                </div>
+              </div>
+
+              <div [formGroupName]="i" class="col-2">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label>Color</label>
+                  <input
+                    type="color"
+                    formControlName="button_color"
+                    class="form-control"
+                    style="width: 50px; height: 40px"
+                    (change)="print($event)"
+                  />
+                  <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+                </div>
+              </div>
+              <div class="col-2 text-center align-self-center">
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="removeButton(giving_buttons, i)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+
+              <hr class="col-12" />
+            </div>
+          </div>
+
+          <div class="col-10">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+              (click)="uploadPicture(input_file)"
+            >
+              <label stacked color="gray"> Background picture </label>
+              <input
+                type="text"
+                required
+                class="form-control"
+                readonly
+                placeholder="Click here to select a picture"
+                formControlName="background_picture"
+              />
+            </div>
+          </div>
+          <div class="col-2 align-self-center">
+            <button class="btn btn-sm btn-success" (click)="addDefaultImage()">
+              Reset to default image
+            </button>
+          </div>
+
+          <div class="col-12 col-md-4" [hidden]="true">
+            <div class="custom-file mb-4">
+              <input
+                #input_file
+                accept="image/*"
+                type="file"
+                class="custom-file-input"
+                id="customFile"
+              />
+              <label class="custom-file-label" for="customFile"
+                >Choose file</label
+              >
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 14">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="booking_template_form"
+          class="row"
+        >
+          <div class="col-12">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization">
+                Select the calendar to display on template.
+              </label>
+              <ng-multiselect-dropdown
+                #multi_select_bookings
+                placeholder="Nothing select... the template will be empty"
+                [data]="bookings"
+                [settings]="select_booking_options"
+                (onSelect)="fixBooking($event)"
+                (onDeSelect)="clearBookingForm()"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 15">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="community_box_template_form"
+          class="row"
+        >
+          <div style="margin-left: 28px !important" class="col-2">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_header"
+                name="display_header_radio"
+                class="custom-control-input"
+                formControlName="display_header"
+                [checked]="
+                  community_box_template_form.get('display_header').value
+                "
+                (click)="
+                  toggleAcceptace(community_box_template_form, 'display_header')
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(community_box_template_form, 'display_header')
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_header"
+              >
+                Display title?
+              </label>
+            </div>
+          </div>
+          <div class="col-9">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization">
+                Select the community to display on template.
+              </label>
+              <ng-multiselect-dropdown
+                #multi_select_community_boxes
+                placeholder="Nothing select... the template will be empty"
+                formControlName="selected_items"
+                [data]="communityBoxes"
+                [settings]="select_community_options"
+                (onSelect)="fixCommunity($event)"
+                (onSelectAll)="fixCommunity($event)"
+                (onDeSelect)="fixCommunity($event)"
+                (onDeSelectAll)="fixCommunity($event)"
+              ></ng-multiselect-dropdown>
+              <small class="text-danger">
+                This template only will show tabs with items set them up.
+              </small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div
+        class="row"
+        *ngIf="template?.idTemplate === 17 || template?.idTemplate === 27"
+      >
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="grid_template_form"
+          class="row mt-4"
+        >
+          <div class="btn-group col-12">
+            <button
+              (click)="settings_obj.menu_option = 'view'"
+              class="btn btn-sm col-6"
+              [ngClass]="{
+                active: settings_obj.menu_option === 'view'
+              }"
+            >
+              View
+            </button>
+            <button
+              (click)="settings_obj.menu_option = 'text'"
+              class="btn btn-sm col-6"
+              [ngClass]="{
+                active: settings_obj.menu_option === 'text'
+              }"
+            >
+              Text
+            </button>
+            <button
+              (click)="settings_obj.menu_option = 'buttons'"
+              class="btn btn-sm col-6"
+              [ngClass]="{
+                active: settings_obj.menu_option === 'buttons'
+              }"
+            >
+              Buttons
+            </button>
+          </div>
+
+          <h5 class="col-12 text-muted">General Settings</h5>
+          <div class="ws-100"></div>
+          <div
+            class="col-12 mt-2 m-0 row"
+            [hidden]="settings_obj.menu_option !== 'view'"
+          >
+            <div style="margin-left: 28px !important" class="col-2">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="display_header"
+                  name="display_header_radio"
+                  class="custom-control-input"
+                  formControlName="display_header"
+                  [checked]="grid_template_form.get('display_header').value"
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'display_header')
+                  "
+                />
+                <span
+                  class="checkmark"
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'display_header')
+                  "
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="display_header"
+                >
+                  Display header?
+                </label>
+              </div>
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="show_tab_searchbar"
+                  name="show_tab_searchbar_radio"
+                  class="custom-control-input"
+                  formControlName="show_tab_searchbar"
+                  [checked]="grid_template_form.get('show_tab_searchbar').value"
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'show_tab_searchbar')
+                  "
+                />
+                <span
+                  class="checkmark"
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'show_tab_searchbar')
+                  "
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="show_tab_searchbar"
+                >
+                  Display searchbar?
+                </label>
+              </div>
+            </div>
+            <div class="col-2" [hidden]="template?.idTemplate !== 17">
+              Blocks per row
+              <div class="form-check custom-radio form-check-inline ml-3">
+                <input
+                  formControlName="blocks_per_row"
+                  class="form-check-input custom-control-input"
+                  type="radio"
+                  id="inlineRadio1"
+                  value="1"
+                  [checked]="
+                    grid_template_form.get('blocks_per_row').value === 1
+                  "
+                />
+                <label
+                  class="form-check-label custom-control-label"
+                  for="inlineRadio1"
+                >
+                  1
+                </label>
+              </div>
+              <div class="form-check custom-radio form-check-inline">
+                <input
+                  formControlName="blocks_per_row"
+                  class="form-check-input custom-control-input"
+                  type="radio"
+                  id="inlineRadio2"
+                  value="2"
+                  [checked]="
+                    grid_template_form.get('blocks_per_row').value === 2
+                  "
+                />
+                <label
+                  class="form-check-label custom-control-label"
+                  for="inlineRadio2"
+                >
+                  2
+                </label>
+              </div>
+            </div>
+            <div style="margin-left: 28px !important" class="col-2">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="display_description"
+                  name="display_description_radio"
+                  class="custom-control-input"
+                  formControlName="display_description"
+                  [checked]="
+                    grid_template_form.get('display_description').value
+                  "
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'display_description')
+                  "
+                />
+                <span
+                  class="checkmark"
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'display_description')
+                  "
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="display_description"
+                >
+                  Display description?
+                </label>
+              </div>
+            </div>
+            <div style="margin-left: 28px !important" class="col-2">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="display_more_button"
+                  name="display_more_button_radio"
+                  class="custom-control-input"
+                  formControlName="display_more_button"
+                  [checked]="
+                    grid_template_form.get('display_more_button').value
+                  "
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'display_more_button')
+                  "
+                />
+                <span
+                  class="checkmark"
+                  (click)="
+                    toggleAcceptace(grid_template_form, 'display_more_button')
+                  "
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="display_more_button"
+                >
+                  Display more button?
+                </label>
+              </div>
+            </div>
+            <div style="margin-left: 28px !important" class="col-2">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="display_article_titles"
+                  name="display_article_titles_radio"
+                  class="custom-control-input"
+                  formControlName="display_article_titles"
+                  [checked]="
+                    grid_template_form.get('display_article_titles').value
+                  "
+                  (click)="
+                    toggleAcceptace(
+                      grid_template_form,
+                      'display_article_titles'
+                    )
+                  "
+                />
+                <span
+                  class="checkmark"
+                  (click)="
+                    toggleAcceptace(
+                      grid_template_form,
+                      'display_article_titles'
+                    )
+                  "
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="display_article_titles"
+                >
+                  Show articles title?
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="col-12 mt-2 m-0 row"
+            [hidden]="settings_obj.menu_option !== 'text'"
+          >
+            <h5 [hidden]="!show_articles_title" class="col-12 text-muted">
+              Title Settings
+            </h5>
+            <div [hidden]="!show_articles_title" class="ws-100"></div>
+            <div [hidden]="!show_articles_title" class="col-1">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Color</label>
+                <input
+                  type="color"
+                  formControlName="title_text_color"
+                  class="form-control"
+                  style="width: 50px; height: 40px"
+                  (change)="print($event)"
+                />
+                <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+              </div>
+            </div>
+
+            <div [hidden]="!show_articles_title" class="col-5">
+              <div class="form-group">
+                <label for="title_text_align" color="gray"> Align </label>
+                <select
+                  class="form-control"
+                  id="title_text_align"
+                  formControlName="title_text_align"
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                  <option value="justify">Justify</option>
+                </select>
+              </div>
+            </div>
+
+            <div [hidden]="!show_articles_title" class="col-5">
+              <div class="form-group">
+                <label for="title_text_bold" color="gray"> Bold </label>
+                <select
+                  class="form-control"
+                  id="title_text_bold"
+                  formControlName="title_text_bold"
+                >
+                  <option value="100">100</option>
+                  <option value="200">200</option>
+                  <option value="300">300</option>
+                  <option value="400">400</option>
+                  <option value="500">500</option>
+                  <option value="600">600</option>
+                  <option value="700">700</option>
+                  <option value="800">800</option>
+                  <option value="900">900</option>
+                  <option value="bold">Bold</option>
+                  <option value="bolder">Bolder</option>
+                  <option value="lighter">Lighter</option>
+                  <option value="normal">Normal</option>
+                </select>
+              </div>
+            </div>
+
+            <!--  -->
+
+            <div class="ws-100" [hidden]="!show_display_description"></div>
+            <h5 class="col-12 text-muted" [hidden]="!show_display_description">
+              Text Settings
+            </h5>
+            <div class="ws-100" [hidden]="!show_display_description"></div>
+
+            <div class="col-3" [hidden]="!show_display_description">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Description Text Color</label>
+                <input
+                  type="color"
+                  formControlName="description_text_color"
+                  class="form-control"
+                  style="width: 50px; height: 40px"
+                  (change)="print($event)"
+                />
+                <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="col-12 mt-2 m-0 row"
+            [hidden]="settings_obj.menu_option !== 'buttons'"
+          >
+            <!--  -->
+            <h5 class="col-12 text-muted">Square Settings</h5>
+            <div class="ws-100"></div>
+            <div class="col-6">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="button_border_radius_range" color="gray">
+                  Button Border Radius
+                  {{ grid_template_form.get("button_border_radius").value }}%
+                </label>
+                <input
+                  type="range"
+                  class="custom-range"
+                  min="0"
+                  max="50"
+                  step="1"
+                  id="button_border_radius_range"
+                  formControlName="button_border_radius"
+                />
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="button_spacing_range" color="gray">
+                  Button Spacing
+                  {{ grid_template_form.get("button_spacing").value }}
+                </label>
+                <input
+                  type="range"
+                  class="custom-range"
+                  min="0"
+                  max="20"
+                  step="0.25"
+                  id="button_spacing_range"
+                  formControlName="button_spacing"
+                />
+              </div>
+            </div>
+
+            <div class="ws-100"></div>
+            <h5 class="col-12 text-muted">Shadow Settings</h5>
+            <div class="ws-100"></div>
+            <div class="col-1">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Color</label>
+                <input
+                  type="color"
+                  formControlName="shadow_color"
+                  class="form-control"
+                  style="width: 50px; height: 40px"
+                  (change)="print($event)"
+                />
+                <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+              </div>
+            </div>
+
+            <div class="col-5">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="shadow_spread_range" color="gray">
+                  Spread {{ grid_template_form.get("shadow_spread").value }}
+                </label>
+                <input
+                  type="range"
+                  class="custom-range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  id="shadow_spread_range"
+                  formControlName="shadow_spread"
+                />
+              </div>
+            </div>
+
+            <div class="col-5">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="shadow_blur_range" color="gray">
+                  Blur {{ grid_template_form.get("shadow_blur").value }}
+                </label>
+                <input
+                  type="range"
+                  class="custom-range"
+                  min="0"
+                  max="3"
+                  step="0.05"
+                  id="shadow_blur_range"
+                  formControlName="shadow_blur"
+                />
+              </div>
+            </div>
+            <div class="ws-100" [hidden]="!show_display_more_button"></div>
+            <h5 class="col-12 text-muted" [hidden]="!show_display_more_button">
+              Button Settings
+            </h5>
+            <div class="ws-100" [hidden]="!show_display_more_button"></div>
+            <div class="col-3" [hidden]="!show_display_more_button">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Button Text Color</label>
+                <input
+                  type="color"
+                  formControlName="button_more_color"
+                  class="form-control"
+                  style="width: 50px; height: 40px"
+                  (change)="print($event)"
+                />
+                <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 18">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="link_template_form"
+          class="row"
+        >
+          <div class="col-12">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label stacked color="gray"> Site Link: </label>
+              <input
+                type="url"
+                required
+                class="form-control"
+                placeholder="Place here the site's url (including http or https)."
+                formControlName="link_page"
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 20">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="gallery_template_form"
+          class="row"
+        >
+          <div class="col-12">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization">
+                Select the gallery to display on template.
+              </label>
+              <ng-multiselect-dropdown
+                #multi_select_galleries
+                formControlName="selected_items"
+                placeholder="Nothing select... the template will be empty"
+                [data]="galleries"
+                [settings]="select_community_options"
+                (onSelect)="fixGallery($event)"
+                (onSelectAll)="fixGallery($event)"
+                (onDeSelect)="fixGallery($event)"
+                (onDeSelectAll)="fixGallery($event)"
+              ></ng-multiselect-dropdown>
+              <small class="text-danger">
+                This template only will show tabs with items set them up.
+              </small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 21">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="mailing_list_template_form"
+          class="row"
+        >
+          <div class="col-12">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization">
+                Select the contact inbox to display on template.
+              </label>
+              <ng-multiselect-dropdown
+                #multi_select_mailing_list_boxes
+                formControlName="selected_items"
+                placeholder="Nothing select... the template will be empty"
+                [data]="mailingLists"
+                [settings]="select_community_options"
+                (onSelect)="fixMailing($event)"
+                (onSelectAll)="fixMailing($event)"
+                (onDeSelect)="fixMailing($event)"
+                (onDeSelectAll)="fixMailing($event)"
+              ></ng-multiselect-dropdown>
+              <small class="text-danger">
+                This template only will show tabs with items set them up.
+              </small>
+            </div>
+          </div>
+          <div class="col-12">
+            <!-- <div class="form-group">
+              <label for="mailing_language" color="gray"> Language </label>
+              <select
+                class="form-control"
+                id="mailing_language"
+                formControlName="mailing_language"
+              >
+                <option value="es">Español</option>
+                <option value="en">English</option>
+              </select>
+            </div> -->
+          </div>
+        </form>
+      </div>
+      <div class="row" *ngIf="template?.idTemplate === 25">
+        <h6 class="col-12 text-citric">This template requires extra info:</h6>
+
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="subcategories_template_form"
+          class="row"
+        >
+          <div class="col-12">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization">
+                Select the headers you want to display on template.
+              </label>
+              <ng-multiselect-dropdown
+                formControlName="selected_items"
+                #multi_select_subcategories
+                placeholder="Nothing select... the template will be empty"
+                [data]="subcategories_headers"
+                [settings]="select_subcategories_options"
+                (onSelect)="fixSubcategories($event)"
+                (onSelectAll)="fixSubcategories($event)"
+                (onDeSelect)="fixSubcategories($event)"
+                (onDeSelectAll)="fixSubcategories($event)"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="row" *ngIf="template?.idTemplate === 26">
+        <form
+          style="width: 100%"
+          #basicForm="ngForm"
+          [formGroup]="detail_template_form"
+        >
+          <div class="col-12">
+            <div class="form-group">
+              <label>Submodule* </label>
+              <select
+                required
+                class="form-control mb-1"
+                placeholder="Enter your tab's name."
+                formControlName="link_module_id"
+                [class.is-invalid]="
+                  detail_template_form.get('link_module_id').dirty &&
+                  detail_template_form.get('link_module_id').invalid
+                "
+                (change)="resetItemID($event)"
+              >
+                <option
+                  *ngFor="let head_item of header_submodules"
+                  [value]="head_item.id"
+                >
+                  {{ head_item.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div
+            class="col-12"
+            *ngIf="detail_template_form.get('link_module_id').value > 0"
+          >
+            <div class="form-group">
+              <label>Item to show* </label>
+              <select
+                type="text"
+                required
+                class="form-control mb-1"
+                placeholder="Enter your tab's name."
+                formControlName="element_id"
+                [class.is-invalid]="
+                  detail_template_form.get('element_id').dirty &&
+                  detail_template_form.get('element_id').invalid
+                "
+              >
+                <option
+                  *ngFor="let head_item of items"
+                  [value]="head_item[detail_item_properties.id_key]"
+                >
+                  {{ head_item[detail_item_properties.name_key] }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-12 text-center mt-3">
+        <button
+          type="button"
+          (click)="saveTemplate(template)"
+          class="btn btn-sm btn-success"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <div class="col-7 col-md-3">
+      <div class="menu-container">
+        <div
+          class="nav nav-pills navbar-light bg-light"
+          id="v-pills-tab"
+          role="tablist"
+        >
+          <a
+            class="nav-link active text-muted padding-fixed"
+            id="v-pills-home-tab"
+            data-toggle="pill"
+            href="#v-pills-home"
+            role="tab"
+            aria-controls="v-pills-home"
+            aria-selected="true"
+            (click)="changeTab('sampleImage', template_selected.idTemplate)"
+          >
+            App
+          </a>
+          <a
+            class="nav-link text-muted padding-fixed"
+            id="v-pills-members-tab"
+            data-toggle="pill"
+            href="#v-pills-members"
+            role="tab"
+            aria-controls="v-pills-members"
+            aria-selected="false"
+            (click)="
+              changeTab('sampleImageTablet', template_selected.idTemplate)
+            "
+          >
+            Tablet
+          </a>
+          <a
+            class="nav-link text-muted padding-fixed"
+            id="v-pills-events-tab"
+            data-toggle="pill"
+            href="#v-pills-events"
+            role="tab"
+            aria-controls="v-pills-events"
+            aria-selected="false"
+            (click)="changeTab('sampleImageWeb', template_selected.idTemplate)"
+          >
+            Web
+          </a>
+        </div>
+      </div>
+
+      <img
+        style="max-width: 100%"
+        [src]="
+          template_selected
+            ? template_selected[tabSelected]
+            : 'https://via.placeholder.com/414x736?text=Image%20Not%20Available'
+        "
+        onError="this.src='https://via.placeholder.com/414x736?text=Image%20Not%20Available'"
+        alt=""
+      />
+    </div>
+  </div>
+</div>

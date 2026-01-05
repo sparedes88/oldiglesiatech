@@ -1,0 +1,60 @@
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <h4>Page: {{ wpPageTitle }}</h4>
+    </div>
+    <div class="col-6" style="text-align: right">
+      <button class="btn btn-success btn-sm" (click)="post()">
+        Save
+        <i class="fa fa-save fa-sm"></i>
+      </button>
+    </div>
+  </div>
+  <div class="row" *ngFor="let key of wpPageData | keyvalue:keepOrder">
+    <div class="col-12">
+      <div class="form-group">
+        <label>
+          <strong>{{ key.key }}</strong>
+        </label>
+        <div *ngIf="!isObject(key.value)">
+          <quill-editor
+            (onEditorCreated)="onEditorCreated($event)"
+            [modules]="modules"
+            [(ngModel)]="key.value"
+            (ngModelChange)="imageChange(key.key, key.value)"
+          ></quill-editor>
+        </div>
+        <ng-select
+          *ngIf="isObject(key.value)"
+          [items]="wpImages"
+          bindLabel="slug"
+          placeholder="Select an image"
+          bindValue="id"
+          [searchable]="true"
+          [(ngModel)]="key.value.id"
+          style="text-align: center; height: 30px"
+          (ngModelChange)="imageChange(key.key, $event)"
+        >
+          <ng-template ng-option-tmp let-item="item" let-index="index">
+            <div class="row">
+              <div class="col-6">
+                <b>{{ item.slug }}</b>
+              </div>
+              <div class="col-6">
+                <img height="100" [src]="item.source_url" />
+              </div>
+            </div>
+          </ng-template>
+        </ng-select>
+        <div style="text-align: center; padding: 10px">
+          <div
+            *ngIf="isObject(key.value)"
+            style="text-align: center; background-color: whitesmoke"
+          >
+            <img style="width: 50%" [src]="returnImage(key.value.id)" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="container" style="min-height: 700px;">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <h4 class="col-11" style="color: white;">{{ id | titlecase }}</h4>
+          <div class="col-1">
+            <button class="btn btn-citric btn-sm" (click)="dismiss()">
+              X
+            </button>
+          </div>
+        </div>
+        <img class="card-img-top card-img-top-fixed" [src]="getCoverByID()" />
+      </div>
+    </div>
+
+    <div class="modules">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <h5 class="text-citric">Please select and event to continue:</h5>
+        </div>
+        <div *ngFor="let event of events" class="col-4 mb-3">
+          <div class="card" (click)="goToRouterEvent(event)">
+            <div class="card-fixed-text opacity-layer"></div>
+            <div class="card-fixed-text row">
+              <span class="col-12 span-number"> </span>
+            </div>
+            <img
+              class="card-img-top card-img-top-fixed"
+              [src]="fixUrl(event)"
+              onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+            />
+            <div class="card-body">
+              <h5 class="card-title text-center text-citric">
+                {{ event.name }}
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

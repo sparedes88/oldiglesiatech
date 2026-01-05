@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center" style="margin: 15%;" *ngIf="loading">
+  <div
+    class="spinner-border text-citric"
+    style="width: 6rem; height: 6rem;"
+    role="status"
+  ></div>
+</div>
+
+<div class="container">
+  <h3 *ngIf="!loading">Organizations</h3>
+
+  <table
+    datatable
+    [dtOptions]="dtOptions"
+    [dtTrigger]="dtTrigger"
+    class="table row-border hover mt-4"
+  >
+    <thead style="display: none;">
+      <tr>
+        <th width="75px">Logo</th>
+        <th>Description</th>
+        <th>Options</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let iglesia of iglesias">
+        <td width="75px">
+          <img class="avatar" [src]="iglesia.Logo" alt="" />
+        </td>
+        <td>
+          <div class="strong">{{ iglesia.Nombre }}</div>
+          <div>
+            {{ iglesia.Ciudad }}, {{ iglesia.Calle }}, {{ iglesia.NoExt }},
+            {{ iglesia.Provincia }}, {{ iglesia.ZIP }},
+          </div>
+        </td>
+        <td align="right">
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            routerLink="./profile/{{ iglesia.idIglesia }}"
+          >
+            View profile
+            <i class="fa fa-eye"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

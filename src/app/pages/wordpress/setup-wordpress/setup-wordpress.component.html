@@ -1,0 +1,46 @@
+<form
+  [formGroup]="wordpressSetingsForm"
+  (submit)="submitForm(wordpressSetingsForm)"
+>
+  <div class="form-group">
+    <label>Wordpress site URL*</label>
+    <input
+      formControlName="wordpressUrl"
+      required
+      type="url"
+      class="form-control"
+      placeholder="Wordpress site URL"
+    />
+  </div>
+
+  <div class="form-group">
+    <label>User*</label>
+    <input
+      formControlName="user"
+      required
+      type="text"
+      class="form-control"
+      placeholder="Wordpress Username"
+    />
+  </div>
+
+  <div class="form-group">
+    <label>Token*</label>
+    <input
+      formControlName="token"
+      required
+      type="text"
+      class="form-control"
+      placeholder="Wordpress Access Token"
+    />
+  </div>
+
+  <div class="form-group">
+    <button
+      class="btn btn-success"
+      [disabled]="wordpressSetingsForm.invalid || loading"
+    >
+      {{ loading ? "Loading..." : "Submit" }}
+    </button>
+  </div>
+</form>

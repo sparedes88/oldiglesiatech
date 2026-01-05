@@ -1,0 +1,604 @@
+<div class="container">
+  <div class="row mt-2 mb-3">
+    <div class="col-12 text-centered">
+      <img class="wp-logo" [src]="fixUrl(currentUser.logoPic)" alt="" />
+      <div class="strong" [ngClass]="configCompleted ? 'green' : 'red'">
+        {{ configCompleted ? "Connected" : "Connection failed!" }}
+        <i *ngIf="!configCompleted" class="fa fa-close"></i>
+        <i *ngIf="configCompleted" class="fa fa-check"></i>
+        <br />
+        <button *ngIf="!configCompleted" class="btn btn-link btn-sm" (click)="setupWPModal.open()">
+          <i class="fa fa-network-wired"></i>
+          Setup connection
+        </button>
+      </div>
+    </div>
+    <div class="col-xs-6 col-md-6">
+      <h3>Content</h3>
+      <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active btn btn-citric" id="pills-home-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">
+            Pages
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link btn btn-citric" id="pills-profile-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false"
+            (click)="rerender(1)">
+            Posts
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="col-xs-6 col-md-6 text-right">
+      <button class="btn btn-outline-citric mr-1" (click)="setupWPModal.open()" *ngIf="!!wpConfig">
+        Update Wordpress connection
+      </button>
+      <button class="btn btn-outline-citric" (click)="postFormModal.open(); selectedPost = undefined">
+        Add a New Post
+      </button>
+      <!-- <input type="text" [(ngModel)]="searchTxt" (keyup)="evento($event)"> -->
+    </div>
+  </div>
+  <div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+      <!-- <table class="table" datatable [dtOptions]="dtOptions[1]" [dtTrigger]="dtTrigger1" #table2 id="table2"
+        *ngIf="wpPages">
+        <thead>
+          <tr>
+            <th style="width: 20%" data-searchable="true">Name</th>
+            <th style="width: 80%">Fields</th>
+          </tr>
+          <tr>
+            <td tyle="width: 20%">
+              <input type="text" style="width: 100%" placeholder="Search page" [(ngModel)]="searchName" />
+            </td>
+            <td style="width: 80%">
+              <div class="row">
+                <div class="col-6">
+                  <input type="text" style="width: 100%" placeholder="Search field by name or content"
+                    [(ngModel)]="searchTxt" />
+                </div>
+                <div class="col-3">
+                  <select style="width: 100%; height: 100%" [(ngModel)]="filterType">
+                    <option value="">All types</option>
+                    <option value="img">Image</option>
+                    <option value="url">Url</option>
+                    <option value="tag">Tag</option>
+                  </select>
+                </div>
+                <div class="col-3">
+                  <select style="width: 100%; height: 100%" [(ngModel)]="filterStatus">
+                    <option value="">All status</option>
+                    <option value="fld">Completed</option>
+                    <option value="nfd">Not filled</option>
+                  </select>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="(wpPages | search: { title_name: searchName }).length == 0">
+            <td style="width: 20%">No data</td>
+            <td class="strong" style="word-wrap: break-word; width: 80%">
+              No data
+            </td>
+          </tr>
+          <tr *ngFor="let page of wpPages | search: { title_name: searchName }">
+            <td class="strong" style="width: 20%">
+              <a [routerLink]="'pageDetails/' + page.id">
+                {{ page?.title_name }}
+              </a>
+            </td>
+            <td class="strong" style="word-wrap: break-word; width: 80%">
+              <div *ngFor="
+              let item of page?.notFilled
+                | search
+                  : { name: searchTxt, value: searchTxt, type: searchTxt }
+                | search: { type: filterType }
+                | search: { status: filterStatus }
+            ">
+                <div style="
+                background: rgba(255, 187, 187, 0.4);
+                border-radius: 5px;
+                border: solid 1px #dadada;
+                padding: 2px;
+                margin: 2px;
+              " class="row" (mouseover)="item.shown = true" (mouseleave)="item.shown = false">
+                  <div class="col-9">
+                    <p>
+                      {{ item.name }}
+                    </p>
+                    <label style="font-weight: normal" *ngIf="
+                    (item.type == 'tag' ||
+                      item.type == 'url' ||
+                      item.type == 'nfd') &&
+                    !item.editing
+                  ">
+                      {{ item.value }}
+                    </label>
+                    <div *ngIf="
+                    (item.type == 'tag' ||
+                      item.type == 'url' ||
+                      item.type == 'nfd') &&
+                    item.editing
+                  " style="width: 100%; background-color: white">
+                      <quill-editor (onEditorCreated)="onEditorCreated($event)" [modules]="modules"
+                        style="max-width: fit-content; max-height: fit-content"
+                        [styles]="{ background: 'white', height: '100%' }" [(ngModel)]="item.value"></quill-editor>
+                    </div>
+
+                    <img *ngIf="item.type == 'img' && !item.editing" [src]="item.value.url" style="width: 25%" />
+                    <ng-select *ngIf="item.type == 'img' && item.editing" [items]="wpImages" bindLabel="slug"
+                      placeholder="Select an image" bindValue="id" [searchable]="true" [(ngModel)]="item.value.id"
+                      style="text-align: center; height: 30px">
+                      <ng-template ng-option-tmp let-item="item" let-index="index">
+                        <div class="row">
+                          <div class="col-6">
+                            <b>{{ item.slug }}</b>
+                          </div>
+                          <div class="col-6">
+                            <img height="100" [src]="item.source_url" />
+                          </div>
+                        </div>
+                      </ng-template>
+                    </ng-select>
+                  </div>
+                  <div class="col-3 d-flex justify-content-end">
+                    <div class="p-2">
+                      <button class="btn btn-success btn-sm" *ngIf="item.shown && !item.editing"
+                        (click)="item.editing = !item.editing; change(item)">
+                        <i class="fa fa-edit fa-sm"></i>
+                      </button>
+                      <button class="btn btn-primary btn-sm" *ngIf="item.editing" (click)="
+                      saveField(
+                        item.type,
+                        item.type == 'img' ? item.value.id : item.value,
+                        item.name,
+                        page.id
+                      )
+                    ">
+                        <i class="fa fa-save fa-sm"></i>
+                      </button>
+                      <button class="btn btn-danger btn-sm" *ngIf="item.editing" (click)="item.editing = !item.editing">
+                        <i class="fa fa-times fa-sm"></i>
+                      </button>
+                    </div>
+                    <div class="p-2">
+                      <small class="text-citric" style="text-align: right">
+                        {{ item.type }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="
+              (
+                page?.fields
+                | search: { name: searchTxt, value: searchTxt }
+                | search: { type: filterType }
+                | search: { status: filterStatus }
+              )?.length == 0 &&
+              (
+                page?.notFilled
+                | search: { name: searchTxt, value: searchTxt }
+                | search: { type: filterType }
+                | search: { status: filterStatus }
+              )?.length == 0
+            ">
+                No data
+              </div>
+              <div *ngFor="
+              let item of page?.fields
+                | search: { name: searchTxt, value: searchTxt }
+                | search: { type: filterType }
+                | search: { status: filterStatus }
+            ">
+                <div style="
+                background: rgba(187, 255, 187, 0.4);
+                border-radius: 5px;
+                border: solid 1px #dadada;
+                padding: 2px;
+                margin: 2px;
+              " class="row" (mouseover)="item.shown = true" (mouseleave)="item.shown = false">
+                  <div class="col-9" style="padding: 10px">
+                    <p>
+                      {{ item.name }}
+                    </p>
+                    <label style="font-weight: normal" *ngIf="
+                    (item.type == 'tag' ||
+                      item.type == 'url' ||
+                      item.type == 'nfd') &&
+                    !item.editing
+                  ">
+                      {{ item.type == 'tag' ? item.string : item.value }}
+                    </label>
+                    <div *ngIf="
+                    (item.type == 'tag' ||
+                      item.type == 'url' ||
+                      item.type == 'nfd') &&
+                    item.editing
+                  " style="width: 100%; background-color: white">
+                      <quill-editor (onEditorCreated)="onEditorCreated($event)" [modules]="modules"
+                        [styles]="{ background: 'white', height: '100%' }" [(ngModel)]="item.value"></quill-editor>
+                    </div>
+                    <img *ngIf="item.type == 'img' && !item.editing" [src]="item.value.url" style="width: 25%" />
+                    <ng-select *ngIf="item.type == 'img' && item.editing" [items]="wpImages" bindLabel="slug"
+                      placeholder="Select an image" bindValue="id" [searchable]="true" [(ngModel)]="item.value.id"
+                      style="text-align: center; height: 30px">
+                      <ng-template ng-option-tmp let-item="item" let-index="index">
+                        <div class="row">
+                          <div class="col-12">
+                            <b>{{ item.slug }}</b>
+                          </div>
+                          <div class="col-12">
+                            <img height="100px" [src]="item.source_url" />
+                          </div>
+                        </div>
+                      </ng-template>
+                    </ng-select>
+                  </div>
+                  <div class="col-3 d-flex justify-content-end">
+                    <div class="p-2">
+                      <button class="btn btn-success btn-sm" *ngIf="item.shown && !item.editing"
+                        (click)="item.editing = !item.editing; change(item)">
+                        <i class="fa fa-edit fa-sm"></i>
+                      </button>
+                      <button class="btn btn-primary btn-sm" *ngIf="item.editing" (click)="
+                      saveField(
+                        item.type,
+                        item.type == 'img' ? item.value.id : item.value,
+                        item.name,
+                        page.id
+                      )
+                    ">
+                        <i class="fa fa-save fa-sm"></i>
+                      </button>
+                      <button class="btn btn-danger btn-sm" *ngIf="item.editing" (click)="item.editing = !item.editing">
+                        <i class="fa fa-times fa-sm"></i>
+                      </button>
+                    </div>
+                    <div class="p-2">
+                      <small class="text-citric" style="text-align: right">
+                        {{ item.type }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table> -->
+      <ejs-grid #grid [dataSource]="
+          wpPages
+            | filter: { title_name: searchName }
+            | search: searchTxt
+            | search: filterType
+            | search: filterStatus
+        " [height]="'500px'" [allowSorting]="false" [allowFiltering]="false" [filterSettings]="filterOptions"
+        [allowPaging]="true" [pageSettings]="pageSettings" (toolbarClick)="toolbarClick($event)"
+        (queryCellInfo)="queryCellInfo($event)" (pdfQueryCellInfo)="pdfQueryCellInfo($event)" allowPdfExport="true"
+        (columnMenuOpen)="onColumnMenuClick($event)" (columnMenuClick)="onColumnMenuClick($event)"
+        (dataBound)="dataBound()" (pdfExportComplete)="pdfExportComplete()" [allowResizing]="true">
+        <!-- [aggregates]="aggregates" -->
+        <e-columns>
+          <e-column field="title_name" width="20%" [customAttributes]='customAttributes'>
+            <ng-template #headerTemplate>
+              <div>
+                <input type="text" placeholder="Search page" [(ngModel)]="searchName" />
+              </div>
+            </ng-template>
+            <ng-template #template let-page style="vertical-align: top">
+              <div style="vertical-align: top; top: 1px;">
+                <a [routerLink]="'pageDetails/' + page.id" style="vertical-align: top">
+                  {{ page?.title_name }}
+                </a>
+              </div>
+            </ng-template>
+          </e-column>
+          <e-column field="string" width="80%">
+            <ng-template #headerTemplate>
+              <div class="row">
+                <div class="col-6">
+                  <input type="text" style="width: 100%" placeholder="Search field by name or content"
+                    [(ngModel)]="searchTxt" />
+                </div>
+                <div class="col-3">
+                  <select style="width: 100%; height: 100%" [(ngModel)]="filterType">
+                    <option value="">All types</option>
+                    <option value="img">Image</option>
+                    <option value="url">Url</option>
+                    <option value="tag">Tag</option>
+                  </select>
+                </div>
+                <div class="col-3">
+                  <select style="width: 100%; height: 100%" [(ngModel)]="filterStatus">
+                    <option value="">All status</option>
+                    <option value="fld">Completed</option>
+                    <option value="nfd">Not filled</option>
+                  </select>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #template let-page>
+              <div>
+                <div *ngFor="
+                    let item of page?.notFilled
+                      | search: searchTxt
+                      | search: filterType
+                      | search: filterStatus
+                  ">
+                  <div style="
+                      background: rgba(255, 187, 187, 0.4);
+                      border-radius: 5px;
+                      border: solid 1px #dadada;
+                      padding: 2px;
+                      margin: 2px;
+                    " class="row" (mouseover)="item.shown = true" (mouseleave)="item.shown = false">
+                    <div class="col-9">
+                      <p>
+                        {{ item.name }}
+                      </p>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                      <div class="p-2">
+                        <button class="btn btn-success btn-sm" *ngIf="item.shown && !item.editing"
+                          (click)="item.editing = !item.editing; change(item)">
+                          <i class="fa fa-edit fa-sm"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm" *ngIf="item.editing" (click)="
+                            saveField(
+                              item.type,
+                              item.type == 'img' ? item.value.id : item.value,
+                              item.name,
+                              page.id
+                            )
+                          ">
+                          <i class="fa fa-save fa-sm"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" *ngIf="item.editing"
+                          (click)="item.editing = !item.editing">
+                          <i class="fa fa-times fa-sm"></i>
+                        </button>
+                      </div>
+                      <div class="p-2">
+                        <small class="text-citric" style="text-align: right">
+                          {{ item.type }}
+                        </small>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <label style="font-weight: normal; width: 100%" *ngIf="
+                          (item.type == 'tag' ||
+                            item.type == 'url' ||
+                            item.type == 'nfd') &&
+                          !item.editing
+                        ">
+                        {{ item.value }}
+                      </label>
+                      <div *ngIf="
+                          (item.type == 'tag' ||
+                            item.type == 'url' ||
+                            item.type == 'nfd') &&
+                          item.editing
+                        " style="
+                          width: 100%;
+                          background-color: whitesmoke;
+                          white-space: pre-wrap;
+                        ">
+                        <quill-editor (onEditorCreated)="onEditorCreated($event)" [modules]="modules" style="
+                            max-width: fit-content;
+                            max-height: fit-content;
+                          " [styles]="{ background: 'white', height: '100%' }" [(ngModel)]="item.value"></quill-editor>
+                      </div>
+
+                      <img *ngIf="item.type == 'img' && !item.editing" [src]="item.value.url" style="width: 25%" />
+                      <ng-select *ngIf="item.type == 'img' && item.editing" [items]="wpImages" bindLabel="slug"
+                        placeholder="Select an image" bindValue="id" [searchable]="true" [(ngModel)]="item.value.id"
+                        style="text-align: center; height: 30px">
+                        <ng-template ng-option-tmp let-item="item" let-index="index">
+                          <div class="row">
+                            <div class="col-6">
+                              <b>{{ item.slug }}</b>
+                            </div>
+                            <div class="col-6">
+                              <img height="100" [src]="item.source_url" />
+                            </div>
+                          </div>
+                        </ng-template>
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="
+                    (
+                      page?.fields
+                      | search: searchTxt
+                      | search: filterType
+                      | search: filterStatus
+                    )?.length == 0 &&
+                    (
+                      page?.notFilled
+                      | search: searchTxt
+                      | search: filterType
+                      | search: filterStatus
+                    )?.length == 0
+                  ">
+                  No data
+                </div>
+                <div *ngFor="
+                    let item of page?.fields
+                      | search: searchTxt
+                      | search: filterType
+                      | search: filterStatus
+                  ">
+                  <div style="
+                      background: rgba(187, 255, 187, 0.4);
+                      border-radius: 5px;
+                      border: solid 1px #dadada;
+                      padding: 2px;
+                      margin: 2px;
+                    " class="row" (mouseover)="item.shown = true" (mouseleave)="item.shown = false">
+                    <div class="col-9" style="padding: 10px">
+                      <p style="font-weight: bold">
+                        {{ item.name }}
+                      </p>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                      <div class="p-2">
+                        <button class="btn btn-success btn-sm" *ngIf="item.shown && !item.editing"
+                          (click)="item.editing = !item.editing; change(item)">
+                          <i class="fa fa-edit fa-sm"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm" *ngIf="item.editing" (click)="
+                            saveField(
+                              item.type,
+                              item.type == 'img' ? item.value.id : item.value,
+                              item.name,
+                              page.id
+                            )
+                          ">
+                          <i class="fa fa-save fa-sm"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" *ngIf="item.editing"
+                          (click)="item.editing = !item.editing">
+                          <i class="fa fa-times fa-sm"></i>
+                        </button>
+                      </div>
+                      <div class="p-2">
+                        <small class="text-citric" style="text-align: right">
+                          {{ item.type }}
+                        </small>
+                      </div>
+                    </div>
+                    <div class="col-12" style="padding: 10px">
+                      <label style="
+                          font-weight: normal;
+                          width: 100%;
+                          white-space: pre-wrap;
+                        " *ngIf="
+                          (item.type == 'tag' ||
+                            item.type == 'url' ||
+                            item.type == 'nfd') &&
+                          !item.editing
+                        ">
+                        {{ item.type == "tag" ? item.string : item.value }}
+                      </label>
+                      <div *ngIf="
+                          (item.type == 'tag' ||
+                            item.type == 'url' ||
+                            item.type == 'nfd') &&
+                          item.editing
+                        " style="
+                          background-color: whitesmoke;
+                          white-space: pre-wrap;
+                        ">
+                        <quill-editor (onEditorCreated)="onEditorCreated($event)" [modules]="modules" style="
+                            max-width: fit-content;
+                            max-height: fit-content;
+                          " [theme]="'snow'" [styles]="{ background: 'white', height: '100%' }"
+                          [(ngModel)]="item.value">
+                        </quill-editor>
+                      </div>
+                      <img *ngIf="item.type == 'img' && !item.editing" [src]="item.value.url" style="width: 25%" />
+                      <ng-select *ngIf="item.type == 'img' && item.editing" [items]="wpImages" bindLabel="slug"
+                        placeholder="Select an image" bindValue="id" [searchable]="true" [(ngModel)]="item.value.id"
+                        style="text-align: center; height: 30px">
+                        <ng-template ng-option-tmp let-item="item" let-index="index">
+                          <div class="row">
+                            <div class="col-12">
+                              <b>{{ item.slug }}</b>
+                            </div>
+                            <div class="col-12">
+                              <img height="100px" [src]="item.source_url" />
+                            </div>
+                          </div>
+                        </ng-template>
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </e-column>
+        </e-columns>
+      </ejs-grid>
+    </div>
+    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+      <table class="table" datatable [dtOptions]="dtOptions[0]" [dtTrigger]="dtTrigger" #table1 id="table">
+        <thead>
+          <tr>
+            <th>Post ID</th>
+            <th>Post title</th>
+            <th>Tags</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let post of wpPosts">
+            <td>#{{ post.id }}</td>
+            <td class="strong">
+              {{ post.title?.rendered }}
+            </td>
+            <td>
+              <span style="margin-right: 4px" class="badge badge-info" *ngFor="let tag of getPostTags(post.tags)">
+                {{ tag?.name }}
+              </span>
+            </td>
+            <td>
+              {{ post.status }}
+            </td>
+            <td>
+              {{ post.date | date: "short" }}
+            </td>
+            <td>
+              <div class="btn-group">
+                <a [href]="post.link" target="_blank" class="btn btn-primary btn-sm">
+                  <i class="fa fa-eye fa-sm"></i>
+                </a>
+                <button class="btn btn-success btn-sm" (click)="openEditPost(post)">
+                  <i class="fa fa-edit fa-sm"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+
+<ngx-smart-modal identifier="pageDetail" #pageDetail customClass="large-modal">
+  <app-pages-list *ngIf="pageDetail.isVisible()" (onSubmit)="getWordpressSettings(); pageDetail.close()"
+    [wpPageId]="wpPageId"></app-pages-list>
+</ngx-smart-modal>
+
+<ngx-smart-modal identifier="setupWPModal" #setupWPModal>
+  <h4>Connect with your Wordpress Site</h4>
+
+  <div class="alert alert-warning">
+    Before start using this module it's require to connect with your wordpress
+    site
+    <br />
+    Please <a href="#">follow this instructions</a> to generate the required
+    token
+  </div>
+
+  <setup-wordpress *ngIf="setupWPModal.isVisible()" (onSubmit)="getWordpressSettings(); setupWPModal.close()"
+    [wordpressSettings]="wordpressSettings"></setup-wordpress>
+</ngx-smart-modal>
+
+<ngx-smart-modal identifier="postFormModal" #postFormModal customClass="full-screen-modal" [escapable]="false"
+  [dismissable]="false">
+  <h4>Create a new Post</h4>
+
+  <post-form *ngIf="postFormModal.isVisible()" (onSubmit)="handlePostSubmit($event)" [wpConfig]="wpConfig"
+    [wpData]="wpData" [post]="selectedPost"></post-form>
+</ngx-smart-modal>

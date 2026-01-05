@@ -1,0 +1,130 @@
+<div class="container mt-2">
+  <div class="row">
+    <div class="col-xs-6 col-md-6">
+      <h4 *ngIf="!hide_header">Galleries</h4>
+    </div>
+    <div class="col-xs-6 col-md-6 text-right">
+      <a class="btn btn-primary" [routerLink]="['/galleries/v2/create']">
+        Add Gallery
+      </a>
+    </div>
+  </div>
+
+  <hr *ngIf="!hide_header" />
+
+  <table
+    datatable
+    [dtOptions]="dtOptions"
+    [dtTrigger]="dtTrigger"
+    class="table row-border hover mt-4"
+  >
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Photos</th>
+        <th>Settings</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let gallery of galleries">
+        <!-- routerLink="/groups/details/{{ group.idGroup }}" -->
+        <td>
+          {{ gallery.name }}
+        </td>
+        <td>
+          {{ gallery.description }}
+        </td>
+        <td>
+          {{ gallery.total_photos }}
+        </td>
+        <td>
+          <div class="btn-group">
+            <a
+              class="btn btn-primary btn-sm"
+              routerLink="/galleries/v2/details/{{ gallery.id }}"
+            >
+              <i class="fa fa-eye"></i>
+            </a>
+            <a
+              class="btn btn-success btn-sm"
+              routerLink="/galleries/v2/edit/{{ gallery.id }}"
+            >
+              <i class="fa fa-edit"></i>
+            </a>
+            <button
+              class="btn btn-danger btn-sm"
+              (click)="deleteGallery(gallery)"
+            >
+              <i class="fa fa-trash"></i>
+            </button>
+            <button
+              class="btn btn-info btn-sm"
+              (click)="openGalleryIframe(gallery.id)"
+            >
+              <i class="fa fa-code"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ngx-smart-modal #iframeCodeModal identifier="iframeCodeModal">
+  <h4>Embed this gallery</h4>
+  <div class="row justify-content-center">
+    <div class="col-10 text-center">
+      <small class="text-secondary">
+        Copy this embed code to share your gallery in your page.
+      </small>
+    </div>
+    <div class="col-12">
+    <pre class="mb-0" style="background-color: #e2e2e2; padding: 8px">{{
+      iframeCode.frame
+    }}</pre>
+    </div>
+    <div class="col-8 text-center">
+      <button
+        (click)="copyValue(iframeCode.frame, 'code')"
+        class="btn btn-sm btn-citric mt-2"
+      >
+        Copy Code
+      </button>
+    </div>
+    <div class="col-12 text-center">
+      <h5 class="my-2">Or</h5>
+      <small class="text-secondary mb-2">
+        Scan this QR or share this url to use it in your website.
+      </small>
+      <ngx-qrcode
+        #qr_code
+        class="col-2"
+        (click)="shareQR(qr_code)"
+        style="width: 50px; height: 50px"
+        [qrc-value]="iframeCode.url"
+        [qrc-class]="'qrItemResize-dash'"
+        qrc-errorCorrectionLevel="M"
+      >
+      </ngx-qrcode>
+      <pre
+        class="mb-0 text-left"
+        style="background-color: #e2e2e2; padding: 8px; white-space: nowrap; top: -25px; position: relative;"
+      >
+        <a [href]="iframeCode.url" target="_blank">{{ iframeCode.url }}</a>
+      </pre>
+      <div class="justify-content-around row" style="position: relative; top: -20px;">
+        <button (click)="shareQR(qr_code)" class="btn btn-sm btn-citric">
+          Share QR
+        </button>
+
+        <button
+          (click)="copyValue(iframeCode.url, 'link')"
+          class="btn btn-sm btn-citric"
+        >
+          Copy Link
+        </button>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>

@@ -1,0 +1,123 @@
+<div class="page">
+  <div class="col-12 text-right">
+    <button class="btn btn-sm" (click)="onDismiss.emit()">
+      <span class="text-muted">
+        Close
+      </span>
+    </button>
+  </div>
+  <h4 class="text-muted text-center">
+    Confirm your reservation
+  </h4>
+
+  <div *ngIf="booking_appointment" class="row mx-0 justify-content-center">
+    <div class="col-12 text-center">
+      <h6 class="text-center">
+        {{ booking_appointment?.session_date | date: "EEEE dd MMMM yyyy" }}
+      </h6>
+    </div>
+    <div class="col-8 text-muted text-center">
+      {{ booking_appointment.start_time_formatted }} -
+      {{ booking_appointment.end_time_formatted }}
+    </div>
+    <form
+      [formGroup]="formBooking"
+      class="col-12 row mx-0 justify-content-center"
+    >
+      <div class="col-12">
+        <div class="form-group">
+          <label>
+            First Name <small class="text-muted">(Required)</small>
+          </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="Your name."
+            formControlName="first_name"
+            [class.is-invalid]="
+              formBooking.get('first_name').dirty &&
+              formBooking.get('first_name').invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label>
+            Last Name <small class="text-muted">(Required)</small>
+          </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="Your Last name."
+            formControlName="last_name"
+            [class.is-invalid]="
+              formBooking.get('last_name').dirty &&
+              formBooking.get('last_name').invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label> Email <small class="text-muted">(Required)</small> </label>
+          <input
+            type="email"
+            required
+            class="form-control mb-1"
+            placeholder="Your email."
+            formControlName="email"
+            [class.is-invalid]="
+              formBooking.get('email').dirty && formBooking.get('email').invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label> Summary <small class="text-muted">(Required)</small> </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="What is the appointment subject."
+            formControlName="summary"
+            [class.is-invalid]="
+              formBooking.get('summary').dirty &&
+              formBooking.get('summary').invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label>
+            Description
+          </label>
+          <textarea
+            type="text"
+            class="form-control mb-1"
+            placeholder="Enter a description about what you want to talk."
+            formControlName="description"
+            [class.is-invalid]="
+              formBooking.get('description').dirty &&
+              formBooking.get('description').invalid
+            "
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="col-6 text-center">
+        <button
+          class="btn btn-sm btn-success"
+          type="button"
+          (click)="reserveAppointment()"
+        >
+          Confirm reservation
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<div class="text-right">
+  <button
+    class="btn btn-primary"
+    (click)="printChart()"
+    [disabled]="printing"
+  >
+    {{ printing ? "Printing..." : "Print Chart" }}
+  </button>
+</div>
+
+<organization-chart
+  id="orgChartId"
+  [datasource]="data"
+  [pan]="true"
+></organization-chart>

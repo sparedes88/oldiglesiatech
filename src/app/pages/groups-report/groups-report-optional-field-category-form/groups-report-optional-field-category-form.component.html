@@ -1,0 +1,58 @@
+<form
+  *ngIf="reviewForm"
+  [formGroup]="reviewForm"
+  style="width: 100%"
+  class="row"
+>
+  <div class="col-8">
+    <div class="form-group">
+      <label for="estimated">
+        Name
+        <span class="text-danger"> * </span>
+      </label>
+      <input
+        class="form-control"
+        placeholder="Category Name."
+        type="text"
+        formControlName="name"
+        required
+      />
+    </div>
+  </div>
+
+  <div class="col-8">
+    <div class="form-group">
+      <label> Description (optional) </label>
+      <textarea
+        class="form-control"
+        placeholder="Place here the description for this category."
+        type="text"
+        formControlName="description"
+      >
+      </textarea>
+    </div>
+  </div>
+</form>
+
+<hr />
+
+<span style="display: block; text-align: right; width: 100%" class="mb-2">
+  <button
+    type="button"
+    *ngIf="!getPermissions()"
+    class="btn btn-sm btn-muted"
+    (click)="deactivateForm()"
+  >
+    Cancel
+  </button>
+
+  <button
+    type="button"
+    *ngIf="!getPermissions()"
+    [disabled]="reviewForm?.invalid && !getPermissions()"
+    (click)="addOptionalField()"
+    class="btn btn-sm btn-success"
+  >
+    Save
+  </button>
+</span>

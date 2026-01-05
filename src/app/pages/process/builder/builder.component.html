@@ -1,0 +1,319 @@
+<div class="container">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+            {{ totalGroups || 0 }}
+          </span>
+          <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/processes_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <button class="btn btn-primary pull-right mb-3" (click)="orgChart.open()">
+        View chart
+      </button>
+    </div>
+    <!-- <h2 class="mt-2">Process</h2> -->
+    <app-pie-chart-graph
+      #pie_chart
+      class="col-12"
+      *ngIf="!loading"
+      [idOrganization]="user?.idIglesia"
+      [processList]="processList"
+      (on_add)="handleAddAction($event)"
+      (on_update)="handleUpdateAction($event)"
+      (on_select_item)="handleSelection($event)"
+    >
+    </app-pie-chart-graph>
+  </div>
+
+  <!-- <app-pie-chart
+    (on_select_item)="handleSelection($event)"
+    #pie_chart
+    [processList]="processList"
+  ></app-pie-chart> -->
+  <!-- <table class="table" style="width: 100%">
+    <thead>
+      <tr>
+        <th width="33.33%">Process</th>
+        <th width="33.33%">Levels</th>
+        <th width="33.33%">Steps</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td style="vertical-align: top">
+          <div class="drag-list builder-scroll">
+            <div
+              class="drag-box no-move"
+              *ngFor="let process of processList"
+              (click)="setSelectedProcess(process)"
+              [ngClass]="{
+                selected: selectedProcess?.idProcess == process.idProcess
+              }"
+            >
+              {{ process.name }}
+
+              <button
+                class="btn btn-light"
+                (click)="openProcessModal(process, $event)"
+              >
+                <i class="fa fa-edit"></i>
+              </button>
+            </div>
+            <div class="drag-box no-move strong blue">
+              <form (ngSubmit)="addProcess(processForm)" #processForm="ngForm">
+                <div class="input-group">
+                  <input
+                    required
+                    type="text"
+                    class="form-control"
+                    placeholder="Process Name"
+                    [(ngModel)]="processForm.name"
+                    name="name"
+                  />
+                  <div class="input-group-append">
+                    <button
+                      type="submit"
+                      class="btn btn-success"
+                      [disabled]="!processForm.name"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </td>
+        <td style="vertical-align: top">
+          <div
+            *ngIf="!loadingLevels && !loadingGroups"
+            cdkDropList
+            class="drag-list builder-scroll"
+            (cdkDropListDropped)="dropLevel($event)"
+          >
+            <ng-container *ngFor="let level of selectedProcess?.levels">
+              <div
+                *ngIf="level.estatus"
+                class="drag-box"
+                cdkDrag
+                (click)="setSelectedLevelSteps(level)"
+                [ngClass]="{
+                  selected: selectedLevel?.idNivel == level.idNivel
+                }"
+              >
+                {{ level.descripcion }}
+
+                <button
+                  class="btn btn-light"
+                  (click)="
+                    openLevelForm(level, updateLevelForm);
+                    $event.stopPropagation()
+                  "
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="!selectedProcess?.idProcess">
+              <div class="item orange centered-text">
+                <b>Please select a Process</b>
+              </div>
+            </ng-container>
+
+            <ng-container
+              *ngIf="
+                selectedProcess?.idProcess && !selectedProcess?.levels?.length
+              "
+            >
+              <div class="item orange centered-text">
+                <b>Please add a level</b>
+              </div>
+            </ng-container>
+
+            <!-- Level form ->
+            <div
+              *ngIf="selectedProcess?.idProcess"
+              class="drag-box no-move strong blue"
+            >
+              <form (ngSubmit)="addLevels(levelForm)" #levelForm="ngForm">
+                <div class="input-group">
+                  <input
+                    required
+                    type="text"
+                    class="form-control"
+                    placeholder="Level Name"
+                    [(ngModel)]="levelForm.name"
+                    name="name"
+                  />
+                  <div class="input-group-append">
+                    <button
+                      type="submit"
+                      class="btn btn-success"
+                      [disabled]="!levelForm.name || updatingLevel"
+                    >
+                      {{ updatingLevel ? "Please wait..." : "Submit" }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Loading levels ->
+          <div *ngIf="loadingLevels && !loadingGroups" class="centered-text">
+            <strong>Loading levels</strong>
+          </div>
+        </td>
+        <td style="vertical-align: top">
+          <div class="drag-list" *ngIf="!selectedLevel?.idNivel">
+            <div
+              class="item drag-box orange strong"
+              style="justify-content: center"
+            >
+              <b>Please select a Level</b>
+            </div>
+          </div>
+
+          <div
+            class="drag-list"
+            *ngIf="selectedLevel?.idNivel && !selectedLevelSteps?.length"
+          >
+            <div
+              class="item drag-box orange strong"
+              style="justify-content: center"
+            >
+              <b>Please add a Step</b>
+            </div>
+          </div>
+
+          <div
+            *ngIf="
+              !loadingLevels && !loadingGroups && selectedLevelSteps?.length
+            "
+            cdkDropList
+            class="drag-list builder-scroll"
+            (cdkDropListDropped)="dropSteep($event)"
+          >
+            <ng-container *ngFor="let steep of selectedLevelSteps">
+              <div
+                class="drag-box"
+                cdkDrag
+                *ngIf="steep.estatus"
+                (click)="setSelectedStep(steep)"
+                [ngClass]="{
+                  selected: selectedStep?.idRequisito == steep.idRequisito
+                }"
+              >
+                {{ steep.descripcion }}
+              </div>
+            </ng-container>
+          </div>
+          <!-- Step form ->
+          <div *ngIf="selectedLevelSteps" class="drag-box no-move strong blue">
+            <form (ngSubmit)="addSteep(steepForm)" #steepForm="ngForm">
+              <div class="input-group">
+                <input
+                  required
+                  type="text"
+                  class="form-control"
+                  placeholder="Step description"
+                  [(ngModel)]="steepForm.description"
+                  name="description"
+                />
+                <div class="input-group-append">
+                  <button
+                    type="submit"
+                    class="btn btn-success"
+                    [disabled]="!steepForm.description || updatingSteep"
+                  >
+                    {{ updatingSteep ? "Please wait.." : "Submit" }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Loading levels ->
+          <div *ngIf="loadingLevels && !loadingGroups" class="centered-text">
+            <strong>Loading steps</strong>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table> -->
+
+  <hr />
+
+  <!-- Process builder -->
+  <!-- <app-contact-process
+    *ngIf="builderSelected == 'process'"
+    [process]="selectedProcess"
+  ></app-contact-process> -->
+
+  <!-- Levels builder -->
+  <!-- <app-contact-levels
+    [levelName]="selectedLevel?.descripcion"
+    [idNivel]="selectedLevel?.idNivel"
+    [idProcess]="selectedProcess?.idProcess"
+    [idIglesia]="selectedProcess?.idOrganization"
+    *ngIf="builderSelected == 'levels'"
+  >
+  </app-contact-levels> -->
+
+  <!-- Step builder -->
+  <!-- <app-contact-steps
+    [stepName]="selectedStep?.descripcion"
+    [idNivel]="selectedLevel?.idNivel"
+    [idProcess]="selectedProcess?.idProcess"
+    [idIglesia]="selectedProcess?.idOrganization"
+    [idRequisito]="selectedStep?.idRequisito"
+    *ngIf="builderSelected == 'steps'"
+  >
+  </app-contact-steps> -->
+</div>
+
+<ngx-smart-modal #createLevelModal identifier="createLevelModal">
+  <level-form (onSubmit)="insertCreatedLevel($event)"></level-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal #updateLevelForm identifier="updateLevelForm">
+  <level-form
+    (onSubmit)="updateLevel($event)"
+    *ngIf="selectedLevel?.idNivel && updateLevelForm.isVisible()"
+    [level]="selectedLevel"
+  ></level-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal #processUpdateFormModal identifier="processUpdateFormModal">
+  <app-process-form
+    *ngIf="selectedProcess?.idProcess && processUpdateFormModal.isVisible()"
+    [process]="selectedProcess"
+    [levels]="levels"
+    [groups]="groups"
+    (onSubmit)="
+      getProcessDetails(selectedProcess);
+      getProcess();
+      processUpdateFormModal.close()
+    "
+  ></app-process-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal #orgChart identifier="orgChart" customClass="large-modal">
+  <app-orgchart *ngIf="!loading"></app-orgchart>
+</ngx-smart-modal>

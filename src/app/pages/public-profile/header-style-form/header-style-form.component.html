@@ -1,0 +1,142 @@
+<form (ngSubmit)="onSubmitForm(headerStyleForm)" #headerStyleForm="ngForm">
+  <div class="row">
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label>Background color</label>
+        <input
+          type="color"
+          name="background_color"
+          class="form-control"
+          [(ngModel)]="headerStyleFormGroup.background_color"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Secondary color</label>
+        <input
+          type="color"
+          name="secondary_color"
+          class="form-control"
+          [(ngModel)]="headerStyleFormGroup.secondary_color"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Icon color</label>
+        <input
+          type="color"
+          name="icon_color"
+          class="form-control"
+          [(ngModel)]="headerStyleFormGroup.icon_color"
+        />
+      </div>
+
+      <div
+        class="form-group"
+        *ngIf="headerStyleFormGroup?.display_mode == 'double_logo'"
+      >
+        <img
+          [src]="headerStyleFormGroup?.secondary_logo"
+          alt="Logo"
+          *ngIf="headerStyleFormGroup?.secondary_logo"
+          class="responsive-img"
+        />
+        <label>Upload logo</label>
+        <input
+          type="file"
+          class="form-control"
+          (change)="addSecondaryLogo($event.target.files[0])"
+        />
+      </div>
+      <div class="form-group">
+        <img
+          [src]="headerStyleFormGroup?.primary_logo"
+          alt="Logo"
+          *ngIf="headerStyleFormGroup?.primary_logo"
+          class="responsive-img"
+        />
+        <div>
+          <button
+            *ngIf="headerStyleFormGroup?.primary_logo"
+            type="button"
+            class="btn btn-danger btn-sm"
+            (click)="headerStyleFormGroup.primary_logo = ''"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+        <label>Upload pirmary logo</label>
+        <input
+          type="file"
+          class="form-control"
+          (change)="addPrimaryLogo($event.target.files[0])"
+        />
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label>Primary secondary color</label>
+        <input
+          type="color"
+          name="primary_color"
+          class="form-control"
+          [(ngModel)]="headerStyleFormGroup.primary_color"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Inactive text color</label>
+        <input
+          type="color"
+          name="inactive_color"
+          class="form-control"
+          [(ngModel)]="headerStyleFormGroup.inactive_color"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Display Mode</label>
+        <select
+          name="display_mode"
+          [(ngModel)]="headerStyleFormGroup.display_mode"
+          class="form-control"
+        >
+          <option value="single_logo">Single Logo</option>
+          <option value="double_logo">Double Logo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Logo size</label>
+        <select
+          name="logo_size"
+          [(ngModel)]="headerStyleFormGroup.logo_size"
+          class="form-control"
+        >
+          <option *ngFor="let size of logoSizes" [value]="size.value">
+            {{ size.title }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Favicon</label>
+        <input
+          type="file"
+          class="form-control"
+          accept=".ico,.png"
+          (change)="addFavicon($event.target.files[0])"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12">
+    <div class="form-group">
+      <button class="btn btn-success">
+        Submit
+        <i class="fa fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</form>

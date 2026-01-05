@@ -1,0 +1,337 @@
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+<div [hidden]="loading" class="container">
+  <div class="description-row row mx-0 mt-2 mb-2">
+    <div *ngIf="!display_new_style" class="col-xs-12 col-md-3 col-lg-2">
+      <img
+        [src]="fixUrl(community?.style_settings?.logo_picture)"
+        alt=""
+        class="responsive-img rounded-circle"
+      />
+    </div>
+    <div
+      class="col-12 is-flex align-items-center flex-wrap"
+      [ngClass]="{
+        'col-md-9 col-lg-10': !display_new_style,
+        'mb-3': display_new_style
+      }"
+    >
+      <div class="w-100">
+        <h2
+          [ngStyle]="{
+            color: community?.style_settings?.main_title_color || '#E65100'
+          }"
+          class="mt-2"
+        >
+          {{ community.name }}
+        </h2>
+        <div>
+          {{ community.description }}
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="community?.style_settings?.banner_picture && display_new_style"
+      class="col-xs-12 mb-4"
+    >
+      <img
+        [src]="fixUrl(community?.style_settings?.banner_picture)"
+        alt=""
+        class="responsive-img"
+      />
+    </div>
+  </div>
+
+  <!-- Search and filtering -->
+  <div
+    [ngClass]="{ 'justify-content-end': display_new_style }"
+    class="filter-row row mt-2"
+  >
+    <div class="col-xs-12 col-md-5 col-lg-5">
+      <div class="form-group">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="searchBox">
+              <i class="fa fa-search"></i>
+            </span>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search"
+            name="searchBox"
+            required
+            [(ngModel)]="searchBoxValue"
+          />
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!display_new_style" class="col-xs-6 col-md-4 col-lg-3">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">
+            <i class="fa fa-filter"></i>
+          </span>
+        </div>
+        <select [(ngModel)]="selectedCategory" class="form-control">
+          <option [value]="undefined" disabled>Filter</option>
+          <option value="all">All</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="display_new_style">
+    <app-community-container
+      [community]="community"
+      [item]="community"
+      [searchBoxValue]="searchBoxValue"
+      [iglesia]="iglesia"
+      (open_entry)="openDetailsModal($event)"
+    ></app-community-container>
+    <!-- <mat-accordion
+      *ngFor="let group of filtered_groups; let i = index; let last = last"
+    >
+      <mat-expansion-panel
+        class="mb-2"
+        [ngClass]="{
+          'mb-3': last
+        }"
+        #accordion
+        hideToggle
+      >
+        <mat-expansion-panel-header
+          class="custom_panel_header"
+          (click)="closeOther(accordion)"
+          [ngStyle]="{
+            background: community?.style_settings?.header_background,
+            color: community?.style_settings?.header_text_color,
+            '--be-text': community?.style_settings?.header_text_color
+          }"
+        >
+          <mat-panel-title
+            [ngStyle]="{
+              color: community?.style_settings?.header_text_color,
+              '--be-text': community?.style_settings?.header_text_color
+            }"
+          >
+            {{ group.name }}
+          </mat-panel-title>
+          <mat-icon>{{ accordion.expanded ? "remove" : "add" }}</mat-icon>
+        </mat-expansion-panel-header>
+        <div class="filter-row justify-content-end row mt-2">
+          <div class="col-xs-12 col-md-4 col-lg-3">
+            <div class="form-group">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="searchBox">
+                    <i class="fa fa-search"></i>
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search"
+                  name="searchBox"
+                  required
+                  [(ngModel)]="group.searchBoxValue"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-center">
+          <div
+            *ngFor="let entry of filtered_group_entries(group) || group.entries"
+            class="list-fixed row col-12 p-0 text-justify clickable py-2"
+            [ngStyle]="{
+              color: community?.style_settings?.entry_text_color
+            }"
+            (click)="openDetailsModal(entry)"
+          >
+            <div class="col-3 align-self-center">
+              {{ entry.business_name }}
+            </div>
+            <div class="col-4 align-self-center">
+              {{ entry.contact_first_name }}
+              {{ entry.contact_last_name }}
+            </div>
+            <div class="col-5 align-self-center">
+              <span class="w200">
+                {{ entry.locations }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion> -->
+  </div>
+
+  <div class="map-row">
+    <div #mapContainer id="map"></div>
+  </div>
+
+  <!-- Main content -->
+  <div
+    *ngIf="!display_new_style"
+    class="row mt-3 mb-4 justify-content-md-center"
+  >
+    <div
+      *ngFor="let entry of filteredEntries; let i = index"
+      class="col-xs-6 col-md-4 col-lg-3"
+    >
+      <div class="entry-container" (click)="openDetailsModal(entry)">
+        <div class="head-tag">
+          <h5 *ngIf="entry.featured">
+            <span
+              [ngStyle]="{
+                'background-color': community?.style_settings?.button_color
+              }"
+              class="badge badge-secondary"
+            >
+              {{
+                community?.style_settings?.featured_entries
+                  ? community?.style_settings?.featured_entries
+                  : "Featured"
+              }}
+            </span>
+          </h5>
+        </div>
+        <div class="avatar-container">
+          <img
+            [src]="getAvatar(entry)"
+            [alt]="entry.business_name"
+            class="avatar"
+          />
+        </div>
+        <div
+          class="main-title"
+          [ngStyle]="{
+            color: community?.style_settings?.title_color
+          }"
+        >
+          {{ entry.business_name }}
+        </div>
+        <div
+          class="sub-title"
+          [ngStyle]="{
+            color: community?.style_settings?.sub_title_color
+          }"
+        >
+          {{ entry.contact_first_name }}
+          {{ entry.contact_last_name }}
+
+          <div class="mt-1" *ngIf="entry.phone">
+            <i class="fa fa-phone-alt"></i>
+            {{ entry.phone }}
+          </div>
+        </div>
+        <div class="categories bd-example">
+          <span
+            *ngFor="let category of entry.industry"
+            class="badge badge-pill badge-primary"
+            [ngStyle]="{
+              'background-color': community?.style_settings?.button_color
+            }"
+          >
+            {{ category }}
+          </span>
+        </div>
+        <p
+          class="description"
+          [ngStyle]="{
+            color: community?.style_settings?.text_color
+          }"
+        >
+          {{ entry.business_summary | truncate: 80 }}
+        </p>
+        <button class="btn-sm btn btn-link">Read more</button>
+        <div
+          class="location"
+          *ngIf="entry.locations"
+          [ngStyle]="{
+            color: community?.style_settings?.text_color
+          }"
+        >
+          <i class="fa fa-map-marker-alt"></i>
+          {{ entry.locations }}
+        </div>
+        <div *ngIf="selectedEntry?.website">
+          <a [href]="selectedEntry?.website" target="_blank">
+            {{ selectedEntry?.website }}
+          </a>
+        </div>
+        <div class="social-links text-center">
+          <a
+            class="btn btn-light social-icon"
+            target="_blank"
+            [href]="'https://www.facebook.com/' + entry.facebook"
+            *ngIf="entry.facebook"
+          >
+            <i
+              [ngStyle]="{
+                color: community?.style_settings?.social_links_color
+              }"
+              class="socicon-facebook"
+            ></i>
+          </a>
+
+          <a
+            class="btn btn-light social-icon"
+            target="_blank"
+            [href]="'https://www.instagram.com/' + entry.instagram"
+            *ngIf="entry.instagram"
+          >
+            <i
+              [ngStyle]="{
+                color: community?.style_settings?.social_links_color
+              }"
+              class="socicon-instagram"
+            ></i>
+          </a>
+
+          <a
+            class="btn btn-light social-icon"
+            target="_blank"
+            [href]="'https://twitter.com/' + entry.twitter"
+            *ngIf="entry.twitter"
+          >
+            <i
+              [ngStyle]="{
+                color: community?.style_settings?.social_links_color
+              }"
+              class="socicon-twitter"
+            ></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #detailsModal
+  identifier="detailsModal"
+  (onAnyCloseEvent)="selectedEntry = undefined"
+>
+  <community-entry
+    v-if="detailsModal.isVisible()"
+    [community]="community"
+    [selectedEntry]="selectedEntry"
+  ></community-entry>
+</ngx-smart-modal>

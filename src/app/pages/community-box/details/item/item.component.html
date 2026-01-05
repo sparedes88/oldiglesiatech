@@ -1,0 +1,20 @@
+<mat-card
+  cdkDrag
+  cdkDropList
+  [cdkDropListData]="item.containers"
+  dragAndDropManager
+  [id]="item.id"
+  (cdkDropListDropped)="onDragDrop$.next($event)"
+  [ngClass]="{
+    invert: invert
+  }"
+>
+  <mat-card-header>{{ item.name }}</mat-card-header>
+  <mat-card-content *ngFor="let item of item.containers">
+    <app-item
+      [item]="item"
+      [invert]="!invert"
+      [onDragDrop]="onDragDrop$"
+    ></app-item>
+  </mat-card-content>
+</mat-card>

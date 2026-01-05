@@ -1,0 +1,38 @@
+<!-- <div style="display: inline-block"> -->
+<div [formGroup]="myFormGroup" class="form-group">
+  <label for="estimated">
+    <small *ngIf="small_label">
+      {{ label }} <span *ngIf="required" class="text-danger">*</span>
+    </small>
+    <span *ngIf="!small_label">
+      {{ label }}
+      <span *ngIf="required" class="text-danger">*</span>
+    </span>
+  </label>
+  <div class="input-group mb-2">
+    <div (click)="openDialog()" class="input-group-prepend">
+      <div class="input-group-text">
+        <i [ngClass]="icon_control.value"></i>
+      </div>
+    </div>
+    <input
+      hidden
+      type="text"
+      class="form-control"
+      formControlName="icon_control"
+      #picker
+      [ipIconPack]="['fa', 'fa5']"
+      [iconPicker]="icon_control.value"
+      [ipPosition]="'bottom'"
+      [ipWidth]="'250px'"
+      [ipIconSize]="'16px'"
+      [ipIconVerticalPadding]="'6px'"
+      [ipIconHorizontalPadding]="'10px'"
+      [ipKeepSearchFilter]="'false'"
+      [ipPlaceHolder]="'Choose an icon'"
+      [ipFallbackIcon]="fallbackIcon"
+      (iconPickerSelect)="onIconPickerSelect($event)"
+    />
+  </div>
+</div>
+<!-- </div> -->

@@ -1,0 +1,24 @@
+<p>
+  {{ idContainerType }}
+</p>
+<div *ngIf="section" class="card mb-2 text-left border-0">
+  <!-- *ngIf="
+  !iglesia.servicio_pastor.editing && iglesia.col5
+" -->
+  <div class="toolDiv">
+    <!-- <button
+      (click)="editService(-1)"
+      *ngIf="can_edit"
+      class="btn btn-primary btn-sm"
+    >
+      <i class="fa fa-pencil" aria-hidden="true"></i>
+    </button> -->
+  </div>
+  <img class="card-img-top" [src]="fixUrl(section.picture)" />
+  <div class="card-body p-0 mt-3">
+    <h6 class="card-subtitle mb-2 text-dark">
+      {{ section.title }}
+    </h6>
+    <p class="card-text" [innerHtml]="section.content | keepHtml"></p>
+  </div>
+</div>

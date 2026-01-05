@@ -1,0 +1,104 @@
+<form [formGroup]="processFormGroup" (submit)="submit(processFormGroup)">
+  <div class="row">
+    <div class="col-12">
+      <img #img_tag class="card-img-top" [src]="fixUrl()" />
+
+      <div class="form-group">
+        <input
+          class="form-control"
+          type="file"
+          accept="image/*"
+          id="file"
+          (change)="addDefaultEntryPhoto($event.target.files[0])"
+        />
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <label>Name <span class="text-danger">*</span></label>
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Process's Name"
+          formControlName="name"
+          required
+        />
+        <div class="input-group-append">
+          <span class="input-group-text">
+            <i class="fas fa-align-left"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <label>Description <small class="text-secondary">(Optional)</small></label>
+      <div class="input-group mb-3">
+        <textarea
+          rows="5"
+          class="form-control"
+          formControlName="description"
+          placeholder="Write a description for the new process"
+        ></textarea>
+        <div class="input-group-append">
+          <span class="input-group-text">
+            <i class="fas fa-align-left"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="col-xs-12 col-md-12">
+      <div class="mb-3">
+        <label>Levels</label>
+        <ng-multiselect-dropdown
+          placeholder="Levels"
+          [data]="levels"
+          [settings]="multiSelectLevels"
+          formControlName="levels"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div> -->
+    <!-- <div class="col-xs-12 col-md-12">
+      <div class="mb-3">
+        <label>Groups</label>
+        <ng-multiselect-dropdown
+          placeholder="Groups"
+          [data]="groups"
+          [settings]="multiSelectGroups"
+          formControlName="groups"
+          (onSelect)="checkChanges($event)"
+          (onDeSelect)="checkChanges($event)"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div> -->
+
+    <div class="col-12" *ngIf="processFormGroup.get('groups').dirty">
+      <small class="red">
+        <b>
+          Warning: You modified the groups associated to the process. This could
+          delete some process user's.
+          <br />
+          <br />
+          Users assigned to the process without a group will remain assigned to
+          the process.
+        </b>
+      </small>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <div class="mb-3">
+        <div class="font-weight-bold">Status</div>
+        <mat-slide-toggle color="primary" formControlName="status">
+          Active/Inactive
+        </mat-slide-toggle>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="processFormGroup.invalid"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,24 @@
+<div class="row justify-content-center">
+  <div class="col-12 text-center mt-3">
+    <img src="/assets/img/logoColor.png" style="height: 60px" alt="" />
+  </div>
+  <div class="col-12 col-md-10" style="min-height: 500px">
+    <div class="card-body p-0 mt-3">
+      <h2
+        *ngIf="disclaimer_content?.display_label"
+        class="card-subtitle mb-2 text-dark"
+      >
+        {{ disclaimer_content?.label }}
+      </h2>
+      <p
+        class="card-text card-content-fixed fix-frame"
+        [innerHtml]="getInfo()"
+      ></p>
+    </div>
+  </div>
+  <div class="col-12 text-center">
+    <small> Iglesia Tech (703) 297-8718 </small>
+    <br />
+    <button (click)="close()" class="btn btn-primary btn-sm">Continue</button>
+  </div>
+</div>

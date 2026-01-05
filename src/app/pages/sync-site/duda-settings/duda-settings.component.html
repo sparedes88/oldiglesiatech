@@ -1,0 +1,190 @@
+
+<div class="container page">
+  <ng-template [ngIf]="loading">
+    <div
+      class="d-flex justify-content-center col-12"
+      style="margin-top: 10%; margin-bottom: 10%"
+    >
+      <div
+        style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div class="row" *ngIf="!loading">
+    <div class="col-12 text-right" *ngIf="is_modal">
+      <button (click)="close()" class="btn btn-sm btn-outline-danger">
+        Close
+      </button>
+    </div>
+    <div class="col-12">
+      <h2>
+        <span class="text-secondary"> Settings </span>|
+        {{ organization?.Nombre }}
+      </h2>
+    </div>
+    <hr />
+    <!-- Neet to sync -->
+    <div class="col-12" *ngIf="!is_linked || editing">
+      <div class="row justify-content-center">
+        <div class="col-8" [formGroup]="settings_form">
+          <div class="form-group">
+            <label class="text-secondary">
+              <span class="tooltip_">
+                <span class="tooltiptext">
+                  Please check how to obtain the site id in IglesiaTechApp.
+                  <img
+                    class="tooltip-image"
+                    src="assets/img/duda-resources/how_get_id.png"
+                    alt=""
+                  />
+                </span>
+                Site ID
+                <i class="text-secondary fa fa-info-circle"></i>
+              </span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              required
+              placeholder="Please type the IglesiaTechApp site ID."
+              formControlName="site_id"
+            />
+          </div>
+
+          <button
+            *ngIf="editing"
+            (click)="cancelEditForm()"
+            class="float-right btn btn-sm btn-outline-danger ml-2"
+          >
+            Cancel
+          </button>
+
+          <button
+            (click)="setSiteID()"
+            class="float-right btn btn-sm btn-success"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-12" *ngIf="is_linked && !editing">
+      <div class="row">
+        <h5 class="col-12 text-secondary">
+          Site info<button (click)="editing = true" class="btn btn-sm">
+            <i class="fa fa-edit text-info"></i>
+          </button>
+        </h5>
+
+        <div class="col-8">
+          <h6>
+            Linked to
+            <a [href]="settings?.site?.canonical_url" target="_blank"
+              >{{ settings?.site_id }}
+            </a>
+
+            <span *ngIf="!show_warning"
+              class="ml-3 badge"
+              [ngClass]="{
+                'badge-danger':
+                  settings?.site?.publish_status == 'NOT_PUBLISHED_YET',
+                'badge-success':
+                  settings?.site?.publish_status != 'NOT_PUBLISHED_YET'
+              }"
+            >
+              {{
+                settings?.site?.publish_status != "NOT_PUBLISHED_YET"
+                  ? "Published"
+                  : "Not published yet"
+              }}
+            </span>
+            <span
+              *ngIf="show_warning && !settings?.site"
+              class="ml-3 badge badge-danger">
+              It seems this site_id is incorrect or the site was deleted.
+            </span>
+          </h6>
+          <span *ngIf="!show_warning && settings?.site?.publish_status == 'NOT_PUBLISHED_YET'">
+            <small class="text-danger">
+              * Site might not be working since status is <i> Unpublished.</i>
+            </small>
+          </span>
+        </div>
+        <div class="col-4 text-center">
+          <button class="btn-sm btn" (click)="checkSettings()">
+            <i class="fa fa-redo text-success"></i>
+          </button>
+        </div>
+        <div class="col-12">
+          <hr />
+        </div>
+
+        <!-- <div class="col-12">
+          <h2>Frame settings</h2>
+
+          <div class="col-12" [formGroup]="options_form">
+            <h5>Select a module:</h5>
+            <div class="form-check" *ngFor="let module of modules">
+              <input
+                formControlName="module"
+                (change)="setOptions($event)"
+                class="form-check-input"
+                type="radio"
+                id="upload"
+                [value]="module.id"
+                checked
+              />
+              <label class="form-check-label" for="upload">
+                {{ module.name }}
+              </label>
+            </div>
+            <div class="mt-2" *ngIf="options_form.get('module').value">
+              <h6 class="mb-0">Which embed option you want to use?</h6>
+              <div class="form-check ml-3" *ngFor="let option of options">
+                <input
+                  formControlName="option"
+                  (change)="setInstructions($event)"
+                  class="form-check-input"
+                  type="radio"
+                  id="upload"
+                  [value]="option.value"
+                  checked
+                />
+                <label class="form-check-label" for="upload">
+                  {{ option.name }}
+                  <small class="text-secondary">
+                    (Ready {{ option.percent }}%)</small
+                  >
+                </label>
+              </div>
+            </div>
+            <div class="ml-3" *ngIf="options_form.get('option').value">
+              <div
+                [ngClass]="instruction.classes"
+                *ngFor="let instruction of instructions; let i = index"
+              >
+                <ol [start]="i + 1" *ngIf="instruction.type == 'explanation'">
+                  <li>
+                    <p>
+                      {{ instruction.text }}
+                    </p>
+                  </li>
+                </ol>
+                <img
+                  *ngIf="instruction.type == 'image'"
+                  [src]="instruction.text"
+                />
+                <pre *ngIf="instruction.type == 'code'">{{
+                  instruction.text
+                }}</pre>
+              </div>
+            </div>
+          </div>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>

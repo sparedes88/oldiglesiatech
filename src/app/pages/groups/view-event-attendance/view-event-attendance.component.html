@@ -1,0 +1,303 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      Attendance | Event: <i>{{ group_event?.name }} </i>
+    </h4>
+    <div *ngIf="show_dismiss" class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+
+    <div class="col-12 row">
+      <div class="col-2 offset-10">
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+          (click)="print()"
+          [disabled]="show_editable || attendances.length === 0"
+        >
+          Print
+        </button>
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div [hidden]="show_loading" class="col-12 p-0" style="min-height: 500px">
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="search_form"
+        style="width: 100%"
+      >
+        <div class="form-group">
+          <label>Search</label>
+          <input
+            class="form-control"
+            type="text"
+            formControlName="search_value"
+            style="width: 100%"
+          />
+        </div>
+      </form>
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="attendanceStatusForm"
+        style="width: 100%"
+      >
+        <div formArrayName="attendance" class="col-12 p-0">
+          <span
+            style="display: block; text-align: right; width: 100%"
+            class="mb-2 mt-2"
+            *ngIf="checkIfMassive()"
+          >
+            <span> Update all the modified attendances: </span>
+            <button
+              type="button"
+              *ngIf="!getPermissions()"
+              class="btn btn-sm btn-muted"
+              (click)="resetCheckMassive()"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              *ngIf="!getPermissions()"
+              [disabled]="!checkIfMassive()"
+              (click)="saveAttendanceMassive()"
+              class="btn btn-sm btn-success"
+            >
+              Save
+            </button>
+          </span>
+
+          <table class="table row-border hover table-striped">
+            <thead style="overflow-wrap: anywhere">
+              <tr>
+                <th style="width: 250px">Member</th>
+                <th style="min-width: 100px; width: 200px">Email</th>
+                <th style="min-width: 100px; width: 150px">Phone</th>
+                <th style="min-width: 100px; width: 100px">
+                  # of confirmation
+                </th>
+                <th style="min-width: 100px; width: 100px"># of guests</th>
+                <th style="width: 80px">Covid Question</th>
+                <th style="width: 30px">Attendance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6"></td>
+                <td>
+                  <mat-slide-toggle
+                    style="margin: 10px 0"
+                    class="col-2"
+                    labelPosition="before"
+                    (change)="toggleAll($event)"
+                    #mat_all
+                    [(ngModel)]="should_check_all"
+                    [ngModelOptions]="{ standalone: true }"
+                    [disabled]="getPermissions()"
+                  >
+                    {{ mat_all.checked ? "Uncheck" : "Check" }} All
+                  </mat-slide-toggle>
+                </td>
+              </tr>
+              <tr
+                *ngFor="let attendance of filtered_attendances; let i = index"
+                [formGroupName]="i"
+                [ngClass]="{ already_member: attendance.already_member }"
+              >
+                <td>
+                  {{ attendance.name }} {{ attendance.lastName }}
+                  <span *ngIf="!attendance.already_member && !getPermissions()">
+                    <button
+                      class="btn btn-sm btn-success float-right"
+                      (click)="
+                        addMemberToEvent(
+                          attendance_on_form.controls[attendance.index],
+                          attendance
+                        )
+                      "
+                    >
+                      Add Member
+                    </button>
+                  </span>
+                </td>
+                <td>
+                  {{ attendance.email }}
+                </td>
+                <td>
+                  {{ attendance.phone | mask: "(000) 000-0000" }}
+                </td>
+                <td class="text-center">
+                  {{ attendance.confirmation_number }}
+                </td>
+                <td class="text-center">
+                  {{ attendance.guests }}
+                </td>
+                <td>
+                  <div class="row justify-content-center">
+                    <div class="col-12 align-self-center text-left mb-4">
+                      <input
+                        type="checkbox"
+                        id="acceptance"
+                        name="customRadio"
+                        readonly
+                        class="custom-control-input"
+                        [checked]="attendance.covid_quest"
+                      />
+                      <span class="checkmark"></span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div *ngIf="!getPermissions()" class="form-group">
+                    <!-- <select
+                      (change)="
+                        checkChange(
+                          attendance_on_form.controls[i].get('attended'),
+                          attendance
+                        )
+                      "
+                      formControlName="attended"
+                      class="form-control mb-1"
+                    >
+                      <option [value]="true">
+                        Spent
+                      </option>
+                      <option [value]="false">
+                        Giving
+                      </option>
+                    </select> -->
+
+                    <mat-slide-toggle
+                      class="col-2"
+                      labelPosition="before"
+                      formControlName="attended"
+                      (change)="
+                        checkChange(
+                          attendance_on_form.controls[attendance.index].get('attended'),
+                          attendance
+                        )
+                      "
+                    >
+                    </mat-slide-toggle>
+
+                    <span style="display: block; text-align: right">
+                      <button
+                        type="button"
+                        *ngIf="
+                          attendance_on_form.controls[attendance.index].get('attended')
+                            .dirty &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="
+                          resetAttendedForm(
+                            attendance_on_form.controls[attendance.index],
+                            attendance
+                          )
+                        "
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          attendance_on_form.controls[attendance.index].get('attended')
+                            .dirty &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        [disabled]="
+                          attendance_on_form.controls[attendance.index].get('attended')
+                            .invalid &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        (click)="
+                          updateSpentType(
+                            attendance_on_form.controls[attendance.index],
+                            attendance
+                          )
+                        "
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span>
+                  </div>
+                  <div *ngIf="getPermissions()">
+                    <span
+                      [ngClass]="{
+                        'text-success': attendance.attended,
+                        'text-muted': !attendance.attended
+                      }"
+                    >
+                      {{ attendance.attended ? "Attended" : "Unattended" }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" class="text-right">
+                  <b> TOTAL ATTENDANCE EXPECT </b>
+                </th>
+                <th class="text-right">{{ attendances.length }} <b> + </b></th>
+                <th class="text-right">
+                  {{ total_guests }} <small class="text-secondary">guests</small>
+                </th>
+                <th class="text-left">
+                  = {{ attendances.length + total_guests }}
+                </th>
+              </tr>
+            </tfoot>
+          </table>
+
+          <span
+            style="display: block; text-align: right; width: 100%"
+            class="mb-2"
+            *ngIf="checkIfMassive()"
+          >
+            <span> Update all the modified attendances: </span>
+            <button
+              type="button"
+              *ngIf="!getPermissions()"
+              class="btn btn-sm btn-muted"
+              (click)="resetCheckMassive()"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              *ngIf="!getPermissions()"
+              [disabled]="!checkIfMassive()"
+              (click)="saveAttendanceMassive()"
+              class="btn btn-sm btn-success"
+            >
+              Save
+            </button>
+          </span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

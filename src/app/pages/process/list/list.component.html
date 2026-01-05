@@ -1,0 +1,147 @@
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-md-12 mt-2">
+      <h1 class="mt-3 ml-5 md-3">Process</h1>
+
+      <div class="row col-12">
+        <br />
+        <div class="col-6 offset-3 col-md-4 offset-md-4 text-center">
+          <span class="text-citric summary summary">
+            {{ totalProcess }}
+          </span>
+          <br />
+          <span
+            class="status text-center primeroColor ColorPrimero"
+            style="width: 90%;
+            display: inline-block;"
+          >
+            Process
+          </span>
+        </div>
+        <!-- <div class="col-6 col-md-4 text-center">
+          <span class="text-citric summary summary">
+            0
+          </span>
+          <br />
+          <span
+            class="status text-center ColorSegundo"
+            style="width: 90%;
+            display: inline-block;"
+          >
+            New Members
+          </span>
+        </div> -->
+        <!-- <div class="col-6 col-md-4 text-center">
+          <span class="text-citric summary summary">
+            14
+          </span>
+          <br />
+          <span
+            class="status text-center ColorTres"
+            style="width: 90%;
+            display: inline-block;"
+          >
+            Incomplete Profile
+          </span>
+        </div> -->
+        <br />
+        <br />
+      </div>
+      <div class="mb-2 mt-5">
+        <button class="btn btn-tech" (click)="processFormModal.open()">
+          Add a new Process
+        </button>
+        <button
+          class="btn btn-tech"
+          routerLink="/levels"
+          style="margin-left: 8px;"
+        >
+          View Levels
+        </button>
+        <button
+          class="btn btn-tech"
+          routerLink="/process/builder"
+          style="margin-left: 8px;"
+        >
+          Builder
+        </button>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12 mt-5 mb-5">
+      <mat-accordion class="example-headers-align">
+        <mat-expansion-panel
+          *ngFor="let item of process"
+          (afterExpand)="getProcessDetails(item)"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{ item.name }}
+            </mat-panel-title>
+            <mat-panel-description>
+              {{ item.description }}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <!-- Content -->
+          <p>
+            <b>Description: </b>
+            {{ item.description }}
+          </p>
+
+          <div class="text-center" *ngIf="!item.levels">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+          </div>
+
+          <hr *ngIf="item.levels" />
+
+          <process-levels
+            *ngIf="item.levels"
+            [process]="item"
+            (onChange)="getProcessDetails(item)"
+          ></process-levels>
+          <mat-action-row>
+            <div class="btn-group">
+              <button
+                class="btn btn-sm btn-primary"
+                routerLink="details/{{ item.idProcess }}"
+              >
+                <i class="fa fa-eye"></i>
+              </button>
+              <button
+                class="btn btn-success btn-sm"
+                (click)="openUpdateModal(item)"
+              >
+                <i class="fa fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-danger btn-sm"
+                (click)="deteleProcess(item.idProcess)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </mat-action-row>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #processFormModal identifier="processFormModal">
+  <h4>Add a new Process</h4>
+
+  <app-process-form (onSubmit)="addProcess($event)"></app-process-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #processUpdateModal
+  identifier="processUpdateModal"
+  (onAnyCloseEvent)="selectedProcess = undefined"
+>
+  <h4>Update Process | {{ selectedProcess?.name }}</h4>
+
+  <app-process-form
+    *ngIf="selectedProcess"
+    [process]="selectedProcess"
+    (onSubmit)="updateProcess($event)"
+  ></app-process-form>
+</ngx-smart-modal>

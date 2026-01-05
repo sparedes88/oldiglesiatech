@@ -1,0 +1,43 @@
+<div class="container" style="min-height: 700px;">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row"></div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/videos_banner_new.png"
+        />
+      </div>
+    </div>
+  </div>
+
+  <app-videos-list
+    *ngIf="view_type === 'videos' && !video_opened"
+    [show_header]="false"
+    (show_video)="show_video($event)"
+    (toggle_view)="changeView()"
+  >
+  </app-videos-list>
+  <app-playlist-list
+    *ngIf="view_type === 'playlist' && !playlist_opened"
+    [show_header]="false"
+    (show_playlist)="show_playlist($event)"
+    (toggle_view)="changeView()"
+  >
+  </app-playlist-list>
+
+  <app-video-detail
+    *ngIf="video_opened"
+    [video]="video_opened"
+    (dismiss_detail)="video_opened = undefined"
+  >
+  </app-video-detail>
+
+  <app-playlist-detail
+    *ngIf="playlist_opened"
+    [playlist]="playlist_opened"
+    (dismiss_detail)="playlist_opened = undefined"
+  >
+  </app-playlist-detail>
+</div>

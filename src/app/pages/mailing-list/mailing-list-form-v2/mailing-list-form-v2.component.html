@@ -1,0 +1,815 @@
+<div *ngIf="!wait" class="container mt-3">
+  <h4>
+    {{
+      form_group.get("id") ? "Edit Contact Inbox" : "Create a new Contact Inbox"
+    }}
+    <button class="btn btn-sm btn-outline-danger ml-4" (click)="cancelForm()">
+      Cancel
+    </button>
+  </h4>
+
+  <div class="row">
+    <div class="col-12 col-md-4">
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <a
+            class="nav-item nav-link active"
+            id="nav-visuals-tab"
+            data-toggle="tab"
+            href="#nav-visuals"
+            role="tab"
+            aria-controls="nav-visuals"
+            aria-selected="true"
+          >
+            General
+          </a>
+          <a
+            class="nav-item nav-link"
+            id="nav-inputs-tab"
+            data-toggle="tab"
+            href="#nav-inputs"
+            role="tab"
+            aria-controls="nav-inputs"
+            aria-selected="false"
+          >
+            Inputs
+          </a>
+          <a
+            class="nav-item nav-link"
+            id="nav-button-tab"
+            data-toggle="tab"
+            href="#nav-button"
+            role="tab"
+            aria-controls="nav-button"
+            aria-selected="false"
+          >
+            Button
+          </a>
+        </div>
+      </nav>
+      <div class="tab-content pt-2" id="nav-tabContent">
+        <div
+          class="tab-pane fade show active"
+          id="nav-visuals"
+          role="tabpanel"
+          aria-labelledby="nav-visuals-tab"
+        >
+          <div class="row m-0" [formGroup]="form_group">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fa fa-align-left"></i>
+                </span>
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Name"
+                name="name"
+                required
+                formControlName="name"
+                [class.is-invalid]="
+                  form_group.get('name').dirty && form_group.get('name').invalid
+                "
+              />
+            </div>
+            <div formGroupName="setup" class="col-12 row m-0 p-0">
+              <div class="col-12 p-0">
+                <div class="form-group">
+                  <label> Header text </label>
+                  <input
+                    type="text"
+                    required
+                    class="form-control mb-1"
+                    placeholder="Please type a header title"
+                    formControlName="header_text"
+                    [class.is-invalid]="
+                      form_group.get('setup').get('header_text').dirty &&
+                      form_group.get('setup').get('header_text').invalid
+                    "
+                  />
+                </div>
+              </div>
+              <div class="col-12 p-0">
+                <div class="form-group">
+                  <label> Thank you message </label>
+                  <input
+                    type="text"
+                    required
+                    class="form-control mb-1"
+                    placeholder="Please type a greetings message"
+                    formControlName="thank_you_message"
+                    [class.is-invalid]="
+                      form_group.get('setup').get('thank_you_message').dirty &&
+                      form_group.get('setup').get('thank_you_message').invalid
+                    "
+                  />
+                </div>
+              </div>
+
+              <h5 class="col-12 text-secondary pl-0">Visuals</h5>
+
+              <div class="col-12 p-0">
+                <div
+                  class="form-check"
+                  style="display: flex; flex-direction: column"
+                >
+                  <input
+                    type="checkbox"
+                    id="display_contact_info"
+                    name="display_contact_info_radio"
+                    class="custom-control-input"
+                    formControlName="display_contact_info"
+                    [checked]="
+                      form_group.get('setup').get('display_contact_info').value
+                    "
+                    (click)="
+                      toggleAcceptace(
+                        form_group.get('setup'),
+                        'display_contact_info'
+                      )
+                    "
+                  />
+                  <span
+                    class="checkmark"
+                    (click)="
+                      toggleAcceptace(
+                        form_group.get('setup'),
+                        'display_contact_info'
+                      )
+                    "
+                  ></span>
+                  <label
+                    style="cursor: pointer"
+                    class="custom-control-label"
+                    for="display_contact_info"
+                  >
+                    Display Contact info
+                  </label>
+                </div>
+              </div>
+              <div
+                [hidden]="
+                  !form_group.get('setup').get('display_contact_info').value
+                "
+                class="col-12 p-0"
+              >
+                <div
+                  class="form-check"
+                  style="display: flex; flex-direction: column"
+                >
+                  <input
+                    type="checkbox"
+                    id="show_address"
+                    name="show_address_radio"
+                    class="custom-control-input"
+                    formControlName="show_address"
+                    [checked]="
+                      form_group.get('setup').get('show_address').value
+                    "
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_address')
+                    "
+                  />
+                  <span
+                    class="checkmark"
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_address')
+                    "
+                  ></span>
+                  <label
+                    style="cursor: pointer"
+                    class="custom-control-label"
+                    for="show_address"
+                  >
+                    Display Address
+                  </label>
+                </div>
+              </div>
+              <div
+                [hidden]="
+                  !form_group.get('setup').get('display_contact_info').value
+                "
+                class="col-12 p-0"
+              >
+                <div
+                  class="form-check"
+                  style="display: flex; flex-direction: column"
+                >
+                  <input
+                    type="checkbox"
+                    id="show_phones"
+                    name="show_phones_radio"
+                    class="custom-control-input"
+                    formControlName="show_phones"
+                    [checked]="form_group.get('setup').get('show_phones').value"
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_phones')
+                    "
+                  />
+                  <span
+                    class="checkmark"
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_phones')
+                    "
+                  ></span>
+                  <label
+                    style="cursor: pointer"
+                    class="custom-control-label"
+                    for="show_phones"
+                  >
+                    Display Phones
+                  </label>
+                </div>
+              </div>
+              <div
+                [hidden]="
+                  !form_group.get('setup').get('display_contact_info').value
+                "
+                class="col-12 p-0"
+              >
+                <div
+                  class="form-check"
+                  style="display: flex; flex-direction: column"
+                >
+                  <input
+                    type="checkbox"
+                    id="hide_emails"
+                    name="hide_emails_radio"
+                    class="custom-control-input"
+                    formControlName="show_emails"
+                    [checked]="form_group.get('setup').get('show_emails').value"
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_emails')
+                    "
+                  />
+                  <span
+                    class="checkmark"
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_emails')
+                    "
+                  ></span>
+                  <label
+                    style="cursor: pointer"
+                    class="custom-control-label"
+                    for="hide_emails"
+                  >
+                    Display Emails
+                  </label>
+                </div>
+              </div>
+              <div
+                [hidden]="
+                  !form_group.get('setup').get('display_contact_info').value
+                "
+                class="col-12 p-0"
+              >
+                <div
+                  class="form-check"
+                  style="display: flex; flex-direction: column"
+                >
+                  <input
+                    type="checkbox"
+                    id="show_picture"
+                    name="show_picture_radio"
+                    class="custom-control-input"
+                    formControlName="show_picture"
+                    [checked]="
+                      form_group.get('setup').get('show_picture').value
+                    "
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_picture')
+                    "
+                  />
+                  <span
+                    class="checkmark"
+                    (click)="
+                      toggleAcceptace(form_group.get('setup'), 'show_picture')
+                    "
+                  ></span>
+                  <label
+                    style="cursor: pointer"
+                    class="custom-control-label"
+                    for="show_picture"
+                  >
+                    Display Picture
+                  </label>
+                </div>
+              </div>
+              <div
+                [hidden]="
+                  !form_group.get('setup').get('display_contact_info').value
+                "
+                class="col-12 p-0"
+              >
+                <div
+                  class="form-check"
+                  style="display: flex; flex-direction: column"
+                >
+                  <input
+                    type="checkbox"
+                    id="show_sunday_service"
+                    name="show_sunday_service_radio"
+                    class="custom-control-input"
+                    formControlName="show_sunday_service"
+                    [checked]="
+                      form_group.get('setup').get('show_sunday_service').value
+                    "
+                    (click)="
+                      toggleAcceptace(
+                        form_group.get('setup'),
+                        'show_sunday_service'
+                      )
+                    "
+                  />
+                  <span
+                    class="checkmark"
+                    (click)="
+                      toggleAcceptace(
+                        form_group.get('setup'),
+                        'show_sunday_service'
+                      )
+                    "
+                  ></span>
+                  <label
+                    style="cursor: pointer"
+                    class="custom-control-label"
+                    for="show_sunday_service"
+                  >
+                    Display Sunday Service
+                  </label>
+                </div>
+              </div>
+
+              <div
+                *ngIf="
+                  form_group.get('setup').get('display_contact_info').value &&
+                  (form_group.get('setup').get('show_emails').value ||
+                    form_group.get('setup').get('show_phones').value ||
+                    form_group.get('setup').get('show_address').value ||
+                    (form_group.get('setup').get('show_sunday_service').value &&
+                      form_group.get('setup').get('sunday_service').value))
+                "
+                class="col-12"
+              >
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label>Icons color</label>
+                  <input
+                    type="color"
+                    formControlName="icon_color"
+                    class="form-control"
+                    style="width: 50px; height: 40px"
+                  />
+                </div>
+              </div>
+
+              <div
+                *ngIf="
+                  form_group.get('setup').get('display_contact_info').value &&
+                  form_group.get('setup').get('show_picture').value
+                "
+                class="col-12"
+              >
+                <div class="form-group">
+                  <label>Picture</label>
+                  <input
+                    type="text"
+                    rows="3"
+                    class="form-control mb-1"
+                    placeholder="Add a picture to your mailing list. (optional)"
+                    formControlName="picture"
+                    [readOnly]="true"
+                    [class.is-invalid]="
+                      form_group.get('setup').get('picture').dirty &&
+                      form_group.get('setup').get('picture').invalid
+                    "
+                  />
+                </div>
+
+                <span style="font-size: 12px">
+                  Recommended size: 1000x428
+                </span>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-light"
+                  (click)="uploadPicture(input_file)"
+                >
+                  Upload image
+                </button>
+              </div>
+
+              <div class="col-12 col-md-4" [hidden]="true">
+                <div class="custom-file mb-4">
+                  <input
+                    #input_file
+                    accept="image/*"
+                    type="file"
+                    class="custom-file-input"
+                    id="customFile"
+                  />
+                  <label class="custom-file-label" for="customFile"
+                    >Choose file</label
+                  >
+                </div>
+              </div>
+              <div
+                class="col-12"
+                *ngIf="
+                  form_group.get('setup').get('display_contact_info').value &&
+                  form_group.get('setup').get('show_sunday_service').value
+                "
+              >
+                <label class="text-citric" for="idOrganization">
+                  Sunday Service info
+                </label>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <textarea
+                    formControlName="sunday_service"
+                    class="form-control mb-1"
+                    placeholder="Aboout your service..."
+                    type="text"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane fade"
+          id="nav-inputs"
+          role="tabpanel"
+          aria-labelledby="nav-inputs-tab"
+        >
+          <form class="row m-0" [formGroup]="form_group">
+            <h5 class="col-12 text-secondary pl-0">Inputs</h5>
+            <div class="col-12 text-right" *ngIf="inputs_array.length === 0">
+              Add an Input
+              <button class="btn btn-sm" (click)="addInput()">
+                <i class="fa fa-plus text-success"></i>
+              </button>
+            </div>
+            <div
+              cdkDropList
+              class="col-12 drag-list"
+              formArrayName="inputs"
+              (cdkDropListDropped)="sortArray($event)"
+            >
+              <!-- <div
+              cdkDropList
+              class="drag-list builder-scroll"
+              (cdkDropListDropped)="dropLevel($event)"
+            >
+              <ng-container *ngFor="let level of questions">
+                <div class="drag-box" cdkDrag>
+                  {{ level.order }}. {{ level.name }}
+                </div>
+              </ng-container>
+            </div> -->
+              <div
+                class="row drag-box"
+                *ngFor="
+                  let input_control of inputs_array.controls;
+                  let i = index;
+                  let l = last
+                "
+                [formGroupName]="i"
+                cdkDrag
+              >
+                <div *ngIf="!input_control.value.editable" class="col-10">
+                  <div class="form-group">
+                    <label> Select an input </label>
+                    <select
+                      class="form-control"
+                      formControlName="idMailingListInput"
+                      (change)="setInput(input_control, $event)"
+                      [class.is-invalid]="
+                        input_control.dirty && input_control.invalid
+                      "
+                    >
+                      <option value="" disabled selected>
+                        -- Select an input --
+                      </option>
+                      <option value="-1">-- Add new --</option>
+                      <option *ngFor="let option of inputs" [value]="option.id">
+                        {{ option.label }}
+                        <small>({{ option.input_type | titlecase }})</small>
+                      </option>
+                    </select>
+                    <small
+                      class="text-danger"
+                      *ngIf="input_control.dirty && input_control.invalid"
+                    >
+                      Please select a valid option.
+                    </small>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      formControlName="is_required"
+                      [checked]="input_control.get('is_required').value"
+                    />
+                    <label class="form-check-label">Will be required?</label>
+                  </div>
+                </div>
+
+                <div *ngIf="input_control.value.editable" class="col-10">
+                  <div class="form-group">
+                    <label> Label </label>
+                    <input
+                      type="text"
+                      formControlName="custom_label"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label> Placeholder </label>
+                    <input
+                      type="text"
+                      formControlName="custom_placeholder"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="form-group" *ngIf="input_control.value.show_hint">
+                    <label> Hint </label>
+                    <input
+                      type="text"
+                      formControlName="custom_hint"
+                      class="form-control"
+                    />
+                  </div>
+                  <!-- <div class="text-right">
+                    <button
+                      class="btn btn-sm"
+                      (click)="saveEdition(input_control)"
+                    >
+                      <i class="fa fa-save text-success"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm ml-2"
+                      (click)="cancelEdition(input_control, true)"
+                    >
+                      <i class="fa fa-close text-danger"></i>
+                    </button>
+                  </div> -->
+                </div>
+                <div class="col-2 text-right">
+                  <button
+                    class="btn btn-sm"
+                    [disabled]="input_control.invalid"
+                    (click)="addInput()"
+                    *ngIf="l"
+                  >
+                    <i class="fa fa-plus text-success"></i>
+                  </button>
+                  <button
+                    *ngIf="!input_control.value.editable"
+                    class="btn btn-sm"
+                    (click)="editInput(input_control)"
+                  >
+                    <i class="fa fa-edit text-info"></i>
+                  </button>
+
+                  <button
+                    *ngIf="input_control.value.editable"
+                    class="btn btn-sm"
+                    (click)="saveEdition(input_control)"
+                  >
+                    <i class="fa fa-save text-success"></i>
+                  </button>
+
+                  <button
+                    *ngIf="!input_control.value.editable"
+                    class="btn btn-sm"
+                    (click)="removeInput(i)"
+                  >
+                    <i class="fa fa-trash text-danger"></i>
+                  </button>
+                  <button
+                    *ngIf="input_control.value.editable"
+                    class="btn btn-sm"
+                    (click)="cancelEdition(input_control, true)"
+                  >
+                    <i class="fa fa-close text-danger"></i>
+                  </button>
+
+                  <div
+                    class="example-handle"
+                    cdkDragHandle
+                    *ngIf="inputs_array.length > 1 && !input_control.value.editable"
+                  >
+                    <svg
+                      width="0.875rem"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+                      ></path>
+                      <path d="M0 0h24v24H0z" fill="none"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div
+          class="tab-pane fade"
+          id="nav-button"
+          role="tabpanel"
+          aria-labelledby="nav-button-tab"
+        >
+          <form [formGroup]="form_group">
+            <h5 class="col-12 text-secondary">Button settings</h5>
+
+            <div formGroupName="setup" class="row">
+              <div formGroupName="button_settings" class="col-12">
+                <div class="row m-0">
+                  <div class="col-6 col-md-3">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label>Button color</label>
+                      <input
+                        type="color"
+                        formControlName="button_color"
+                        class="form-control"
+                        style="width: 50px; height: 40px"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label>Text color</label>
+                      <input
+                        type="color"
+                        formControlName="text_color"
+                        class="form-control"
+                        style="width: 50px; height: 40px"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="form-group">
+                      <label> Text </label>
+                      <input
+                        type="text"
+                        class="form-control mb-1"
+                        placeholder="Text button"
+                        formControlName="text"
+                        [class.is-invalid]="
+                          form_group
+                            .get('setup')
+                            .get('button_settings')
+                            .get('text').dirty &&
+                          form_group
+                            .get('setup')
+                            .get('button_settings')
+                            .get('text').invalid
+                        "
+                      />
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label for="button_border_radius_range" color="gray">
+                        Border Radius
+                        {{
+                          form_group
+                            .get("setup")
+                            .get("button_settings")
+                            .get("border_radius").value
+                        }}%
+                      </label>
+                      <input
+                        type="range"
+                        class="custom-range"
+                        min="1"
+                        max="20"
+                        step="1"
+                        id="button_border_radius_range"
+                        formControlName="border_radius"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label for="button_width_range" color="gray">
+                        Width
+                        {{
+                          form_group
+                            .get("setup")
+                            .get("button_settings")
+                            .get("width").value
+                        }}%
+                      </label>
+                      <input
+                        type="range"
+                        class="custom-range"
+                        min="20"
+                        max="100"
+                        step="5"
+                        id="button_width_range"
+                        formControlName="width"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label for="align_select" color="gray"> Align </label>
+                      <select
+                        class="form-control"
+                        id="align_select"
+                        formControlName="align"
+                      >
+                        <option value="left">Left</option>
+                        <option value="center">Center</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button
+          [disabled]="wait"
+          class="btn btn-success btn-sm"
+          (click)="submit()"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <div class="col-12 col-md-8">
+      <app-mailing-list-view
+        [idOrganization]="current_user?.idIglesia"
+        [is_preview]="true"
+        [mailing_list]="form_group.value"
+      ></app-mailing-list-view>
+
+      <!-- <app-mailing-list-view
+        [idOrganization]="99999"
+        [idMailingList]="7351"
+      ></app-mailing-list-view>
+      <app-mailing-list-view
+        [idOrganization]="99999"
+        [idMailingList]="7353"
+      ></app-mailing-list-view> -->
+    </div>
+  </div>
+</div>
+<div *ngIf="wait" class="container mt-3">
+  <ng-template [ngIf]="wait">
+    <div
+      class="d-flex justify-content-center col-12"
+      style="margin-top: 10%; margin-bottom: 10%"
+    >
+      <div
+        style="
+          height: 120px;
+          width: 120px;
+          font-size: 15px;
+          border-width: 0.45em;
+        "
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+</div>
+<ngx-smart-modal
+  identifier="add_new_input_form"
+  #add_new_input_form
+  customClass="large-modal"
+>
+  <app-mailing-list-input-form
+    #mailing_input_form
+    (on_add)="refreshInputs($event)"
+  ></app-mailing-list-input-form>
+</ngx-smart-modal>

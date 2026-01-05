@@ -1,0 +1,426 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{
+        isEdit
+          ? "Edit design request #" + designRequest.idDesignRequest
+          : "Add design request"
+      }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div class="row">
+    <!-- <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label class="text-muted">
+          Seleccione un proyecto
+        </label>
+        <select
+          class="form-control"
+          [(ngModel)]="designRequest.idIglesia"
+          (change)="onSelectIglesia($event.target.value)"
+        >
+          <option
+            *ngFor="let item of dropdowns?.iglesias"
+            [value]="item.idIglesia"
+          >
+            {{ item.Nombre }}
+          </option>
+        </select>
+      </div>
+    </div> -->
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label floating class="text-muted" class="width-fix"> Title:* </label>
+        <input
+          class="form-control col-12"
+          [(ngModel)]="designRequest.title"
+          type="text"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="category"> Select a project </label>
+        <ng-multiselect-dropdown
+          #multi_select
+          placeholder="Select a project"
+          [data]="dropdowns?.iglesias"
+          [settings]="selectOptions"
+          (onSelect)="fixIdProject($event)"
+          (onDeSelect)="designRequest.idIglesia = 0; iglesia = undefined"
+          [disabled]="!currentUser.isSuperUser"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="form-group">
+        <label class="text-muted"> Status </label>
+        <select
+          class="form-control"
+          [(ngModel)]="designRequest.idDesignRequestStatus"
+          (ngModelChange)="setSelectedStatus()"
+        >
+          <option
+            *ngFor="let item of dropdowns?.statuses"
+            [value]="item.idDesignRequestStatus"
+          >
+            {{ item.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="form-group">
+        <label class="text-muted"> Design type </label>
+        <select
+          class="form-control"
+          [(ngModel)]="designRequest.idDesignRequestType"
+        >
+          <option
+            *ngFor="let item of dropdowns?.types"
+            [value]="item.idDesignRequestType"
+          >
+            {{ item.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="form-group">
+        <label class="text-muted"> Priority </label>
+        <select
+          class="form-control"
+          [(ngModel)]="designRequest.idDesignRequestPriority"
+        >
+          <option
+            *ngFor="let item of dropdowns?.priorities"
+            [value]="item.idDesignRequestPriority"
+          >
+            {{ item.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div
+      class="col-12 col-md-6 center-fix"
+      *ngIf="designRequest.idDesignRequestType == 7"
+    >
+      <div class="form-group">
+        <label floating class="text-muted"> Other (specify): </label>
+        <textarea
+          [(ngModel)]="designRequest.other"
+          maxHeight="500"
+          placeholder=""
+          auto-resize-textarea="320"
+          [ngModelOptions]="{ standalone: true }"
+          type="text"
+          class="form-control"
+        ></textarea>
+      </div>
+    </div>
+
+    <div
+      *ngIf="selected_status?.idDesignRequestParentStatus === 1"
+      class="row col-12 align-items-center justify-content-center center-fix"
+    >
+      <div class="col-2 col-md-1">
+        <button
+          [disabled]="designRequest.quantity <= 1"
+          ion-button
+          (click)="addQuantity(-1)"
+          class="btn btn-danger circular-button"
+        >
+          <mat-icon matPrefix>remove</mat-icon>
+        </button>
+      </div>
+      <div class="col-8 col-md-3">
+        <div no-lines class="center-fix">
+          <label floating class="text-muted" class="width-fix">
+            #. of proposals:*
+          </label>
+          <input
+            class="col-12 align-center-fixer"
+            [(ngModel)]="designRequest.quantity"
+            type="number"
+            readonly
+            required
+          />
+        </div>
+      </div>
+      <div class="col-2 col-md-1">
+        <button
+          (click)="addQuantity(1)"
+          ion-button
+          class="btn btn-success circular-button"
+        >
+          <mat-icon matPrefix>add</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="col-12 col-md-4"
+      *ngIf="selected_status?.idDesignRequestParentStatus === 2"
+    >
+      <div class="form-group">
+        <label stacked class="text-muted"> Platform </label>
+        <select
+          class="form-control"
+          [(ngModel)]="designRequest.platform"
+          [ngModelOptions]="{ standalone: true }"
+        >
+          <option value="">-- Select --</option>
+          <option value="mobile">Mobile</option>
+          <option value="web">Web</option>
+          <option value="both">Both</option>
+        </select>
+      </div>
+    </div>
+    <div
+      class="col-12 col-md-4"
+      *ngIf="selected_status?.idDesignRequestParentStatus === 2"
+    >
+      <div class="form-group">
+        <label stacked class="text-muted"> Module </label>
+        <select
+          class="form-control"
+          [(ngModel)]="designRequest.idDesignRequestModule"
+          [ngModelOptions]="{ standalone: true }"
+        >
+          <option *ngFor="let module of dropdowns.modules" [value]="module.id">
+            {{ module.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label stacked class="text-muted"> Description </label>
+        <textarea
+          class="form-control"
+          [(ngModel)]="designRequest.description"
+          maxHeight="500"
+          placeholder=""
+          auto-resize-textarea="320"
+          [ngModelOptions]="{ standalone: true }"
+          type="text"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <div class="from-group center-fix">
+        <label stacked class="text-muted">Deadline:</label>
+        <div class="dateInputItem" no-lines>
+          <input
+            class="form-control dateTimeInput"
+            [min]="today"
+            max="2100-12-31"
+            [(ngModel)]="designRequest.deadline"
+            displayFormat="MMM-DD-YYYY"
+            type="date"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="col-8">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="category"> Assigned to: </label>
+        <ng-multiselect-dropdown
+          #multi_select_users
+          placeholder="Select an user"
+          [data]="users"
+          [settings]="selectUsersOptions"
+          (onSelect)="fixIdUser($event)"
+          (onDeSelect)="designRequest.assignedTo = 0"
+        ></ng-multiselect-dropdown>
+      </div>
+
+      <!-- <div class="form-group">
+        <label for="category">Assigned to:</label>
+        <select
+          class="form-control"
+          [(ngModel)]="designRequest.assignedTo"
+          placeholder="Select an user."
+        >
+          <option *ngFor="let item of users" [value]="item.idUsuarioSistema">
+            {{ item.fullName }}
+          </option>
+        </select>
+      </div> -->
+    </div>
+    <div class="col-4">
+      <div class="form-group">
+        <label for="estimated">Estimated time</label>
+        <input
+          class="form-control"
+          [(ngModel)]="designRequest.estimatedTime"
+          placeholder="Estimated time."
+        />
+      </div>
+    </div>
+
+    <div class="row col-12 align-items-center">
+      <div
+        class="col-12 col-md-3"
+        *ngIf="selected_status?.idDesignRequestParentStatus === 1"
+      >
+        <div class="from-group">
+          <label class="text-muted mr-2"> Designer criteria? </label>
+          <ng-toggle
+            class="form-control"
+            onColor="success"
+            onText="Yes"
+            offColor="danger"
+            offText="No"
+            [(ngModel)]="designRequest.designerCriteria"
+            (valueChange)="checkCriteria($event)"
+          >
+          </ng-toggle>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-9">
+        <div
+          class="form-group"
+          *ngIf="
+            !designRequest.designerCriteria &&
+            selected_status?.idDesignRequestParentStatus === 1
+          "
+        >
+          <label class="text-muted"> Specify colors </label>
+          <textarea
+            class="form-control"
+            [(ngModel)]="designRequest.specifiedColors"
+            maxHeight="500"
+            placeholder=""
+            auto-resize-textarea="320"
+            [ngModelOptions]="{ standalone: true }"
+            [readonly]="designRequest.designerCriteria"
+            type="text"
+          ></textarea>
+        </div>
+      </div>
+      <div class="row col-12 align-items-center">
+        <div class="col-12 col-md-3">
+          <div class="from-group">
+            <label class="text-muted mr-2"> Is ready to work? </label>
+            <ng-toggle
+              class="form-control"
+              onColor="success"
+              onText="Yes"
+              offColor="danger"
+              offText="No"
+              [(ngModel)]="designRequest.is_ready"
+            >
+            </ng-toggle>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="row col-12 align-items-center"
+        *ngIf="selected_status?.idDesignRequestParentStatus === 1"
+      >
+        <div class="col-10 col-md-4">
+          <h4 class="text-muted">Images to use.</h4>
+        </div>
+        <div class="col-2">
+          <button
+            (click)="showActionSheet(1, input_file_use)"
+            *ngIf="!isEdit"
+            class="btn btn-citric circular-button"
+          >
+            <mat-icon matPrefix>add</mat-icon>
+          </button>
+          <input
+            [hidden]="true"
+            #input_file_use
+            multiple
+            type="file"
+            class="custom-file-input"
+            id="customFile"
+          />
+        </div>
+      </div>
+
+      <div
+        class="scrollmenu"
+        *ngIf="selected_status?.idDesignRequestParentStatus === 1"
+      >
+        <div class="slide-image" *ngFor="let image of designRequest.useImages">
+          <img [src]="fixUrl(image)" style="height: 120px" />
+          <button
+            class="btn btn-danger front-element"
+            *ngIf="!isEdit"
+            (click)="removeImage(designRequest.useImages, image)"
+          >
+            x
+          </button>
+        </div>
+      </div>
+
+      <hr class="col-12" />
+
+      <div class="row col-12 align-items-center">
+        <div class="col-10 col-md-4">
+          <h4 class="text-muted">Reference images</h4>
+        </div>
+        <div class="col-2">
+          <button
+            (click)="showActionSheet(2, input_file_reference)"
+            class="btn btn-citric circular-button"
+            *ngIf="!isEdit"
+          >
+            <mat-icon matPrefix>add</mat-icon>
+          </button>
+          <input
+            [hidden]="true"
+            #input_file_reference
+            multiple
+            type="file"
+            class="custom-file-input"
+            id="customFile"
+          />
+        </div>
+      </div>
+      <div class="col-12 scrollmenu" style="min-width: 1px; min-height: 120px">
+        <div
+          class="slide-image"
+          *ngFor="let image of designRequest.referenceImages"
+        >
+          <img [src]="fixUrl(image)" style="height: 120px" />
+          <button
+            class="btn btn-danger front-element"
+            *ngIf="!isEdit"
+            (click)="removeImage(designRequest.referenceImages, image)"
+          >
+            x
+          </button>
+        </div>
+      </div>
+
+      <hr class="col-12" />
+
+      <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+        <button
+          [disabled]="serverBusy"
+          (click)="submit(designRequest)"
+          class="btn btn-citric searchButton"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

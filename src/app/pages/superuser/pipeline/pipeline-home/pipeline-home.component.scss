@@ -1,0 +1,60 @@
+.totales {
+    text-align: center;
+    .grid[no-padding] > .row > .col {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-radius: 5px;
+    }
+}
+.selected {
+    background-color: #dddddd !important;
+}
+.tag {
+    padding: 5px;
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    color: white;
+    margin-left: 3px;
+}
+.size-fix {
+    text-align: center;
+}
+.border-fixer-item {
+    .label {
+        margin: 0 !important;
+    }
+    .item-inner {
+        padding-right: 0 !important;
+    }
+    border: 1px solid #ddd !important;
+    padding-left: 0 !important;
+    padding-bottom: 5px;
+}
+.border-fixer-row {
+    ion-col {
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+    }
+}
+.add-button-container {
+    button {
+        height: 32px !important;
+    }
+}
+@media screen and (orientation: landscape) {
+    .size-fix {
+        font-size: 2vw;
+    }
+}
+@media screen and (orientation: portrait) {
+    .size-fix {
+        font-size: 3vw;
+    }
+}

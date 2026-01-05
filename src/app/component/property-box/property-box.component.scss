@@ -1,0 +1,13 @@
+.property-box {
+  border: 1px solid #e7e7e7;
+  border-radius: 20px;
+  .content {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .not-provided {
+    color: #94a1ad !important;
+  }
+}

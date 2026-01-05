@@ -1,0 +1,404 @@
+<form (ngSubmit)="submitForm(sectionFormGroup)" #sectionFormGroup="ngForm">
+  <div class="form-group">
+    <div class="form-group">
+      <label>Title</label>
+      <text-editor
+        [ngModelOptions]="{ standalone: true }"
+        [(ngModel)]="sectionForm.title"
+        [lite]="true"
+      ></text-editor>
+    </div>
+  </div>
+
+  <!-- Section type selector -->
+  <div class="form-group">
+    <label>Select type of Section</label>
+    <div
+      class="form-check"
+      *ngFor="let sectionType of sectionTypes; let idx = index"
+    >
+      <input
+        [id]="'radio' + idx"
+        class="form-check-input"
+        type="radio"
+        name="section_type"
+        [value]="sectionType"
+        [(ngModel)]="sectionForm.section_type"
+      />
+      <label class="form-check-label" [for]="'radio' + idx">
+        {{ sectionType }}
+      </label>
+    </div>
+  </div>
+
+  <!-- Iframe selector -->
+  <div class="form-group" *ngIf="sectionForm.section_type == 'iframe'">
+    <label>Select the iframe</label>
+    <select
+      class="form-control"
+      required
+      name="section_content"
+      [(ngModel)]="sectionForm.section_content"
+      (change)="checkIframeType($event)"
+    >
+      <option *ngFor="let opt of iframes" [ngValue]="opt">
+        {{ opt.label }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Columns selector -->
+  <div class="form-group" *ngIf="sectionForm.section_type == 'columns'">
+    <label>Select column distribution</label>
+    <select
+      name="columns_type"
+      required
+      [(ngModel)]="sectionForm.columns_type"
+      class="form-control"
+    >
+      <option value="text-image">Text, Button - Image</option>
+      <option value="image-text">Image - Text, Button</option>
+    </select>
+  </div>
+
+  <div class="form-group" *ngIf="sectionForm.section_type == 'gallery'">
+    <label>Select a gallery to show</label>
+    <select
+      class="form-control"
+      required
+      name="gallery_id"
+      [(ngModel)]="sectionForm.gallery_id"
+    >
+      <option *ngFor="let gallery of galleries" [ngValue]="gallery.id">
+        {{ gallery.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-group" *ngIf="sectionForm.section_type == 'iframe'">
+    <label>Recommended height </label>
+    <input
+      type="number"
+      class="form-control"
+      required
+      name="iframe_height"
+      [(ngModel)]="sectionForm.section_content.iframe_height"
+    />
+  </div>
+  <div
+    class="form-group"
+    *ngIf="
+      sectionForm.section_type == 'iframe' &&
+      sectionForm.section_content.id === 'iframe_contact'
+    "
+  >
+    <label>Select Contact Inbox to show </label>
+    <select
+      class="form-control"
+      required
+      name="iframe_height"
+      [(ngModel)]="selected_contact_inbox_id"
+    >
+      <option *ngFor="let ci of mailingLists" [value]="ci.id">
+        {{ ci.name }}
+      </option>
+    </select>
+  </div>
+  <div
+    class="form-group"
+    *ngIf="
+      sectionForm.section_type == 'iframe' &&
+      (sectionForm.section_content.id === 'iframe_groups'
+      || sectionForm.section_content.id === 'iframe_contact')
+    "
+  >
+    <label>Language </label>
+    <select
+      class="form-control"
+      required
+      name="view_type"
+      [ngModelOptions]="{ standalone: true }"
+      [(ngModel)]="sectionForm.section_content.lang"
+    >
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+  <div
+    class="form-group"
+    *ngIf="
+      sectionForm.section_type == 'iframe' &&
+      sectionForm.section_content.id === 'iframe_groups'
+    "
+  >
+    <label>Select View Type </label>
+    <select
+      class="form-control"
+      required
+      name="view_type"
+      [ngModelOptions]="{ standalone: true }"
+      [(ngModel)]="sectionForm.section_content.view_type"
+    >
+      <option value="list">List</option>
+      <option value="grid">Grid</option>
+    </select>
+  </div>
+  <div
+    class="form-group"
+    *ngIf="
+      sectionForm.section_type == 'iframe' &&
+      sectionForm.section_content.id === 'iframe_groups'
+    "
+  >
+    <label>Select Group Type to show </label>
+    <select
+      class="form-control"
+      required
+      name="view_type"
+      [ngModelOptions]="{ standalone: true }"
+      [(ngModel)]="sectionForm.section_content.group_type_id"
+    >
+      <option [value]="1">Ministries</option>
+      <option [value]="2">Groups</option>
+      <option [value]="3">Events</option>
+      <option [value]="4">Teams</option>
+    </select>
+  </div>
+
+  <div
+    class="row"
+    *ngIf="
+      sectionForm.section_type == 'iframe' &&
+      sectionForm.section_content.id === 'iframe_groups'
+    "
+  >
+    <h5 class="col-12 text-muted">Header Settings</h5>
+    <div class="ws-100"></div>
+    <div class="col-2">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label>Text Color</label>
+        <input
+          type="color"
+          [(ngModel)]="sectionForm.section_content.text_color"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-control"
+          style="width: 50px; height: 40px"
+        />
+        <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+      </div>
+    </div>
+    <div class="col-10">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="degrees_radius" color="gray">
+          Degrees
+          {{ sectionForm.section_content.degrees }}°
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="0"
+          max="360"
+          step="1"
+          id="degrees_radius"
+          [ngModelOptions]="{ standalone: true }"
+          [(ngModel)]="sectionForm.section_content.degrees"
+        />
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label>Main Color</label>
+        <input
+          type="color"
+          [ngModelOptions]="{ standalone: true }"
+          [(ngModel)]="sectionForm.section_content.main_color"
+          class="form-control"
+          style="width: 50px; height: 40px"
+        />
+        <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+      </div>
+    </div>
+    <div class="col-10">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="main_color_percent_radius_range" color="gray">
+          Main Color Gradient
+          {{ sectionForm.section_content.main_percent }}%
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="0"
+          max="100"
+          step="1"
+          id="main_color_percent_radius_range"
+          [ngModelOptions]="{ standalone: true }"
+          [(ngModel)]="sectionForm.section_content.main_percent"
+        />
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label>Second Color</label>
+        <input
+          type="color"
+          [(ngModel)]="sectionForm.section_content.second_color"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-control"
+          style="width: 50px; height: 40px"
+        />
+        <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+      </div>
+    </div>
+    <div class="col-10">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="second_color_percent_radius_range" color="gray">
+          Second Color Gradient
+          {{ sectionForm.section_content.second_percent }}%
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="0"
+          max="100"
+          step="1"
+          id="second_color_percent_radius_range"
+          [ngModelOptions]="{ standalone: true }"
+          [(ngModel)]="sectionForm.section_content.second_percent"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="
+      sectionForm.section_type == 'iframe' &&
+      sectionForm.section_content.id === 'iframe_groups'
+    "
+    class="header-div"
+    [ngStyle]="{
+      background:
+        'linear-gradient(' +
+        sectionForm.section_content.degrees +
+        'deg, ' +
+        sectionForm.section_content.main_color +
+        ' ' +
+        sectionForm.section_content.main_percent +
+        '%, ' +
+        sectionForm.section_content.second_color +
+        ' ' +
+        sectionForm.section_content.second_percent +
+        '%)'
+    }"
+  >
+    <h3
+      style="font-size: 40px; font-family: 'Poppins'"
+      class="text-center py-1"
+      [ngStyle]="{ color: sectionForm.section_content.text_color }"
+    >
+      Sample text
+    </h3>
+  </div>
+
+  <div class="row">
+    <div class="col-6">
+      <!-- Section Background color -->
+      <div class="form-group">
+        <label>Section background color</label>
+        <input
+          type="color"
+          name="background_color"
+          class="form-control"
+          [(ngModel)]="sectionForm.background_color"
+        />
+      </div>
+    </div>
+    <div class="col-6">
+      <!-- Section font color -->
+      <div class="form-group">
+        <label>Section text color</label>
+        <input
+          type="color"
+          name="text_color"
+          class="form-control"
+          [(ngModel)]="sectionForm.text_color"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-6">
+      <!-- Section number of columns -->
+      <img
+        *ngIf="sectionForm.background_image"
+        [src]="sectionForm.background_image"
+        alt=""
+        class="responsive-img"
+      />
+      <button
+        *ngIf="sectionForm.background_image"
+        type="button"
+        class="btn btn-sm btn-danger"
+        (click)="deleteBgPhoto()"
+      >
+        <i class="fa fa-trash"></i>
+      </button>
+      <div class="form-group">
+        <label>Background Image</label>
+        <input
+          type="file"
+          name="text_color"
+          class="form-control"
+          min="1"
+          max="12"
+          (change)="addBgImage($event.target.files[0])"
+        />
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-group">
+        <label>Background position</label>
+        <select
+          [(ngModel)]="sectionForm.background_position"
+          name="background_position"
+          class="form-control"
+        >
+          <option *ngFor="let position of positions" [value]="position">
+            {{ position }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-group">
+        <label>Background size</label>
+        <select
+          [(ngModel)]="sectionForm.background_size"
+          name="background_size"
+          class="form-control"
+        >
+          <option *ngFor="let size of sizes" [value]="size">
+            {{ size }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-xs-6">
+      <div class="form-group">
+        <label>Add container</label>
+        <input
+          type="checkbox"
+          name="text_color"
+          [(ngModel)]="sectionForm.container"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <button class="btn btn-success" [disabled]="sectionFormGroup.invalid">
+      Submit
+      <i class="fa fa-paper-plane"></i>
+    </button>
+  </div>
+</form>

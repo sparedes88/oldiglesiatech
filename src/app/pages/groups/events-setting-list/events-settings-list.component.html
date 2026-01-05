@@ -1,0 +1,226 @@
+<div class="container" style="min-height: 700px">
+  <div class="row">
+    <div class="col-12" [hidden]="!show_detail_loading">
+      <ng-template [ngIf]="show_detail_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div
+      class="col-xs-12 col-md-12 mt-2 table-responsive-sm"
+      [hidden]="selectedEvent || show_detail_loading"
+    >
+      <div class="row">
+        <div class="col-12">
+          <button
+          *ngIf="currentUser.isSuperUser || currentUser.idUserType === 1"
+            class="btn btn-sm btn-outline-success float-right"
+            (click)="openModalAddEventV2(group_event_modal_v2)"
+          >
+            Add events
+          </button>
+          <!-- <button
+            *ngIf="currentUser.isSuperUser || currentUser.idUserType === 1"
+            class="btn btn-sm btn-outline-success float-right"
+            (click)="
+              openModalAddEvent(group_event_modal, group_event_setting_form)
+            "
+          >
+            Add events <small *ngIf="currentUser.isSuperUser">(v1)</small>
+          </button> -->
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-xs-12 col-md-12 mt-2 table-responsive-sm"
+      [hidden]="selectedEvent || show_detail_loading"
+    >
+      <table
+        style="width: 100%"
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        class="table row-border hover mt-4"
+      >
+        <thead>
+          <tr>
+            <th width="100px"></th>
+            <th>Title</th>
+            <th>Description.</th>
+            <th>Frequency.</th>
+            <!-- <th>Attendances</th> -->
+            <th>Settings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let event of events">
+            <td>
+              <img
+                [src]="fixUrl(event.picture)"
+                [alt]="event.name"
+                class="responsive my-1"
+                onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+              />
+            </td>
+            <td>
+              <b class="pl-1">{{ event.name }}</b>
+            </td>
+            <td>
+              {{ event.description }}
+            </td>
+            <td>
+              <span *ngIf="!event.is_v2">
+                {{ event.frequency | translate }}
+              </span>
+            </td>
+            <!-- <td>
+              {{ event.attendances_count }} /
+              {{ event.attendances_total }}
+            </td> -->
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-sm btn-info"
+                  (click)="
+                    openModalUpdateEvent(
+                      group_event_modal,
+                      group_event_setting_form,
+                      event
+                    )
+                  "
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteEvent(event)"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-view-event-activities
+      [hidden]="!selectedEvent || hide_activities"
+      #view_event_activities_form
+      (onDismiss)="closeViews()"
+    >
+    </app-view-event-activities>
+    <app-view-event-reviews
+      [hidden]="!selectedEvent || hide_reviews"
+      #view_event_reviews_form
+      (onDismiss)="closeViews()"
+    >
+    </app-view-event-reviews>
+
+    <app-view-event-finances
+      [hidden]="!selectedEvent || hide_finances"
+      #view_event_finances_form
+      (onDismiss)="closeViews()"
+    >
+    </app-view-event-finances>
+
+    <app-view-event-attendance
+      [hidden]="!selectedEvent || hide_attendance"
+      #view_event_attendances_form
+      (onDismiss)="closeViews($event)"
+    >
+    </app-view-event-attendance>
+
+    <div class="col-xs-12">
+      <button class="btn btn-primary mb-2" (click)="iframeCodeModal.open()">
+        Get iframe code
+      </button>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #group_event_modal
+  identifier="group_event_modal"
+  customClass="full-screen-modal"
+  [dismissable]="false"
+  [closable]="false"
+  (onAnyCloseEventFinished)="resetForm(group_event_setting_form)"
+>
+  <app-group-event-setting-form
+    #group_event_setting_form
+    (submit)="reloadEvents(group_event_modal, $event)"
+  ></app-group-event-setting-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #group_event_modal_v2
+  identifier="group_event_modal_v2"
+  [dismissable]="false"
+  [closable]="false"
+  (onEscape)="selected_event_v2 = undefined"
+>
+  <!-- customClass="full-screen-modal" -->
+  <!-- (onAnyCloseEventFinished)="resetForm(group_event_setting_form)" -->
+  <app-group-event-setting-form-v2
+    #group_event_setting_form_v2
+    *ngIf="selected_event_v2"
+    (submit)="handleCloseV2($event)"
+  ></app-group-event-setting-form-v2>
+  <!-- (submit)="reloadEvents(group_event_modal, $event)" -->
+</ngx-smart-modal>
+
+<ngx-smart-modal #iframeCodeModal identifier="iframeCodeModal">
+  <h4>Insert events on your page</h4>
+
+  <p>Entry Point</p>
+  <pre style="background-color: whitesmoke; padding: 8px">
+    {{ iframeCode.entry_point }}
+  </pre>
+  <p>Scripts</p>
+  <pre style="background-color: whitesmoke; padding: 8px">
+    {{ iframeCode.scripts }}
+  </pre>
+
+  <div class="form-group mt-1">
+    <label for="selectLang">Select language</label>
+    <select class="form-control" id="selectLang" [(ngModel)]="iframeLang">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+    </select>
+  </div>
+
+  <div class="form-group mt-1">
+    <label for="iframeMode">Select Mode</label>
+    <select class="form-control" id="iframeMode" [(ngModel)]="iframeMode">
+      <option value="">Default</option>
+      <option value="-slider">Slider</option>
+    </select>
+  </div>
+
+  <div class="form-group mt-1">
+    <label for="iframeMode">Display Mode</label>
+    <select class="form-control" id="displayMode" [(ngModel)]="displayMode">
+      <option value="false">Grid</option>
+      <option value="true">Horizontal list</option>
+    </select>
+  </div>
+
+  <p>Copy this code and paste it on your website</p>
+</ngx-smart-modal>
+
+<ngx-smart-modal #linkModal identifier="linkModal">
+  <h4>Register Link</h4>
+  <pre style="background-color: #e2e2e2; padding: 8px">
+    <a [href]="iframeCode.event_link" target="_blank">{{ iframeCode.event_link }}</a>
+  </pre>
+
+  <p>Copy this url and paste use it on you website</p>
+</ngx-smart-modal>

@@ -1,0 +1,516 @@
+<div class="container" style="min-height: 700px">
+  <div class="row">
+    <div *ngIf="show_header" class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row"></div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/videos_banner_new.png"
+        />
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="col-12 p-0" *ngIf="display_form">
+      <div class="row py-2">
+        <h3 class="text-citric col-8">
+          {{ selected_media_name | titlecase }} Info
+        </h3>
+        <div class="col-4">
+          <div class="btn-group float-right">
+            <button class="btn btn-sm btn-outline-citric" (click)="closeForm()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <form #group_form="ngForm" [formGroup]="video_form">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12 col-md-6">
+                <div class="form-group">
+                  <label>Select type *</label>
+                  <select
+                    (change)="setValidations($event)"
+                    type="text"
+                    required
+                    class="form-control mb-1"
+                    formControlName="idMediaType"
+                    [class.is-invalid]="
+                      video_form.get('idMediaType').dirty &&
+                      video_form.get('idMediaType').invalid
+                    "
+                  >
+                    <option [value]="1">Video</option>
+                    <option [value]="2">Audio</option>
+                    <option [value]="3">Document</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6 mb-3">
+                <label>Assigned to this series:</label>
+                <ng-multiselect-dropdown
+                  [placeholder]="
+                    'This ' +
+                    (selected_media_name | lowercase) +
+                    ' will appear in these series.'
+                  "
+                  [data]="playlists"
+                  [settings]="select_options"
+                  formControlName="playlists"
+                ></ng-multiselect-dropdown>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="form-group">
+                  <label>Title *</label>
+                  <input
+                    type="text"
+                    required
+                    class="form-control mb-1"
+                    [placeholder]="
+                      'Enter your ' +
+                      (selected_media_name | lowercase) +
+                      '\'s title.'
+                    "
+                    formControlName="title"
+                    [class.is-invalid]="
+                      video_form.get('title').dirty &&
+                      video_form.get('title').invalid
+                    "
+                  />
+                </div>
+              </div>
+
+              <div class="col-12 col-md-4">
+                <div class="form-group">
+                  <label>Speaker *</label>
+                  <input
+                    type="text"
+                    required
+                    class="form-control mb-1"
+                    placeholder="Who is your speaker?"
+                    formControlName="speaker"
+                    [class.is-invalid]="
+                      video_form.get('speaker').dirty &&
+                      video_form.get('speaker').invalid
+                    "
+                  />
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="form-group">
+                  <div class="dateInputItem" no-lines>
+                    <label for=""> Publish date </label>
+                    <input
+                      class="form-control dateTimeInput"
+                      max="2100-12-31"
+                      formControlName="publish_date"
+                      displayFormat="MMM-DD-YYYY"
+                      type="date"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="col-12"
+                *ngIf="video_form.get('idMediaType').value == 1"
+              >
+                <div class="form-group">
+                  <label>Embed code *</label>
+                  <textarea
+                    type="text"
+                    rows="5"
+                    class="form-control mb-1"
+                    placeholder="Paste here you iframe code."
+                    formControlName="embed_frame"
+                    [class.is-invalid]="
+                      video_form.get('embed_frame').dirty &&
+                      video_form.get('embed_frame').invalid
+                    "
+                  >
+                  </textarea>
+                </div>
+              </div>
+
+              <div
+                class="col-12 mb-3"
+                *ngIf="video_form.get('idMediaType').value != 1"
+              >
+                <div class="card">
+                  <div class="row card-body justify-content-center">
+                    <div class="col-12">
+                      <input
+                        readonly
+                        class="form-control"
+                        [placeholder]="
+                          'Attach your ' +
+                          (selected_media_name | lowercase) +
+                          '.'
+                        "
+                        (click)="resource_item_file.click()"
+                      />
+                    </div>
+                    <div class="col-12 col-md-4" [hidden]="true">
+                      <div class="custom-file mb-4">
+                        <input
+                          #resource_item_file
+                          [accept]="accepted_formats"
+                          (change)="uploadFile($event, 'resource_file')"
+                          type="file"
+                          class="custom-file-input"
+                          id="customFile"
+                        />
+                        <label class="custom-file-label" for="customFile"
+                          >Choose file</label
+                        >
+                      </div>
+                    </div>
+
+                    <div class="col-12" *ngIf="resource_file || file_info">
+                      <a *ngIf="resource_file">
+                        {{ resource_file.name }}
+                      </a>
+                      <a *ngIf="file_info && !resource_file">
+                        {{ file_info.original_name }}
+                      </a>
+                      <button class="btn" (click)="removeAttach()">
+                        <i class="fa fa-trash text-danger"></i>
+                      </button>
+
+                      <div
+                        class="float-right"
+                        *ngIf="video_form.get('idMediaType').value == 3"
+                      >
+                        <div class="form-group mb-0 mt-1">
+                          <label>Show embed?</label>
+                          <input
+                            type="checkbox"
+                            rows="5"
+                            class="ml-2"
+                            placeholder="Show the document in an embed view?"
+                            formControlName="is_embed"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-group">
+                  <label>Media Description</label>
+                  <textarea
+                    type="text"
+                    rows="3"
+                    class="form-control mb-1"
+                    [placeholder]="
+                      'Tell about your ' +
+                      (selected_media_name | lowercase) +
+                      ' (optional)'
+                    "
+                    formControlName="description"
+                    [class.is-invalid]="
+                      video_form.get('description').dirty &&
+                      video_form.get('description').invalid
+                    "
+                  >
+                  </textarea>
+                </div>
+              </div>
+              <div *ngIf="temp_video" class="col-12">
+                <div class="form-group">
+                  <label>Sermon Notes</label>
+                  <text-editor
+                    [ngModelOptions]="{ standalone: true }"
+                    [(ngModel)]="temp_video.sermon_notes"
+                    [identifier]="'video-' + temp_video?.idVideo"
+                    [hide_font_buttons]="true"
+                    [height]="'100%'"
+                  ></text-editor>
+                </div>
+              </div>
+              <div class="col-7 mb-3">
+                <div class="card">
+                  <div class="row card-body justify-content-center">
+                    <img
+                      #img_tag
+                      [src]="fixUrl()"
+                      [alt]="video_form.get('title').value"
+                      class="group-picture mb-1"
+                      (click)="thumbnail_item_file.click()"
+                    />
+                    <div class="col-6">
+                      <button
+                        class="btn btn-sm btn-light"
+                        (click)="thumbnail_item_file.click()"
+                      >
+                        Upload image
+                      </button>
+                      <!-- <button
+                        class="btn btn-sm btn-light"
+                        (click)="visiblePixieModal = true"
+                      >
+                        Create your own design
+                      </button> -->
+                    </div>
+
+                    <span style="font-size: 12px">
+                      Recommended size: 1000x428
+                    </span>
+                    <div class="col-12 col-md-4" [hidden]="true">
+                      <div class="custom-file mb-4">
+                        <input
+                          #thumbnail_item_file
+                          accept="image/*"
+                          (change)="uploadFile($event, 'thumbnail_file')"
+                          type="file"
+                          class="custom-file-input"
+                          id="customFile"
+                        />
+                        <label class="custom-file-label" for="customFile"
+                          >Choose file</label
+                        >
+                      </div>
+                    </div>
+                    <!-- <div class="col-9" hidden>
+                      <div class="form-group">
+                        <label>Thumbnail</label>
+                        <input
+                          type="text"
+                          rows="3"
+                          class="form-control mb-1"
+                          placeholder="Add a thumbnail to your video. (optional)"
+                          formControlName="thumbnail"
+                          [readOnly]="!video_form.get('custom_url').value"
+                          [class.is-invalid]="
+                            video_form.get('thumbnail').dirty &&
+                            video_form.get('thumbnail').invalid
+                          "
+                        />
+                      </div>
+                    </div> -->
+                    <!-- <div class="col-3 align-self-center">
+                      <button
+                        class="btn btn-sm btn-light"
+                        (click)="toggleThumbReadOnly()"
+                      >
+                        {{
+                          video_form.get("custom_url").value
+                            ? "Cancel"
+                            : "Use external"
+                        }}
+                      </button>
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12" [hidden]="!submit_loading">
+                <small>
+                  <span *ngIf="!uploaded">
+                    Uploading {{ this.selected_media_name }}
+                  </span>
+                  <span *ngIf="uploaded">
+                    {{ this.selected_media_name }} uploaded
+                  </span>
+                </small>
+                <div class="progress-wrapper">
+                  <div id="progress-bar-file1" class="progress btn-success">
+                    0%
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 text-center mt-3">
+                <button
+                  [disabled]="video_form.invalid || submit_loading"
+                  type="button"
+                  (click)="submitForm(video_form)"
+                  class="btn btn-sm btn-success"
+                  [ngClass]="{
+                    'btn-success': !submit_loading,
+                    'btn-secondary': submit_loading
+                  }"
+                >
+                  <span [ngClass]="{ 'is-loading': submit_loading }">
+                    Submit
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      *ngIf="!display_form && !show_loading"
+      class="col-xs-12 col-md-12 mt-2 text-right row p-0"
+    >
+      <div class="col-8">
+        <h4 class="text-citric text-left mb-2 mt-3">Manage media</h4>
+      </div>
+      <div class="btn-group col-2 mb-2 mt-3">
+        <button class="btn bt-sm btn-outline-success" (click)="addVideo()">
+          Add media
+        </button>
+      </div>
+      <div class="btn-group col-2 mb-2 mt-3">
+        <button class="btn bt-sm btn-citric" (click)="toggle_view.emit()">
+          View Series
+        </button>
+      </div>
+    </div>
+    <div
+      *ngIf="!display_form && !show_loading"
+      class="col-xs-12 col-md-12 mt-2 table-responsive-sm"
+    >
+      <!-- datatable
+      [dtOptions]="dtOptions"
+      [dtTrigger]="dtTrigger" -->
+
+      <div class="row mx-0" [formGroup]="filter_form">
+        <div class="col-12 col-md-3">
+          <div class="form-group">
+            <label> Sort by </label>
+            <select
+              class="form-control"
+              formControlName="sort_by"
+              (change)="applyFilters()"
+            >
+              <option value="desc">Desc</option>
+              <option value="asc">Asc</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="form-group">
+            <label> Type of media </label>
+            <select
+              class="form-control"
+              formControlName="media_type"
+              (change)="applyFilters()"
+            >
+              <option value="all">All</option>
+              <option value="video">Video</option>
+              <option value="audio">Audio</option>
+              <option value="document">Document</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-10 col-md-6">
+          <div class="form-group">
+            <label> Search </label>
+            <input
+              type="text"
+              formControlName="search"
+              class="form-control"
+              (keydown.enter)="applyFilters()"
+            />
+          </div>
+        </div>
+        <div class="col-11">
+          <div class="form-group">
+            <label> By playlist </label>
+            <ng-multiselect-dropdown
+              [placeholder]="'Search by serie(s)'"
+              [data]="playlists"
+              [settings]="select_options"
+              formControlName="playlists"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+        <div class="align-self-center col text-right">
+          <button class="btn btn-sm btn-citric mt-3" (click)="applyFilters()">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <table
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+      class="table row-border hover mt-4">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Short Desc.</th>
+            <th>Playlists</th>
+            <th>Settings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let video of videos">
+            <td width="350" class="fixed">
+              <b>{{ video.title }}</b>
+              <br />
+              <br />
+              Speaker: <b> {{ video.speaker }} </b> at
+              <b class="text-citric">
+                {{ video.publish_date_fixed }}
+              </b>
+            </td>
+            <td class="fixed" style="max-width: 400px">
+              {{ video.description }}
+            </td>
+            <td>
+              <li *ngFor="let item of video.playlists">
+                {{ item.name }}
+              </li>
+              <span *ngIf="video.playlists?.length === 0">
+                <i> No playlists </i>
+              </span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <!-- <button class="btn btn-sm btn-info" disabled>
+                  <i class="fa fa-comments"></i>
+                </button> -->
+                <button
+                  class="btn btn-sm btn-primary"
+                  (click)="openVideoDetail(video)"
+                >
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button
+                  class="btn btn-success btn-sm"
+                  (click)="editVideo(video)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="deleteVideo(video)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- <div class="col-xs-12">
+      <button class="btn btn-primary mb-2" (click)="iframeCodeModal.open()">
+        Get iframe code
+      </button>
+    </div> -->
+  </div>
+</div>

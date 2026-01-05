@@ -1,0 +1,67 @@
+::ng-deep {
+  .container-fw {
+    max-width: unset;
+    .fw {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .articles-display {
+      app-articles-per-category.articles-per-category {
+        .fw-fixer {
+          *[class^="carousel-control-"] {
+            width: 0px;
+          }
+          .carousel-control-prev {
+            left: -0.8%;
+          }
+          .carousel-control-next {
+            right: 0.2%;
+          }
+        }
+      }
+    }
+  }
+  .container-fw,
+  .fw {
+    &.preview {
+      display: flex;
+      justify-content: center;
+    }
+    .articles-display {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      app-articles-per-category.articles-per-category {
+        background-color: #007bb5;
+        .fw-fixer {
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          flex: 0 0 100% !important;
+          max-width: 100% !important;
+        }
+        .carousel-item.active {
+          .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            // [class^="col"] {
+            //   padding: 0 !important;
+            // }
+          }
+        }
+      }
+    }
+  }
+}
+
+app-meetings-manager {
+  max-width: 350px;
+  display: inline-block;
+}
+
+::ng-deep {
+  body.transparent {
+    background: transparent !important;
+  }
+}

@@ -1,0 +1,56 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{
+        category?.idCategoriaMiembro
+          ? "Editing " + category?.descripcion
+          : "Create Category"
+      }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+  </div>
+  <div #basic_form="ngForm" [formGroup]="basicInfoForm" style="width: 100%;">
+    <div class="row">
+      <div class="col-8">
+        <div class="form-group">
+          <label for="estimated">Name *</label>
+          <input
+            class="form-control"
+            placeholder="Name"
+            type="text"
+            formControlName="name"
+            required
+          />
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="form-group">
+          <label for="estimated">Description *</label>
+          <input
+            class="form-control"
+            placeholder="Name"
+            type="text"
+            formControlName="description"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="w-100"></div>
+
+      <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+        <button
+          [disabled]="basicInfoForm.invalid || serverBusy"
+          (click)="onRegister()"
+          class="btn btn-citric searchButton"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

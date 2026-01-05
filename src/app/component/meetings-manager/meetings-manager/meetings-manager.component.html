@@ -1,0 +1,259 @@
+<form
+  *ngIf="view_mode === 'edition'"
+  style="width: 100%"
+  #group_form="ngForm"
+  [formGroup]="contact_form"
+  (submit)="submitContact(contact_form, group_form)"
+>
+  <ng-template [ngIf]="!show_detail">
+    <div class="d-flex justify-content-center" style="margin: 15%">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div [hidden]="!show_detail" class="tab-content mb-3">
+    <div [ngClass]="{ 'm-0': show_as_minimal }" class="row">
+      <div class="col-12">
+        <div class="row mb-4 border-bottom">
+          <div class="col-6 d-md-none">
+            <h5 class="text-secondary">Meeting</h5>
+          </div>
+          <div class="col-5 col-md-10 text-right align-self-center">
+            <label class="text-citric" for="idOrganization">
+              Add Meeting
+            </label>
+          </div>
+          <div class="col-1 text-center align-self-center">
+            <button
+              (click)="addItem()"
+              type="button"
+              class="btn btn-outline-success circular-button"
+            >
+              <mat-icon matPrefix>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-12 p-0 mb-5 d-md-none" *ngIf="displayEmptyMessage()">
+          <h5 class="text-danger">There isn't any meeting yet.</h5>
+          <hr />
+        </div>
+
+        <div
+          *ngFor="
+            let meeting of meetings.controls;
+            let i = index;
+            let last = last;
+            let first = first
+          "
+        >
+          <div
+            formArrayName="meetings"
+            class="p-0 col-12"
+            style="padding-top: 5px"
+          >
+            <div [formGroupName]="i" [hidden]="!meeting.get('status').value">
+              <div class="row justify-content-end">
+                <div
+                  [ngClass]="{
+                    'col-md-4': !show_as_minimal
+                  }"
+                  class="col-8 p-0"
+                >
+                  <div
+                    [ngClass]="{ 'mb-0': show_as_minimal }"
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for=""> Name </label>
+                    <input
+                      formControlName="name"
+                      class="form-control mb-1"
+                      placeholder="Add a meeting name"
+                      type="text"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-4 align-self-end">
+                  <div class="form-group form-check mb-0">
+                    <input
+                      formControlName="is_this_live"
+                      (change)="toggleShowMap(meeting)"
+                      type="checkbox"
+                      class="form-check-input"
+                      id="is_this_live"
+                    />
+                    <label class="form-check-label" for="is_this_live">
+                      Is this live?
+                    </label>
+                  </div>
+                </div>
+                <!-- <div
+                  [ngClass]="{ 'col-md-6 px-md-2': !show_as_minimal }"
+                  class="p-0 col-10"
+                >
+                  <div
+                    [ngClass]="{ 'mb-0': show_as_minimal }"
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for=""> Meeting </label>
+                  </div>
+                </div> -->
+                <div class="col-6 p-0">
+                  <label>Start Time*</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    formControlName="meeting_start"
+                    (change)="
+                      addAnHourOnEnd(
+                        $event.target.value,
+                        'meeting_start',
+                        meeting
+                      )
+                    "
+                    required
+                  />
+                </div>
+                <div class="col-6 p-0">
+                  <label>End Time*</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    formControlName="meeting_end"
+                    (change)="
+                      addAnHourOnEnd(
+                        $event.target.value,
+                        'meeting_end',
+                        meeting
+                      )
+                    "
+                    required
+                  />
+                </div>
+                <div class="col-12 p-0 align-self-center">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select one or multiple days
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_select_days
+                      placeholder="Check some days"
+                      [data]="days_array"
+                      [settings]="days_select_options"
+                      (onSelect)="updateDays($event, meeting)"
+                      (onDeSelect)="updateDays($event, meeting)"
+                      (onSelectAll)="updateDays($event, meeting)"
+                      (onDeSelectAll)="updateDays($event, meeting)"
+                      formControlName="days_on_live_temp"
+                    >
+                      <ng-template
+                        #optionsTemplate
+                        let-item
+                        let-option="option"
+                        let-id="id"
+                        let-isSelected="isSelected"
+                      >
+                        1 {{ option | translate }}
+                      </ng-template>
+                    </ng-multiselect-dropdown>
+                    <!-- [ngModelOptions]="{ standalone: true }" -->
+                    <!-- [(ngModel)]="selected_categories" -->
+                  </div>
+                </div>
+                <div
+                  *ngIf="meeting.get('is_this_live').value"
+                  class="col-10 p-0 align-self-center"
+                >
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select one or multiple Network
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_select_categories
+                      placeholder="Check some networks"
+                      [data]="networks"
+                      [settings]="category_select_options"
+                      (onSelect)="updateCategories($event, meeting)"
+                      (onDeSelect)="updateCategories($event, meeting)"
+                      (onSelectAll)="updateCategories($event, meeting)"
+                      (onDeSelectAll)="updateCategories($event, meeting)"
+                      formControlName="networks_on_live_temp"
+                    ></ng-multiselect-dropdown>
+                    <!-- [ngModelOptions]="{ standalone: true }" -->
+                    <!-- [(ngModel)]="selected_categories" -->
+                  </div>
+                </div>
+                <div class="col-2 align-self-center">
+                  <button
+                    [ngClass]="{
+                      'mt-2': !show_as_minimal,
+                      'mt-4': show_as_minimal
+                    }"
+                    type="button"
+                    (click)="removeItem(i)"
+                    class="btn btn-outline-danger circular-button"
+                  >
+                    <mat-icon matPrefix>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <hr *ngIf="!last" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 mt-2 text-center">
+        <button class="btn btn-sm btn-success">Submit</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div *ngIf="view_mode !== 'edition'" style="width: 100%">
+  <div class="row">
+    <div class="col-12">
+      <div
+        class="row m-0 p-0"
+        *ngFor="let meeting of active_meetings; let last = last"
+      >
+        <div class="col-2 text-left align-self-center">
+          <i class="noColor fa fa-clock" aria-hidden="true"></i>
+        </div>
+        <div class="col-10 text-left">
+          <p class="card-text">
+            <span class="text-secondary">
+              {{ meeting.get("name").value }}
+            </span>
+            <br />
+            <small>
+              <span *ngIf="meeting.get('days_name').value">
+                {{ meeting.get("days_name").value | translate }} <br>
+              </span> {{ meeting.get("meeting_start_parsed").value }} -
+              {{ meeting.get("meeting_end_parsed").value }}
+            </small>
+          </p>
+        </div>
+        <div *ngIf="!last" class="col-12 text-center">
+          <hr class="m-0" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<small class="text-danger bold" *ngIf="contact_form.dirty">
+  * Remember save your changes.
+</small>

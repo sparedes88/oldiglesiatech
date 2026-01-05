@@ -1,0 +1,44 @@
+<form [formGroup]="tabFormGroup" (submit)="submitForm(tabFormGroup)">
+  <div class="row">
+    <div class="col-12">
+      <div class="form-group">
+        <label>Title</label>
+        <input
+          type="email"
+          class="form-control"
+          required
+          formControlName="title"
+          (input)="slugifyTitle()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Slug</label>
+        <input
+          type="url"
+          class="form-control"
+          required
+          formControlName="slug"
+          (change)="slugifyValue()"
+        />
+      </div>
+
+      <div class="form-group form-check">
+        <input
+          formControlName="active"
+          type="checkbox"
+          class="form-check-input"
+          id="activeCheck"
+        />
+        <label class="form-check-label" for="activeCheck">Active</label>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-success" [disabled]="tabFormGroup.invalid">
+          Submit
+          <i class="fa fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,710 @@
+<div
+  class="container page pt-4"
+  [ngStyle]="{
+    'background-color': ezlink?.settings?.background_color || '#ffffff'
+  }"
+>
+  <div class="row justify-content-center">
+    <div class="col-md-4 text-center">
+      <button
+        class="btn btn-sm btn-info"
+        *ngIf="can_edit"
+        (click)="openSettingsInfo()"
+      >
+        Settings
+        <i class="fa fa-gear"> </i>
+      </button>
+      <button
+        class="btn btn-sm btn-light circular"
+        *ngIf="!can_edit"
+        (click)="openShare()"
+      >
+        <i class="fa fa-share-square"></i>
+      </button>
+    </div>
+    <div class="col-md-4 text-center">
+      <!-- <img src="" alt=""> -->
+      <img
+        *ngIf="ezlink?.settings?.show_icon"
+        class="logo_container_ad"
+        [src]="fixUrl(iglesia?.Logo)"
+        [alt]="iglesia?.Nombre | uppercase"
+        [ngStyle]="{
+          'border-color': ezlink?.settings?.border_color || '#ffffff'
+        }"
+      />
+      <div class="header-section">
+        <div class="title">
+          {{ iglesia.Nombre | uppercase }}
+        </div>
+        <p class="description">
+          <span *ngIf="ezlink?.settings?.show_description && is_preview">
+            {{ ezlink?.settings?.description }}
+          </span>
+          <button
+            class="btn btn-sm ml-2"
+            *ngIf="!is_preview && settings_form.get('show_description').value"
+            (click)="openSettingsInfo()"
+          >
+            <span>
+              <i> Edit description </i>
+            </span>
+            <i class="fa fa-edit text-info"></i>
+          </button>
+        </p>
+
+        <!-- <div [formControlName]="settings_form" [hidden]="!ezlink.editing_description">
+          <div
+            class="form-group"
+            [hidden]="!settings_form.get('show_description').value"
+          >
+            <label for=""> Description </label>
+            <textarea
+              class="form-control"
+              formControlName="description"
+              cols="30"
+              rows="10"
+            ></textarea>
+          </div>
+        </div> -->
+      </div>
+    </div>
+    <div class="col-md-4 text-center">
+      <button
+        class="btn btn-sm btn-success"
+        (click)="togglePreview()"
+        *ngIf="can_toggle"
+      >
+        {{ is_preview ? "Edit" : "Preview" }}
+      </button>
+      <br *ngIf="!is_preview" />
+      <br *ngIf="!is_preview" />
+      <button
+        *ngIf="!is_preview && !show_categories"
+        class="btn btn-sm btn-citric"
+        (click)="showCategories()"
+      >
+        Categories
+      </button>
+    </div>
+
+    <div
+      class="col-11 col-md-8 col-lg-7"
+      *ngIf="!show_categories && !show_category_link"
+    >
+      <div class="row mx-0" *ngIf="ezlink?.settings?.show_profile_networks">
+        <h4 *ngIf="!ezlink?._edit_category_name">
+          {{ ezlink?.settings?.network_category_name }}
+        </h4>
+        <div
+          [hidden]="!ezlink?._edit_category_name"
+          class="form-group mb-0"
+          [formGroup]="settings_form"
+        >
+          <input
+            class="form-control"
+            placeholder="Type the name this section will have..."
+            formControlName="network_category_name"
+            type="text"
+          />
+        </div>
+        <button
+          class="btn btn-sm ml-2"
+          *ngIf="!is_preview && !ezlink?._edit_category_name"
+          (click)="ezlink._edit_category_name = true"
+        >
+          <i class="fa fa-edit text-info"></i>
+        </button>
+        <button
+          class="btn btn-sm ml-2 btn-outline-success align-self-center"
+          *ngIf="!is_preview && ezlink?._edit_category_name"
+          (click)="saveSettings('_edit_category_name')"
+        >
+          Save <i class="fa fa-check"></i>
+        </button>
+        <button
+          class="btn btn-sm ml-2 btn-outline-danger align-self-center"
+          *ngIf="!is_preview && ezlink?._edit_category_name"
+          (click)="ezlink._edit_category_name = false"
+        >
+          Cancel <i class="fa fa-ban"></i>
+        </button>
+        <div
+          (click)="handleAction(net)"
+          *ngFor="let net of networks"
+          class="col-12 row mx-0 mb-1 network-round"
+          [ngStyle]="{
+            'border-color': ezlink?.settings?.border_color || '#a9a9a9'
+          }"
+        >
+          <div class="col-2 align-self-center">
+            <i
+              *ngIf="!net.is_custom_icon"
+              [ngClass]="net.icon_svg"
+              [ngStyle]="{
+                background: net.background_color,
+                color: net.text_color
+              }"
+              class="bigIcon rounded-circle"
+            ></i>
+            <img
+              class="bigIcon"
+              *ngIf="net.is_custom_icon"
+              [src]="fixUrl(net.icon_path)"
+            />
+          </div>
+          <div class="col-10 align-self-center text-left">
+            <h5 class="m-0">
+              {{ net.custom_name }}
+              <div class="btn-group" *ngIf="can_edit">
+                <button
+                  *ngIf="can_edit"
+                  class="btn btn-light edit-logo-btn"
+                  (click)="
+                    updateNetworkOrganization(net); $event.stopPropagation()
+                  "
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  *ngIf="can_edit"
+                  class="btn btn-danger edit-logo-btn edit-logo-btn-delete"
+                  (click)="
+                    deleteNetworkOrganization(net); $event.stopPropagation()
+                  "
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </h5>
+          </div>
+        </div>
+      </div>
+      <div class="row mx-0" *ngFor="let category of ezlink?.categories">
+        <div class="col-12 row">
+          <h4>
+            {{ category.name }}
+          </h4>
+
+          <button
+            *ngIf="can_edit"
+            class="btn btn-sm ml-2"
+            (click)="addNetwork(category)"
+          >
+            <i class="fa fa-plus text-success"></i>
+          </button>
+          <button
+            class="btn btn-sm ml-2"
+            *ngIf="can_edit"
+            (click)="showEditCategoryLinks(category)"
+          >
+            <i class="fa fa-edit text-info"></i>
+          </button>
+        </div>
+        <div
+          (click)="handleAction(net)"
+          *ngFor="let net of category.links"
+          class="col-12 row mx-0 mb-1 network-round"
+          [ngStyle]="{
+            'border-color': ezlink?.settings?.border_color || '#a9a9a9'
+          }"
+        >
+          <div class="col-2 align-self-center">
+            <i
+              *ngIf="!net.is_custom_icon"
+              [ngClass]="net.icon_svg"
+              [ngStyle]="{
+                background: net.background_color,
+                color: net.text_color
+              }"
+              class="bigIcon rounded-circle"
+            ></i>
+            <img
+              class="bigIcon"
+              *ngIf="net.is_custom_icon"
+              [src]="fixUrl(net.icon_path)"
+            />
+          </div>
+          <div class="col-10 align-self-center text-left">
+            <h5 class="m-0">
+              {{ net.custom_name }}
+              <!-- <div class="btn-group" *ngIf="can_edit">
+                <button
+                  *ngIf="can_edit"
+                  class="btn btn-light edit-logo-btn"
+                  (click)="
+                    updateNetworkOrganization(net); $event.stopPropagation()
+                  "
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  *ngIf="can_edit"
+                  class="btn btn-danger edit-logo-btn edit-logo-btn-delete"
+                  (click)="
+                    deleteNetworkOrganization(net); $event.stopPropagation()
+                  "
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div> -->
+
+              <!-- <div *ngIf="is_live(net)" class="btn-group">
+              <img
+                class="sound-bars"
+                style="display: inline-block"
+                src="/assets/img/on_live.gif"
+                alt="Playing actually..."
+              />
+              <small class="live-text"> LIVE </small>
+            </div> -->
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-11 col-md-8 col-lg-7"
+      *ngIf="!show_categories && show_category_link"
+    >
+      <div class="row mx-0">
+        <div class="col-12 text-right">
+          <button
+            class="btn btn-sm btn-citric"
+            (click)="show_category_link = false"
+          >
+            Close
+          </button>
+        </div>
+        <div
+          class="row mt-2"
+          cdkDropList
+          cdkDropListOrientation="vertical"
+          [ngClass]="can_edit ? 'category-drag-list' : ''"
+          (cdkDropListDropped)="
+            sortCategoriesArray(selected_category.links, $event, 'links')
+          "
+        >
+          <h4 class="text-secondary">
+            {{ selected_category.name }}
+            <!-- <button
+              class="btn btn-sm ml-2"
+              (click)="addNetwork(selected_category)"
+            >
+              <i class="fa fa-plus text-success"></i>
+            </button> -->
+          </h4>
+          <div
+            cdkDrag
+            [cdkDragDisabled]="!can_edit"
+            [cdkDragLockAxis]="'y'"
+            [ngClass]="{
+              'category-drag-box': can_edit
+            }"
+            *ngFor="let net of selected_category.links"
+            class="row"
+          >
+            <div class="col-2 align-self-center">
+              <i
+                *ngIf="!net.is_custom_icon"
+                [ngClass]="net.icon_svg"
+                [ngStyle]="{
+                  background: net.background_color,
+                  color: net.text_color
+                }"
+                class="bigIcon rounded-circle"
+              ></i>
+              <img
+                class="bigIcon"
+                *ngIf="net.is_custom_icon"
+                [src]="fixUrl(net.icon_path)"
+              />
+            </div>
+            <div class="col-10 align-self-center text-left">
+              <h5 class="m-0">
+                {{ net.custom_name }}
+                <div class="btn-group">
+                  <button
+                    class="btn btn-sm"
+                    (click)="
+                      updateNetworkOrganization(net); $event.stopPropagation()
+                    "
+                  >
+                    <i class="fa fa-edit text-info"></i>
+                  </button>
+                  <button
+                    class="btn btn-sm ml-2"
+                    (click)="
+                      deleteNetworkOrganization(net); $event.stopPropagation()
+                    "
+                  >
+                    <i class="fa fa-trash text-danger"></i>
+                  </button>
+                </div>
+                <div class="btn-group ml-2">
+                  <div class="example-handle" cdkDragHandle>
+                    <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+                      <path
+                        d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+                      ></path>
+                      <path d="M0 0h24v24H0z" fill="none"></path>
+                    </svg>
+                  </div>
+                </div>
+              </h5>
+            </div>
+
+            <!-- <div class="col-8">
+              {{ category.custom_name }}
+            </div>
+            <div class="col-4 text-right">
+              
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div
+      class="col-11 col-md-8 col-lg-7"
+      *ngIf="show_categories && !show_category_link"
+    >
+      <div class="row mx-0">
+        <div class="col-12 text-right">
+          <button class="btn btn-sm btn-citric" (click)="hideCategories()">
+            Close
+          </button>
+        </div>
+
+        <div
+          class="col-12"
+          cdkDropList
+          cdkDropListOrientation="vertical"
+          [ngClass]="can_edit ? 'category-drag-list' : ''"
+          (cdkDropListDropped)="
+            sortCategoriesArray(categories, $event, 'categories')
+          "
+        >
+          <h4 class="text-secondary" cdkDragDisabled="true">
+            Categories
+            <button class="btn btn-sm ml-2" (click)="openCategoryForm()">
+              <i class="fa fa-plus text-success"></i>
+            </button>
+          </h4>
+
+          <div
+            cdkDrag
+            [cdkDragDisabled]="!can_edit"
+            [cdkDragLockAxis]="'y'"
+            [ngClass]="{
+              'category-drag-box': can_edit
+            }"
+            *ngFor="let category of categories"
+            class="row"
+          >
+            <div class="col-8">
+              {{ category.name }}
+            </div>
+            <div class="col-4 text-right">
+              <div class="btn-group">
+                <button class="btn btn-sm" (click)="openCategoryForm(category)">
+                  <i class="fa fa-edit text-info"></i>
+                </button>
+                <button
+                  class="btn btn-sm ml-2"
+                  (click)="deleteCategory(category)"
+                >
+                  <i class="fa fa-trash text-danger"></i>
+                </button>
+              </div>
+              <div class="btn-group ml-2">
+                <div class="example-handle" cdkDragHandle>
+                  <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+                    ></path>
+                    <path d="M0 0h24v24H0z" fill="none"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #ezlink_settings_modal
+  identifier="ezlink_settings_modal"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <form [formGroup]="settings_form">
+    <div class="row justify-content-center">
+      <div class="col-5 col-md-2">
+        <!-- <div class="form-group">
+          <label>Unique name </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="Enter your unique url."
+            formControlName="unique_url"
+          />
+        </div> -->
+        <small class="ezlink_url">
+          Your url will be:
+          <br />
+          <a [href]="getUniqueUrl()" target="_blank">
+            {{ getUniqueUrl() }}
+          </a>
+        </small>
+        <div class="form-group">
+          <label>Background color </label>
+          <input
+            type="color"
+            required
+            class="form-control mb-1"
+            placeholder="Enter your tab's name."
+            formControlName="background_color"
+          />
+          <!-- [class.is-invalid]="
+              actual_style_settings.get('background_color').dirty &&
+              actual_style_settings.get('background_color').invalid
+            "
+            (ngModelChange)="wasEdited()" -->
+        </div>
+        <div class="form-group">
+          <label>Border color </label>
+          <input
+            type="color"
+            required
+            class="form-control mb-1"
+            placeholder="Enter your tab's name."
+            formControlName="border_color"
+          />
+          <!-- [class.is-invalid]="
+              actual_style_settings.get('hover_background_color').dirty &&
+              actual_style_settings.get('hover_background_color').invalid
+            "
+            (ngModelChange)="wasEdited()" -->
+        </div>
+      </div>
+      <div class="col-7 col-md-6">
+        <div class="form-group">
+          <mat-slide-toggle formControlName="show_icon" [color]="'warn'">
+            Show organization icon?
+          </mat-slide-toggle>
+        </div>
+        <div class="form-group">
+          <mat-slide-toggle
+            formControlName="show_profile_networks"
+            [color]="'warn'"
+          >
+            Show profile networks?
+          </mat-slide-toggle>
+        </div>
+        <div class="form-group">
+          <mat-slide-toggle formControlName="show_description" [color]="'warn'">
+            Show description?
+          </mat-slide-toggle>
+        </div>
+        <div
+          class="form-group"
+          [hidden]="!settings_form.get('show_description').value"
+        >
+          <label for=""> Description </label>
+          <textarea
+            class="form-control"
+            formControlName="description"
+            cols="30"
+            rows="10"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="col-12 mt-2 text-center">
+        <button class="btn btn-sm btn-success" (click)="saveSettings()">
+          Save
+        </button>
+      </div>
+    </div>
+  </form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #ezlink_category_modal
+  identifier="ezlink_category_modal"
+  [dismissable]="false"
+>
+  <form [formGroup]="category_form">
+    <div class="row justify-content-center">
+      <div class="col-7">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" formControlName="name" />
+        </div>
+      </div>
+
+      <div class="col-7 text-center mt-2">
+        <button class="btn btn-sm btn-success" (click)="saveCategory()">
+          Save <i class="fa fa-check"> </i>
+        </button>
+      </div>
+    </div>
+  </form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #ezlink_category_network
+  identifier="ezlink_category_network"
+  [dismissable]="false"
+>
+  <app-networks-organization-form
+    [idOrganization]="currentUser?.idIglesia"
+    [is_for_ezlink]="true"
+    [hidden]="!show_network_form"
+    #network_organization_form
+    (on_cancel)="cancelNetworkOrganizationForm()"
+    (make_refresh)="cancelNetworkOrganizationForm(); getEzLink()"
+  >
+  </app-networks-organization-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #ezlink_share_modal
+  identifier="ezlink_share_modal"
+  [dismissable]="false"
+  [closable]="false"
+  [escapable]="false"
+  customClass="share-modal"
+>
+  <div class="row">
+    <div class="col-12 text-center">
+      <button class="btn btn-sm float-right" (click)="closeShare()">
+        <i class="fa fa-times"></i>
+      </button>
+      <h4>Share this ezlink</h4>
+    </div>
+  </div>
+  <div class="row mt-4 mx-0">
+    <div class="col-12 share-item" *ngFor="let share_net of share_networks">
+      <a
+        [href]="share_net.share_url"
+        target="_blank"
+        class="row mx-2 py-2 underline"
+      >
+        <div class="col-10 align-items-center">
+          <svg
+            *ngIf="share_net.color === 'messenger'"
+            viewBox="0 0 24 24"
+            data-testid="ShareIcon-messenger"
+            enable-background="new 0 0 24 24"
+            class="sc-gKsewC fzJjte net_icon mr-2"
+          >
+            <g clip-path="url(#clip0_657_559)">
+              <rect
+                y="0.00170898"
+                width="24"
+                height="24.0004"
+                rx="4"
+                fill="#F1F1F1"
+              ></rect>
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M12 6.00171C8.62002 6.00171 6 8.4776 6 11.8218C6 13.5711 6.71688 15.0826 7.88434 16.1267C7.98234 16.2144 8.0415 16.3373 8.04552 16.4688L8.0782 17.5361C8.08864 17.8765 8.44029 18.0981 8.75181 17.9605L9.94273 17.4348C10.0437 17.3903 10.1568 17.382 10.2632 17.4113C10.8104 17.5618 11.3929 17.6419 12 17.6419C15.38 17.6419 18 15.166 18 11.8218C18 8.4776 15.38 6.00171 12 6.00171Z"
+                fill="url(#paint0_radial_657_559)"
+              ></path>
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M8.39691 13.5238L10.1594 10.7275C10.4398 10.2827 11.0401 10.1719 11.4608 10.4874L12.8626 11.5388C12.9912 11.6353 13.1682 11.6347 13.2962 11.5375L15.1895 10.1007C15.4421 9.90896 15.772 10.2114 15.6029 10.4797L13.8404 13.276C13.56 13.7208 12.9596 13.8316 12.539 13.5161L11.1372 12.4647C11.0086 12.3682 10.8316 12.3688 10.7035 12.466L8.81031 13.9028C8.55762 14.0945 8.22777 13.7921 8.39691 13.5238Z"
+                fill="white"
+              ></path>
+            </g>
+            <defs>
+              <radialGradient
+                id="paint0_radial_657_559"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(8.3097 17.9377) scale(13.0752 13.0754)"
+              >
+                <stop stop-color="#0099FF"></stop>
+                <stop offset="0.609754" stop-color="#A033FF"></stop>
+                <stop offset="0.934823" stop-color="#FF5280"></stop>
+                <stop offset="1" stop-color="#FF7061"></stop>
+              </radialGradient>
+              <clipPath id="clip0_657_559">
+                <path
+                  d="M0 4.00171C0 1.79257 1.79086 0.00170898 4 0.00170898H20C22.2091 0.00170898 24 1.79257 24 4.00171V20.0021C24 22.2113 22.2091 24.0021 20 24.0021H4C1.79086 24.0021 0 22.2113 0 20.0021V4.00171Z"
+                  fill="white"
+                ></path>
+              </clipPath>
+            </defs>
+          </svg>
+          <i
+            *ngIf="share_net.color !== 'messenger' && share_net.color !== 'qr'"
+            [ngStyle]="{ color: share_net.color }"
+            [ngClass]="share_net.icon"
+            class="mr-2 net_icon"
+          ></i>
+
+          <span class="middle-text">
+            {{ share_net.text }}
+          </span>
+        </div>
+        <div class="col-2 align-items-center">
+          <button class="btn btn-sm">
+            <i class="fa fa-external-link"></i>
+          </button>
+        </div>
+      </a>
+    </div>
+    <div class="col-12 share-item" (click)="shareQR(qr_code)">
+      <div class="row mx-2 py-2 underline">
+        <div class="col-10 align-items-center">
+          <ngx-qrcode
+            #qr_code
+            style="width: 32px; height: 32px"
+            [qrc-value]="getUniqueUrl()"
+            [qrc-class]="'qrItemResize-dash-ezlink mr-2'"
+            qrc-errorCorrectionLevel="M"
+          >
+          </ngx-qrcode>
+
+          <span class="middle-text qr-ezlink"> Share via QR </span>
+        </div>
+        <div class="col-2 align-items-center">
+          <button class="btn btn-sm">
+            <i class="fa fa-external-link"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4 mx-0 copy-item" (click)="copyUrl()">
+    <div class="col-9 align-items-center">
+      <div class="row align-content-center mx-0" style="height: 100%">
+        <span>
+          {{ getUniqueUrl() | slice: 8 }}
+        </span>
+      </div>
+    </div>
+    <div
+      class="col-3 align-items-stretch px-0"
+      [ngClass]="copied ? 'copied-active' : ''"
+    >
+      <button class="btn btn-sm btn-copy">
+        {{ copied ? "Copied!" : "Copy" }}
+      </button>
+    </div>
+  </div>
+</ngx-smart-modal>

@@ -1,0 +1,72 @@
+<form [formGroup]="levelFormGroup" (submit)="submitForm(levelFormGroup)">
+  <div class="row">
+    <div class="col-xs-12 col-md-12">
+      <div class="form-group">
+        <label for="descripcion">Description*</label>
+        <input
+          type="text"
+          class="form-control"
+          id="descripcion"
+          placeholder="Description"
+          formControlName="descripcion"
+          required
+        />
+      </div>
+    </div>
+    <div
+      class="col-xs-12 col-md-12"
+      style="display: flex; justify-content: space-between;"
+    >
+      <h5>Requirements</h5>
+      <button
+        type="button"
+        class="btn btn-success btn-sm"
+        (click)="addRequirement()"
+      >
+        Add requirement
+      </button>
+    </div>
+    <div
+      formArrayName="requisitos"
+      class="col-xs-12 col-md-12"
+      *ngFor="
+        let requirement of levelFormGroup.get('requisitos')['controls'];
+        let i = index
+      "
+    >
+      <div [formGroupName]="i">
+        <hr *ngIf="i > 0" />
+        <div class="form-group">
+          <label for="descripcion_1">Description*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="descripcion_1"
+            placeholder="Description"
+            formControlName="descripcion"
+            required
+          />
+        </div>
+        <div class="text-right">
+          <button
+            type="button"
+            class="btn btn-sm btn-danger"
+            *ngIf="i > 0"
+            (click)="deleteRequirement(i)"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="levelFormGroup.invalid"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+</form>

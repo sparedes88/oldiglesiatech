@@ -1,0 +1,72 @@
+<div class="row">
+  <div class="col-3 my-3">
+    <h2 class="text-citric">
+      <img
+        [src]="fixUrl(playlist.picture)"
+        [alt]="playlist.name"
+        class="responsive"
+        onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+      />
+    </h2>
+  </div>
+  <div class="col-5 my-3 align-self-center">
+    <h2 class="text-citric">
+      {{ playlist.name }}
+    </h2>
+    <p class="text-muted description-text mb-0">
+      {{ playlist.description }}
+    </p>
+    <p class="text-muted date-text">
+      {{ playlist.created_at | date: "MMM. dd yyyy" }}
+    </p>
+  </div>
+  <div class="col-4 my-3">
+    <div class="btn-group float-right">
+      <button
+        class="btn btn-sm btn-outline-citric"
+        (click)="dismiss_detail.emit()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+
+  <app-video-detail
+    class="col-12"
+    [show_header]="false"
+    *ngFor="let video of playlist.videos"
+    [video]="video"
+  >
+  </app-video-detail>
+
+  <div class="col-xs-12">
+    <button class="btn btn-primary mb-2 mt-2" (click)="iframeCodeModal.open()">
+      <i class="fa fa-code"></i>
+      Embed this serie
+    </button>
+  </div>
+</div>
+
+<ngx-smart-modal #iframeCodeModal identifier="iframeCodeModal">
+  <h4>Insert events on your page</h4>
+  <pre style="background-color: #e2e2e2; padding: 8px;">
+    {{ iframeCode.entry_point }}
+  </pre>
+
+  <div>Scripts</div>
+  <pre style="background-color: #e2e2e2; padding: 8px;">
+    {{ iframeCode.scripts }}
+  </pre>
+
+  <div class="form-group mt-1">
+    <label for="selectLang">Select language</label>
+    <select class="form-control" id="selectLang" [(ngModel)]="iframeLang">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+    </select>
+  </div>
+
+  <p>
+    Copy this code and paste it on your website
+  </p>
+</ngx-smart-modal>

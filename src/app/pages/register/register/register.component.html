@@ -1,0 +1,245 @@
+<nav
+  *ngIf="!currentUser"
+  class="navbar navbar-expand-lg navbar-light bg-citric"
+></nav>
+
+<div class="container page">
+  <div class="row">
+    <div class="col-12" [hidden]="!show_detail_loading">
+      <ng-template [ngIf]="show_detail_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div *ngIf="!show_detail_loading" class="col-12 text-right mb-3">
+      <button class="btn btn-sm btn-outline-citric" routerLink="/login">
+        Back
+      </button>
+    </div>
+    <div [hidden]="show_detail_loading" class="col-12 col-md-7 row m-0">
+      <div class="image_container" style="align-self: stretch">
+        <div class="image_fixer">
+          <img
+            class="disclaimer_image"
+            src="/assets/img/register_image.png"
+            alt=""
+          />
+        </div>
+      </div>
+    </div>
+    <div [hidden]="show_detail_loading" class="col-12 col-md-5">
+      <div class="card">
+        <form
+          #activity_form="ngForm"
+          [formGroup]="activityForm"
+          style="width: 100%"
+        >
+          <div class="row card-body">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="estimated">
+                  Contact Name <span class="text-danger">*</span>
+                </label>
+                <input
+                  class="form-control"
+                  placeholder="First Name."
+                  type="text"
+                  formControlName="firstName"
+                  required
+                  [class.is-invalid]="
+                    activityForm.get('firstName').touched &&
+                    activityForm.get('firstName').invalid
+                  "
+                />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="estimated">
+                  <span class="text-danger">*</span>
+                </label>
+                <input
+                  class="form-control"
+                  placeholder="Last Name."
+                  type="text"
+                  formControlName="lastName"
+                  required
+                  [class.is-invalid]="
+                    activityForm.get('lastName').touched &&
+                    activityForm.get('lastName').invalid
+                  "
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label for="estimated">
+                  Country Code <span class="text-danger">*</span>
+                </label>
+                <app-custom-select-country
+                  [return_value]="'callingCode'"
+                  formControlName="country_code"
+                >
+                </app-custom-select-country>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label> Phone <span class="text-danger">*</span> </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Your contact phone"
+                  formControlName="phone"
+                  mask="(000) 000-0000"
+                  [dropSpecialCharacters]="false"
+                  [class.is-invalid]="
+                    activityForm.get('phone').touched &&
+                    activityForm.get('phone').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label for="estimated">
+                  Email address <span class="text-danger">*</span>
+                </label>
+                <input
+                  class="form-control"
+                  placeholder="Your contact email."
+                  type="email"
+                  formControlName="email"
+                  [class.is-invalid]="
+                    activityForm.get('email').touched &&
+                    activityForm.get('email').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label for="estimated">
+                  Password <span class="text-danger">*</span>
+                </label>
+                <input
+                  class="form-control"
+                  placeholder="Type your password."
+                  type="password"
+                  formControlName="password"
+                  [class.is-invalid]="
+                    activityForm.get('password').touched &&
+                    activityForm.get('password').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label for="estimated">
+                  Repeat Password <span class="text-danger">*</span>
+                </label>
+                <input
+                  class="form-control"
+                  placeholder="Repeat your password."
+                  type="password"
+                  formControlName="repeat_password"
+                  [class.is-invalid]="
+                    activityForm.get('repeat_password').touched &&
+                    activityForm.get('repeat_password').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label for="estimated">
+                  Organization Name <span class="text-danger">*</span>
+                </label>
+                <input
+                  class="form-control"
+                  placeholder="Your organization name"
+                  type="text"
+                  formControlName="organization_name"
+                  [class.is-invalid]="
+                    activityForm.get('organization_name').touched &&
+                    activityForm.get('organization_name').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="col-12">
+                <span style="pointer-events: none">
+                  Address <span class="text-danger">*</span>
+                </span>
+              </label>
+              <div class="input-group">
+                <google-address-component
+                  *ngIf="init_map"
+                  [value]="activityForm.get('location').value"
+                  placeholder="Please type the location of your organization."
+                  adressType="address"
+                  (setAddress)="getAddress($event)"
+                  [class.is-invalid]="
+                    activityForm.get('city').touched &&
+                    activityForm.get('city').invalid
+                  "
+                  (on_reload)="reloadMap()"
+                ></google-address-component>
+              </div>
+              <span
+                class="text-danger error-span"
+                *ngIf="activityForm.get('city').invalid"
+              >
+                * Please fill this info
+              </span>
+            </div>
+
+            <!-- <div class="col-12">
+              <div class="form-group">
+                <label for="estimated">
+                  City <span class="text-danger">*</span>
+                </label>
+                <input
+                  class="form-control"
+                  placeholder="Your city"
+                  type="text"
+                  formControlName="city"
+                  [class.is-invalid]="
+                    activityForm.get('city').touched &&
+                    activityForm.get('city').invalid
+                  "
+                />
+              </div>
+            </div> -->
+          </div>
+          <span
+            style="display: block; text-align: center; width: 100%"
+            class="mb-2"
+          >
+            <button
+              type="button"
+              [disabled]="activityForm.invalid"
+              (click)="registerOrganization(activityForm)"
+              class="btn btn-sm btn-success"
+            >
+              Submit
+            </button>
+          </span>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

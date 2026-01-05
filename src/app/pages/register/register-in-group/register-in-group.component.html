@@ -1,0 +1,226 @@
+<div class="col-12" *ngIf="!show_detail_loading">
+  <ng-template [ngIf]="show_detail_loading">
+    <div
+      class="d-flex row justify-content-center"
+      style="/* margin: 140px; */ height: 100%"
+    >
+      <div class="col-12 align-self-center justify-content-center text-center">
+        <div
+          class="spinner-border text-citric"
+          role="status"
+          style="width: 6rem; height: 6rem"
+        ></div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<div class="main-dashboard" [hidden]="show_detail_loading">
+  <div class="banner-container">
+    <img class="original" [src]="getCover()" alt="" />
+    <img class="blurred" [src]="getCover()" alt="" />
+    <h2 class="organization-name-h2">{{ group_event?.title }}</h2>
+  </div>
+  <div class="col-12 mb-3">
+    <div class="card mt-2">
+      <app-get-started
+        *ngIf="
+          !actual_user_status && actual_user_status !== 'display_already_member'
+        "
+        [get_started_form]="full_form.get('get_started_form')"
+        [currentUser]="currentUser"
+        [group_event]="group_event"
+        (user_status)="getUserStatus($event)"
+        [header_message]="'login.verify_email_or_phone_disclaimer' | translate"
+        [login_text_button]="'generals.verify' | translate"
+      >
+      </app-get-started>
+
+      <app-login-portal
+        *ngIf="
+          actual_user_status === 'checked_in_organization' ||
+          actual_user_status === 'checked_not_available'
+        "
+        [currentUser]="currentUser"
+        [group_event]="group_event"
+        [full_form]="full_form"
+        [login_form]="full_form.get('login_form')"
+        (cancel_login)="cancelForm()"
+        (login_response)="loginResponse($event)"
+        [force_stay]="true"
+        (open_reset)="openResetPassword($event)"
+      ></app-login-portal>
+
+      <!-- <app-successful-registration
+      *ngIf="actual_user_status === 'display_already_member'"
+      [currentUser]="currentUser"
+      [group_event]="group_event"
+      (redirect)="handleRedirectByRole($event)"
+    >
+    </app-successful-registration> -->
+
+      <div *ngIf="actual_user_status === 'checked_ok'">
+        <app-create-account-portal
+          [full_form]="full_form"
+          [register_form]="full_form.get('register_form')"
+          [currentUser]="currentUser"
+          [group_event]="group_event"
+          (cancel_login)="cancelRegister()"
+          (register_response)="selectLoginUser($event); showHowManyForm($event)"
+          [custom_message]="'groups.acceptation_disclaimer'"
+        >
+        </app-create-account-portal>
+      </div>
+
+      <div *ngIf="actual_user_status === 'reset_password'">
+        <app-reset-password
+          [full_form]="full_form"
+          [login_form]="full_form.get('login_form')"
+          [currentUser]="currentUser"
+          [group_event]="group_event"
+          (cancel_login)="getUserStatus($event)"
+        >
+        </app-reset-password>
+      </div>
+      <!-- How Many? -->
+      <!-- <div *ngIf="actual_user_status === 'how_many'">
+      <app-how-many-portal
+        [full_form]="full_form"
+        [additional_form]="full_form.get('additional_form')"
+        [currentUser]="currentUser"
+        [group_event]="group_event"
+        (cancel_login)="cancelRegister()"
+        (accept_response)="acceptInvitation($event)"
+      >
+      </app-how-many-portal>
+    </div> -->
+
+      <div *ngIf="actual_user_status === 'display_already_member'">
+        <div class="col-12" *ngIf="!show_detail_loading">
+          <ng-template [ngIf]="show_detail_loading">
+            <div
+              class="d-flex row justify-content-center"
+              style="/* margin: 140px; */ height: 100%"
+            >
+              <div
+                class="col-12 align-self-center justify-content-center text-center"
+              >
+                <div
+                  class="spinner-border text-citric"
+                  role="status"
+                  style="width: 6rem; height: 6rem"
+                ></div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="main-dashboard" [hidden]="show_detail_loading">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-8 mb-2">
+              <div class="card mt-2">
+                <div class="card-title">
+                  <h3 class="text-center">
+                    {{ "generals.about" | translate }}
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <small class="text-secondary">
+                    {{ "generals.name" | translate }}
+                  </small>
+                  <h4>{{ group_info.group_name }}</h4>
+                  <small class="text-secondary">
+                    {{ "generals.description" | translate }}
+                  </small>
+                  <p>{{ group_info.group_long_description }}</p>
+                </div>
+              </div>
+              <div class="card mt-2">
+                <div class="card-title">
+                  <h3 class="text-center">
+                    {{ "generals.about" | translate }}
+                    {{ "generals.you" | translate | lowercase }}
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <h4 class="text-center">
+                    {{ group_info.name }} {{ group_info.lastName }}
+                    <br />
+                    <small class="text-secondary">
+                      {{ group_info.email }}
+                    </small>
+                  </h4>
+                  <div *ngIf="display_already_member">
+                    {{ "groups.member_since" | translate }}
+                    <br />
+                    <span ion-text color="gray">
+                      <small> {{ user_info.member_since | date }} </small>
+                    </span>
+                  </div>
+                  <div *ngIf="display_already_member">
+                    {{ "groups.member_type" | translate }}
+                    <br />
+                    <span class="text-secondary">
+                      <small>
+                        {{
+                          (user_info.is_leader
+                            ? "groups.leader"
+                            : "groups.member"
+                          ) | translate
+                        }}
+                      </small>
+                    </span>
+                  </div>
+                  <div class="text-wrap" *ngIf="!display_already_member">
+                    <h6 class="text-citric">
+                      {{ "groups.join_disclaimer" | translate }}
+                    </h6>
+                  </div>
+                  <!-- <div
+                  *ngIf="display_already_member"
+                  class="row card-body is-vh-centered justify-content-center"
+                >
+                  <div  class="col-8 text-center">
+                    <button
+                      class="col-6 btn btn-sm btn-citric"
+                      (click)="dismiss()"
+                    >
+                      {{ "generals.close" | translate }}
+                    </button>
+                  </div>
+                </div> -->
+
+                  <div
+                    *ngIf="!display_already_member"
+                    class="row card-body is-vh-centered justify-content-center"
+                  >
+                    <div class="col-8 text-center">
+                      <button
+                        class="btn btn-sm btn-secondary"
+                        (click)="sendRequestToJoin()"
+                      >
+                        {{ "generals.join" | translate }}
+                      </button>
+                    </div>
+                    <!-- <div col-4 offset-4 text-center class="col-8 text-center">
+                    <button
+                      ion-button
+                      small
+                      color="citric"
+                      col-6
+                      class="btn btn-sm btn-citric"
+                      (click)="dismiss()"
+                    >
+                      {{ "generals.close" | translate }}
+                    </button>
+                  </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

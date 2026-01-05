@@ -1,0 +1,157 @@
+<div class="container">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" *ngFor="let slide of slidesByLang; let idx = index">
+      <button
+        class="nav-link"
+        [ngClass]="{ active: currentTabIndex == idx }"
+        (click)="currentTabIndex = idx"
+      >
+        Slide # {{ idx + 1 }}
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" (click)="addSlide()">
+        <i class="fa fa-plus"></i>
+        Add slide
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content mt-1">
+    <div
+      *ngFor="let slide of slidesByLang; let idx = index"
+      class="tab-pane fade"
+      [ngClass]="{ 'show active': currentTabIndex == idx }"
+    >
+      <div class="row">
+        <div class="col-12">
+          <slide-item
+            *ngIf="preview"
+            [slide]="slide"
+            [height]="'450px'"
+          ></slide-item>
+          <hr />
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <h4>Text content</h4>
+          <text-editor [(ngModel)]="slide.content"></text-editor>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <h4>Slider settings</h4>
+          <!-- background image -->
+          <div>
+            <!-- <img
+              *ngIf="slide.background_image && !uploading"
+              [src]="slide.background_image"
+              alt=""
+              class="responsive-img"
+            />
+            <div class="text-center" *ngIf="uploading">
+              <div
+                class="spinner-border text-citric"
+                style="width: 3rem; height: 3rem;"
+                role="status"
+              ></div>
+            </div> -->
+
+            <div>Background Image</div>
+
+            <div class="custom-file">
+              <input
+                type="file"
+                class="custom-file-input"
+                (change)="addBgImage($event.target.files[0])"
+                accept="image/*"
+                id="fileUploadInput"
+              />
+              <label class="custom-file-label" for="fileUploadInput">
+                Choose file
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6">
+              <!-- Text position -->
+              <div class="form-group">
+                <label>Vertical position</label>
+                <select
+                  [(ngModel)]="slide.vertical_position"
+                  class="form-control"
+                >
+                  <option
+                    *ngFor="let position of verticalPositions"
+                    [value]="position"
+                  >
+                    {{ position }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6">
+              <!-- Text position -->
+              <div class="form-group">
+                <label>Horizontal position</label>
+                <select
+                  [(ngModel)]="slide.horizontal_position"
+                  class="form-control"
+                >
+                  <option
+                    *ngFor="let position of horizontalPositions"
+                    [value]="position"
+                  >
+                    {{ position }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6">
+              <!-- Cover size -->
+              <div class="form-group">
+                <label>Background size</label>
+                <select
+                  [(ngModel)]="slide.background_size"
+                  class="form-control"
+                >
+                  <option *ngFor="let size of backgroundSizes" [value]="size">
+                    {{ size }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6">
+              <!-- Cover size -->
+              <div class="form-group">
+                <label>Background size</label>
+                <select
+                  [(ngModel)]="slide.background_position"
+                  class="form-control"
+                >
+                  <option
+                    *ngFor="let position of backgroundPositions"
+                    [value]="position"
+                  >
+                    {{ position }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Animation -->
+
+          <!-- Preview -->
+          <div class="form-group">
+            <button class="btn btn-info btn-sm" (click)="preview = !preview">
+              <i class="fa fa-picture-o"></i>
+              {{ preview ? "Hide preview" : "Show preview" }}
+            </button>
+            <button class="btn btn-danger btn-sm ml-1" (click)="deleteSlider(currentTabIndex)">
+              <i class="fa fa-picture-o"></i>
+              Delete slider
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

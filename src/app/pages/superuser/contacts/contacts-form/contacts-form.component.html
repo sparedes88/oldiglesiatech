@@ -1,0 +1,198 @@
+<div class="row">
+  <div class="col-10"></div>
+  <div class="col-2">
+    <button class="btn btn-sm btn-outline-citric" (click)="close()">
+      Close
+    </button>
+  </div>
+
+  <form
+    style="width: 100%;"
+    #group_form="ngForm"
+    [formGroup]="contact_form"
+    (submit)="submitContact(contact_form, group_form)"
+  >
+    <ng-template [ngIf]="!show_detail">
+      <div class="d-flex justify-content-center" style="margin: 15%;">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem;"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+
+    <div [hidden]="!show_detail" class="tab-content mb-3">
+      <div class="row">
+        <div class="col-6">
+          <!-- Name -->
+          <div
+            class="form-group"
+            style="display: flex; flex-direction: column;"
+          >
+            <label>Name <span class="text-danger"> * </span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="nombre"
+              placeholder="Contact name"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-6">
+          <!-- Last Name -->
+          <div class="form-group">
+            <label>Last Name <span class="text-danger"> * </span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="apellido"
+              placeholder="Contact last name"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-6">
+          <!-- Last Name -->
+          <div class="form-group">
+            <label> Position <span class="text-danger"> * </span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="posicion"
+              placeholder="Contact position"
+              required
+            />
+          </div>
+        </div>
+        <div class="w-100"></div>
+        <div class="col-xs-12 col-md-6">
+          <div class="row mb-4 border-bottom">
+            <div class="col-10 text-right align-self-center">
+              <label class="text-citric" for="idOrganization">
+                Add Phone
+              </label>
+            </div>
+            <div class="col-1 text-center align-self-center">
+              <button
+                (click)="addItem('telefonos')"
+                type="button"
+                class="btn btn-outline-success circular-button"
+              >
+                <mat-icon matPrefix>add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div *ngFor="let phone of phones.controls; let i = index">
+            <div
+              formArrayName="telefonos"
+              class="col-12"
+              style="padding-top: 5px;"
+            >
+              <div [formGroupName]="i" [hidden]="!phone.get('estatus').value">
+                <div class="row">
+                  <div class="col-2">
+                    <span class="span-for-select">
+                      Phone
+                    </span>
+                  </div>
+                  <div class="col-8">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column;"
+                    >
+                      <input
+                        formControlName="telefono"
+                        class="form-control mb-1"
+                        placeholder="(999) 999-9999."
+                        type="tel"
+                        [dropSpecialCharacters]="false"
+                        mask="(000) 000-0000"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-2">
+                    <button
+                      type="button"
+                      (click)="removeItem('telefonos', i)"
+                      class="btn btn-outline-danger circular-button"
+                    >
+                      <mat-icon matPrefix>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+          <div class="row mb-4 border-bottom">
+            <div class="col-10 text-right align-self-center">
+              <label class="text-citric" for="idOrganization">
+                Add Email
+              </label>
+            </div>
+            <div class="col-1 text-center align-self-center">
+              <button
+                (click)="addItem('correos')"
+                type="button"
+                class="btn btn-outline-success circular-button"
+              >
+                <mat-icon matPrefix>add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div *ngFor="let email of emails.controls; let i = index">
+            <div
+              formArrayName="correos"
+              class="col-12"
+              style="padding-top: 5px;"
+            >
+              <div [formGroupName]="i">
+                <div class="row">
+                  <div class="col-2">
+                    <span class="span-for-select">
+                      Email
+                    </span>
+                  </div>
+                  <div class="col-8">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column;"
+                    >
+                      <input
+                        formControlName="correo"
+                        class="form-control mb-1"
+                        placeholder="your@mail.com"
+                        type="email"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-2">
+                    <button
+                      type="button"
+                      (click)="removeItem('correos', i)"
+                      class="btn btn-outline-danger circular-button"
+                    >
+                      <mat-icon matPrefix>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mt-2 text-center">
+          <button class="btn btn-sm btn-success">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

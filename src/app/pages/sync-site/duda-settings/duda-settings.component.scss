@@ -1,0 +1,36 @@
+.tooltiptext {
+  width: 360px;
+  text-align: center;
+}
+
+pre {
+  white-space: pre;
+  background-color: whitesmoke;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.fix-size {
+  text-align: center;
+  img {
+    max-height: 250px;
+    height: 250px;
+    border: 1px solid gainsboro;
+    border-radius: 10px;
+    margin-top: -10px;
+    margin-bottom: 12px;
+  }
+}
+.fix-size-w {
+  img {
+    max-width: 550px !important;
+    width: 550px !important;
+    height: auto !important;
+    max-height: auto !important;
+  }
+}
+
+.text-wrap {
+  white-space: pre !important;
+}

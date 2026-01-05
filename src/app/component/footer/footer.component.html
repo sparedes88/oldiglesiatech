@@ -1,0 +1,48 @@
+<footer *ngIf="currentUser && currentUser?.idUserType !== 2 || currentUser?.isSuperUser" class="page-footer font-small blue">
+  <div class="container text-center">
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-md-0 mb-3">
+        <ul>
+          <li>
+            <a
+              href="https://apps.apple.com/us/app/iglesia-tech-panel/id1353145986"
+            >
+              <img id="logo-appstore" src="/assets/img/apple_transparent.png" />
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-3 mb-md-0 mb-3">
+        <ul>
+          <li>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.basedetados"
+            >
+              <img
+                id="logo-googlestore"
+                src="/assets/img/google-play-badge.png"
+              />
+            </a>
+          </li>
+        </ul>
+        <!-- <ul class="ul-social-net">
+          <li>
+            <a class="link-footer" href="#"><i class="fab fa-facebook-square"></i> Facebook</a>
+          </li>
+          <li>
+            <a class="link-footer" href="#"><i class="fab fa-twitter-square"></i> Twitter</a>
+          </li>
+          <li>
+            <a class="link-footer" href="#"><i class="fab fa-instagram"></i> Instagram</a>
+          </li>
+        </ul> -->
+      </div>
+    </div>
+  </div>
+  <div class="footer-copyright text-center py-3">
+    © 2023
+    <a class="link-footer" href="https://iglesiatech.com/"> IglesiaTech</a
+    ><br />
+    For support, please call us at: (703) 297-8718
+  </div>
+</footer>

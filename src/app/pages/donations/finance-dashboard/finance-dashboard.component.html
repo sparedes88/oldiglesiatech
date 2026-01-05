@@ -1,0 +1,165 @@
+<div class="row" *ngIf="loaders.general">
+  <div class="col-12">
+    <ng-template>
+      <div class="d-flex justify-content-center" style="margin: 140px">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+<div
+  *ngIf="!loaders.general && !forms.any_open"
+  class="row justify-content-center"
+>
+  <!-- Videos -->
+  <div (click)="openForm('how_to')" class="col-xs-6 col-md-3 col-lg-3 mb-3">
+    <div class="card cursor">
+      <div class="card-fixed-text opacity-layer"></div>
+      <div class="card-fixed-text row">
+        <span class="col-12 span-number"> </span>
+      </div>
+      <img
+        class="card-img-top card-img-top-fixed"
+        src="/assets/img/videos_banner_new.png"
+      />
+      <div class="card-body">
+        <h5 class="card-title text-center text-citric">
+          Como crear tu propia cuenta
+        </h5>
+      </div>
+    </div>
+  </div>
+
+  <!-- Galleries -->
+  <div (click)="openForm('stripe_info')" class="col-xs-6 col-md-3 col-lg-3 mb-3">
+    <div class="card cursor">
+      <div class="card-fixed-text opacity-layer"></div>
+      <div class="card-fixed-text row">
+        <span class="col-12 span-number"> </span>
+      </div>
+      <img
+        class="card-img-top card-img-top-fixed"
+        src="/assets/img/gallery_banner_new.png"
+      />
+      <div class="card-body">
+        <h5 class="card-title text-center text-citric">
+          Añade tus Stripe keys
+        </h5>
+      </div>
+    </div>
+  </div>
+
+  <!-- Directory -->
+  <div (click)="openForm('donations_categories')" class="col-xs-6 col-md-3 col-lg-3 mb-3" *ngIf="check_stripe_settings">
+    <div
+      class="card cursor"
+      >
+      <!-- routerLink="/donations/categories"
+      [queryParams]="{ origin: 'dashboard' }" -->
+      <div class="card-fixed-text opacity-layer"></div>
+      <div class="card-fixed-text row">
+        <span class="col-12 span-number"> </span>
+      </div>
+      <img
+        class="card-img-top card-img-top-fixed"
+        src="/assets/img/directory_banner_new.png"
+      />
+      <div class="card-body">
+        <h5 class="card-title text-center text-citric">
+          Crea tus categorías de donaciones
+        </h5>
+      </div>
+    </div>
+  </div>
+  <div class="w-100"></div>
+  <div (click)="openForm('donations_list')" class="col-xs-6 col-md-3 col-lg-3 mb-3" *ngIf="check_stripe_settings">
+    <div
+      class="card cursor"
+      >
+      <!-- [routerLink]="'/donations/list'"
+      [queryParams]="{ origin: 'dashboard' }" -->
+      <div class="card-fixed-text opacity-layer"></div>
+      <div class="card-fixed-text row">
+        <span class="col-12 span-number"> </span>
+      </div>
+      <img
+        class="card-img-top card-img-top-fixed"
+        src="/assets/img/frame_settings_banner.jpeg"
+      />
+      <div class="card-body">
+        <h5 class="card-title text-center text-citric">
+          Revisa tus donaciones
+        </h5>
+      </div>
+    </div>
+  </div>
+  <!-- Booking -->
+  <div (click)="openForm('form_list')" class="col-xs-6 col-md-3 col-lg-3 mb-3" *ngIf="check_stripe_settings">
+    <div
+      class="card cursor"
+      >
+      <!-- routerLink="/donations/forms"
+      [queryParams]="{ origin: 'dashboard' }" -->
+      <div class="card-fixed-text opacity-layer"></div>
+      <div class="card-fixed-text row">
+        <span class="col-12 span-number"> </span>
+      </div>
+      <img
+        class="card-img-top card-img-top-fixed"
+        src="/assets/img/calendar_banner_new.png"
+      />
+      <div class="card-body">
+        <h5 class="card-title text-center text-citric">
+          Configura tus formularios
+        </h5>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-6 col-md-3 col-lg-3 mb-3" *ngIf="check_stripe_settings">
+    <div
+      class="card cursor"
+      [routerLink]="'/donations/forms'"
+      [queryParams]="{ origin: 'dashboard' }"
+    >
+      <div class="card-fixed-text opacity-layer"></div>
+      <div class="card-fixed-text row">
+        <span class="col-12 span-number"> </span>
+      </div>
+      <img
+        class="card-img-top card-img-top-fixed"
+        src="/assets/img/photo_editor_banner_new.png"
+      />
+      <div class="card-body">
+        <h5 class="card-title text-center text-citric">
+          Comparte tus formularios
+        </h5>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="forms.any_open">
+  <div class="col-12" *ngIf="forms.how_to">
+    <app-how-to-set-stripe (on_close)="closeForms()"> </app-how-to-set-stripe>
+  </div>
+  <div class="col-12" *ngIf="forms.stripe_info">
+    <app-stripe-info-form
+      [idOrganization]="idOrganization"
+      (on_close)="closeForms($event, 'stripe_info')"
+    >
+    </app-stripe-info-form>
+  </div>
+  <div class="col-12"  *ngIf="forms.donations_categories">
+    <app-donation-category #donation_category_view [is_embed]="true" (on_close)="closeForms()"></app-donation-category>
+  </div>
+  <div class="col-12"  *ngIf="forms.donations_list">
+    <app-donations-list [stripe_info]="stripe_info" [is_embed]="true" (on_close)="closeForms()"></app-donations-list>
+  </div>
+  <div class="col-12"  *ngIf="forms.form_list">
+    <app-donation-form-list [is_embed]="true" (on_close)="closeForms()"></app-donation-form-list>
+  </div>
+</div>

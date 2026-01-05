@@ -1,0 +1,228 @@
+<!--Algo aún más extraño, es que al comentar este html al completo se genera el mismo resultado que ingresar WordpressModule
+en app.module y dashboard.module. Dejando hacer login a no superusers, pero imposibilitándoselo a superusers. En ambos casos, al navegar
+a dashboard se puede ingresar a wordpress-->
+
+<div
+  class="post-media-cover text-center"
+  *ngIf="postMedia?.id || uploadingCover"
+>
+  <h4 *ngIf="uploadingCover" class="mt-3 mb-3">
+    Uploading, please wait...
+  </h4>
+  <img
+    class="responsive-img"
+    [src]="postMedia?.source_url"
+    [alt]="postMedia?.title.rendered"
+  />
+</div>
+
+<form [formGroup]="postFormGroup" (submit)="submitPost(postFormGroup)">
+  <div class="row">
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="file">Upload photo</label>
+        <input
+          class="form-control"
+          type="file"
+          accept="image/*"
+          id="file"
+          (change)="handleFileInput($event.target.files)"
+        />
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-6" (click)="visiblePixieModal = true">
+      <div class="form-group">
+        <label>Create your own design</label>
+        <div>
+          <button type="button" class="btn btn-primary">
+            Open Editor
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Post title*</label>
+    <input
+      style="max-width: 400px;"
+      type="text"
+      required
+      class="form-control"
+      formControlName="title"
+      placeholder="A descriptive title for your post"
+    />
+  </div>
+
+  <div class="row">
+    <div class="col-xs-6 col-md-3">
+      <div class="form-group">
+        <label>Publish date</label>
+        <input
+          type="datetime-local"
+          class="form-control"
+          formControlName="date"
+        />
+        <small class="form-text text-muted">
+          If you leave blank the post will be published immediately.
+        </small>
+      </div>
+    </div>
+    <div class="col-xs-6 col-md-3">
+      <div class="form-group">
+        <label>Status</label>
+        <select formControlName="status" class="form-control">
+          <option selected="selected" value="publish">publish</option>
+          <option value="future">future</option>
+          <option value="draft">draft</option>
+          <option value="pending">pending</option>
+          <option value="private">private</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-xs-6 col-md-3">
+      <div class="form-froup">
+        <label>Tags</label>
+        <ng-select
+          [items]="wpData.tags"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [searchable]="true"
+          bindLabel="name"
+          placeholder="Select tags"
+          formControlName="tags"
+          bindValue="id"
+        >
+        </ng-select>
+      </div>
+    </div>
+
+    <div class="col-xs-6 col-md-3">
+      <div class="form-froup">
+        <label>Categories</label>
+        <ng-select
+          [items]="wpData.categories"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [searchable]="true"
+          bindLabel="name"
+          placeholder="Select categories"
+          formControlName="categories"
+          bindValue="id"
+        >
+        </ng-select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <quill-editor
+      formControlName="content"
+      (onEditorCreated)="onEditorCreated($event)"
+      [modules]="modules"
+    ></quill-editor>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-6 col-lg-3">
+      <div class="form-group">
+        <label>Notify contacts?</label>
+        <select
+          [(ngModel)]="notifyContacts"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-control"
+        >
+          <option [value]="null">None</option>
+          <option value="all">All</option>
+          <option value="groups">Groups</option>
+          <option value="mailing_lists">Contact Inboxes</option>
+          <option value="both">Both</option>
+        </select>
+      </div>
+    </div>
+    <div
+      class="col-xs-6 col-lg-3"
+      *ngIf="notifyContacts == 'groups' || notifyContacts == 'both'"
+    >
+      <div class="form-group">
+        <label>Groups to notify{{[groups[0].idGroup]}}</label>
+        <ng-select
+          [items]="groups"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [searchable]="true"
+          bindLabel="title"
+          placeholder="Select groups"
+          bindValue="idGroup"
+          [(ngModel)]="selectedGroups"
+          [ngModelOptions]="{ standalone: true }"
+        >
+        </ng-select>
+      </div>
+    </div>
+    <div
+      class="col-xs-6 col-lg-3"
+      *ngIf="notifyContacts == 'mailing_lists' || notifyContacts == 'both'"
+    >
+      <div class="form-group">
+        <label>Contact Inboxes to notify</label>
+        <ng-select
+          [items]="mailingLists"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [searchable]="true"
+          bindLabel="name"
+          placeholder="Select Contact Inbox"
+          bindValue="id"
+          [(ngModel)]="selectedMailingLists"
+          [ngModelOptions]="{ standalone: true }"
+        >
+        </ng-select>
+      </div>
+    </div>
+    <div class="col-xs-6 col-lg-3" *ngIf="notifyContacts">
+      <div class="form-group">
+        <label>Notify by</label>
+        <select
+          [(ngModel)]="notifyBy"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-control"
+        >
+          <option value="email">Email + Facebook + Web + App</option>
+          <option value="sms">SMS + Facebook + Web + App</option>
+          <option value="both">All - Email + SMS + Facebook + Web + App</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <button
+      type="submit"
+      class="btn btn-success"
+      [disabled]="postFormGroup.invalid || uploading || uploadingCover"
+    >
+      {{ uploading ? "Please wait..." : "Submit post" }}
+      <i class="fa fa-paper-plane"></i>
+    </button>
+  </div>
+</form>
+
+<input
+  type="file"
+  id="fileUpload"
+  hidden
+  (change)="uploadPhoto()"
+  accept="image/*"
+/>
+
+<fullscreen-modal
+  [(visible)]="visiblePixieModal"
+  (visibilityChange)="visiblePixieModal = $event"
+>
+  <pixie-editor
+    *ngIf="visiblePixieModal"
+    (onExport)="handlePixieExport($event)"
+  ></pixie-editor>
+</fullscreen-modal>

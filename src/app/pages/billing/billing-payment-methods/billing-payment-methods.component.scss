@@ -1,0 +1,88 @@
+.new-card {
+    height: 155px;
+    width: 256px;
+    border-radius: 0.84615em;
+    background: linear-gradient(90deg, #c5c5c5, #f3f3f3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.brand-logo {
+    max-width: 70px;
+    width: 70px;
+    min-height: 3em;
+    background-repeat: no-repeat;
+    background-size: 17.076923em 39.69230769230769em;
+    display: inline-block;
+    &.amex {
+        background-position: -0.07692307692307693em -0.07692307692307693em;
+        background-image: url(/assets/img/card-logos.svg);
+        width: 3.4615384615384617em;
+        height: 3.4615384615384617em;
+    }
+    &.visa {
+        background-position: -0.07692307692307693em -36.746154em;
+        background-image: url(/assets/img/card-logos.svg);
+    }
+    &.mastercard {
+        background-image: url(/assets/img/card-logos.svg);
+        background-position: -0.07692307692307693em -18.846153846153847em;
+    }
+}
+.check-fixer {
+    width: 256px;
+    max-width: 256px;
+    // top: -12px;
+    left: 4px;
+}
+.form-check-input.disabled {
+    pointer-events: none !important;
+}
+.is-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+    // .tooltip_ {
+    //   display: none !important;
+    // }
+}
+.is-loading::after {
+    position: absolute;
+    left: calc(50% - (1em / 2));
+    top: calc(50% - (1em / 2));
+    position: absolute !important;
+}
+.is-loading::after,
+.control.is-loading::after,
+.loader,
+.is-loading::after {
+    -webkit-animation: spinAround 0.5s infinite linear;
+    animation: spinAround 0.5s infinite linear;
+    border: 2px solid var(--donation-header-background);
+    border-radius: 290486px;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    content: "";
+    display: block;
+    height: 1em;
+    position: relative;
+    width: 1em;
+}
+
+@-webkit-keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+@keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}

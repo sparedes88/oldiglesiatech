@@ -1,0 +1,105 @@
+<div
+  class="tab-pane fade show active"
+  id="v-pills-home"
+  role="tabpanel"
+  aria-labelledby="v-pills-home-tab"
+>
+  <div class="col-12 mb-3">
+    <div class="card" [hidden]="is_loading">
+      <app-get-started
+        *ngIf="
+          !actual_user_status && actual_user_status !== 'display_already_member'
+        "
+        [get_started_form]="full_form.get('get_started_form')"
+        [currentUser]="currentUser"
+        [group_event]="{
+          idOrganization: process_info?.idOrganization
+        }"
+        (user_status)="getUserStatus($event)"
+        [header_message]="
+          'process.verify_email_or_phone_disclaimer'
+            | translate
+            | replace: 'name':process_info?.step_name
+        "
+        [login_text_button]="'Login_Button' | translate"
+      >
+      </app-get-started>
+
+      <app-login-portal
+        *ngIf="
+          actual_user_status == 'checked_in_organization' ||
+          actual_user_status == 'checked_not_available'
+        "
+        [currentUser]="currentUser"
+        [group_event]="{
+          idOrganization: process_info?.idOrganization
+        }"
+        [close_button_text]="'generals.back' | translate"
+        [close_button_position]="'bottom'"
+        [close_button_alignment]="'center'"
+        [full_form]="full_form"
+        [login_form]="full_form.get('login_form')"
+        (cancel_login)="cancelForm()"
+        (login_response)="loginResponse($event)"
+        (open_reset)="openResetPassword($event)"
+      ></app-login-portal>
+
+      <div *ngIf="actual_user_status === 'checked_ok'">
+        <app-create-account-portal
+          [full_form]="full_form"
+          [register_form]="full_form.get('register_form')"
+          [currentUser]="currentUser"
+          [group_event]="{
+            idOrganization: process_info?.idOrganization
+          }"
+          [is_not_event]="true"
+          (cancel_login)="cancelRegister()"
+          (register_response)="loginResponse($event)"
+        >
+        </app-create-account-portal>
+      </div>
+
+      <div *ngIf="actual_user_status === 'reset_password'">
+        <app-reset-password
+          [full_form]="full_form"
+          [login_form]="full_form.get('login_form')"
+          [currentUser]="currentUser"
+          [group_event]="{
+            idOrganization: process_info?.idOrganization
+          }"
+          (cancel_login)="getUserStatus($event)"
+        >
+        </app-reset-password>
+      </div>
+
+      <div *ngIf="actual_user_status === 'display_already_member'">
+        <app-successful-process-assigned
+          [currentUser]="currentUser"
+          [process_info]="process_info"
+          (redirect)="handleRedirectByRole($event)"
+        >
+        </app-successful-process-assigned>
+      </div>
+    </div>
+
+    <div class="card" [hidden]="!is_loading">
+      <ng-template [ngIf]="is_loading">
+        <div
+          class="d-flex justify-content-center col-12"
+          style="margin-top: 10%; margin-bottom: 10%"
+        >
+          <div
+            style="
+              height: 120px;
+              width: 120px;
+              font-size: 15px;
+              border-width: 0.45em;
+            "
+            class="spinner-border text-citric"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="display-fixer">
+  <div *ngIf="articuloMedia.mediaType == 'Content'">
+    <p
+      ion-text
+      class="card-content card-content-fixed fix-frame"
+      [innerHtml]="articuloMedia.content"
+    ></p>
+  </div>
+  <div
+    class="row justify-content-center"
+    *ngIf="articuloMedia.idMediaType == 8"
+  >
+    <!-- <h5 ion-text class="youtube-content-title">
+      {{ articuloMedia.titulo }}
+    </h5>
+    <div class="videoWrapper">
+      <iframe
+        width="100%"
+        height="100%"
+        [src]="articuloMedia.url"
+        frameborder="0"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div> -->
+    <app-playlist-embed
+      class="p-0 col-12 col-md-10"
+      #playlist_embed
+      [is_standalone]="true"
+      [show_tab_searchbar]="false"
+      [standalone_videos]="[articuloMedia.media_item]"
+    ></app-playlist-embed>
+
+    <!-- <app-videoplayer
+      #video_player
+      class="p-0 col-12 col-md-10"
+      *ngIf="articuloMedia.media_item.url"
+      [src]="articuloMedia.media_item.url"
+      [hide_buttons]="true"
+    ></app-videoplayer> -->
+  </div>
+  <div *ngIf="articuloMedia.mediaType == 'Image'" style="text-align: center">
+    <img
+      class="img-width"
+      alt="articuloMedia.titulo"
+      [src]="fixUrl(articuloMedia.url)"
+    />
+    <p ion-text class="card-content-image">
+      <i>
+        {{ articuloMedia.titulo }}
+      </i>
+    </p>
+  </div>
+  <div
+    *ngIf="articuloMedia.mediaType == 'External Image'"
+    style="text-align: center"
+  >
+    <img
+      class="img-width"
+      alt="articuloMedia.titulo"
+      [src]="articuloMedia.url"
+    />
+    <p ion-text class="card-content-image">
+      <i>
+        {{ articuloMedia.titulo }}
+      </i>
+    </p>
+  </div>
+  <div
+    class="row justify-content-center"
+    *ngIf="articuloMedia.mediaType == 'Audio'"
+  >
+    <app-audio-embed
+      class="col-12 col-md-10"
+      #audio_embed
+      [media_item]="articuloMedia.media_item"
+      [handle_as_page]="true"
+    >
+    </app-audio-embed>
+
+    <!-- <app-audio-player
+      #audio_player
+      class="col-12 col-md-10"
+      *ngIf="articuloMedia.media_item.url"
+      [src]="articuloMedia.media_item.url"
+      [video]="articuloMedia.media_item"
+      [autoplay]="false"
+      [hide_buttons]="true"
+    ></app-audio-player> -->
+  </div>
+  <div
+    class="row justify-content-center"
+    *ngIf="articuloMedia.mediaType == 'Document'"
+  >
+    <app-document-embed
+      #document_embed
+      [id]="'id_' + articuloMedia.media_item.idVideo"
+      class="col-12 col-md-10"
+      [media_item]="articuloMedia.media_item"
+      [handle_as_page]="true"
+      [emit_open]="true"
+      (open_video)="closeOthers($event)"
+    >
+    </app-document-embed>
+    <!-- <div
+      class="col-12 col-md-10 mb-3 align-self-stretch p-0"
+      (click)="openDocument(articuloMedia.media_item)"
+    >
+      <div class="row" style="width: 100%; height: 100%">
+        <div class="col-6 align-self-center">
+          <img
+            [alt]="articuloMedia.media_item.title"
+            [src]="getPicture(articuloMedia.media_item.thumbnail)"
+            class="recent_video_thumbnail ec-border-radius ec-box-shadow full-width lazyloaded"
+            onerror="this.onerror=null; this.src='https://iglesiatech.app/assets/img/default-image.jpg'"
+          />
+        </div>
+        <div class="col-6 p-0 align-self-center">
+          <p
+            style="line-height: 13px"
+            class="sec-font bold sm-title m-b-spacer-none max-w-200 ellipsis_3"
+            [ngStyle]="{
+              'text-align': 'left',
+              color: '#000000',
+              'font-weight': 'bolder'
+            }"
+          >
+            {{ articuloMedia.media_item.title }}
+          </p>
+          <small class="smaller sec-font bold text-dark half-here">
+            {{ articuloMedia.media_item.speaker }}
+          </small>
+        </div>
+      </div>
+    </div> -->
+  </div>
+  <br />
+</div>

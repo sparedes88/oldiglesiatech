@@ -1,0 +1,121 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-8 align-self-center">
+      <h1 class="text-secondary">Approved Disciplers</h1>
+    </div>
+    <div class="col-12 col-md-4 text-right align-self-center">
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-citric" (click)="close.emit()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-12 text-right">
+      <button
+        *ngIf="!show_form"
+        class="btn btn-sm btn-success"
+        (click)="openAddForm()"
+      >
+        Add
+      </button>
+      <button
+        *ngIf="show_form"
+        class="btn btn-sm btn-secondary"
+        (click)="show_form = false"
+      >
+        Cancel
+      </button>
+    </div>
+    <div *ngIf="!show_form" class="col-12 mt-2">
+      <!-- datatable
+      [dtOptions]="dtOptions"
+      [dtTrigger]="dtTrigger" -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Discipler</th>
+            <th>Access</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of records">
+            <td>
+              {{ record.full_name }}
+            </td>
+            <td>
+              {{ record.access_name }}
+            </td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-info" (click)="openEditForm(record)">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteItem(record)"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div *ngIf="show_form" class="col-12">
+      <div class="row mx-0 justify-content-center" [formGroup]="discipler_form">
+        <div class="col-12 col-md-8 mt-2">
+          <div class="row">
+            <div class="col-12">
+              <h4 class="my-0">Disciplers</h4>
+            </div>
+            <div class="col-12">
+              <h6 class="m-0 text-secondary">
+                Select which users can be disciplers.
+              </h6>
+              <ng-multiselect-dropdown
+                placeholder="Select an user"
+                [data]="users"
+                [settings]="selectCatOptions"
+                formControlName="selected_user"
+              ></ng-multiselect-dropdown>
+              <!-- (onSelect)="setAvailableUsers()"
+                (onSelectAll)="setAvailableUsers()"
+                (onDeSelect)="setAvailableUsers()"
+                (onDeSelectAll)="setAvailableUsers()" -->
+            </div>
+            <!-- <small class="col-12 text-citric">*Only members are available.</small> -->
+
+            <div class="col-12">
+              <div class="form-group">
+                <label>Access type</label>
+                <select
+                  required
+                  class="form-control"
+                  formControlName="idDisciplerAccess"
+                >
+                  <option [value]="1">All</option>
+                  <option [value]="2">Assigned only</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-12 text-center">
+              <button
+                [disabled]="loading"
+                class="btn btn-sm btn-success"
+                (click)="submitForm()"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

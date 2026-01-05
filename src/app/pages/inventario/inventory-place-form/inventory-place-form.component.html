@@ -1,0 +1,170 @@
+<div class="container">
+  <nav class="bg-citric fix-nav-height">
+    <div class="row">
+      <h5 class="col-11 text-light align-self-center pl-4">Add inventory</h5>
+      <div class="col-1 text-center p-0 align-self-center">
+        <button class="btn btn-sm btn-outline-light" (click)="dismiss()">
+          X
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div class="row mt-3">
+    <div class="col-xs-12 col-sm-12 col-md-12">
+      <form
+        [formGroup]="inventory_place_form"
+        (submit)="submitInventory(inventory_place_form)"
+      >
+        <div class="row">
+          <div class="col-12 col-md-5 row">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="description">
+                  Name <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="
+                    inventory_place_form.get('name').touched &&
+                    inventory_place_form.get('name').invalid
+                  "
+                  id="name"
+                  formControlName="name"
+                  placeholder="Item name"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label for="description">Description (optional)</label>
+                <textarea
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="
+                    inventory_place_form.get('description').touched &&
+                    inventory_place_form.get('description').invalid
+                  "
+                  id="description"
+                  formControlName="description"
+                  placeholder="Some description"
+                  autocomplete="off"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-7 row">
+            <h5 class="text-citric col-10">Register Products</h5>
+            <div class="col-2">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                [disabled]="inventory_place_form.get('products').invalid"
+                (click)="addProduct()"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+
+            <div
+              *ngFor="let item of products_array; let i = index"
+              class="col-12"
+            >
+              <div formArrayName="products" class="col-12 bordered">
+                <div [formGroupName]="i" class="row no-margin">
+                  <div class="col-10">
+                    <div class="form-group">
+                      <label>
+                        Product <span class="text-danger">*</span>
+                      </label>
+                      <ng-multiselect-dropdown
+                        placeholder="Select a product."
+                        [data]="item.get('available_products').value"
+                        [settings]="select_products_options"
+                        (onSelect)="fixProductFilter(item, $event)"
+                        (onDeSelect)="resetProductAvailable(item)"
+                      ></ng-multiselect-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-2 align-self-center text-center">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger"
+                      (click)="removeProduct(i)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label> Name <span class="text-danger">*</span> </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        [class.is-invalid]="
+                          item.get('name').touched && item.get('name').invalid
+                        "
+                        formControlName="name"
+                        placeholder="Name"
+                        autocomplete="off"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>
+                        Price bought at<span class="text-danger">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        [class.is-invalid]="
+                          item.get('price_bought_at').touched &&
+                          item.get('price_bought_at').invalid
+                        "
+                        formControlName="price_bought_at"
+                        placeholder="How much this product cost?"
+                        autocomplete="off"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>
+                        Vendor
+                        <small class="text-secondary"> (Optional) </small>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        [class.is-invalid]="
+                          item.get('vendor').touched &&
+                          item.get('vendor').invalid
+                        "
+                        formControlName="vendor"
+                        placeholder="Vendor"
+                        autocomplete="off"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 text-center">
+            <button
+              [disabled]="inventory_place_form.invalid"
+              type="submit"
+              class="btn btn-success btn-sm mt-3"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+        <!--  {{ formSalon.value | json}}-->
+      </form>
+    </div>
+  </div>
+</div>

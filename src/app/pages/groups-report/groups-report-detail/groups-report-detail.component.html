@@ -1,0 +1,195 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col">Report | {{ report?.name }}</h4>
+    <div *ngIf="!show_editable" class="col text-right">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        <i class="fa fa-chevron-left"></i> Back
+      </button>
+    </div>
+  </div>
+
+  <div class="row my-2" *ngIf="!show_editable">
+    <div class="col-12 col-md-6"></div>
+    <div class="col-12 col-md-6 text-right">
+      <button
+        *ngIf="!show_editable && show_detail && report?.records?.length > 0"
+        class="btn btn-sm btn-outline-success mr-2"
+        (click)="print()"
+        [disabled]="printing"
+      >
+        {{ printing ? "Please wait..." : "Print" }}
+      </button>
+
+      <button class="btn btn-sm btn-citric mr-2" (click)="openRegisterRow()">
+        <i class="fa fa-plus"></i> Register Information
+      </button>
+
+      <button
+        class="btn btn-sm btn-citric"
+        [routerLink]="'/groups/reports/' + idGroupReport + '/optional_fields'"
+      >
+        Optional fields
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="show_editable">
+    <app-groups-report-entry-form
+      #group_report_entry_form
+      [idGroupReport]="idGroupReport"
+      [organization]="organization"
+      (on_dismiss)="dismissRow($event)"
+    ></app-groups-report-entry-form>
+  </div>
+
+  <!-- <ng-template [ngIf]="!show_detail">
+    <div class="d-flex justify-content-center" style="margin: 140px">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem"
+        role="status"
+      ></div>
+    </div>
+  </ng-template> -->
+
+  <app-group-report-records-table
+    #group_reports_table
+    [hidden]="show_editable"
+    *ngIf="report?.records?.length > 0"
+    [loading]="!show_detail"
+    [columns]="report?.categories"
+    [records]="report?.records"
+    [idGroupReport]="idGroupReport"
+    [organization]="organization"
+    (on_edit)="editRecord($event)"
+    (on_delete)="deleteRecord($event)"
+    (on_refresh)="getRows()"
+  >
+  </app-group-report-records-table>
+
+  <!-- <table
+    *ngIf="!show_editable && show_detail && report?.records?.length > 0"
+    class="table table-striped table-bordered"
+  >
+    <thead>
+      <tr>
+        <th class="th-h2" rowspan="2">
+          <span
+            [ngClass]="{ clickable: dates.length > 0 }"
+            *ngIf="!filtering"
+            (click)="setFilters()"
+          >
+            Fecha <i *ngIf="dates.length > 0" class="fa fa-filter mr-2"></i>
+          </span>
+          <span *ngIf="filtering">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+              [formGroup]="filter_form"
+            >
+              <ng-multiselect-dropdown
+                #multi_select
+                placeholder="Select your dates"
+                [data]="dates"
+                [settings]="selectOptions"
+                formControlName="dates"
+              ></ng-multiselect-dropdown>
+            </div>
+            <div class="btn-group float-right">
+              <button class="btn btn-sm btn-light mr-1" (click)="cancel()">
+                Cancel
+              </button>
+              <button class="btn btn-sm btn-success" (click)="getRows()">
+                Apply
+              </button>
+            </div>
+          </span>
+        </th>
+        <th
+          class="text-center"
+          [colSpan]="category.columns?.length"
+          *ngFor="let category of report?.categories"
+        >
+          {{ category.name }}
+        </th>
+        <th class="th-h2" rowspan="2">Actions</th>
+      </tr>
+      <tr>
+        <th class="text-center" *ngFor="let column of combined_columns">
+          {{ column.name }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let record of report?.records">
+        <td>
+          {{ record.report_date }}
+        </td>
+        <td
+          *ngFor="let column of combined_columns"
+          [ngClass]="{ 'text-center': column.input_type == 4 }"
+        >
+          <span
+            *ngIf="column.input_type != 4"
+            [ngClass]="{ 'float-right': column.input_display_type == 3 }"
+          >
+            {{ getValue(record, column) }}
+          </span>
+          <input
+            *ngIf="column.input_type == 4"
+            readonly
+            disabled
+            type="checkbox"
+            [checked]="getValue(record, column)"
+          />
+        </td>
+        <td>
+          <button class="btn btn-sm" (click)="editRecord(record)">
+            <i class="fa fa-edit text-info"></i>
+          </button>
+          <button class="btn btn-sm" (click)="deleteRecord(record)">
+            <i class="fa fa-trash-alt text-danger"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>
+          <h4>Total</h4>
+        </td>
+        <td *ngFor="let column of combined_columns">
+          <span
+            *ngIf="column.input_type != 4"
+            [ngClass]="{ 'float-right': column.input_display_type == 3 }"
+          >
+            {{ formatValue(column.total, column) }}
+            <small
+              class="text-secondary"
+              *ngIf="
+                column.input_type == 1 ||
+                column.input_type == 2 ||
+                column.input_type == 5 ||
+                column.input_type == 6
+              "
+            >
+              <br />
+              ({{ column.input_type_name }})
+            </small>
+          </span>
+        </td>
+      </tr>
+    </tfoot>
+  </table> -->
+
+  <h3
+    class="text-center text-danger"
+    *ngIf="!show_editable && show_detail && report?.records?.length == 0"
+  >
+    There are not records registered...
+    <br />
+    <button class="btn btn-sm btn-citric" (click)="openRegisterRow()">
+      Start now...
+    </button>
+  </h3>
+</div>

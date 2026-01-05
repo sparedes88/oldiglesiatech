@@ -1,0 +1,175 @@
+<form [formGroup]="eventFormGroup" (submit)="submitForm(eventFormGroup)">
+  <div class="row">
+    <div class="col-xs-12 col-md-12">
+      <label>Title*</label>
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Event's Name"
+          formControlName="titulo"
+          required
+        />
+        <div class="input-group-append">
+          <span class="input-group-text">
+            <i class="fas fa-align-left"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <label>Description</label>
+      <div class="input-group mb-3">
+        <textarea
+          rows="5"
+          class="form-control"
+          formControlName="descripcion"
+          placeholder="Write a description for the new event"
+        ></textarea>
+        <div class="input-group-append">
+          <span class="input-group-text">
+            <i class="fas fa-align-left"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <div class="form-group">
+        <label for="file">Choose File</label>
+        <input
+          class="form-control"
+          type="file"
+          id="file"
+          (change)="handleFileInput($event.target.files)"
+        />
+      </div>
+    </div>
+    <div class="col-xs-6 col-md-6">
+      <div class="mb-3">
+        <label>Frecuency*</label>
+        <select formControlName="idFrecuencia" class="form-control" required>
+          <option *ngFor="let item of frecuencies" [value]="item.idFrecuencia">
+            {{ item.descripcion }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-xs-6 col-md-6">
+      <div class="mb-3">
+        <label>Level of access*</label>
+        <select formControlName="idNivelAcceso" class="form-control" required>
+          <option
+            *ngFor="let item of accessLevels"
+            [value]="item.idNivelAcceso"
+          >
+            {{ item.descripcion }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div
+      class="col-xs-6 col-md-6"
+      *ngIf="eventFormGroup.value.idFrecuencia != 1; else elsePeriodic"
+    >
+      <div class="mb-3">
+        <label>End date</label>
+        <input type="date" class="form-control" formControlName="fechaFin" />
+      </div>
+    </div>
+    <ng-template #elsePeriodic>
+      <div class="col-xs-12 col-md-12">
+        <div class="mb-3">
+          <label>End date</label>
+          <input
+            type="datetime-local"
+            class="form-control"
+            formControlName="fechaFin"
+          />
+        </div>
+      </div>
+    </ng-template>
+    <div
+      class="col-xs-6 col-md-6"
+      *ngIf="eventFormGroup.value.idFrecuencia != 1"
+    >
+      <div class="mb-3">
+        <label>Time*</label>
+        <input
+          type="time"
+          class="form-control"
+          formControlName="hora"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-12">
+      <div class="mb-3">
+        <div class="font-weight-bold">Status</div>
+        <mat-slide-toggle color="primary" formControlName="estatus">
+          Inactive/Active
+        </mat-slide-toggle>
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="provincia">State</label>
+        <input
+          type="text"
+          class="form-control"
+          id="provincia"
+          placeholder="State"
+          formControlName="provincia"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="ciudad">City</label>
+        <input
+          type="text"
+          class="form-control"
+          id="ciudad"
+          placeholder="City"
+          formControlName="ciudad"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="calle">Street</label>
+        <input
+          type="text"
+          class="form-control"
+          id="calle"
+          placeholder="Street"
+          formControlName="calle"
+        />
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="form-group">
+        <label for="zip">ZIP</label>
+        <input
+          type="text"
+          class="form-control"
+          id="zip"
+          placeholder="ZIP"
+          formControlName="zip"
+        />
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="eventFormGroup.invalid || loading"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+</form>

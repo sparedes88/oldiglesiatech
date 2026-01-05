@@ -1,0 +1,49 @@
+<div class="row">
+  <div *ngIf="show_header" class="col-12 my-3">
+    <div class="btn-group float-right">
+      <button
+        class="btn btn-sm btn-outline-citric"
+        (click)="dismiss_detail.emit()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="row p-0">
+      <div class="col-6 text-center">
+        <div
+          *ngIf="video.has_been_sanitize"
+          style="background-color: gainsboro"
+          class="videoWrapper"
+          [innerHTML]="video.embed_frame"
+        ></div>
+      </div>
+      <div class="col-6">
+        <div class="row p-0">
+          <div class="col-12">
+            <h3>{{ video.title }}</h3>
+            <h6 class="text-muted">
+              {{ video.speaker }}
+              <br />
+              {{ video.publish_date | date: "MMM. dd yyyy" }}
+            </h6>
+          </div>
+          <div class="col-12">
+            <p style="font-weight: lighter" class="text-justify">
+              {{ video.description }}
+            </p>
+          </div>
+          <div class="col-12 text-muted">
+            <i class="fa fa-tag"></i>
+            <span *ngIf="video.categories?.length === 0">
+              <i> No tags </i>
+            </span>
+            <span *ngFor="let tag of video.categories"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

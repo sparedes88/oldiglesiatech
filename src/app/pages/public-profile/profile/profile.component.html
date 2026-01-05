@@ -1,0 +1,76 @@
+<div [ngStyle]="{height : app_header.height + 'px'}" class="header-container">
+  <app-header
+    #app_header
+    [lang]="publicProfile?.profile_data?.lang || 'en'"
+    [iglesia]="iglesia"
+    [socialLinks]="publicProfile?.profile_data?.social_links"
+    [headerStyle]="publicProfile?.profile_data?.header_style"
+    [tabs]="tabsByLang"
+    [currentTabIndex]="currentTabIndex"
+    (onChangeTab)="changeTab($event); reloadAnimations()"
+    (onChangeSubPage)="changeSubPage($event)"
+    (onChangeLang)="changeLang($event)"
+    displayMode="prod"
+  ></app-header>
+</div>
+
+<slider
+  *ngIf="publicProfile.profile_data?.slides?.length > 0 && currentTabIndex === 0 && tabsByLang.length > 0"
+  [slides]="publicProfile.profile_data?.slides"
+  [lang]="publicProfile?.profile_data?.lang || 'en'"
+></slider>
+
+<div class="mt-5" *ngIf="!currentSubPage">
+  <!-- Tabs container -->
+  <div class="tab-content mt-2">
+    <div
+      *ngFor="let tab of tabsByLang; let i = index"
+      class="tab-pane fade section-container"
+      [ngClass]="{ show: i == currentTabIndex, active: i == currentTabIndex }"
+      style="overflow-x: hidden"
+    >
+      <div
+        class="section-item"
+        *ngFor="
+          let section of tab.sections;
+          let idx = index;
+          trackBy: trackSections
+        "
+        attr.data-aos="{{ section?.animation?.name }}"
+        attr.data-aos-offset="{{ section?.animation?.offset }}"
+        attr.data-aos-delay="{{ section?.animation?.delay }}"
+        attr.data-aos-duration="{{ section?.animation?.duration }}"
+        attr.data-aos-easing="{{ section?.animation?.easing }}"
+        attr.data-aos-once="{{ section?.animation?.once }}"
+        style="overflow-x: hidden"
+      >
+        <app-section [section]="section" [displayMode]="'prod'"></app-section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-5" *ngIf="currentSubPage">
+  <div
+    *ngFor="
+      let section of currentSubPage.sections;
+      let idx = index;
+      trackBy: trackSections
+    "
+    attr.data-aos="{{ section?.animation?.name }}"
+    attr.data-aos-offset="{{ section?.animation?.offset }}"
+    attr.data-aos-delay="{{ section?.animation?.delay }}"
+    attr.data-aos-duration="{{ section?.animation?.duration }}"
+    attr.data-aos-easing="{{ section?.animation?.easing }}"
+    attr.data-aos-mirror="{{ section?.animation?.mirror }}"
+    attr.data-aos-once="{{ section?.animation?.once }}"
+    style="overflow-x: hidden"
+  >
+    <app-section [section]="section" [displayMode]="'prod'"></app-section>
+  </div>
+</div>
+
+<profile-footer
+  *ngIf="publicProfile?.profile_data?.footer"
+  [footer]="publicProfile?.profile_data?.footer"
+></profile-footer>

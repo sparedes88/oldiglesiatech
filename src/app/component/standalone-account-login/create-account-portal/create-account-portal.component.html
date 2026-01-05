@@ -1,0 +1,342 @@
+<form style="width: 100%" [formGroup]="register_form">
+  <div
+    class="row justify-content-center align-content-center"
+    style="min-height: 500px"
+  >
+    <div class="row justify-content-center col-9">
+      <div class="col-12 text-right">
+        <button
+          class="btn btn-sm btn-outline-citric mx-5"
+          (click)="cancel_login.emit()"
+        >
+        {{'General_Cerrar' | translate }}
+        </button>
+      </div>
+      <div class="col-12 align-self-center">
+        <h2 class="text-citric text-center" *ngIf="!currentUser">
+          {{'users.create_an_account' | translate | uppercase}}
+        </h2>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="estimated">
+            {{'users.first_name' | translate}}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-align-left"></i>
+              </div>
+            </div>
+            <input
+              class="form-control"
+              [placeholder]="('general.type_your_info_name' | translate) | replace: 'name':'users.first_name'"
+              type="text"
+              formControlName="nombre"
+              required
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="estimated">
+            {{'users.last_name'| translate}}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-align-left"></i>
+              </div>
+            </div>
+            <input
+              class="form-control"
+              [placeholder]="('general.type_your_info_name' | translate) | replace: 'name':'users.last_name'"
+              type="text"
+              formControlName="apellido"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="estimated">
+            {{'users.country_code' | translate}} <span class="text-danger">*</span>
+          </label>
+          <app-custom-select-country
+            [return_value]="'callingCode'"
+            formControlName="country_code"
+            [idOrganization]="register_form.get('idIglesia').value"
+            >
+          </app-custom-select-country>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 align-items-center">
+        <div class="form-group">
+          <label for="estimated">
+            {{'Miembro_Telefono' | translate}}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-phone"></i>
+              </div>
+            </div>
+            <input
+              class="form-control"
+              placeholder="(999) 999-9999."
+              type="tel"
+              formControlName="telefono"
+              [dropSpecialCharacters]="false"
+              mask="(000) 000-0000"
+              [readonly]="
+                full_form.get('get_started_form').get('login_type').value ===
+                'phone'
+              "
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        [hidden]="register_form.get('login_type').value === 'email'"
+        class="col-12 align-items-center"
+      >
+        <div class="form-group">
+          <label for="estimated">
+            Email
+            <span class="text-danger">*</span>
+          </label>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-at"></i>
+              </div>
+            </div>
+            <input
+              class="form-control col-12"
+              type="text"
+              formControlName="email"
+              required
+              [readonly]="
+                full_form.get('get_started_form').get('login_type').value ===
+                'email'
+              "
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="estimated">
+            {{'Login_Password' | translate}}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-lock"></i>
+              </div>
+            </div>
+            <input
+              class="form-control"
+              [placeholder]="('general.type_your_info_name' | translate) | replace: 'name':'Login_Password'"
+              [type]="toggle_pass.password ? 'password' : 'text'"
+              formControlName="password"
+              required
+            />
+
+            <div
+              class="input-group-append"
+              (click)="toggle_pass.password = !toggle_pass.password"
+            >
+              <span class="input-group-text">
+                <i
+                  [ngClass]="toggle_pass.password ? 'fa-eye' : 'fa-eye-slash'"
+                  class="fa"
+                ></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <span
+            class="text-danger"
+            *ngIf="register_form.get('password').invalid"
+          >
+          {{'users.min_char_password' | translate}}
+          </span>
+        </div>
+        <br />
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="estimated">
+            {{'Miembro_RepetirPassword' | translate}}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-lock"></i>
+              </div>
+            </div>
+            <input
+              class="form-control"
+              [placeholder]="'Miembro_RepetirPassword' | translate"
+              [type]="toggle_pass.confirm_password ? 'password' : 'text'"
+              formControlName="confirm_password"
+              required
+            />
+            <div
+              class="input-group-append"
+              (click)="
+                toggle_pass.confirm_password = !toggle_pass.confirm_password
+              "
+            >
+              <span class="input-group-text">
+                <i
+                  [ngClass]="
+                    toggle_pass.confirm_password ? 'fa-eye' : 'fa-eye-slash'
+                  "
+                  class="fa"
+                ></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <span
+            class="text-danger"
+            *ngIf="
+              register_form.get('password').value !==
+              register_form.get('confirm_password').value
+            "
+          >
+            * {{'users.password_did_not_match' | translate}}
+          </span>
+        </div>
+        <br />
+      </div>
+
+      <div
+        [hidden]="is_not_event"
+        class="col-12 align-self-center text-left mb-4"
+      >
+        <input
+          type="checkbox"
+          id="acceptance"
+          name="customRadio"
+          class="custom-control-input"
+          formControlName="is_available"
+          [checked]="register_form.get('is_available').value"
+          (click)="toggleAcceptace(register_form, 'is_available')"
+        />
+        <span
+          class="checkmark"
+          (click)="toggleAcceptace(register_form, 'is_available')"
+        ></span>
+        <label
+          style="cursor: pointer"
+          class="custom-control-label"
+          for="acceptance"
+        >
+        <span *ngIf="!is_not_event" [innerHTML]="(custom_message | translate) | replace: 'name': group_event?.organization_name"></span>
+        </label>
+      </div>
+
+      <div class="col-6 text-center">
+        <button
+          [disabled]="register_form.invalid || serverBusy"
+          (click)="onRegister()"
+          class="btn btn-sm btn-citric"
+        >
+        {{'login.register_now' | translate}}
+        </button>
+      </div>
+
+      <!-- <div
+    [formGroup]="additional_form"
+    class="row col-10 align-items-center justify-content-center center-fix mb-2"
+  >
+    <div class="col-2 col-md-2 text-center">
+      <button
+        [disabled]="additional_form.get('guests').value <= 0"
+        ion-button
+        (click)="addQuantity(-1)"
+        class="btn btn-danger circular-button"
+      >
+        <mat-icon matPrefix>remove</mat-icon>
+      </button>
+    </div>
+    <div class="col-8 col-md-6">
+      <div no-lines class="center-fix">
+        <label floating class="text-muted" class="width-fix">
+          How many come with you
+        </label>
+        <input
+          class="col-12 align-center-fixer"
+          formControlName="guests"
+          type="number"
+          readonly
+          required
+        />
+      </div>
+    </div>
+    <div class="col-2 col-md-2 text-center">
+      <button
+        (click)="addQuantity(1)"
+        ion-button
+        class="btn btn-success circular-button"
+      >
+        <mat-icon matPrefix>add</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div
+    [formGroup]="additional_form"
+    class="col-8 align-self-center text-left mb-4"
+  >
+    <input
+      type="checkbox"
+      id="covid_quest"
+      name="customRadio"
+      class="custom-control-input"
+      formControlName="covid_quest"
+      [checked]="additional_form.get('covid_quest').value"
+      (click)="toggleAcceptace(additional_form, 'covid_quest')"
+    />
+    <span
+      class="checkmark"
+      (click)="toggleAcceptace(additional_form, 'covid_quest')"
+    ></span>
+    <label
+      style="cursor: pointer"
+      class="custom-control-label"
+      for="covid_quest"
+    >
+      Have you been in touch with someone who has Covid-19 in the last 14 days?
+    </label>
+  </div> -->
+
+      <!-- <div class="col-6 text-center">
+    <button
+      [disabled]="serverBusy"
+      (click)="cancelRegister()"
+      class="btn btn-sm btn-outline-danger"
+    >
+      Change email
+    </button>
+  </div>
+-->
+    </div>
+  </div>
+</form>

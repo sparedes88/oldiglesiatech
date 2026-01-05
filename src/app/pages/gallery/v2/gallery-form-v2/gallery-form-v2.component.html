@@ -1,0 +1,145 @@
+<div class="container mt-2">
+  <h4>Gallery Form</h4>
+  <form (ngSubmit)="saveGallery()" #form="ngForm">
+    <div class="row">
+      <div class="col-xs-12 col-md-4">
+        <div class="form-group">
+          <label for="nameInput">Title</label>
+          <input
+            type="text"
+            class="form-control"
+            id="nameInput"
+            placeholder="Title"
+            name="name"
+            [(ngModel)]="galleryForm.name"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-8">
+        <div class="form-group">
+          <label for="descriptionInput">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            id="descriptionInput"
+            placeholder="Description"
+            name="description"
+            [(ngModel)]="galleryForm.description"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-12">
+        <button
+          class="btn btn-success"
+          type="submit"
+          *ngIf="galleryForm.id"
+          [disabled]="uploading || form.invalid || !pictures_array.length"
+        >
+          Save gallery
+          <span *ngIf="saving" class="spinner-grow spinner-grow-sm mb-1"></span>
+        </button>
+        <button
+          class="btn btn-success"
+          type="submit"
+          *ngIf="!galleryForm.id"
+          [disabled]="uploading || form.invalid"
+        >
+          Save gallery
+          <span *ngIf="saving" class="spinner-grow spinner-grow-sm mb-1"></span>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="form-group" *ngIf="galleryForm.id && !loading">
+    <input
+      type="file"
+      name="file"
+      id="file"
+      class="input-file"
+      accept="image/*"
+      multiple
+      (change)="handlePhotosV2($event.target.files)"
+      [disabled]="uploading"
+    />
+    <label for="file" class="btn btn-tertiary js-labelFile">
+      <i class="icon fa fa-check"></i>
+      <span class="js-fileName">
+        Add Photos
+        <i class="fa fa-circle-o-notch fa-spin" *ngIf="uploading"></i>
+      </span>
+    </label>
+  </div>
+
+  <!-- <div class="form-group" *ngIf="!galleryForm.id && !loading">
+    <h4 class="text-danger text-center">
+      Please save your gallery to start upload photos.
+    </h4>
+  </div> -->
+
+  <div class="text-center">
+    <span *ngIf="uploading" class="spinner-grow spinner-grow-lg mb-1"></span>
+  </div>
+
+  <!-- <sam-drag-and-drop-grid
+    [items]="pictures_array.controls"
+    [columnNumber]="3"
+    *ngIf="!uploading"
+  >
+  </sam-drag-and-drop-grid> -->
+  <div
+    [ngClass]="{ 'justify-content-center': pictures_array.length % 2 == 0 }"
+    class="row justify-content-center"
+  >
+    <div
+      class="col-12 col-lg-6 row mx-0 justify-content-center"
+      *ngFor="let photo of pictures_array.controls; let i = index"
+    >
+      <div class="gallery-item text-right">
+        <button *ngIf="!photo.get('is_enable').value" class="btn" (click)="enableCropper(cropper_js, photo)">
+          <i class="fa fa-edit text-info"></i>
+        </button>
+        <button *ngIf="photo.get('is_enable').value" class="btn" (click)="setCropperValues(cropper_js, photo, true)">
+          <i class="fa fa-save text-success"></i>
+        </button>
+        <button *ngIf="!photo.get('is_enable').value" class="btn btn-danger btn-sm" (click)="deletePhoto(photo, i)">
+          <i class="fa fa-trash"></i>
+        </button>
+        <div
+          #test_form
+          class="test-form"
+          [ngStyle]="{ height: test_form.offsetWidth / 1.777776 + 'px' }"
+        >
+        <!-- *ngIf="photo.get('ready').value" -->
+          <angular-cropper
+            #cropper_js
+            [cropperOptions]="config"
+            [imageUrl]="getSrc(photo)"
+            (ready)="cropperReady(cropper_js, $event, photo)"
+            [ngStyle]="{ height: test_form.offsetWidth / 1.777776 + 'px' }"
+          ></angular-cropper>
+        </div>
+        <!-- <div class="img-tag-test" [ngStyle]="getNewStyle(photo)"></div> -->
+        <!-- <div class="btn-group">
+          <button class="btn" (click)="setCropperValues(cropper_js, photo)">
+            <i class="fa fa-edit text-info"></i>
+          </button>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #submitModal identifier="submitModal">
+  <div class="text-center">
+    <h4>Gallery Saved</h4>
+    <div class="buttons text-center">
+      <a class="btn btn-success"  [routerLink]="['/galleries/home']" [queryParams]="{ tab: 'galleries'}">
+        Return to list
+      </a>
+      <button class="btn btn-primary" (click)="submitModal.close()">
+        Keep editing
+      </button>
+    </div>
+  </div>
+</ngx-smart-modal>

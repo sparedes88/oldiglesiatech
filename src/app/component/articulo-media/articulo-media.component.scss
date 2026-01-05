@@ -1,0 +1,109 @@
+hr {
+  height: 1px !important;
+}
+.card-content {
+  width: 100%;
+  // color: #a0a0a0;
+  //   font-size: 1.5rem;
+  // font-family: gotham_book !important;
+  //   line-height: 2.2rem;
+  font-family: "Montserrat" !important;
+  text-align: justify;
+}
+.youtube-content-title {
+  // color: #a0a0a0;
+  font-size: 1.7rem;
+  font-family: "Montserrat" !important;
+  // font-family: gotham_book !important;
+  line-height: 2.2rem;
+  display: inline;
+}
+.img-width {
+  width: 100%;
+  max-width: 520px;
+}
+.videoWrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+}
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+p {
+  margin-bottom: 0 !important;
+}
+
+.card-content::after > p {
+  margin-bottom: 0 !important;
+  &::after {
+    margin-bottom: 0 !important;
+  }
+}
+
+.card-content-fixed,
+.card-content-fixed::after,
+.card-content-fixed::before {
+  width: 100%;
+  color: black !important;
+  // font-size: 1.5rem;
+  // font-family: gotham_book !important;
+  // line-height: 2.2rem;
+  // font-size: 1.5rem !important;
+  text-align: justify;
+  margin-bottom: 0 !important;
+  font-family: "Montserrat" !important;
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  &.p-embed-frame,
+  &.p-embed-frame::after,
+  &.p-embed-frame::before {
+    text-align: center !important;
+  }
+}
+.ln-height-reset {
+  line-height: 1;
+}
+.m-t-spacer-sm {
+  margin-top: 0.7ex;
+}
+.sm-title {
+  font-size: 0.8125rem;
+}
+.m-b-spacer-none {
+  margin-bottom: 0;
+}
+.max-w-200 {
+  max-width: 200px !important;
+}
+.ellipsis_3 {
+  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  /* autoprefixer: off */
+}
+.smaller {
+  font-size: 0.625rem;
+}
+.text-dark {
+  color: #212529 !important;
+}
+.half-here {
+  opacity: 0.5;
+}
+.recent_video_thumbnail {
+  height: auto;
+  width: 100%;
+}
+
+.ec-border-radius {
+  border-radius: 10px;
+}

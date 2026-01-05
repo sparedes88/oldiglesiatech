@@ -1,0 +1,344 @@
+<div class="row p-4">
+  <div *ngIf="!registered" class="col-4">
+    <!-- Unused -->
+  </div>
+  <div *ngIf="!registered" class="col-8">
+    <div class="row">
+      <div class="col-12 text-center">
+        <h2>
+          {{ lang?.keys["register"] }}
+        </h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-4 align-self-center">
+    <img
+      [src]="organization?.Logo || 'assets/img/logoColor.png'"
+      alt=""
+      class="responsive-img"
+      onerror="this.onerror=null; this.src=`assets/img/logoColor.png`"
+    />
+  </div>
+  <div *ngIf="!registered && !exists && !logged" class="col-8">
+    <div class="row">
+      <hr class="col-12" />
+
+      <div class="col-12" *ngIf="lang">
+        <div [formGroup]="userForm" class="row">
+          <div class="col-6">
+            <div class="form-group">
+              <label>{{ lang?.keys["first_name"] }}* </label>
+              <input
+                type="text"
+                required
+                class="form-control mb-1"
+                [placeholder]="lang.keys['your_first_name']"
+                formControlName="nombre"
+                [class.is-invalid]="
+                  userForm.get('nombre').dirty && userForm.get('nombre').invalid
+                "
+              />
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label> {{ lang.keys["last_name"] }} * </label>
+              <input
+                type="text"
+                required
+                class="form-control mb-1"
+                [placeholder]="lang.keys['your_last_name']"
+                formControlName="apellido"
+                [class.is-invalid]="
+                  userForm.get('apellido').dirty &&
+                  userForm.get('apellido').invalid
+                "
+              />
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label>Email* </label>
+              <input
+                type="text"
+                required
+                class="form-control mb-1"
+                [placeholder]="lang.keys['your_email']"
+                formControlName="email"
+                [class.is-invalid]="
+                  userForm.get('email').dirty && userForm.get('email').invalid
+                "
+              />
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label>{{ lang.keys["sex"] }} * </label>
+              <select
+                class="form-control mb-1"
+                formControlName="sexo"
+                required
+                [class.is-invalid]="
+                  userForm.get('sexo').dirty && userForm.get('sexo').invalid
+                "
+              >
+                <option [value]="''">
+                  {{ lang.keys["select_your_sex"] }}
+                </option>
+                <option value="Masculino">
+                  {{ lang.keys["male"] }}
+                </option>
+                <option value="Femenino">
+                  {{ lang.keys["female"] }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label for="estimated">
+                Country Code <span class="text-danger">*</span>
+              </label>
+              <app-custom-select-country
+                #custom_select_country
+                [return_value]="'callingCode'"
+                formControlName="country_code"
+                [idOrganization]="idOrganization"
+              >
+              </app-custom-select-country>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label> {{ lang.keys["phone_number"] }} * </label>
+              <input
+                type="text"
+                required
+                class="form-control mb-1"
+                [placeholder]="lang.keys['your_phone_number']"
+                formControlName="telefono"
+                mask="(000) 000-0000"
+                [dropSpecialCharacters]="false"
+                [class.is-invalid]="
+                  userForm.get('telefono').dirty &&
+                  userForm.get('telefono').invalid
+                "
+              />
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label>{{ lang.keys["password"] }} * </label>
+              <input
+                type="password"
+                required
+                class="form-control mb-1"
+                [placeholder]="lang.keys['6_chars_least']"
+                formControlName="password"
+                [class.is-invalid]="
+                  userForm.get('password').dirty &&
+                  userForm.get('password').invalid
+                "
+              />
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label> {{ lang.keys["confirm_password"] }} * </label>
+              <input
+                type="password"
+                required
+                class="form-control mb-1"
+                [placeholder]="lang.keys['confirm_password']"
+                formControlName="passConfirm"
+                [class.is-invalid]="
+                  userForm.get('passConfirm').dirty &&
+                  userForm.get('passConfirm').invalid
+                "
+              />
+              <p
+                class="help danger"
+                *ngIf="
+                  userForm.get('password').value &&
+                  userForm.get('password').value !=
+                    userForm.get('passConfirm').value
+                "
+              >
+                {{ lang.keys["password_not_match"] }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!registered && !exists && !logged" class="col-8 offset-4">
+    <div class="row">
+      <div class="col-12 text-center" *ngIf="lang">
+        <button
+          class="btn btn-small btn-citric button"
+          style="width: 100%"
+          (click)="registerUser()"
+          [ngClass]="{ 'is-loading': loading }"
+        >
+          {{ lang.keys["create_my_account"] }}
+        </button>
+        <!-- <p class="center-xs" style="padding: 8px 0px">
+          <small> {{ lang.keys["or"] }} </small>
+        </p>
+        <button class="btn btn-small v-facebook-login" style="width: 100%">
+          Continue with Facebook
+        </button>
+        <v-facebook-login
+          ref="fbLoginBtn"
+          app-id="3117419608270269"
+          @login="handleLogin"
+          @sdk-init="handleSdkInit"
+        ></v-facebook-login> -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Registered -->
+  <div
+    *ngIf="registered || exists || logged"
+    class="col-8 align-self-center text-center"
+  >
+    <h2 *ngIf="registered">
+      {{ lang.keys["account_greeting"] }}
+    </h2>
+
+    <h2 *ngIf="exists" class="is-size-2 has-text-weight-semibold">
+      {{ lang.keys["please_login"] }}
+    </h2>
+
+    <h2 *ngIf="logged" class="is-size-2 has-text-weight-semibold">
+      {{ lang.keys["logged_now"] }}
+    </h2>
+
+    <div [formGroup]="loginForm" class="row" [hidden]="logged || registered">
+      <div class="col-12">
+        <div
+          class="form-group"
+          *ngIf="loginForm.get('login_type').value === 'Email'"
+        >
+          <label>Email* </label>
+          <input
+            readonly
+            type="text"
+            required
+            class="form-control mb-1"
+            [placeholder]="lang.keys['your_email']"
+            formControlName="email"
+            [class.is-invalid]="
+              loginForm.get('email').dirty && loginForm.get('email').invalid
+            "
+          />
+        </div>
+
+        <div
+          class="form-group"
+          *ngIf="loginForm.get('login_type').value === 'Phone'"
+        >
+          <label> {{ lang.keys["phone_number"] }} * </label>
+          <input
+            readonly
+            type="text"
+            required
+            class="form-control mb-1"
+            [placeholder]="lang.keys['your_phone_number']"
+            formControlName="telefono"
+            mask="(000) 000-0000"
+            [dropSpecialCharacters]="false"
+            [class.is-invalid]="
+              loginForm.get('telefono').dirty &&
+              loginForm.get('telefono').invalid
+            "
+          />
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="form-group">
+          <label>{{ lang.keys["password"] }} * </label>
+          <input
+            type="password"
+            required
+            class="form-control mb-1"
+            [placeholder]="lang.keys['6_chars_least']"
+            formControlName="password"
+            [class.is-invalid]="
+              loginForm.get('password').dirty &&
+              loginForm.get('password').invalid
+            "
+          />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <hr class="col-12" />
+
+      <div class="col-12">
+        <div class="row justify-content-center">
+          <div
+            *ngIf="!registered && !logged"
+            class="col-xs-12 col-md-6 col-lg-4"
+          >
+            <ul style="list-style: none">
+              <li>
+                <button
+                  target="_blank"
+                  class="btn btn-small btn-secondary button"
+                  type="button"
+                  (click)="exists = false"
+                >
+                  < {{ lang.keys["back"] }}
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div *ngIf="exists" class="col-lg-4"></div>
+          <div class="col-xs-12 col-md-6 col-lg-4">
+            <ul style="list-style: none">
+              <li>
+                <a
+                  *ngIf="!exists || logged"
+                  [href]="
+                    login_token
+                      ? 'https://iglesiatech.app/login?token=' + login_token
+                      : 'https://iglesiatech.app/login'
+                  "
+                  target="_blank"
+                  class="btn btn-small btn-citric button"
+                  type="button"
+                >
+                  {{ lang.keys["my_profile"] }}
+                </a>
+
+                <button
+                  *ngIf="exists && !logged"
+                  class="btn btn-small btn-citric button"
+                  type="button"
+                  [ngClass]="{ 'is-loading': loading }"
+                  (click)="makeLogin()"
+                >
+                  {{ lang.keys["login"] }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="registered" class="row p-4">
+    <div class="col-12 col-md-10 col-lg-8 center-xs">
+      <div class="row center-xs" style="margin-top: 1em">
+        <div class="col-xs-12 col-md-6 col-lg-4"></div>
+      </div>
+    </div>
+  </div>
+</div>

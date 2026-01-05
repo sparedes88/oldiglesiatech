@@ -1,0 +1,431 @@
+<div class="container page">
+  <ng-template [ngIf]="!show_detail">
+    <div class="d-flex justify-content-center" style="margin: 15%">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+  <div *ngIf="show_detail">
+    <div class="row">
+      <h3 class="col-8 text-citric">
+        Design Request #{{ designRequest.idDesignRequest }}:
+        {{ designRequest.title || "No title provided" }}
+      </h3>
+      <div class="col-4" style="display: flex; justify-content: space-between">
+        <button
+          class="btn btn-outline-citric align-self-center"
+          (click)="goBack()"
+        >
+          {{ is_embed ? "Close" : "Back" }}
+        </button>
+        <button
+          class="btn btn-outline-citric align-self-center"
+          (click)="openEditModal(designRequest, design_request__form)"
+        >
+          Update
+        </button>
+        <button
+          class="btn btn-outline-secondary align-self-center"
+          (click)="copyLink()"
+        >
+          <i class="fa fa-link"></i>
+        </button>
+        <button class="btn btn-success align-self-center" (click)="print()">
+          <mat-icon>print</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md-4 order-1 order-md-12">
+        <!-- Management -->
+        <div class="row col-12 management">
+          <div class="col-12">
+            <h4 class="text-citric">Ticket management info:</h4>
+          </div>
+          <div class="col-4 col-md-12">
+            <span class="header"> Assigned To: </span>
+            <br />
+            {{ designRequest.userAssignedTo }}
+          </div>
+          <div class="col-4 col-md-12">
+            <span class="header"> Estimated Time: </span>
+            <br />
+            {{ designRequest.estimatedTime }} Hrs.
+          </div>
+          <div class="col-4 col-md-12">
+            <span class="header"> Completed Time: </span>
+            <br />
+            {{
+              designRequest.completedTime
+                ? designRequest.completedTime + "Hrs."
+                : "N/A"
+            }}
+          </div>
+          <div
+            class="col-4 col-md-12"
+            *ngIf="designRequest.idDesignRequestParentStatus == 2"
+          >
+            <span class="header"> Platform: </span>
+            <br />
+            {{ designRequest.platform | titlecase }}
+            <i
+              class="fa fa-mobile-alt ml-2"
+              *ngIf="
+                designRequest.platform === 'mobile' ||
+                designRequest.platform === 'both'
+              "
+            >
+            </i>
+            <i
+              class="fa fa-desktop ml-2"
+              *ngIf="
+                designRequest.platform === 'web' ||
+                designRequest.platform === 'both'
+              "
+            ></i>
+          </div>
+          <div
+            class="col-4 col-md-12"
+            *ngIf="designRequest.idDesignRequestParentStatus == 2"
+          >
+            <span class="header"> Module: </span>
+            <br />
+            {{ designRequest.designRequestModule | titlecase }}
+          </div>
+          <div class="w-100">
+            <br />
+            <br />
+          </div>
+          <!-- Add Note -->
+          <a class="text-citric" (click)="addNote(design_request_note__form_1)">
+            Add Note
+          </a>
+          <div class="w-100">
+            <br />
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-8 order-12 order-md-1">
+        <!-- Detail Info -->
+        <div class="row">
+          <div class="col-6 col-padding">
+            <b> Desc. </b> <br />
+            <div
+              style="white-space: pre-wrap"
+              [innerHTML]="designRequest.description | attachParse | keepHtml"
+            ></div>
+            <br />
+            <br />
+            <b> Iglesia </b> <br />
+            {{ designRequest.iglesia }}
+            <span *ngIf="currentUser.idUsuario === 78">
+              <br />
+              <br />
+              <b> ID: </b>
+              (#{{ designRequest.idIglesia }})
+              <br />
+              <b> TOPIC: </b>
+              <br />
+              {{ designRequest.topic }}
+              <br />
+              <br />
+              <b> IMAGE Name: </b>
+              <br />
+              {{ designRequest.topic | lowercase }}.png
+              <br />
+              <br />
+              <b>
+                BRANCH:
+                <br />
+              </b>
+              {{ designRequest.idIglesia }}_{{
+                fixName(designRequest.iglesia)
+              }}_Tech
+              <br />
+            </span>
+          </div>
+          <div class="col-6">
+            <b> Status </b> <br />
+            <span
+              class="status"
+              [ngStyle]="{
+                background: designRequest.color
+                  ? '#' + designRequest.color
+                  : '#6c757d'
+              }"
+            >
+              {{ designRequest.designRequestStatus }}
+            </span>
+            <br />
+            <br />
+            <span *ngIf="designRequest.idDesignRequestParentStatus === 1">
+              <b> Qty. </b> <br />
+              {{ designRequest.quantity }}
+            </span>
+            <br />
+            <br />
+            <b> Priority lvl. </b> <br />
+            <span
+              class="badge"
+              [ngClass]="{
+                'badge-secondary': designRequest.priority == 0,
+                'badge-info':
+                  designRequest.priority > 0 && designRequest.priority < 3,
+                'badge-warning':
+                  designRequest.priority > 2 && designRequest.priority < 5,
+                'badge-danger': designRequest.priority > 4
+              }"
+            >
+              {{ designRequest.priority }}
+            </span>
+            {{ designRequest.designRequestPriority || "Not assigned" }}
+          </div>
+          <div class="col-6">
+            <b> Deadline </b> <br />
+            {{ designRequest.deadline | date: "dd-MMM-yyyy" }}
+            <br />
+            <br />
+            <b> Type. </b> <br />
+            {{ designRequest.designRequestType }}
+          </div>
+          <div class="col-6" *ngIf="designRequest.idDesignRequestParentStatus === 1">
+            <b> Other </b> <br />
+            {{ designRequest.other }}
+            <br />
+            <br />
+          </div>
+          
+          <hr class="col-12" />
+
+          <div *ngIf="designRequest.idDesignRequestParentStatus === 1" class="col-12">
+            <div no-lines class="fix-disabled">
+              <label>
+                <b> Designer's Criteria? </b>
+              </label>
+              <br />
+              <ng-toggle
+                onColor="success"
+                onText="Yes"
+                disabled
+                offColor="danger"
+                offText="No"
+                [(ngModel)]="designRequest.designerCriteria"
+              >
+              </ng-toggle>
+            </div>
+            <br />
+            <span *ngIf="!designRequest.designerCriteria">
+              <b> Specified Colores </b> <br />>
+              {{ designRequest.specifiedColors }}
+              <br />
+            </span>
+          </div>
+          <div class="col-12">
+            <div no-lines class="fix-disabled">
+              <label class="mr-2">
+                <b> Is ready to work? </b>
+              </label>
+              <br />
+              <ng-toggle
+                onColor="success"
+                onText="Yes"
+                disabled
+                offColor="danger"
+                offText="No"
+                [(ngModel)]="designRequest.is_ready"
+              >
+              </ng-toggle>
+            </div>
+            <br />
+          </div>
+        </div>
+
+        <!-- Timesheets -->
+        <div class="col-12">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table row-border hover"
+            *ngIf="designRequest.timesheets?.length > 0"
+          >
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Notes</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of designRequest.timesheets">
+                <td>
+                  {{ item.workDate | date: "MMM dd yyyy" }}
+                </td>
+                <td>
+                  {{ item.notes }}
+                </td>
+                <td>{{ item.workHours }} Hrs.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+
+        <!-- Use images -->
+        <div class="row">
+          <div class="col-10">
+            <h4>
+              <span *ngIf="designRequest.useImages?.length === 0"> Sin </span>
+              Imágenes a utilizar
+            </h4>
+          </div>
+          <div class="scrollmenu">
+            <div
+              style="cursor: pointer"
+              *ngFor="let image of designRequest.useImages"
+            >
+              <img
+                (click)="openFileOrImage(image)"
+                [src]="fixUrl(image)"
+                style="height: 120px"
+              />
+            </div>
+          </div>
+          <hr class="col-12" />
+        </div>
+
+        <!-- Reference images -->
+        <div class="row">
+          <div class="col-10">
+            <h4>
+              <span *ngIf="designRequest.referenceImages?.length === 0">
+                Sin
+              </span>
+              Imágenes de referencia
+            </h4>
+          </div>
+          <div class="scrollmenu">
+            <div
+              style="cursor: pointer"
+              *ngFor="let image of designRequest.referenceImages"
+            >
+              <img
+                (click)="openFileOrImage(image)"
+                [src]="fixUrl(image)"
+                style="height: 120px"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <h5 *ngIf="designRequest.notes?.length > 0" class="text-citric">Notes</h5>
+    <mat-accordion *ngFor="let item of designRequest.notes">
+      <mat-expansion-panel
+        #accordion
+        [expanded]="true"
+        style="margin-bottom: 10px"
+        [ngStyle]="{ background: item.is_private ? 'beige' : 'unset' }"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <h6 class="text-muted">
+              {{ item.is_private ? "Private" : "" }} Note #
+              {{ designRequest.idDesignRequest }}-{{ item.idDesignRequestNote }}
+            </h6>
+          </mat-panel-title>
+          <mat-panel-description>
+            <span class="text-muted">
+              {{ item.userCreatedBy }} At
+              {{ item.createdAt | date: "MMM/dd yyyy hh:mm:ss a" }}
+            </span>
+          </mat-panel-description>
+          <!-- <ion-col col-6>
+          </ion-col>
+          <ion-col col-6>
+          </ion-col> -->
+        </mat-expansion-panel-header>
+        <div class="row">
+          <span class="col-11" [innerHtml]="addClass(item.content)"> </span>
+          <div class="col-1">
+            <button
+              class="btn btn-outline-dark fixed-edit"
+              (click)="viewNote(item, design_request_note_detail)"
+            >
+              <i class="fa fa-eye"></i>
+            </button>
+            <br />
+            <button
+              class="btn btn-outline-citric fixed-edit"
+              (click)="updateNote(item, design_request_note__form_1)"
+            >
+              <i class="fa fa-edit"></i>
+            </button>
+            <br />
+            <button
+              class="btn btn-outline-danger fixed-edit"
+              (click)="deleteNote(item)"
+            >
+              <i class="fa fa-trash-alt"></i>
+            </button>
+          </div>
+          <div class="col-6">
+            <span class="subtext">
+              {{ item.userCreatedBy }}
+            </span>
+          </div>
+          <div class="col-6">
+            <span class="subtext">
+              {{ item.createdAt | date: "MMM/dd yyyy hh:mm:ss a" }}
+            </span>
+          </div>
+          <div class="col-12">
+            <hr />
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #design_request_formModal_1
+  identifier="design_request_formModal_1"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-design-request-note-form
+    #design_request_note__form_1
+    (onDismiss)="onModalDidDismiss($event)"
+  >
+  </app-design-request-note-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #design_request_form_detail_modal
+  identifier="design_request_form_detail_modal"
+  customClass="large-modal"
+>
+  <app-design-request-note-detail #design_request_note_detail>
+  </app-design-request-note-detail>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #design_request_form_edit_modal
+  identifier="design_request_form_edit_modal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-design-request-form
+    #design_request__form
+    (onDismiss)="onModalEditDidDismiss($event)"
+  >
+  </app-design-request-form>
+</ngx-smart-modal>

@@ -1,0 +1,12 @@
+<mat-select-country
+  [id]="'country_sel'"
+  #mat_select_country
+  appearance="outline"
+  [label]="label"
+  class="col-4 select-country mat-input-element mat-form-field-infix-fixed"
+  [showCallingCode]="show_country_code"
+  [value]="initial_item"
+  (onCountrySelected)="onCountrySelected($event)"
+  [itemsLoadSize]="5"
+  [excludedCountries]="[{alpha2Code:'CA'},{alpha2Code:'PR'}]"
+></mat-select-country>

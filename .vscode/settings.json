@@ -1,0 +1,14 @@
+{
+    "cSpell.words": [
+        "event",
+        "level",
+        "options",
+        "select"
+    ],
+    "explorer.compactFolders": false,
+    "angular-schematics.schematicsDefaultOptions": {
+        "angular-*": {
+            "style": "scss"
+        }
+    }
+}

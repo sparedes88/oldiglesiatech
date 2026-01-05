@@ -1,0 +1,107 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row mt-2" [hidden]="show_form">
+        <div
+          [ngClass]="currentUser.isSuperUser ? 'col-10' : 'col-12'"
+          class="mt-2 text-right"
+        >
+          <div class="btn-group col-2 mb-2 mt-3">
+            <button
+              class="btn btn-outline-citric btn-sm"
+              (click)="addPipeline(pipeline_form)"
+            >
+              <i class="fa fa-user-plus"></i> Add Pipeline
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 row totales" [hidden]="show_form">
+        <div
+          class="col-4"
+          (click)="manageClick(estadoCliente)"
+          *ngFor="let estadoCliente of pipelines"
+          [ngClass]="tabSelected == estadoCliente.nombre ? 'selected' : ''"
+        >
+          <span ion-text>
+            <b>
+              {{ estadoCliente.nombre }}
+            </b>
+            <br />
+            {{
+              estadoCliente.valorExpectativo | currency: "USD ":"code":"2.2-2"
+            }}
+          </span>
+        </div>
+      </div>
+
+      <div class="row mt-4 mb-5">
+        <div [hidden]="show_form" class="col-md-12 table-responsive-sm">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table table-striped"
+          >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Tags</th>
+                <th>Configurations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let oportunidad of get_oportunidades">
+                <td>
+                  {{ oportunidad.nombre }}
+                </td>
+                <td>
+                  {{ oportunidad.valorExpectativo | currency }}
+                </td>
+                <td>
+                  <span
+                    ion-text
+                    *ngFor="let tag of oportunidad.tags"
+                    [ngStyle]="{
+                      background: tag.color ? '#' + tag.color : '#6c757d'
+                    }"
+                    class="tag"
+                  >
+                    {{ tag.nombre }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button
+                      class="btn btn-sm btn-warning"
+                      (click)="editPipeline(pipeline_form, oportunidad)"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="deletePipeline(oportunidad)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-12" [hidden]="!show_form">
+          <app-pipeline-form
+            (dismiss_form)="dismissPipelineForm($event)"
+            style="width: 100%"
+            #pipeline_form
+          >
+          </app-pipeline-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,531 @@
+<div class="card">
+  <h4 class="mb-4 p-2">Preview</h4>
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 row">
+      <div [ngClass]="setup.display_contact_info ? 'col-6' : 'col-12'">
+        <div *ngIf="mailing_list" class="row">
+          <div
+            class="col-12 col-sm-4 col-md-2 align-self-center"
+            *ngIf="mailing_list"
+          >
+            <div class="logo-container">
+              <img [src]="base_url + mailing_list.organization.logo" />
+            </div>
+          </div>
+          <h1
+            class="header-element align-self-center"
+            [ngClass]="
+              mailing_list.organization.logo
+                ? 'col-12 col-sm-8 col-md-10'
+                : 'col-12'
+            "
+          >
+            {{ mailing_list.organization.name }}
+          </h1>
+          <h4 class="col-12">{{ setup.header_text }}</h4>
+        </div>
+        <form [formGroup]="setup_form" class="row justify-content-center">
+          <div [ngClass]="getClasses('first_name')" class="col-12 col-md-6">
+            <div class="form-group">
+              <label class="label"> {{ lang.keys["first_name"] }} </label>
+              <input
+                type="text"
+                name="first_name"
+                class="form-control mb-1"
+                [placeholder]="lang.keys['your_first_name']"
+                formControlName="first_name"
+                [required]="setup.first_name_required_input"
+                [class.is-invalid]="setup_form.get('first_name').invalid"
+              />
+            </div>
+          </div>
+          <div [ngClass]="getClasses('last_name')" class="col-12 col-md-6">
+            <div class="form-group">
+              <label class="label"> {{ lang.keys["last_name"] }}</label>
+              <input
+                type="text"
+                name="last_name"
+                class="form-control mb-1"
+                [placeholder]="lang.keys['your_last_name']"
+                formControlName="last_name"
+                [required]="setup.last_name_required_input"
+                [class.is-invalid]="setup_form.get('last_name').invalid"
+              />
+            </div>
+          </div>
+          <div
+            [ngClass]="getClasses('email')"
+            [hidden]="setup.hide_email_input"
+            class="col-12 col-md-6"
+          >
+            <div class="form-group">
+              <label class="label">Email</label>
+              <div class="control has-icons-left">
+                <input
+                  type="email"
+                  name="email"
+                  class="input"
+                  [placeholder]="lang.keys['your_email']"
+                  formControlName="email"
+                  [required]="setup.email_required_input"
+                  [class.is-invalid]="setup_form.get('email').invalid"
+                />
+                <span class="icon is-small is-left">
+                  <i class="fas fa-at"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div [ngClass]="getClasses('phone')" class="col-12 col-md-6">
+            <div class="form-group">
+              <label class="label">
+                {{ lang.keys["phone_number"] }}
+              </label>
+              <div class="control has-icons-left">
+                <input
+                  required
+                  class="input"
+                  type="tel"
+                  [placeholder]="lang.keys['your_phone_number']"
+                  name="phone"
+                  formControlName="phone"
+                  [required]="setup.phone_required_input"
+                  [class.is-invalid]="setup_form.get('phone').invalid"
+                />
+                <span class="icon is-small is-left">
+                  <i class="fas fa-phone"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            [ngClass]="getOrder('message')"
+            [hidden]="setup.hide_message_input"
+            class="col-12"
+          >
+            <div class="form-group">
+              <label class="label">
+                {{ setup.message_text || "Message unset" }}</label
+              >
+              <textarea
+                type="text"
+                name="message"
+                class="form-control mb-1"
+                rows="5"
+                [placeholder]="setup.message_text || 'Message unset'"
+                formControlName="message"
+                [required]="setup.message_required_input"
+                [class.is-invalid]="setup_form.get('message').invalid"
+              ></textarea>
+            </div>
+          </div>
+
+          <div
+            [ngClass]="getOrder('custom')"
+            [hidden]="setup.hide_custom_input"
+            class="col-12"
+          >
+            <div class="form-group">
+              <label class="label">
+                {{ setup.custom_text || "Label unset" }}</label
+              >
+              <input
+                class="form-control mb-1"
+                name="custom"
+                [hidden]="!setup.inline"
+                [type]="setup.custom_type"
+                [placeholder]="setup.custom_placeholder || 'Placeholder unset'"
+                [required]="setup.custom_required_input"
+                [class.is-invalid]="setup_form.get('custom').invalid"
+                formControlName="custom"
+              />
+              <textarea
+                [hidden]="setup.inline"
+                name="custom"
+                class="form-control mb-1"
+                [rows]="setup.row_size || 5"
+                [placeholder]="setup.custom_placeholder || 'Placeholder unset'"
+                formControlName="custom"
+                [required]="setup.custom_required_input"
+                [class.is-invalid]="setup_form.get('custom').invalid"
+              ></textarea>
+            </div>
+          </div>
+          <div
+            [ngClass]="
+              setup.display_e_group_question || setup.display_e_team_question
+                ? 'd-none'
+                : 'd-block'
+            "
+            class="col-12 mt-4 order-6"
+          >
+            <button
+              [ngStyle]="{
+                'background-color': setup.button_settings.button_color,
+                color: setup.button_settings.text_color,
+                width: setup.button_settings.width + '%',
+                'text-align': setup.button_settings.align,
+                'border-radius': setup.button_settings.border_radius + 'px'
+              }"
+              class="subscribe-button button is-itech"
+              type="submit"
+            >
+              {{ setup.button_settings.text }}
+            </button>
+          </div>
+        </form>
+      </div>
+      <div *ngIf="setup.display_contact_info" class="col-6">
+        <div class="row p-0 w-100">
+          <div *ngIf="!setup.hide_address" class="row col-12 align-self-center">
+            <i
+              [ngStyle]="{
+                color: setup.icon_color ? setup.icon_color : '#ff7f50'
+              }"
+              class="
+                fas
+                fa-map-marker-alt
+                resized-fa-icon
+                col-3 col-md-2
+                text-center
+                align-self-center
+                p-0
+              "
+            ></i>
+            <div
+              *ngIf="mailing_list"
+              class="col-9 col-md-10 align-self-center p-0"
+            >
+              <h4 class="bold my-0">{{ lang.keys["address"] }}</h4>
+              <span
+                [ngClass]="{
+                  'not-provided': !mailing_list.organization.street
+                }"
+              >
+                {{ mailing_list.organization.street || "-- No street --" }}
+              </span>
+              <span
+                [ngClass]="{ 'not-provided': !mailing_list.organization.city }"
+              >
+                {{ mailing_list.organization.city || "-- No city --" }},
+              </span>
+              <span
+                [ngClass]="{ 'not-provided': !mailing_list.organization.state }"
+              >
+                {{ mailing_list.organization.state || "-- No state --" }}
+              </span>
+              <span
+                [ngClass]="{
+                  'not-provided': !mailing_list.organization.zip_code
+                }"
+              >
+                {{ mailing_list.organization.zip_code || "-- No zip code --" }}
+              </span>
+            </div>
+          </div>
+          <!-- Phones -->
+          <div
+            *ngIf="!setup.hide_phones"
+            class="row col-12 align-self-center mt-4"
+          >
+            <i
+              [ngStyle]="{
+                color: setup.icon_color ? setup.icon_color : '#ff7f50'
+              }"
+              class="
+                fas
+                fa-phone-alt
+                resized-fa-icon
+                col-3 col-md-2
+                text-center
+                align-self-center
+                p-0
+              "
+            ></i>
+            <div class="col-9 col-md-10 align-self-center p-0">
+              <h4 class="bold my-0">{{ lang.keys["contact_phone"] }}</h4>
+              <span
+                *ngIf="contact_info.phones?.length === 0"
+                class="not-provided"
+              >
+                -- No phones provided --
+              </span>
+              <ul class="p-0" style="list-style-type: none">
+                <li
+                  *ngFor="let phone of contact_info.phones"
+                  class="form-group mb-0"
+                >
+                  <a class="text-400 text-dark" [href]="'tel:' + phone.phone">
+                    {{ phone.phone }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- Emails -->
+          <div
+            *ngIf="!setup.hide_emails"
+            class="row col-12 align-self-center mt-4"
+          >
+            <i
+              [ngStyle]="{
+                color: setup.icon_color ? setup.icon_color : '#ff7f50'
+              }"
+              class="
+                fas
+                fa-envelope
+                resized-fa-icon
+                col-3 col-md-2
+                text-center
+                align-self-center
+                p-0
+              "
+            ></i>
+            <div class="col-9 col-md-10 align-self-center p-0">
+              <h4 class="bold my-0">{{ lang.keys["contact_email"] }}</h4>
+              <span
+                *ngIf="contact_info.emails?.length === 0"
+                class="not-provided"
+              >
+                -- No emails provided --
+              </span>
+              <ul class="p-0" style="list-style-type: none">
+                <li
+                  *ngFor="let email of contact_info.emails"
+                  class="form-group mb-0"
+                >
+                  <a class="text-400 text-dark" :href="'mailto:' + email.email">
+                    {{ email.email }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- Sunday Service -->
+          <div
+            *ngIf="setup.sunday_service && !setup.hide_sunday_service"
+            class="row col-12 align-self-center mt-4"
+          >
+            <i
+              [ngStyle]="{
+                color: setup.icon_color ? setup.icon_color : '#ff7f50'
+              }"
+              class="
+                fas
+                fa-calendar
+                resized-fa-icon
+                col-3 col-md-2
+                text-center
+                align-self-center
+                p-0
+              "
+            ></i>
+            <div
+              class="col-9 col-md-10 align-self-center"
+              style="position: relative"
+            >
+              <h4 class="bold my-0">{{ lang.keys["sunday_service"] }}</h4>
+              <span
+                class="fixed-span-sunday"
+                style="
+                  white-space: pre-line;
+                  position: absolute;
+                  display: contents;
+                "
+              >
+                {{ setup.sunday_service }}
+              </span>
+            </div>
+          </div>
+          <div
+            class="mt-4 col-12 align-self-center row d-none d-sm-block"
+            *ngIf="setup.picture && !setup.hide_picture"
+          >
+            <div class="img-container">
+              <img [src]="base_url + setup.picture" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="mt-4 col-12 col-sm-6 d-sm-none offset-sm-6 align-self-center row"
+        *ngIf="setup.picture && !setup.hide_picture"
+      >
+        <div class="img-container">
+          <img [src]="base_url + setup.picture" />
+        </div>
+      </div>
+      <div *ngIf="setup" class="row col-12 mt-2">
+        <div *ngIf="setup.display_groups" class="col-12 col-md-6">
+          <div class="form-group">
+            <label class="label">
+              {{ lang.keys["want_to_belong_groups"] }}
+            </label>
+            <div class="form-group mb-0">
+              <ul class="p-0" style="list-style-type: none">
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  Check All
+                </li>
+
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  Group example <small class="text-secondary">
+                    (For preview purposes)
+                  </small>
+                </li>
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  No, thanks
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="setup.display_events" class="col-12 col-md-6">
+          <div class="form-group">
+            <label class="label">
+              {{ lang.keys["want_to_belong_events"] }}
+            </label>
+            <div class="form-group mb-0">
+              <ul class="p-0" style="list-style-type: none">
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  Check All
+                </li>
+
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  Event Example <small class="text-secondary">
+                    (For preview purposes)
+                  </small>
+                </li>
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  No, thanks
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="w-100"></div>
+        <div *ngIf="setup.display_e_group_question" class="col-12 col-md-6">
+          <div class="form-group">
+            <label class="label">
+              <span
+                [ngClass]="{
+                  'text-secondary italic text-300': !setup.question_1_text
+                }"
+              >
+                {{ setup.question_1_text || "Please provide a question" }}
+              </span>
+            </label>
+            <div *ngIf="!setup.question_1_as_check" class="control">
+              <label class="radio">
+                <input
+                  v-model="subscriptionForm.e_group"
+                  value="true"
+                  type="radio"
+                  name="e_group"
+                />
+                {{ setup.question_1_answer_1 || lang.keys["yes"] }}
+              </label>
+              <label class="radio ml-3">
+                <input
+                  v-model="subscriptionForm.e_group"
+                  value="false"
+                  type="radio"
+                  name="e_group"
+                />
+                {{ setup.question_1_answer_2 || lang.keys["no"] }}
+              </label>
+            </div>
+            <div *ngIf="setup.question_1_as_check" class="form-group mb-0">
+              <ul class="p-0" style="list-style-type: none">
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  {{ setup.question_1_answer_1 || lang.keys["yes"] }}
+                </li>
+
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  {{ setup.question_1_answer_2 || lang.keys["yes"] }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="setup.display_e_team_question" class="col-12 col-md-6">
+          <div class="form-group">
+            <label class="label">
+              <span
+                [ngClass]="{
+                  'text-secondary italic text-300': !setup.question_2_text
+                }"
+              >
+                {{ setup.question_2_text || "Please provide a question" }}
+              </span>
+            </label>
+            <div *ngIf="!setup.question_2_as_check" class="control">
+              <label class="radio">
+                <input
+                  v-model="subscriptionForm.e_team"
+                  type="radio"
+                  value="true"
+                  name="e_team"
+                />
+                {{ setup.question_2_answer_1 || lang.keys["yes"] }}
+              </label>
+              <label class="radio ml-3">
+                <input
+                  v-model="subscriptionForm.e_team"
+                  type="radio"
+                  value="false"
+                  name="e_team"
+                />
+                {{ setup.question_2_answer_2 || lang.keys["no"] }}
+              </label>
+            </div>
+            <div *ngIf="setup.question_2_as_check" class="form-group mb-0">
+              <ul class="p-0" style="list-style-type: none">
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  {{ setup.question_2_answer_1 || lang.keys["yes"] }}
+                </li>
+
+                <li class="form-group mb-0">
+                  <input type="checkbox" />
+                  {{ setup.question_2_answer_2 || lang.keys["yes"] }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        [ngClass]="
+          setup.display_e_group_question || setup.display_e_team_question
+            ? 'd-block'
+            : 'd-none'
+        "
+        class="col-12 col-sm-6 text-center mt-4"
+      >
+        <button
+          [ngStyle]="{
+            'background-color': setup.button_settings.button_color,
+            color: setup.button_settings.text_color,
+            width: setup.button_settings.width + '%',
+            'text-align': setup.button_settings.align,
+            'border-radius': setup.button_settings.border_radius + 'px'
+          }"
+          class="subscribe-button button is-itech"
+          type="submit"
+        >
+          {{ setup.button_settings.text }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,117 @@
+<div class="container">
+  <div
+    [hidden]="!hide_products || !hide_categories || !hide_status"
+    class="row"
+  >
+    <div class="col-md-12">
+      <h1 class="mt-2">Inventory</h1>
+      <div class="row justify-content-end">
+        <div class="col-md-6 text-right">
+          <button
+            class="btn btn-sm btn-outline-citric mr-2"
+            routerLink="optional-fields"
+          >
+            <!-- (click)="showProducts(inventory_product_form)" -->
+            Optional Fields
+          </button>
+          <button
+            class="btn btn-sm btn-outline-citric mr-2"
+            routerLink="products"
+          >
+            <!-- (click)="showProducts(inventory_product_form)" -->
+            Products
+          </button>
+          <button
+            class="btn btn-sm btn-success"
+            (click)="
+              addInventory(add_inventory_place_modal, add_inventory_place_form)
+            "
+          >
+            <i class="fa fa-plus"></i> Add location
+          </button>
+        </div>
+      </div>
+      <div class="row mt-2 mb-2">
+        <div class="col-md-12">
+          <table datatable class="table row-border hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Created By</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let inventario of inventory_places; let i = index">
+                <td>{{ inventario.name }}</td>
+                <td>{{ inventario.description }}</td>
+                <td>{{ inventario.created_at | date : "MMM. dd yyyy" }}</td>
+                <td>{{ inventario.user_created_by }}</td>
+                <td>
+                  <button
+                    class="btn btn-info ml-2"
+                    routerLink="place/{{ inventario.idInventoryPlace }}"
+                  >
+                    <i class="fa fa-eye"></i>
+                  </button>
+                  <button
+                    class="btn btn-danger ml-2"
+                    (click)="deleteInventoryPlace(inventario)"
+                  >
+                    <i class="fa fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <app-inventory-product-form
+    #inventory_product_form
+    (onDismiss)="hide_products = true"
+    [hidden]="hide_products"
+    [is_embed]="true"
+  >
+  </app-inventory-product-form> -->
+
+  <!-- <app-inventory-product-status-form
+    #inventory_status_form
+    (onDismiss)="hide_status = true"
+    [hidden]="hide_status"
+    [is_embed]="true"
+  >
+  </app-inventory-product-status-form> -->
+
+  <!-- <app-inventory-product-category-form
+    #inventory_category_form
+    (onDismiss)="hide_categories = true"
+    [hidden]="hide_categories"
+    [is_embed]="true"
+  >
+  </app-inventory-product-category-form> -->
+</div>
+
+<ngx-smart-modal
+  #add_inventory_place_modal
+  identifier="add_inventory_place_modal"
+  customClass="large-modal"
+  [escapable]="false"
+  [closable]="false"
+  [dismissable]="false"
+>
+  <app-inventory-place-form
+    #add_inventory_place_form
+    (onDismiss)="
+      onModalDidDismiss(
+        add_inventory_place_modal,
+        add_inventory_place_form,
+        $event
+      )
+    "
+  ></app-inventory-place-form>
+</ngx-smart-modal>

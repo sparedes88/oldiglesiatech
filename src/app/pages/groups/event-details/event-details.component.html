@@ -1,0 +1,1444 @@
+<div class="container">
+  <div class="page p-0">
+    <div class="col-12 p-0">
+      <div class="main-dashboard">
+        <!-- BANNER AREA -->
+        <div
+          class="banner-container"
+        >
+          <button
+            class="btn btn-light edit-cover-btn"
+            (click)="uploadSelectModal.open()"
+            [disabled]="uploadingCover"
+            *ngIf="!getPermissions()"
+          >
+            <i *ngIf="!uploadingCover" class="fa fa-edit"></i>
+            <i *ngIf="uploadingCover" class="fa fa-spinner fa-spin"></i>
+          </button>
+          <img class="original" [src]="fixCover()" alt="">
+          <img class="blurred" [src]="fixCover()" alt="">
+          <h2 class="organization-name-h2">{{ group_event?.name }}</h2>
+        </div>
+    <div class="col-12" [hidden]="!show_detail_loading">
+      <ng-template [ngIf]="show_detail_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+    <div
+      [hidden]="show_detail_loading"
+      class="row"
+      style="margin: 0px !important"
+    >
+      <div class="col-12 p-0">
+        <div class="main-dashboard">
+
+
+          <div
+            class="row general_info"
+            [ngClass]="
+              !currentUser || display_already_member || login_complete
+                ? 'pt-5'
+                : 0
+            "
+          >
+            <div
+              [hidden]="
+                !currentUser || display_already_member || login_complete
+              "
+              [ngClass]="{ disabled_menu: !currentUser }"
+              class="col-3 col-md-3 pr-0"
+            >
+            <div *ngIf="origin === 'profile' && group_event?.idOrganization" class="my-2 px-0">
+              <button (click)="backToSearch()" class="btn btn-sm btn-outline-citric">
+                <i class="fa fa-arrow-left"></i> Back to Profile
+              </button>
+            </div>
+              <div class="menu-container">
+                <div
+                  class="nav flex-column nav-pills navbar-light bg-light"
+                  id="v-pills-tab"
+                  role="tablist"
+                  aria-orientation="vertical"
+                >
+                  <a
+                    class="nav-link active text-muted padding-fixed"
+                    id="v-pills-home-tab"
+                    data-toggle="pill"
+                    href="#v-pills-home"
+                    role="tab"
+                    aria-controls="v-pills-home"
+                    aria-selected="true"
+                  >
+                    {{ currentUser ? "Home" : "Login" }}
+                  </a>
+                  <a
+                    [hidden]="
+                      (!currentUser || currentUser?.idUserType === 2) &&
+                      !currentUser?.isSuperUser
+                    "
+                    class="nav-link text-muted padding-fixed"
+                    id="activities"
+                    data-toggle="pill"
+                    href="#v-pills-activities"
+                    role="tab"
+                    aria-controls="v-pills-activities"
+                    aria-selected="false"
+                  >
+                    Activities
+                  </a>
+                  <a
+                    [hidden]="
+                      (!currentUser || currentUser?.idUserType === 2) &&
+                      !currentUser?.isSuperUser
+                    "
+                    class="nav-link text-muted padding-fixed"
+                    id="reviews"
+                    data-toggle="pill"
+                    href="#v-pills-reviews"
+                    role="tab"
+                    aria-controls="v-pills-reviews"
+                    aria-selected="false"
+                  >
+                    Reviews
+                  </a>
+                  <a
+                    [hidden]="
+                      (!currentUser || currentUser?.idUserType === 2) &&
+                      !currentUser?.isSuperUser
+                    "
+                    class="nav-link text-muted padding-fixed"
+                    id="finances"
+                    data-toggle="pill"
+                    href="#v-pills-finances"
+                    role="tab"
+                    aria-controls="v-pills-finances"
+                    aria-selected="false"
+                  >
+                    Finances
+                  </a>
+                  <a
+                    [hidden]="
+                      (!currentUser || currentUser?.idUserType === 2) &&
+                      !currentUser?.isSuperUser
+                    "
+                    class="nav-link text-muted padding-fixed"
+                    id="attendances"
+                    data-toggle="pill"
+                    href="#v-pills-attendances"
+                    role="tab"
+                    aria-controls="v-pills-attendances"
+                    aria-selected="false"
+                  >
+                    Attendances
+                    <span class="text-citric" id="members-count">
+                      {{ group_event?.attendances_count }}
+                    </span>
+                    /
+                    <span class="text-citric" id="members-count">
+                      {{ group_event?.attendances_total }}
+                    </span>
+                    <span *ngIf="group_event?.attendances_available">
+                      <br />( {{ group_event?.attendances_total }}/
+                      {{ group_event?.attendances_available }}
+                      )
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- With User -->
+            <div
+              *ngIf="currentUser && actual_user_status === 'group_detail'"
+              class="col-12 col-md-9 pl-0"
+              [hidden]="show_detail_loading"
+            >
+              <div class="tab-content" id="v-pills-tabContent">
+                <div class="row">
+                  <div class="col-12 pt-2">
+                    <button
+                      class="btn btn-sm btn-citric float-right"
+                      type="button"
+                      [routerLink]="getGroupRouter().link"
+                    >
+                      Back to {{ getGroupRouter().place | titlecase }}
+                    </button>
+                  </div>
+                </div>
+                <!-- Home Tab -->
+                <div
+                  class="tab-pane fade show active"
+                  id="v-pills-home"
+                  role="tabpanel"
+                  aria-labelledby="v-pills-home-tab"
+                >
+                <div class="row m">
+                  <div class="col-12 col-md-8 mb-3">
+                    General Info
+                    <div class="card scrollable">
+                      <form #group_form="ngForm" [formGroup]="formGroup">
+                        <div class="mx-0 row card-body">
+                          <div class="col-12">
+                            <div class="form-group">
+                              <label>Name* </label>
+                              <input
+                                type="text"
+                                required
+                                class="form-control mb-1"
+                                placeholder="Enter your name's group_event."
+                                [readonly]="getPermissions()"
+                                formControlName="name"
+                                [class.is-invalid]="
+                                  formGroup.get('name').dirty &&
+                                  formGroup.get('name').invalid
+                                "
+                              />
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <div class="form-group">
+                              <label>Description</label>
+                              <textarea
+                                type="text"
+                                required
+                                class="form-control mb-1"
+                                placeholder="Enter a short description."
+                                formControlName="description"
+                                [readonly]="getPermissions()"
+                                [class.is-invalid]="
+                                  formGroup.get('description').dirty &&
+                                  formGroup.get('description').invalid
+                                "
+                              ></textarea>
+                            </div>
+                          </div>
+
+
+                          <div
+                            class="col-12 text-center my-3"
+                            *ngIf="!getPermissions()"
+                          >
+                            <button
+                              [disabled]="formGroup.invalid"
+                              type="button"
+                              (click)="submitForm(formGroup)"
+                              class="btn btn-sm btn-success"
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-4 mb-3 mt-4">
+                    <div class="card scrollable">
+                      <div class="mx-0 row card-body justify-content-center">
+                        <div class="col-12 text-center">
+                          <small class="text-secondary">
+                            Share this QR with someone by clicking on it or
+                            ask to scan it using the app to join to the
+                            event.
+                          </small>
+                          <ngx-qrcode
+                            #qr_code
+                            class="col-2"
+                            (click)="shareQR(qr_code)"
+                            style="width: 50px; height: 50px"
+                            [qrc-value]="iframeCode.link"
+                            [qrc-class]="'qrItemResize-dash'"
+                            qrc-errorCorrectionLevel="M"
+                          >
+                          </ngx-qrcode>
+                          <button
+                            (click)="shareQR(qr_code)"
+                            class="btn btn-sm btn-citric"
+                          >
+                            Copy QR
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+
+                <!-- Activities Tab -->
+                <div
+                  class="tab-pane fade"
+                  id="v-pills-activities"
+                  role="tabpanel"
+                  aria-labelledby="activities"
+                >
+                  <div class="col-12 mb-3">
+                    Activities
+                    <div class="card">
+                      <form #group_form="ngForm" [formGroup]="formGroup">
+                        <div class="row card-body">
+                          <app-view-event-activities
+                            #view_event_activities_form
+                            [show_dismiss]="false"
+                          >
+                          </app-view-event-activities>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Reviews Tab -->
+                <div
+                  class="tab-pane fade"
+                  id="v-pills-reviews"
+                  role="tabpanel"
+                  aria-labelledby="reviews"
+                >
+                  <div class="col-12 mb-3">
+                    Reviews
+                    <div class="card scrollable">
+                      <form #group_form="ngForm" [formGroup]="formGroup">
+                        <div class="row card-body">
+                          <app-view-event-reviews
+                            #view_event_reviews_form
+                            [show_dismiss]="false"
+                          >
+                          </app-view-event-reviews>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Finances Tab -->
+                <div
+                  class="tab-pane fade"
+                  id="v-pills-finances"
+                  role="tabpanel"
+                  aria-labelledby="finances"
+                >
+                  <div class="col-12 mb-3">
+                    Finances
+                    <div class="card scrollable">
+                      <form #group_form="ngForm" [formGroup]="formGroup">
+                        <div class="row card-body">
+                          <app-view-event-finances
+                            #view_event_finances_form
+                            [show_dismiss]="false"
+                          >
+                          </app-view-event-finances>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Finances Tab -->
+                <div
+                  class="tab-pane fade"
+                  id="v-pills-attendances"
+                  role="tabpanel"
+                  aria-labelledby="attendances"
+                >
+                  <div class="col-12 mb-3">
+                    Attendances
+                    <div class="card">
+                      <form #group_form="ngForm" [formGroup]="formGroup">
+                        <div class="row card-body">
+                          <app-view-event-attendance
+                            #view_event_attendances_form
+                            [show_dismiss]="false"
+                            (refresh_totals)="refreshTotals($event)"
+                          >
+                          </app-view-event-attendance>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Without User -->
+            <div
+              *ngIf="
+                !currentUser ||
+                actual_user_status === 'display_already_member' ||
+                actual_user_status === 'login' ||
+                actual_user_status === 'how_many'
+              "
+              class="col-12 px-6"
+              [hidden]="show_detail_loading"
+            >
+              <div class="tab-content" id="v-pills-tabContent">
+                <div
+                  class="row"
+                  *ngIf="display_register_form && !display_reset_form"
+                >
+                  <!-- <div class="col-12 pt-2">
+                    <button
+                      class="btn btn-sm btn-citric float-right"
+                      type="button"
+                      (click)="hideRegisterForm()"
+                    >
+                      Back to Login
+                    </button>
+                  </div> -->
+                </div>
+                <!-- Home Tab -->
+                <div
+                  class="tab-pane fade show active"
+                  id="v-pills-home"
+                  role="tabpanel"
+                  aria-labelledby="v-pills-home-tab"
+                >
+                  <div class="col-12 mb-3">
+                    <div class="card">
+                      <div class="card-body" *ngIf="!start_register">
+                        <h3 class="mt-3 text-dark">
+                          {{ group_event?.name }}
+                        </h3>
+                        <h5 class="text-secondary">
+                          {{ group_event?.description }}
+                        </h5>
+                        <hr>
+                        <h4 class="mt-3 text-dark">
+                          Date and time
+                        </h4>
+                        <h5 class="text-secondary">
+                          <span class="text-citric">
+                            {{ group_event?.meta?.start_date }}
+                            <span
+                              *ngIf="
+                                group_event?.meta?.end_date && !group_event?.meta?.is_same_date
+                              "
+                            >
+                              -
+                              {{ group_event?.meta?.end_date }}</span
+                            >
+                            <br />
+                            {{ group_event?.meta?.start_time }}
+                            <span *ngIf="group_event?.meta?.end_time && !group_event?.meta?.is_same_hour">
+                              - {{ group_event?.meta?.end_time }}</span
+                            >
+                          </span>
+                        </h5>
+                        <h4 class="mt-3 text-dark">
+                          Location
+                        </h4>
+                        <h6 class="text-secondary">
+                          {{ group_event?.full_address }}
+                        </h6>
+                        <div class="text-center">
+                          <hr>
+
+                          <button class="btn btn-sm btn-citric" (click)="start_register = true">
+                            Register
+                          </button>
+                        </div>
+                      </div>
+
+                      <app-get-started
+                        *ngIf="
+                          start_register &&
+                          !actual_user_status &&
+                          actual_user_status !== 'display_already_member'
+                        "
+                        [get_started_form]="full_form.get('get_started_form')"
+                        [currentUser]="currentUser"
+                        [group_event]="group_event"
+                        (user_status)="getUserStatus($event)"
+                        [header_message]="'events.verify_email_or_phone_disclaimer' | translate"
+                        [login_text_button]="'generals.verify' | translate"
+                      >
+                      </app-get-started>
+
+                      <app-login-portal
+                        *ngIf="
+                          (actual_user_status === 'checked_in_organization' ||
+                            actual_user_status === 'checked_not_available') &&
+                          actual_user_status !== 'display_already_member'
+                        "
+                        [currentUser]="currentUser"
+                        [group_event]="group_event"
+                        [full_form]="full_form"
+                        [login_form]="full_form.get('login_form')"
+                        (cancel_login)="cancelForm()"
+                        (login_response)="loginResponse($event)"
+                        (open_reset)="openResetPassword($event)"
+                      ></app-login-portal>
+
+                      <app-successful-registration
+                        *ngIf="actual_user_status === 'display_already_member'"
+                        [currentUser]="currentUser"
+                        [group_event]="group_event"
+                        (redirect)="handleRedirectByRole($event)"
+                      >
+                      </app-successful-registration>
+
+                      <div *ngIf="actual_user_status === 'checked_ok'">
+                        <app-create-account-portal
+                          [full_form]="full_form"
+                          [register_form]="full_form.get('register_form')"
+                          [currentUser]="currentUser"
+                          [group_event]="group_event"
+                          (cancel_login)="cancelRegister()"
+                          (register_response)="
+                            selectLoginUser($event);
+                            showHowManyForm($event)
+                          "
+                        >
+                        </app-create-account-portal>
+                      </div>
+                      <!-- How Many? -->
+                      <div *ngIf="actual_user_status === 'how_many'">
+                        <app-how-many-portal
+                          [full_form]="full_form"
+                          [additional_form]="full_form.get('additional_form')"
+                          [currentUser]="currentUser"
+                          [group_event]="group_event"
+                          (cancel_login)="cancelRegister()"
+                          (accept_response)="acceptInvitation($event)"
+                        >
+                        </app-how-many-portal>
+                      </div>
+
+                      <div *ngIf="actual_user_status === 'reset_password'">
+                        <app-reset-password
+                          [full_form]="full_form"
+                          [login_form]="full_form.get('login_form')"
+                          [currentUser]="currentUser"
+                          [group_event]="group_event"
+                          (cancel_login)="getUserStatus($event)"
+                        >
+                        </app-reset-password>
+                      </div>
+
+                      <!-- Login Form -->
+                      <!-- <form
+                        *ngIf="
+                          display_login_form &&
+                          !login_complete &&
+                          !display_already_member
+                        "
+                        #group_form="ngForm"
+                        [formGroup]="login_form"
+                      >
+                        <div class="px-5">
+                          <h2
+                            class="text-citric text-center"
+                            *ngIf="!currentUser"
+                          >
+                            LOGIN PORTAL
+                          </h2>
+                          <h4 class="text-citric">
+                            <span class="text-secondary">
+                              In order to register for:
+                              <h6>
+                                {{ group_event?.name }}
+                                {{
+                                  group_event?.start_date ||
+                                    group_event?.event_date | date: "MMMM dd"
+                                }}
+                                <br />
+                                <br />
+                                {{ group_event?.event_time_start }}
+                                <br />
+                                <br />
+                                {{ group_event?.description }}
+                                <br />
+                              </h6>
+                            </span>
+                          </h4>
+                        </div>
+
+                        <div class="row card-body is-vh-centered">
+                          <div class="col-12"></div>
+                          <div class="col-8">
+                            <div class="form-group">
+                              <label>Email * </label>
+                              <input
+                                type="text"
+                                required
+                                class="form-control mb-1"
+                                placeholder="Enter your email."
+                                formControlName="usuario"
+                                [class.is-invalid]="
+                                  login_form.get('usuario').dirty &&
+                                  login_form.get('usuario').invalid
+                                "
+                              />
+                            </div>
+                          </div>
+                          <div class="col-8">
+                            <div class="form-group">
+                              <label>Password * </label>
+                              <input
+                                type="password"
+                                required
+                                class="form-control mb-1"
+                                placeholder="Enter your password."
+                                formControlName="password"
+                                [class.is-invalid]="
+                                  login_form.get('password').dirty &&
+                                  login_form.get('password').invalid
+                                "
+                              />
+                            </div>
+                          </div>
+
+                          <div
+                            [formGroup]="additional_form"
+                            class="row col-10 align-items-center justify-content-center center-fix mb-2"
+                          >
+                            <div class="col-2 col-md-2 text-center">
+                              <button
+                                [disabled]="
+                                  additional_form.get('guests').value <= 0
+                                "
+                                ion-button
+                                (click)="addQuantity(-1)"
+                                class="btn btn-danger circular-button"
+                              >
+                                <mat-icon matPrefix>remove</mat-icon>
+                              </button>
+                            </div>
+                            <div class="col-8 col-md-6">
+                              <div no-lines class="center-fix">
+                                <label
+                                  floating
+                                  class="text-muted"
+                                  class="width-fix"
+                                >
+                                  How many come with you
+                                </label>
+                                <input
+                                  class="col-12 align-center-fixer"
+                                  formControlName="guests"
+                                  type="number"
+                                  readonly
+                                  required
+                                />
+                              </div>
+                            </div>
+                            <div class="col-2 col-md-2 text-center">
+                              <button
+                                (click)="addQuantity(1)"
+                                ion-button
+                                class="btn btn-success circular-button"
+                              >
+                                <mat-icon matPrefix>add</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div
+                            [formGroup]="additional_form"
+                            class="col-8 align-self-center text-left mb-4"
+                          >
+                            <input
+                              type="checkbox"
+                              id="acceptance"
+                              name="customRadio"
+                              class="custom-control-input"
+                              formControlName="covid_quest"
+                              [checked]="
+                                additional_form.get('covid_quest').value
+                              "
+                              (click)="
+                                toggleAcceptace(additional_form, 'covid_quest')
+                              "
+                            />
+                            <span
+                              class="checkmark"
+                              (click)="
+                                toggleAcceptace(additional_form, 'covid_quest')
+                              "
+                            ></span>
+                            <label
+                              style="cursor: pointer"
+                              class="custom-control-label"
+                              for="acceptance"
+                            >
+                              Have you been in touch with someone who has
+                              Covid-19 in the last 14 days?
+                            </label>
+                          </div>
+
+                          <div class="text-center col-6">
+                            <button
+                              class="btn btn-sm btn-citric"
+                              (click)="makeLogin(login_form)"
+                            >
+                              Login
+                            </button>
+                          </div>
+
+                          <div class="col-6">
+                            <a
+                              class="login_link"
+                              (click)="showResetPassForm()"
+                              class="mt-2"
+                            >
+                              Forgot password?</a
+                            >
+                          </div>
+
+                        </div>
+                      </form> -->
+
+                      <!-- Register Form -->
+                      <!-- <div
+                        *ngIf="
+                          display_register_form &&
+                          !login_complete &&
+                          !display_already_member
+                        "
+                      >
+                        <h2
+                          class="text-citric text-center"
+                          *ngIf="!currentUser"
+                        >
+                          <span
+                            *ngIf="
+                              !(
+                                register_form.get('email').valid &&
+                                userAvailable &&
+                                !errorChecking
+                              ) && !display_reset_form
+                            "
+                          >
+                            GET STARTED
+                          </span>
+                          <span
+                            *ngIf="
+                              register_form.get('email').valid &&
+                              userAvailable &&
+                              !errorChecking
+                            "
+                          >
+                            CREATE AN ACCOUNT
+                          </span>
+
+                          <span
+                            *ngIf="
+                              !(
+                                register_form.get('email').valid &&
+                                userAvailable &&
+                                !errorChecking
+                              ) && display_reset_form
+                            "
+                          >
+                            FORGOT PASSWORD
+                          </span>
+                        </h2>
+                        <h6
+                          class="text-citric text-center"
+                          *ngIf="
+                            !(
+                              register_form.get('email').valid &&
+                              userAvailable &&
+                              !errorChecking
+                            )
+                          "
+                        >
+                          <span *ngIf="!display_reset_form">
+                            In order to register for this event, let's verify
+                            your <b> email </b> or <b>phone number</b>
+                          </span>
+                          <span *ngIf="display_reset_form">
+                            Please type in your email and hit send. You will
+                            receive an email confirmation.
+                          </span>
+                        </h6>
+
+                        <div class="row card-body is-vh-centered">
+                          <div class="col-12">
+                            <div
+                              #basic_form="ngForm"
+                              [formGroup]="register_form"
+                              style="width: 100%"
+                            >
+                              <div class="row is-vh-centered">
+                                <div class="col-12 col-md-9">
+                                  <div class="form-group">
+                                    <!- <div class="input-group mb-2">
+                                      <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                          <i class="fa fa-at"></i>
+                                        </div>
+                                      </div>
+                                      <input
+                                        class="form-control col-12"
+                                        type="email"
+                                        formControlName="email"
+                                        required
+                                        [readonly]="
+                                          loading || display_full_form
+                                        "
+                                        (keydown)="startTimeout()"
+                                      />
+                                    </div> ->
+                                    <div class="input-group mb-2">
+                                      <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                          <i class="fa fa-at"></i>
+                                        </div>
+                                      </div>
+                                      <input
+                                        class="form-control col-12"
+                                        type="text"
+                                        formControlName="value_to_verify"
+                                        required
+                                        [readonly]="
+                                          loading || display_full_form
+                                        "
+                                        (keydown)="startTimeout()"
+                                      />
+                                    </div>
+                                  </div>
+
+                                </div>
+                                <div class="col-12"></div>
+
+                                <div
+                                  class="col-6 col-md-3 text-center align-self-center"
+                                >
+                                  <button
+                                    *ngIf="
+                                      display_register_form &&
+                                      !display_reset_form
+                                    "
+                                    class="btn btn-sm btn-citric"
+                                    type="button"
+                                    [disabled]="
+                                      register_form.get('value_to_verify')
+                                        .invalid
+                                    "
+                                    (click)="validateInputType()"
+                                  >
+                                    Verify
+                                  </button>
+
+                                  <button
+                                    *ngIf="display_reset_form"
+                                    class="btn btn-sm btn-citric"
+                                    type="button"
+                                    [disabled]="
+                                      register_form.get('email').invalid
+                                    "
+                                    (click)="sendRecoveryEmail(register_form)"
+                                  >
+                                    Send
+                                  </button>
+                                </div>
+
+                                <div
+                                  *ngIf="display_reset_form"
+                                  class="col-6 text-center"
+                                >
+                                  <button
+                                    [disabled]="serverBusy"
+                                    (click)="cancelResetForm()"
+                                    class="btn btn-sm btn-outline-danger"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+
+                                <div
+                                  class="row col-12"
+                                  [hidden]="!display_full_form"
+                                >
+                                  <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                      <label for="estimated">
+                                        First Name
+                                        <span class="text-danger">*</span>
+                                      </label>
+                                      <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                          <div class="input-group-text">
+                                            <i class="fa fa-align-left"></i>
+                                          </div>
+                                        </div>
+                                        <input
+                                          class="form-control"
+                                          placeholder="Your first name."
+                                          type="text"
+                                          formControlName="nombre"
+                                          required
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                      <label for="estimated">
+                                        Last Name
+                                        <span class="text-danger">*</span>
+                                      </label>
+                                      <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                          <div class="input-group-text">
+                                            <i class="fa fa-align-left"></i>
+                                          </div>
+                                        </div>
+                                        <input
+                                          class="form-control"
+                                          placeholder="Your last name."
+                                          type="text"
+                                          formControlName="apellido"
+                                          required
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div
+                                    [hidden]="
+                                      register_form.get('login_type').value ===
+                                      'phone'
+                                    "
+                                    class="col-12 col-md-4 align-items-center"
+                                  >
+                                    <div class="form-group">
+                                      <label for="estimated">
+                                        Cell Phone
+                                        <span class="text-danger">*</span>
+                                      </label>
+                                      <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                          <div class="input-group-text">
+                                            <i class="fa fa-phone"></i>
+                                          </div>
+                                        </div>
+                                        <input
+                                          class="form-control"
+                                          placeholder="(999) 999-9999."
+                                          type="tel"
+                                          formControlName="telefono"
+                                          [dropSpecialCharacters]="false"
+                                          mask="(000) 000-0000"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div
+                                    [hidden]="
+                                      register_form.get('login_type').value ===
+                                      'email'
+                                    "
+                                    class="col-12 col-md-4 align-items-center"
+                                  >
+                                    <div class="form-group">
+                                      <label for="estimated">
+                                        Email
+                                        <span class="text-danger">*</span>
+                                      </label>
+                                      <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                          <div class="input-group-text">
+                                            <i class="fa fa-phone"></i>
+                                          </div>
+                                        </div>
+                                        <input
+                                          class="form-control col-12"
+                                          type="text"
+                                          formControlName="email"
+                                          required
+                                          (keydown)="startTimeout()"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12 col-md-4">
+                                    <div class="form-group">
+                                      <label for="estimated">
+                                        Password
+                                        <span class="text-danger">*</span>
+                                      </label>
+                                      <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                          <div class="input-group-text">
+                                            <i class="fa fa-lock"></i>
+                                          </div>
+                                        </div>
+                                        <input
+                                          class="form-control"
+                                          placeholder="Type your pass."
+                                          [type]="
+                                            toggle_pass.password
+                                              ? 'password'
+                                              : 'text'
+                                          "
+                                          formControlName="password"
+                                          required
+                                        />
+
+                                        <div
+                                          class="input-group-append"
+                                          (click)="
+                                            toggle_pass.password = !toggle_pass.password
+                                          "
+                                        >
+                                          <span class="input-group-text">
+                                            <i
+                                              [ngClass]="
+                                                toggle_pass.password
+                                                  ? 'fa-eye'
+                                                  : 'fa-eye-slash'
+                                              "
+                                              class="fa"
+                                            ></i>
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <span
+                                        class="text-danger"
+                                        *ngIf="
+                                          register_form.get('password').invalid
+                                        "
+                                      >
+                                        * Please fill this info (Min 6
+                                        characters)
+                                      </span>
+                                    </div>
+                                    <br />
+                                  </div>
+                                  <div class="col-12 col-md-4">
+                                    <div class="form-group">
+                                      <label for="estimated">
+                                        Confirm Password
+                                        <span class="text-danger">*</span>
+                                      </label>
+                                      <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                          <div class="input-group-text">
+                                            <i class="fa fa-lock"></i>
+                                          </div>
+                                        </div>
+                                        <input
+                                          class="form-control"
+                                          placeholder="Confirm your pass."
+                                          [type]="
+                                            toggle_pass.confirm_password
+                                              ? 'password'
+                                              : 'text'
+                                          "
+                                          formControlName="confirm_password"
+                                          required
+                                        />
+                                        <div
+                                          class="input-group-append"
+                                          (click)="
+                                            toggle_pass.confirm_password = !toggle_pass.confirm_password
+                                          "
+                                        >
+                                          <span class="input-group-text">
+                                            <i
+                                              [ngClass]="
+                                                toggle_pass.confirm_password
+                                                  ? 'fa-eye'
+                                                  : 'fa-eye-slash'
+                                              "
+                                              class="fa"
+                                            ></i>
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <span
+                                        class="text-danger"
+                                        *ngIf="
+                                          register_form.get('password')
+                                            .value !==
+                                          register_form.get('confirm_password')
+                                            .value
+                                        "
+                                      >
+                                        * Passwords doesn't match
+                                      </span>
+                                    </div>
+                                    <br />
+                                  </div>
+
+                                  <div
+                                    [formGroup]="additional_form"
+                                    class="row col-10 align-items-center justify-content-center center-fix mb-2"
+                                  >
+                                    <div class="col-2 col-md-2 text-center">
+                                      <button
+                                        [disabled]="
+                                          additional_form.get('guests').value <=
+                                          0
+                                        "
+                                        ion-button
+                                        (click)="addQuantity(-1)"
+                                        class="btn btn-danger circular-button"
+                                      >
+                                        <mat-icon matPrefix>remove</mat-icon>
+                                      </button>
+                                    </div>
+                                    <div class="col-8 col-md-6">
+                                      <div no-lines class="center-fix">
+                                        <label
+                                          floating
+                                          class="text-muted"
+                                          class="width-fix"
+                                        >
+                                          How many come with you
+                                        </label>
+                                        <input
+                                          class="col-12 align-center-fixer"
+                                          formControlName="guests"
+                                          type="number"
+                                          readonly
+                                          required
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="col-2 col-md-2 text-center">
+                                      <button
+                                        (click)="addQuantity(1)"
+                                        ion-button
+                                        class="btn btn-success circular-button"
+                                      >
+                                        <mat-icon matPrefix>add</mat-icon>
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div
+                                    [formGroup]="additional_form"
+                                    class="col-8 align-self-center text-left mb-4"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      id="covid_quest"
+                                      name="customRadio"
+                                      class="custom-control-input"
+                                      formControlName="covid_quest"
+                                      [checked]="
+                                        additional_form.get('covid_quest').value
+                                      "
+                                      (click)="
+                                        toggleAcceptace(
+                                          additional_form,
+                                          'covid_quest'
+                                        )
+                                      "
+                                    />
+                                    <span
+                                      class="checkmark"
+                                      (click)="
+                                        toggleAcceptace(
+                                          additional_form,
+                                          'covid_quest'
+                                        )
+                                      "
+                                    ></span>
+                                    <label
+                                      style="cursor: pointer"
+                                      class="custom-control-label"
+                                      for="covid_quest"
+                                    >
+                                      Have you been in touch with someone who
+                                      has Covid-19 in the last 14 days?
+                                    </label>
+                                  </div>
+
+                                  <div
+                                    class="col-12 align-self-center text-left mb-4"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      id="acceptance"
+                                      name="customRadio"
+                                      class="custom-control-input"
+                                      formControlName="is_available"
+                                      [checked]="
+                                        register_form.get('is_available').value
+                                      "
+                                      (click)="
+                                        toggleAcceptace(
+                                          register_form,
+                                          'is_available'
+                                        )
+                                      "
+                                    />
+                                    <span
+                                      class="checkmark"
+                                      (click)="
+                                        toggleAcceptace(
+                                          register_form,
+                                          'is_available'
+                                        )
+                                      "
+                                    ></span>
+                                    <label
+                                      style="cursor: pointer"
+                                      class="custom-control-label"
+                                      for="acceptance"
+                                    >
+                                      By registering for this event, you also
+                                      creating a profile with
+                                      <b>{{
+                                        group_event?.organization_name
+                                      }}</b>
+                                      for data purposes only.
+                                    </label>
+                                  </div>
+
+                                  <div class="col-6 text-center">
+                                    <button
+                                      [disabled]="serverBusy"
+                                      (click)="cancelRegister()"
+                                      class="btn btn-sm btn-outline-danger"
+                                    >
+                                      Change email
+                                    </button>
+                                  </div>
+                                  <div class="col-6 text-center">
+                                    <button
+                                      [disabled]="
+                                        register_form.invalid || serverBusy
+                                      "
+                                      (click)="onRegister()"
+                                      class="btn btn-sm btn-citric"
+                                    >
+                                      Register Now!
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div
+                              class="disclaimer-div"
+                              *ngIf="
+                                !userAvailable && !errorChecking && isChecked
+                              "
+                            >
+                              Excellent, it looks like you have an account.
+                              <span
+                                class="login_link text-danger"
+                                (click)="
+                                  hideRegisterForm(
+                                    register_form.get('email').value
+                                  )
+                                "
+                              >
+                                Please login.
+                              </span>
+                              <br />
+                              <br />
+                              If you forgot your password, please
+                              <span
+                                (click)="showResetPassForm()"
+                                class="login_link text-danger"
+                              >
+                                click here to reset.
+                              </span>
+                            </div>
+
+                            <div
+                              class="disclaimer-div"
+                              *ngIf="
+                                register_form.get('value_to_verify').valid &&
+                                userAvailable &&
+                                !errorChecking &&
+                                !display_full_form
+                              "
+                            >
+                              <span>
+                                Excellent, it looks like you've never registered
+                                with us!
+                                <br />
+                                Please
+                                <span
+                                  class="text-danger login_link"
+                                  (click)="display_full_form = true"
+                                >
+                                  create an account
+                                </span>
+                                now in order to register for this event.
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div> -->
+
+                      <!-- REGISTER CONFIRMATION -->
+                      <!-- <div *ngIf="login_complete" class="px-5">
+                        <h2
+                          class="text-citric text-center"
+                          *ngIf="!currentUser || login_complete"
+                        >
+                          SUCCESSFUL REGISTRATION
+                        </h2>
+                        <h4 class="text-citric">
+                          <span class="text-secondary">
+                            You are now registered for the following event. You
+                            will receive an email for your registration and for
+                            this event.
+                            <h6>
+                              {{ group_event?.name }}
+                              {{
+                                group_event?.start_date ||
+                                  group_event?.event_date | date: "MMMM dd"
+                              }}
+                              <br />
+                              <br />
+                              {{ group_event?.event_time_start }}
+                              <br />
+                              <br />
+                              {{ group_event?.description }}
+                              <br />
+                              <span *ngIf="group_event?.confirmation_number">
+                                <br />
+                                <br />
+                                <b>
+                                  Confirmation Number:
+                                  {{ group_event?.confirmation_number }}
+                                </b>
+                              </span>
+                              <span *ngIf="group_event?.guests">
+                                <br />
+                                <b> Your guests: </b>
+                                {{ group_event?.guests }}
+                              </span>
+                            </h6>
+                          </span>
+                        </h4>
+
+                        <div class="row card-body is-vh-centered">
+                          <div class="col-8 text-center">
+                            <button
+                              class="btn btn-sm btn-citric"
+                              (click)="handleRedirectByRole(logged_user)"
+                            >
+                              My Profile
+                            </button>
+                          </div>
+                        </div>
+                      </div> -->
+
+                      <!-- Already member -->
+                      <!-- <div *ngIf="display_already_member" class="px-5">
+                        <h2 class="text-citric text-center">
+                          YOU HAVE ALREADY REGISTERED
+                        </h2>
+                        <h4 class="text-citric">
+                          <span class="text-secondary">
+                            You have been registered previously on this event.
+                            This is a detail about your registration:
+                            <h6>
+                              {{ group_event?.name }}
+                              {{
+                                group_event?.start_date ||
+                                  group_event?.event_date | date: "MMMM dd"
+                              }}
+                              <br />
+                              <br />
+                              {{ group_event?.event_time_start }}
+                              <br />
+                              <br />
+                              {{ group_event?.description }}
+                              <br />
+                              <span *ngIf="group_event?.confirmation_number">
+                                <br />
+                                <br />
+                                <b>
+                                  Confirmation Number:
+                                  {{ group_event?.confirmation_number }}
+                                </b>
+                              </span>
+                              <span *ngIf="group_event?.guests">
+                                <br />
+                                <b> Your guests: </b>
+                                {{ group_event?.guests }}
+                              </span>
+                            </h6>
+                          </span>
+                        </h4>
+
+                        <div class="row card-body is-vh-centered">
+                          <div class="col-8 text-center">
+                            <button
+                              class="btn btn-sm btn-citric"
+                              (click)="
+                                handleRedirectByRole(logged_user || currentUser)
+                              "
+                            >
+                              My Profile
+                            </button>
+                          </div>
+                        </div>
+                      </div> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4" [hidden]="true">
+    <div class="custom-file mb-4">
+      <input
+        #input_file
+        accept="image/*"
+        type="file"
+        class="custom-file-input"
+        id="customFile"
+      />
+      <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+  </div>
+
+  <fullscreen-modal
+    [(visible)]="visiblePixieModal"
+    (visibilityChange)="visiblePixieModal = $event"
+  >
+    <pixie-editor
+      *ngIf="visiblePixieModal"
+      (onExport)="handlePixieExport($event)"
+    ></pixie-editor>
+  </fullscreen-modal>
+
+  <ngx-smart-modal #uploadSelectModal identifier="uploadSelectModal">
+    <h4>Change event cover</h4>
+
+    <div class="mt-5 text-center">
+      <button
+        class="btn btn-success mr-2"
+        (click)="addCover(); uploadSelectModal.close()"
+      >
+        Upload photo
+        <i class="fa fa-upload"></i>
+      </button>
+
+      <button
+        class="btn btn-primary"
+        (click)="visiblePixieModal = true; uploadSelectModal.close()"
+      >
+        Create your own design
+        <i class="fa fa-image"></i>
+      </button>
+    </div>
+  </ngx-smart-modal>
+</div>

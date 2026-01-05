@@ -1,0 +1,148 @@
+<!-- <div class="example-container" cdkDropListGroup>
+  <div cdkDropList [cdkDropListEnterPredicate]="enter" (cdkDropListDropped)="drop()" #placeholder></div>
+  <div cdkDropList *ngFor="let item of items"
+       [cdkDropListEnterPredicate]="enter" (cdkDropListDropped)="drop()">
+    <div cdkDrag class="example-box">{{item}}</div>
+  </div>
+</div>  -->
+<div
+  [hidden]="!show_detail"
+  cdkDropList
+  cdkDropListOrientation="vertical"
+  [ngClass]="can_edit ? 'example-list' : ''"
+  (cdkDropListDropped)="dropLevel($event)"
+  class="row"
+  class="navbar-nav mr-auto"
+  [cdkDropListEnterPredicate]="enter"
+  #placeholder
+>
+  <div
+    [id]="getElement('drag_tech_item_1').item_id"
+    [cdkDragDisabled]="!can_edit"
+    [cdkDragLockAxis]="'y'"
+    cdkDrag
+    class="col-12 p-0"
+    [ngClass]="{
+      'example-box': can_edit,
+      is_last_element: getElement('drag_tech_item_1').is_last && can_edit
+    }"
+  >
+    <div *ngIf="can_edit" class="example-handle" cdkDragHandle>
+      <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+        ></path>
+        <path d="M0 0h24v24H0z" fill="none"></path>
+      </svg>
+    </div>
+
+    <app-map
+      *ngIf="
+        address_manager.first_item?.value.show_map &&
+        address_manager.first_item?.value.lat &&
+        address_manager.first_item?.value.lng
+      "
+      [locations]="[organization_location]"
+      [height]="300"
+      [allow_street_view]="false"
+      [disable_scroll]="true"
+    ></app-map>
+
+    <app-address-manager
+      #address_manager
+      [hidden]="!show_detail"
+      [idOrganization]="idOrganization"
+      [view_mode]="view_mode"
+      class="col-12 p-0 form-fixed"
+      [show_as_minimal]="true"
+    >
+    </app-address-manager>
+
+    <!-- <div *ngIf="!can_edit" class="row m-0 p-0">
+      <div class="col-2 text-left">
+        <i class="noColor fa fa-map-marker" aria-hidden="true"></i>
+      </div>
+      <div class="col-10 text-left">
+        <p class="card-text">
+          {{ iglesia.full_address }}
+        </p>
+      </div>
+    </div> -->
+  </div>
+  <div
+    [id]="getElement('drag_tech_item_2').item_id"
+    [cdkDragDisabled]="!can_edit"
+    [cdkDragLockAxis]="'y'"
+    cdkDrag
+    class="col-12 p-0"
+    [ngClass]="{
+      'example-box': can_edit,
+      is_last_element: getElement('drag_tech_item_2').is_last && can_edit
+    }"
+  >
+    <div *ngIf="can_edit" class="example-handle" cdkDragHandle>
+      <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+        ></path>
+        <path d="M0 0h24v24H0z" fill="none"></path>
+      </svg>
+    </div>
+    <app-organization-contact-info-form
+      [hidden]="!show_detail"
+      [idIglesia]="idOrganization"
+      [view_mode]="view_mode"
+      class="col-12 p-0 form-fixed"
+      #contact_info
+      [contact_type]="3"
+      name="Profile Contact"
+      description="This phones will be show on your organization profile."
+      [inputs_to_show]="['phones']"
+      [show_header]="false"
+      [show_as_minimal]="true"
+    >
+    </app-organization-contact-info-form>
+  </div>
+  <div
+    [id]="getElement('drag_tech_item_3').item_id"
+    [cdkDragDisabled]="!can_edit"
+    [cdkDragLockAxis]="'y'"
+    cdkDrag
+    class="col-12 p-0"
+    [ngClass]="{
+      'example-box': can_edit,
+      is_last_element: getElement('drag_tech_item_3').is_last && can_edit
+    }"
+  >
+    <div *ngIf="can_edit" class="example-handle" cdkDragHandle>
+      <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+        ></path>
+        <path d="M0 0h24v24H0z" fill="none"></path>
+      </svg>
+    </div>
+
+    <app-meetings-manager
+      #meetings_manager
+      [hidden]="!show_detail"
+      [idOrganization]="idOrganization"
+      [view_mode]="view_mode"
+      class="col-12 p-0 form-fixed"
+      [show_as_minimal]="true"
+      (refresh_meetings)="refresh_meetings.emit()"
+    >
+    </app-meetings-manager>
+
+    <!-- <div *ngIf="!can_edit" class="row m-0 p-0">
+    <div class="col-2 text-left">
+      <i class="noColor fa fa-map-marker" aria-hidden="true"></i>
+    </div>
+    <div class="col-10 text-left">
+      <p class="card-text">
+        {{ iglesia.full_address }}
+      </p>
+    </div>
+  </div> -->
+  </div>
+</div>

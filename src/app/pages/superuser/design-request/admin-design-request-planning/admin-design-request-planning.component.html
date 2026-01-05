@@ -1,0 +1,206 @@
+<div class="container page">
+  <br />
+  <div class="row">
+    <h3 class="col-6 text-citric">Planning</h3>
+    <div class="col-4">
+      <button class="btn btn-outline-citric" routerLink="/admin/design-request">
+        Back
+      </button>
+    </div>
+  </div>
+  <div class="row align-items-center">
+    <div class="col-8 col-md-3">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="category">Users</label>
+        <ng-multiselect-dropdown
+          placeholder="Select users"
+          [data]="users"
+          [settings]="selectOptions"
+          (onSelectAll)="displayWarning()"
+          (onSelect)="displayWarningOnClose($event)"
+          (onDropDownClose)="displayWarningOnClose($event)"
+          [(ngModel)]="idUser"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-8 col-md-3">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="category">Status</label>
+        <ng-multiselect-dropdown
+          placeholder="Select status"
+          [data]="dropdowns?.statuses"
+          [settings]="selectStatusOptions"
+          (onSelectAll)="displayWarning()"
+          (onSelect)="displayWarningOnClose($event)"
+          (onDropDownClose)="displayWarningOnClose($event)"
+          [(ngModel)]="idStatus"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-8 col-md-3">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="category">Status</label>
+        <ng-multiselect-dropdown
+          placeholder="Select priority"
+          [data]="dropdowns?.priorities"
+          [settings]="selectPriorityOptions"
+          (onSelectAll)="displayWarning()"
+          (onSelect)="displayWarningOnClose($event)"
+          (onDropDownClose)="displayWarningOnClose($event)"
+          [(ngModel)]="idPriorities"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-8 col-md-3">
+      <div [formGroup]="search_form" class="form-group" style="display: flex; flex-direction: column">
+        <label for="category">Deadline</label>
+        <input
+          type="date"
+          class="form-control"
+          placeholder="Deadline"
+          formControlName="deadline"
+          pattern="\d{2}-\d{2}-\d{4}" placeholder="MM-DD-YYYY"
+        />
+      </div>
+    </div>
+    <div class="col-12 text-right">
+      <button class="btn btn-outline-citric" (click)="createPlanningTable()">
+        <mat-icon matPrefix>search</mat-icon>
+        Search
+      </button>
+    </div>
+    <!-- Table -->
+
+    <!-- [dtOptions]="dtOptions"
+    [dtTrigger]="dtTrigger" -->
+    <h4 class="col-12 text-citric" *ngIf="contacts.length === 0">
+      Please select the users first and then click Search.
+    </h4>
+    <div
+      class="align-self-start col-12 col-md-3 scroll-y"
+      *ngIf="contacts.length > 0"
+    >
+      <table class="table row-border hover">
+        <thead>
+          <tr>
+            <th *ngFor="let contact of contacts">
+              {{ contact.name }} {{ contact.lastName }} <br />
+              {{ contact.total }} Tickets
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td *ngFor="let contact of contacts">
+              <button
+                class="btn btn-outline-citric"
+                (click)="addDesignRequest(design_request_form_, contact)"
+              >
+                Add Design Request
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td *ngFor="let contact of contacts">
+              <a
+                target="_blank"
+                *ngFor="let item of contact.designRequests"
+                [routerLink]="
+                  '/admin/design-request/detail/' + item.idDesignRequest
+                "
+                [queryParams]="{ origin: 'planning' }"
+              >
+                <div
+                  class="px-1"
+                  (click)="setPreview($event, item)"
+                  [ngClass]="{
+                    'in-red': item.estimatedTime == 0,
+                    'in-green': item.estimatedTime > 0 && item.is_ready,
+                    selected:
+                      item.idDesignRequest ==
+                      selected_design_request?.idDesignRequest
+                  }"
+                >
+                  <!-- (click)="goToDetail(item)" -->
+                  <b> {{ item.iglesia }} </b>
+                  <span
+                    class="status text-center"
+                    [ngStyle]="{
+                      background: item.color ? '#' + item.color : '#6c757d'
+                    }"
+                    style="width: 100px; display: inline-block"
+                  >
+                    {{ item.designRequestStatus }}
+                  </span>
+                  <br />
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'badge-secondary': item.priority == 0,
+                      'badge-info': item.priority > 0 && item.priority < 3,
+                      'badge-warning': item.priority > 2 && item.priority < 5,
+                      'badge-danger': item.priority > 4
+                    }"
+                  >
+                    {{ item.priority }}
+                  </span>
+                  {{ item.designRequestPriority || "Not assigned" }}
+                  <br />
+                  #{{ item.idDesignRequest }}:
+                  {{ item.title || "No title Provided" }} -
+                  {{ item.estimatedTime }} Hrs.
+                  <br />
+                  <b> Created at: </b>
+                  {{ item.createdAt | date }}
+                  <br />
+                  <b> Deadline: </b>
+                  {{ item.deadline | date }}
+                  <hr />
+                </div>
+              </a>
+              <span *ngFor="let item of fixedSize(contact.designRequests)">
+                <!-- This fix the style for empty items -->
+                <br />
+                <hr />
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td *ngFor="let contact of contacts; let i = index">
+              <span *ngIf="i === 0">
+                <b> Total: </b>
+              </span>
+              {{ contact.total_hours }} Hrs.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div
+      *ngIf="selected_design_request"
+      class="d-none d-md-block col-md-9 align-self-start scroll-y"
+    >
+      <app-design-request-detail
+        #design_detail
+        [idDesignRequest]="selected_design_request.idDesignRequest"
+        [is_embed]="true"
+        (close)="selected_design_request = undefined"
+      >
+      </app-design-request-detail>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #design_request_form_modal_2
+  identifier="design_request_form_modal_2"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-admin-design-request-form
+    #design_request_form_
+    (onDismiss)="onModalDidDismiss($event)"
+  >
+  </app-admin-design-request-form>
+</ngx-smart-modal>

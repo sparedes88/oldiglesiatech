@@ -1,0 +1,124 @@
+<div class="container page">
+  <div class="row">
+    <div *ngIf="!hide_title" class="col-10">
+      <h1 class="mt-2">Payment methods</h1>
+    </div>
+    <!-- <div class="col-2">
+      <div class="d-flex justify-content-right mt-3" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div> -->
+  </div>
+  <hr />
+  <div class="row col-12" [hidden]="add_new_payment">
+    <div
+      class="col-12 col-md-6 col-lg-4 row mx-0 justify-content-center mb-3"
+      *ngFor="let card of payment_methods.controls"
+    >
+      <app-card-ui
+        (click)="selectCard(card)"
+        [card_number]="card.get('last4').value"
+        [brand]="card.get('brand').value"
+        [exp_month]="card.get('exp_month').value"
+        [exp_year]="card.get('exp_year').value"
+      ></app-card-ui>
+      <!-- [selected]="card.get('selected').value" -->
+      <div class="col-12 check-fixer">
+        <div class="form-check" [formGroup]="card">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            [ngClass]="{ disabled: card.get('set_as_default').value }"
+            formControlName="set_as_default"
+            (change)="askAndDisable($event, card)"
+          />
+          <label class="form-check-label">
+            <small> Use this as my default payment method. </small>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4 row mx-0 justify-content-center mb-3">
+      <button
+        class="new-card btn"
+        [ngClass]="{ 'is-loading': !elements_loaded }"
+        [disabled]="!elements_loaded"
+        (click)="add_new_payment = true"
+      >
+        <span> Nueva tarjeta </span>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group row" [hidden]="!add_new_payment">
+    <div class="col-12 col-md-8 row mx-0">
+      <div class="col-12">
+        <div class="form-group">
+          <label> Número de tarjeta</label>
+          <div #card_info_number></div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group">
+          <label> Expiración </label>
+          <div #card_info_exp></div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group">
+          <label> CVV </label>
+          <div #card_info_cvv></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 d-none d-md-block row mx-0">
+      <div class="col-12">Supported</div>
+      <div class="brand-logo mastercard"></div>
+      <div class="brand-logo visa"></div>
+      <div class="brand-logo amex"></div>
+    </div>
+
+    <div class="col-12" *ngIf="payment_methods.controls.length > 0">
+      <div class="form-check" [formGroup]="main_form">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          formControlName="set_as_default"
+        />
+        <label class="form-check-label">
+          Use this as my default payment method.
+        </label>
+      </div>
+    </div>
+    <div class="col-12" *ngIf="payment_methods.controls.length == 0">
+      <label class="form-check-label">
+        This will be your default payment method.
+      </label>
+    </div>
+
+    <div class="col-12">
+      <hr />
+      <div class="float-right">
+        <button
+          type="button"
+          class="btn btn-sm btn-muted"
+          (click)="closeNewCardForm()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          (click)="addNewPayment()"
+          [ngClass]="{ 'is-loading': processing }"
+          [disabled]="processing"
+          class="btn btn-sm btn-success"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

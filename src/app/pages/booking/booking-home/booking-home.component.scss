@@ -1,0 +1,43 @@
+.booking-item {
+    border: 1px solid gainsboro;
+    border-radius: 4px;
+}
+
+.footer-style {
+    border-top: 1px solid gainsboro;
+    background: #f9f9f9;
+}
+
+.google-picture {
+    width: 40px;
+    border-radius: 50%;
+}
+
+.header {
+    background: #f9f9f9;
+    border-bottom: 1px solid gainsboro;
+}
+
+.google-box {
+    border: 1px solid gainsboro;
+}
+
+.list-calendar {
+    border-top: 1px gainsboro solid;
+    border-bottom: 1px gainsboro solid;
+    cursor: pointer;
+}
+
+::ng-deep {
+    .sync-modal {
+        *.nsm-content {
+            padding: 0 !important;
+        }
+    }
+}
+
+.color-square {
+    width: 20px;
+    height: 20px;
+    
+}

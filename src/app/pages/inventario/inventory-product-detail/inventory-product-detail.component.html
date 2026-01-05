@@ -1,0 +1,439 @@
+<div class="container page">
+  <ng-template [ngIf]="loading">
+    <div
+      class="d-flex justify-content-center"
+      style="margin-top: 15%; margin-bottom: 15%"
+    >
+      <div
+        style="
+          height: 120px;
+          width: 120px;
+          font-size: 15px;
+          border-width: 0.45em;
+        "
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div class="row justify-content-center" *ngIf="product">
+    <div class="col-12">
+      <div class="card mb-3">
+        <div [formGroup]="form_group" class="card-body">
+          <h4>About this Product</h4>
+          <hr />
+          <div class="row">
+            <div>
+              <div class="img-container">
+                <img
+                  #img_tag
+                  style="width: 80px; height: auto"
+                  [src]="fixPicture()"
+                  [alt]="product.product.name"
+                  (click)="upload_file.click()"
+                />
+              </div>
+            </div>
+            <div class="col align-self-start">
+              <h5 *ngIf="!editable_values.name" class="text-citric">
+                {{ product.product.name }}
+                <button class="btn btn-sm" (click)="editMainValues('name')">
+                  <i class="fa fa-edit text-info"> </i>
+                </button>
+              </h5>
+              <div *ngIf="editable_values.name" class="form-group">
+                <label> Name <span class="text-danger">*</span></label>
+                <input
+                  class="form-control"
+                  type="text"
+                  formControlName="name"
+                  [class.is-invalid]="
+                    item.get('name').touched && item.get('name').invalid
+                  "
+                />
+                <div class="btn-group float-right">
+                  <button
+                    [disabled]="form_group.get('name').invalid"
+                    class="btn btn-sm"
+                    (click)="saveMainValue('name')"
+                  >
+                    <i class="fa fa-save text-success"> </i></button
+                  ><button class="btn btn-sm" (click)="cancelMainValue('name')">
+                    <i class="fa fa-close text-danger"> </i>
+                  </button>
+                </div>
+              </div>
+
+              <input
+                #upload_file
+                hidden
+                type="file"
+                accept="image/*"
+                (change)="uploadFile($event)"
+              />
+              <button class="btn btn-sm" (click)="upload_file.click()">
+                <i class="fa fa-upload text-secondary"></i>
+              </button>
+
+              <div [hidden]="uploaded" class="progress-wrapper">
+                <div id="progress-bar-file1" class="progress btn-success">
+                  0%
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h6 *ngIf="product.product.description" class="mb-0 text-secondary">
+            {{ product.product.description }}
+            <!-- <small class="text-secondary"> {{ product.product.description }} </small> -->
+          </h6>
+          <hr />
+          <h6 class="mb-0 text-citric">
+            {{ product.place.name }}
+            <small class="text-secondary"> (This place) </small>
+          </h6>
+          <small>
+            {{ product.place.description }}
+          </small>
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <h6 *ngIf="!editable_values.vendor" class="mb-0">
+                Vendor
+                <button class="btn btn-sm" (click)="editMainValues('vendor')">
+                  <i class="fa fa-edit text-info"> </i>
+                </button>
+              </h6>
+              <p *ngIf="!editable_values.vendor" class="text-secondary">
+                {{ product.product.vendor }}
+              </p>
+              <div *ngIf="editable_values.vendor" class="form-group">
+                <label> Vendor</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  formControlName="vendor"
+                />
+                <div class="btn-group float-right">
+                  <button
+                    [disabled]="form_group.get('vendor').invalid"
+                    class="btn btn-sm"
+                    (click)="saveMainValue('vendor')"
+                  >
+                    <i class="fa fa-save text-success"> </i></button
+                  ><button
+                    class="btn btn-sm"
+                    (click)="cancelMainValue('vendor')"
+                  >
+                    <i class="fa fa-close text-danger"> </i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <h6 *ngIf="!editable_values.price_bought_at" class="mb-0">
+                Price
+                <button
+                  class="btn btn-sm"
+                  (click)="editMainValues('price_bought_at')"
+                >
+                  <i class="fa fa-edit text-info"> </i>
+                </button>
+              </h6>
+              <p
+                *ngIf="!editable_values.price_bought_at"
+                class="text-secondary"
+              >
+                {{ product.product.price_bought_at | currency }}
+              </p>
+              <div *ngIf="editable_values.price_bought_at" class="form-group">
+                <label> Price</label>
+                <input
+                  class="form-control"
+                  type="number"
+                  formControlName="price_bought_at"
+                />
+                <div class="btn-group float-right">
+                  <button
+                    [disabled]="form_group.get('price_bought_at').invalid"
+                    class="btn btn-sm"
+                    (click)="saveMainValue('price_bought_at')"
+                  >
+                    <i class="fa fa-save text-success"> </i></button
+                  ><button
+                    class="btn btn-sm"
+                    (click)="cancelMainValue('price_bought_at')"
+                  >
+                    <i class="fa fa-close text-danger"> </i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <h6
+                *ngIf="!editable_values.idInventoryProductCategory"
+                class="mb-0"
+              >
+                Category
+                <button
+                  class="btn btn-sm"
+                  (click)="editMainValues('idInventoryProductCategory')"
+                >
+                  <i class="fa fa-edit text-info"> </i>
+                </button>
+              </h6>
+              <p
+                *ngIf="!editable_values.idInventoryProductCategory"
+                class="text-secondary"
+              >
+                {{ product.product.category_name }}
+              </p>
+              <div
+                *ngIf="editable_values.idInventoryProductCategory"
+                class="form-group"
+              >
+                <div class="form-group">
+                  <label> Category</label>
+                  <ng-multiselect-dropdown
+                    #multi_select_category
+                    placeholder="Select a item category."
+                    [data]="categories"
+                    [settings]="selectCategoryOptions"
+                    (onSelect)="
+                      fixIdField('idInventoryProductCategory', $event)
+                    "
+                    (onDeSelect)="
+                      product_form.patchValue({
+                        idInventoryProductCategory: undefined
+                      })
+                    "
+                  ></ng-multiselect-dropdown>
+                </div>
+                <div class="btn-group float-right">
+                  <button
+                    [disabled]="
+                      form_group.get('idInventoryProductCategory').invalid
+                    "
+                    class="btn btn-sm"
+                    (click)="saveMainValue('idInventoryProductCategory')"
+                  >
+                    <i class="fa fa-save text-success"> </i></button
+                  ><button
+                    class="btn btn-sm"
+                    (click)="cancelMainValue('idInventoryProductCategory')"
+                  >
+                    <i class="fa fa-close text-danger"> </i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <h6
+                *ngIf="!editable_values.idInventoryProductStatus"
+                class="mb-0"
+              >
+                Status
+                <button
+                  class="btn btn-sm"
+                  (click)="editMainValues('idInventoryProductStatus')"
+                >
+                  <i class="fa fa-edit text-info"> </i>
+                </button>
+              </h6>
+              <p
+                *ngIf="!editable_values.idInventoryProductStatus"
+                class="text-secondary"
+              >
+                {{ product.product.status_name }}
+              </p>
+              <div
+                *ngIf="editable_values.idInventoryProductStatus"
+                class="form-group"
+              >
+                <div class="form-group">
+                  <label>Status</label>
+                  <ng-multiselect-dropdown
+                    #multi_select_status
+                    placeholder="Select a status"
+                    [data]="statuses"
+                    [settings]="selectStatusOptions"
+                    (onSelect)="fixIdField('idInventoryProductStatus', $event)"
+                    (onDeSelect)="
+                      form_group.patchValue({
+                        idInventoryProductStatus: undefined
+                      })
+                    "
+                  ></ng-multiselect-dropdown>
+                </div>
+                <div class="btn-group float-right">
+                  <button
+                    [disabled]="
+                      form_group.get('idInventoryProductStatus').invalid
+                    "
+                    class="btn btn-sm"
+                    (click)="saveMainValue('idInventoryProductStatus')"
+                  >
+                    <i class="fa fa-save text-success"> </i></button
+                  ><button
+                    class="btn btn-sm"
+                    (click)="cancelMainValue('idInventoryProductStatus')"
+                  >
+                    <i class="fa fa-close text-danger"> </i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <table class="table row-border hover table-striped mb-0">
+          <thead>
+            <tr>
+              <th width="30%" class="text-right">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right">
+                {{ product.product.price_bought_at | currency }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="text-right">
+                {{ product.product.total_worth | currency }}
+              </td>
+            </tr>
+          </tbody>
+        </table> -->
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body" [formGroup]="form_group">
+          <h4 class="text-citric">Optional fields</h4>
+          <div class="row" formArrayName="optional_fields">
+            <div
+              class="col-12 col-md-6"
+              [formGroupName]="i"
+              *ngFor="let optional of optional_fields.controls; let i = index"
+            >
+              <h6 *ngIf="!optional.value.is_editing" class="mb-0">
+                {{ optional.value.name }}
+                <button class="btn btn-sm" (click)="startEdit(optional)">
+                  <i class="fa fa-edit text-info"> </i>
+                </button>
+              </h6>
+              <p *ngIf="!optional.value.is_editing" class="text-secondary">
+                {{ optional.value.value }}
+              </p>
+              <div *ngIf="optional.value.is_editing" class="form-group">
+                <label> {{ optional.value.name }}</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  formControlName="value"
+                />
+                <div class="btn-group float-right">
+                  <button
+                    [disabled]="optional.invalid"
+                    class="btn btn-sm"
+                    (click)="save(optional, i)"
+                  >
+                    <i class="fa fa-save text-success"> </i></button
+                  ><button class="btn btn-sm" (click)="cancel(optional, i)">
+                    <i class="fa fa-close text-danger"> </i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3" *ngIf="product.other_places.length > 0">
+        <div class="card-body">
+          <h4 class="text-citric">More products like this</h4>
+        </div>
+        <table class="table row-border hover table-striped mb-0">
+          <thead>
+            <tr>
+              <th>Place</th>
+              <th>
+                Product
+                <br />
+                <small>(Vendor)</small>
+              </th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let place of product.other_places">
+              <td>
+                {{ place.name }}
+              </td>
+              <td>
+                {{ place.product_name }}
+                <small class="text-secondary" *ngIf="place.vendor">
+                  ({{ place.vendor }})
+                </small>
+              </td>
+              <td class="text-right">
+                {{ place.total_worth | currency }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="text-right">
+                Total Worth
+                <br />
+                <small>(including this one)</small>
+              </td>
+              <td class="text-right">
+                {{ product.total_worth | currency }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <hr />
+    </div>
+
+    <div class="col-12">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h4 class="text-citric">Share options</h4>
+        </div>
+        <div class="col-12 col-md-4 align-self-center text-center">
+          <ngx-qrcode
+            #qr_code
+            (click)="shareQR(product?.place?.qr_code)"
+            style="width: 50px; height: 50px"
+            [qrc-value]="product?.place?.qr_code"
+            [qrc-class]="'qrItemResize-dash'"
+            qrc-errorCorrectionLevel="M"
+          >
+          </ngx-qrcode>
+          <button
+            (click)="shareQR(product?.place?.qr_code)"
+            class="btn btn-sm btn-citric"
+          >
+            Copy QR
+          </button>
+        </div>
+
+        <div class="col-12 col-md-8 align-self-center my-4">
+          <h6 class="text-center text-secondary">
+            Print this QR and put it on your product
+          </h6>
+
+          <h5 class="text-center my-3">Or</h5>
+          <h6 class="text-center text-secondary mb-2">
+            Scan this QR using the app to get more details
+          </h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

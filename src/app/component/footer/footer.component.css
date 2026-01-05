@@ -1,0 +1,122 @@
+footer {
+  background-color: #EEEEEE;
+  padding-top: 4em;
+  padding-bottom: 1em;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+  text-align: center;
+}
+
+@media (min-width: 200px) and (max-width: 420px) {
+  footer {
+    padding-top: 2em;
+  }
+
+  .ul-social-net {
+    text-align: left;
+    padding-left: 113px;
+  }
+
+  .ul-about {
+    list-style: disc;
+    text-align: left;
+    padding-left: 32px;
+  }
+
+}
+
+@media (min-width: 421px) and (max-width: 524px) {
+  footer {
+    padding-top: 2em;
+  }
+
+  .ul-social-net {
+    text-align: left;
+    padding-left: 155px;
+  }
+
+  .ul-about {
+    list-style: disc;
+    text-align: left;
+    padding-left: 32px;
+  }
+
+}
+
+@media (min-width: 525px) and (max-width: 767px) {
+  footer {
+    padding-top: 2em;
+  }
+
+  .ul-social-net {
+    text-align: left;
+    padding-left: 200px;
+  }
+
+  .ul-about {
+    list-style: disc;
+    text-align: left;
+    padding-left: 32px;
+  }
+
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .ul-social-net {
+    text-align: left;
+    padding-left: 56px;
+  }
+
+  .ul-about {
+    list-style: disc;
+    text-align: left;
+    padding-left: 32px;
+  }
+
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .ul-social-net {
+    text-align: left;
+    padding-left: 100px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .ul-social-net {
+    text-align: left;
+    padding-left: 127px;
+  }
+}
+
+.ul-about {
+  list-style: disc;
+  text-align: left;
+}
+
+h5 {
+  text-align: center;
+}
+
+.link-footer {
+  color: red;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.link-footer:hover {
+  color: #FF7200;
+}
+
+#logo-appstore {
+  width: 200px;
+  height: 65px;
+}
+
+#logo-googlestore {
+  width: 200px;
+  height: 62px;
+}

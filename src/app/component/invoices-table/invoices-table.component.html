@@ -1,0 +1,309 @@
+<div class="row mt-2 mb-3" [formGroup]="filter_form">
+  <div *ngIf="!hide_title" class="col-12">
+    <h3>Dashboard</h3>
+  </div>
+  <div class="col-12 col-md-4">
+    <h6 class="font-weight-bold text-muted">Periods</h6>
+    <ng-multiselect-dropdown
+      [placeholder]="'Select a period'"
+      [data]="dropdowns.dates"
+      [settings]="options.dates"
+      (onSelect)="setValue($event, 'period')"
+      (onDeSelect)="clearValue('period')"
+      formControlName="period"
+    >
+    </ng-multiselect-dropdown>
+  </div>
+  <div class="col-12 col-md-4" *ngIf="!idOrganization">
+    <h6 class="font-weight-bold text-muted">Organization</h6>
+    <ng-multiselect-dropdown
+      [placeholder]="'Select an organization'"
+      [data]="dropdowns.organizations"
+      [settings]="options.organizations"
+      (onSelect)="setValue($event, 'organization')"
+      (onDeSelect)="clearValue('organization')"
+      formControlName="organization"
+    >
+    </ng-multiselect-dropdown>
+    <small class="text-secondary">
+      (Only organizations with invoices will shown)
+    </small>
+  </div>
+  <div class="col-12 col-md-4">
+    <h6 class="font-weight-bold text-muted">Status</h6>
+    <div class="form-group">
+      <select class="form-control" formControlName="status">
+        <option value="unpaid">Unpaid</option>
+        <option value="paid">Paid</option>
+        <option value="all">All</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-12 text-right">
+    <!-- <span class="text-danger">
+      * Don't worry, you are on a test account. But the mails will send, so be
+      careful.
+    </span> -->
+    <!-- <button (click)="deleteInvoices()" class="btn btn-sm btn-danger mr-2">Delete All</button> -->
+    <button [disabled]="processing" (click)="generateInvoices()" class="btn btn-sm btn-success mr-2">Create Again</button>
+    <button [disabled]="processing" (click)="getInvoices()" class="btn btn-sm btn-citric">Search</button>
+  </div>
+</div>
+<hr />
+
+<ng-template [ngIf]="loading || processing">
+  <div class="d-flex justify-content-center" style="margin: 140px">
+    <div
+      class="spinner-border text-citric"
+      style="width: 6rem; height: 6rem"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<table
+  *ngIf="!loading && !processing"
+  style="min-width: 100%"
+  class="table table-striped table-bordered"
+>
+  <thead>
+    <tr *ngIf="invoices.length > 0">
+      <th width="230px">Date</th>
+      <th>Organization</th>
+      <th>Name</th>
+      <th>Amount</th>
+      <th>Period</th>
+      <th>Status</th>
+      <th width="130px">Actions</th>
+    </tr>
+    <tr *ngIf="invoices.length === 0">
+      <td>
+        <h4 class="text-citric text-center">
+          There aren't invoices with this filters
+        </h4>
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let invoice of invoices">
+      <td>
+        {{ invoice.invoice_date }}
+      </td>
+      <td>
+        <div class="row">
+          <div class="col">
+            <img
+              class="organization-logo"
+              [src]="fixUrl(invoice.organization_picture)"
+              alt=""
+            />
+          </div>
+          <div class="col">
+            {{ invoice.organization_name }}
+          </div>
+        </div>
+      </td>
+      <td>
+        {{ invoice.name }}
+        <small class="text-secondary">
+          <br />
+          {{ invoice.description }}
+        </small>
+      </td>
+      <td class="text-right">
+        {{ invoice.amount | currency }}
+      </td>
+      <td>
+        <span *ngIf="invoice.is_period">
+          From <span class="text-citric">{{ invoice.period_start }}</span>
+          <br />
+          To <span class="text-citric">{{ invoice.period_end }}</span>
+        </span>
+        <span *ngIf="!invoice.is_period">
+          This invoice is one only payment.
+        </span>
+      </td>
+      <td>
+        <span
+          class="badge"
+          [ngClass]="{
+            'badge-danger': invoice.stripe_status != 'paid',
+            'badge-success': invoice.stripe_status == 'paid'
+          }"
+        >
+          {{ invoice.stripe_status | titlecase }}
+        </span>
+      </td>
+      <td class="text-center">
+        <button
+          *ngIf="invoice.stripe_status != 'paid'"
+          [disabled]="processing"
+          class="btn btn-sm"
+          (click)="payInvoice(invoice)"
+        >
+          <span class="tooltip_">
+            <span class="tooltiptext"> Pay invoice </span>
+            <i class="fa fa-money-bill-wave text-success"></i>
+          </span>
+        </button>
+        <button
+          *ngIf="invoice.stripe_status == 'paid'"
+          [disabled]="processing"
+          class="btn btn-sm"
+          (click)="printInvoice(invoice)"
+        >
+          <span class="tooltip_">
+            <span class="tooltiptext"> Download receipt </span>
+            <i class="fa fa-receipt text-secondary"></i>
+          </span>
+        </button>
+        <button
+          [disabled]="processing"
+          class="btn btn-sm"
+          (click)="sendInvoice(invoice)"
+        >
+          <span class="tooltip_">
+            <span class="tooltiptext"> Send invoice </span>
+            <i class="fa fa-paper-plane text-info"></i>
+          </span>
+        </button>
+        <!-- <button class="btn btn-sm" (click)="deleteRecord(record)">
+          <i class="fa fa-trash-alt text-danger"></i>
+        </button> -->
+      </td>
+    </tr>
+  </tbody>
+  <!-- <tfoot>
+    <tr>
+      <td>
+        <h4>Total</h4>
+      </td>
+      <td *ngFor="let column of combined_columns">
+        <span
+          *ngIf="column.input_type != 4"
+          [ngClass]="{ 'float-right': column.input_display_type == 3 }"
+        >
+          {{ formatValue(column.total, column) }}
+          <small
+            class="text-secondary"
+            *ngIf="
+              column.input_type == 1 ||
+              column.input_type == 2 ||
+              column.input_type == 5 ||
+              column.input_type == 6
+            "
+          >
+            <br />
+            ({{ column.input_type_name }})
+          </small>
+        </span>
+      </td>
+    </tr>
+  </tfoot> -->
+</table>
+<ngx-smart-modal
+  [closable]="false"
+  [escapable]="false"
+  [dismissable]="false"
+  #choose_after_action
+  identifier="choose_after_action"
+  customClass="full-modal"
+>
+  <div class="text-center">
+    <h4 class="text-danger" *ngIf="!has_more_cards">
+      This organization hasn't any payment method.
+    </h4>
+    <h4 class="text-danger" *ngIf="has_more_cards">
+      Your default payment method was declined. Please select another card an
+      try again.
+    </h4>
+    <div class="row" *ngIf="payment_methods_arr.length > 0">
+      <div
+        class="col-12 col-md-6 row mx-0 justify-content-center mb-3"
+        *ngFor="let card of payment_methods_arr"
+      >
+        <app-card-ui
+          (click)="selectCard(card)"
+          [card_number]="card.last_4_digits"
+          [brand]="card.brand"
+          [exp_month]="card.exp_month"
+          [exp_year]="card.exp_year"
+          [selected]="card.selected"
+        ></app-card-ui>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6 text-center">
+        <button
+          *ngIf="has_more_cards"
+          class="btn btn-sm btn-success"
+          (click)="tryToPayAgain()"
+          [ngClass]="{ 'is-loading': processing }"
+          [disabled]="processing"
+        >
+          Try again
+        </button>
+        <a
+          *ngIf="!has_more_cards"
+          class="btn btn-sm btn-success"
+          (click)="goToAddPayment(choose_after_action)"
+        >
+          Add Payment method
+        </a>
+      </div>
+      <div class="col-6 text-center">
+        <button
+          class="btn btn-sm btn-danger"
+          (click)="handleModalClose(choose_after_action)"
+          [disabled]="processing"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  [closable]="false"
+  [escapable]="false"
+  [dismissable]="false"
+  #setup_email
+  identifier="setup_email"
+>
+  <div class="row">
+    <div class="col-12" [formGroup]="email_setup_form">
+      <h5>Select an email:</h5>
+      <div class="form-check" *ngFor="let email of available_emails">
+        <input
+          formControlName="email"
+          (change)="onPrintEvent($event)"
+          class="form-check-input"
+          type="radio"
+          [id]="email.email"
+          [value]="email.email"
+          checked
+        />
+        <label class="form-check-label" [for]="email.email">
+          {{ email.email }}
+        </label>
+      </div>
+    </div>
+
+    <div class="col-4 text-center">
+      <button
+        [disabled]="email_setup_form.invalid"
+        class="btn btn-sm btn-success"
+        (click)="setEmail()"
+      >
+        Set email
+      </button>
+    </div>
+    <div class="col-4"></div>
+    <div class="col-4 text-center">
+      <button class="btn btn-sm btn-danger" (click)="dismissSetupModal()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</ngx-smart-modal>

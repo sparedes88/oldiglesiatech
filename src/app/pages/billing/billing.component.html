@@ -1,0 +1,636 @@
+<div class="container">
+  <div class="row">
+    <div class="col-10">
+      <h1 class="mt-2">Billing dashboard</h1>
+    </div>
+    <div class="col-2">
+      <div class="d-flex justify-content-right mt-3" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active"
+        id="home-tab"
+        data-toggle="tab"
+        data-target="#home"
+        type="button"
+        role="tab"
+        aria-controls="home"
+        aria-selected="true"
+      >
+        Home
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="profile-tab"
+        data-toggle="tab"
+        data-target="#profile"
+        href="#profile"
+        type="button"
+        role="tab"
+        aria-controls="profile"
+        aria-selected="false"
+      >
+        Payment methods
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="billing-tab"
+        data-toggle="tab"
+        data-target="#billing"
+        type="button"
+        role="tab"
+        aria-controls="billing"
+        aria-selected="false"
+      >
+        Billing
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div
+      class="tab-pane fade show active"
+      id="home"
+      role="tabpanel"
+      aria-labelledby="home-tab"
+    >
+      <app-invoices-table
+        [idOrganization]="idOrganization"
+        [hide_title]="true"
+        [origin]="'billing'"
+        (on_add)="onAddPayment()"
+      ></app-invoices-table>
+    </div>
+    <div
+      class="tab-pane fade"
+      id="profile"
+      role="tabpanel"
+      aria-labelledby="profile-tab"
+    >
+      <app-billing-payment-methods
+        #payment_methods
+        [idOrganization]="idOrganization"
+      ></app-billing-payment-methods>
+    </div>
+    <div
+      class="tab-pane fade"
+      id="billing"
+      role="tabpanel"
+      aria-labelledby="billing-tab"
+    >
+      <div
+        [hidden]="!hide_products || !hide_categories || !hide_status"
+        class="row"
+      >
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-10"></div>
+            <div class="col-2">
+              <div class="d-flex justify-content-right mt-3" *ngIf="loading">
+                <div class="spinner-border" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justify-content-end">
+            <div class="col-md-6 text-right"></div>
+          </div>
+          <div class="row" *ngIf="!datosStripe?.customer_id">
+            <div class="col-12">
+              <h5>
+                Current plan:
+                {{
+                  datosStripe?.idCatalogoPlan == 1
+                    ? "Basic"
+                    : datosStripe?.idCatalogoPlan == 2
+                    ? "Premium"
+                    : datosStripe?.idCatalogoPlan == 3
+                    ? "Exclusive"
+                    : "Undefined"
+                }}
+              </h5>
+            </div>
+            <div class="col-6" style="padding-top: 9px">
+              <div class="form-group">
+                <label for="estimated">
+                  Plan <span class="text-danger">*</span>
+                </label>
+                <ng-select
+                  [items]="plans"
+                  bindLabel="name"
+                  placeholder="Select a Plan"
+                  bindValue="id"
+                  [(ngModel)]="plan"
+                  style="text-align: center; height: 30px"
+                  (change)="(null)"
+                >
+                </ng-select>
+              </div>
+            </div>
+            <div class="col-6">
+              <span
+                style="display: block; text-align: right; width: 100%"
+                class="mb-2"
+              >
+                <button
+                  type="button"
+                  [disabled]="false"
+                  (click)="consolelog()"
+                  class="btn btn-sm btn-success"
+                >
+                  Submit
+                </button>
+              </span>
+              <div id="card-element" class="form-control" style="padding: 5px">
+                <div #cardInfo></div>
+              </div>
+              <div class="error">
+                {{ cardError ? cardError : "" }}
+              </div>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-4">
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-12" style="text-align: center">
+                    <label>Coupon code:</label>
+                  </div>
+                  <div
+                    class="col-12"
+                    style="text-align: center"
+                    *ngIf="this.currentUser.isSuperUser"
+                  >
+                    <ng-select
+                      [items]="coupons"
+                      bindLabel="name"
+                      placeholder="Select a coupon (optional)"
+                      bindValue="id"
+                      [(ngModel)]="coupon"
+                      style="text-align: center; height: 30px"
+                      (ngModelChange)="changedCoupon()"
+                    >
+                    </ng-select>
+                  </div>
+                  <div
+                    class="col-12"
+                    style="text-align: center"
+                    *ngIf="!this.currentUser.isSuperUser"
+                  >
+                    <input
+                      type="text"
+                      [(ngModel)]="couponCode"
+                      class="form-control"
+                    />
+                    <label
+                      *ngIf="this.coupon && !this.couponError"
+                      style="color: green"
+                    >
+                      Valid coupon for {{ this.coupon.percent }}% off
+                    </label>
+                    <label *ngIf="this.couponError" style="color: red">
+                      Invalid coupon code
+                    </label>
+                  </div>
+                  <div
+                    class="col-12"
+                    style="text-align: center; padding-top: 10px"
+                    *ngIf="!this.currentUser.isSuperUser"
+                  >
+                    <button
+                      type="button"
+                      [disabled]="false"
+                      (click)="checkCoupon()"
+                      class="btn btn-sm btn-success"
+                    >
+                      Check
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div
+                class="col-12"
+                style="text-align: center"
+                *ngIf="this.currentUser.isSuperUser"
+              >
+                <button
+                  type="button"
+                  [disabled]="
+                    !couponPercent || couponPercent < 5 || couponPercent > 95
+                  "
+                  (click)="addCoupon()"
+                  class="btn btn-sm btn-success"
+                >
+                  Add new coupon
+                </button>
+                <div class="input-group mb-3">
+                  <input
+                    type="number"
+                    [(ngModel)]="couponPercent"
+                    class="form-control"
+                    name="currency"
+                    aria-describedby="basic-addon1"
+                    min="5"
+                  />
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1"
+                      >% off</span
+                    >
+                  </div>
+                </div>
+                <label
+                  *ngIf="couponPercent < 5 || couponPercent > 95"
+                  style="color: red"
+                >
+                  Percentage must be between 5% and 95%
+                </label>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="datosStripe?.customer_id" class="row">
+            <div class="col-4" style="padding-bottom: 10px">
+              <h5>
+                Current plan:
+                {{
+                  datosStripe?.idCatalogoPlan == 1
+                    ? "Basic"
+                    : datosStripe?.idCatalogoPlan == 2
+                    ? "Premium"
+                    : datosStripe?.idCatalogoPlan == 3
+                    ? "Exclusive"
+                    : "Undefined"
+                }}
+              </h5>
+            </div>
+            <div
+              class="col-6"
+              style="padding-bottom: 10px"
+              *ngIf="datosStripe?.is_active && this.currentUser.isSuperUser"
+            >
+              <div class="row">
+                <div class="col-12">
+                  <ng-select
+                    [items]="plans"
+                    bindLabel="name"
+                    placeholder="Upgrade/Downgrade Plan"
+                    bindValue="id"
+                    [(ngModel)]="plan"
+                    style="text-align: center; height: 30px"
+                    (change)="this.changePlan()"
+                  >
+                  </ng-select>
+                </div>
+              </div>
+            </div>
+            <div
+              class="col-1"
+              style="padding-bottom: 10px"
+              *ngIf="datosStripe?.is_active"
+            >
+              <button
+                type="button"
+                [disabled]="!plan_is_changed"
+                (click)="changeSuscription()"
+                class="btn btn-sm btn-success"
+              >
+                Save
+              </button>
+            </div>
+            <div class="col-12" *ngIf="this.plan_is_changed">
+              <div class="row">
+                <div class="col-4"></div>
+                <div class="col-4" *ngIf="this.plan_is_changed">
+                  <label style="color: red; font-size: 12px; padding-top: 12px">
+                    {{
+                      plan < this.datosStripe.idCatalogoPlan
+                        ? "You are downgrading your plan. The cost of $" +
+                          ((this.cost < 0 ? this.cost * -1 : this.cost) / 100 <
+                          1
+                            ? 1
+                            : (this.cost < 0 ? this.cost * -1 : this.cost) / 100
+                          ).toFixed(2) +
+                          " for the remaining days will be " +
+                          (this.cost < 0 ? "refunded" : "charged") +
+                          " immediatly and your subscription will be updated."
+                        : "You are upgrading your plan. The cost of $" +
+                          ((this.cost < 0 ? this.cost * -1 : this.cost) / 100 <
+                          1
+                            ? 1
+                            : (this.cost < 0 ? this.cost * -1 : this.cost) / 100
+                          ).toFixed(2) +
+                          " for the remaining days will be " +
+                          (this.cost < 0 ? "refunded" : "charged") +
+                          " immediatly and your subscription will be updated."
+                    }}
+                  </label>
+                </div>
+                <div
+                  class="col-4"
+                  *ngIf="this.plan_is_changed"
+                  style="padding-top: 10px"
+                >
+                  <ng-select
+                    [items]="coupons"
+                    bindLabel="name"
+                    placeholder="Select a coupon (optional)"
+                    bindValue="id"
+                    [(ngModel)]="coupon"
+                    style="text-align: center; height: 30px"
+                    (ngModelChange)="changedCouponPlan()"
+                  >
+                  </ng-select>
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="
+                datosStripe?.subscriptions.length == 0 &&
+                datosStripe?.schedules.length == 0 &&
+                datosStripe?.is_active
+              "
+              style="align-items: center"
+              class="col-12 text-center"
+            >
+              <h5 style="color: red">
+                Your current plan will expire in {{ days_remaining }} days.
+                Renew your subscription to keep receiving all the benefits of
+                your plan!
+              </h5>
+              <button class="btn btn-success" (click)="renewSuscription()">
+                Renew
+              </button>
+            </div>
+            <div
+              *ngIf="
+                datosStripe.subscriptions.length == 0 &&
+                datosStripe?.schedules.length == 0 &&
+                !datosStripe?.is_active
+              "
+              style="align-items: center"
+              class="col-12 text-center"
+            >
+              <h5 style="color: red">
+                Your current plan expired
+                {{
+                  days_remaining == 0
+                    ? " today "
+                    : days_remaining + " day(s) ago "
+                }}. Renew your subscription to keep receiving all the benefits
+                of your plan!
+              </h5>
+              <button class="btn btn-success" (click)="renewSuscription()">
+                Renew
+              </button>
+            </div>
+            <div
+              *ngIf="
+                datosStripe?.schedules.length != 0 &&
+                datosStripe.subscriptions.length == 0
+              "
+              class="col-12"
+            >
+              <div *ngIf="datosStripe?.schedules[0]?.phases[0]">
+                <table
+                  *ngIf="datosStripe?.schedules[0]?.phases[0]"
+                  class="table"
+                >
+                  <thead>
+                    <tr>
+                      <th scope="col">Start of next billing</th>
+                      <th scope="col">End of next billing</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Amount</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        {{
+                          datosStripe?.schedules[0]?.phases[0].start_date * 1000
+                            | date
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          datosStripe?.schedules[0]?.phases[0].end_date * 1000
+                            | date
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          datosStripe?.schedules[0].status == "not_started"
+                            ? "Not started"
+                            : datosStripe?.schedules[0].status
+                                ?.charAt(0)
+                                .toUpperCase() +
+                              datosStripe?.schedules[0].status?.slice(1)
+                        }}
+                        {{
+                          datosStripe?.schedules[0]?.end_behavior == "cancel"
+                            ? " (It will expire)"
+                            : ""
+                        }}
+                        {{
+                          datosStripe?.percent_off
+                            ? " (with " + datosStripe?.percent_off + "% off)"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        ${{
+                          (
+                            (datosStripe?.schedules[0]?.phases[0]?.plans[0]
+                              ?.plan
+                              ? datosStripe?.schedules[0]?.phases[0]?.plans[0]
+                                  ?.plan == "estandar"
+                                ? 49.99
+                                : datosStripe?.schedules[0]?.phases[0]?.plans[0]
+                                    ?.plan == "premium"
+                                ? 79.99
+                                : 99.99
+                              : 0.0) *
+                            (datosStripe?.percent_off
+                              ? (100 - datosStripe?.percent_off) / 100
+                              : 1)
+                          ).toFixed(2)
+                        }}
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-danger ml-2"
+                          *ngIf="
+                            datosStripe?.schedules[0]?.status ==
+                              'not_started' ||
+                            datosStripe?.schedules[0]?.status == 'active'
+                          "
+                          (click)="
+                            cancelSuscription(datosStripe?.schedules[0]?.id)
+                          "
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          class="btn btn-success ml-2"
+                          *ngIf="
+                            datosStripe?.schedules[0]?.status == 'canceled'
+                          "
+                          (click)="
+                            cancelSuscription(datosStripe?.schedules[0]?.id)
+                          "
+                        >
+                          Renew
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div *ngIf="datosStripe.subscriptions.length != 0" class="col-12">
+              <table *ngIf="datosStripe?.subscriptions[0]" class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Start</th>
+                    <th scope="col">End</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      {{
+                        datosStripe?.subscriptions[0].current_period_start *
+                          1000 | date
+                      }}
+                    </td>
+                    <td>
+                      {{
+                        datosStripe?.subscriptions[0].current_period_end * 1000
+                          | date
+                      }}
+                    </td>
+                    <td>
+                      {{
+                        datosStripe?.subscriptions[0].status ==
+                        "incomplete_expired"
+                          ? "Incomplete expired"
+                          : datosStripe?.subscriptions[0].status == "past_due"
+                          ? "Past due"
+                          : datosStripe?.subscriptions[0].status
+                              ?.charAt(0)
+                              .toUpperCase() +
+                            datosStripe?.subscriptions[0].status?.slice(1)
+                      }}
+                      {{
+                        datosStripe?.subscriptions[0]?.cancel_at_period_end
+                          ? " (It will expire)"
+                          : ""
+                      }}
+                    </td>
+                    <td>
+                      ${{ datosStripe?.invoice.amount / 100 }}
+                      {{
+                        datosStripe?.subscriptions[0]?.discount
+                          ? " (with " +
+                            datosStripe?.subscriptions[0]?.discount.coupon
+                              .percent_off +
+                            "% off)"
+                          : ""
+                      }}
+                    </td>
+                    <td>
+                      <button
+                        class="btn btn-danger ml-2"
+                        *ngIf="
+                          !datosStripe?.subscriptions[0]?.cancel_at_period_end
+                        "
+                        (click)="
+                          cancelSuscription(datosStripe?.subscriptions[0]?.id)
+                        "
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        class="btn btn-success ml-2"
+                        *ngIf="
+                          datosStripe?.subscriptions[0]?.cancel_at_period_end
+                        "
+                        (click)="renewSuscription()"
+                      >
+                        Reactivate
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-12">
+              <h5 *ngIf="datosStripe?.sources">Registered cards:</h5>
+              <table *ngIf="datosStripe?.sources" class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Last 4 digit</th>
+                    <th scope="col">Expiry</th>
+                    <th scope="col">Brand</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of datosStripe?.sources">
+                    <th scope="row">1</th>
+                    <td>**** {{ item.last4 }}</td>
+                    <td>{{ item.exp_month }}/{{ item.exp_year }}</td>
+                    <td>{{ item.brand }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row mt-2 mb-2">
+            <div *ngIf="datosStripe?.charges" class="col-md-12">
+              <table datatable class="table row-border hover">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Charged at</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let charge of datosStripe?.charges; let i = index"
+                  >
+                    <td>{{ charge.description }}</td>
+                    <td>${{ charge.amount / 100 }}</td>
+                    <td>{{ charge.created * 1000 | date }}</td>
+                    <td>
+                      {{
+                        charge.status?.charAt(0).toUpperCase() +
+                          charge.status?.slice(1)
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,121 @@
+* {
+    color: #4a4a4a;
+}
+
+p {
+    margin: 0;
+}
+
+.btn {
+    color: white;
+}
+
+.v-facebook-login {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    cursor: default;
+    color: #fff;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    border: 1px solid hsla(0, 0%, 100%, 0.05);
+    background-color: #3c57a4;
+}
+.form-control {
+    box-sizing: border-box;
+    clear: both;
+    font-size: 1rem;
+    position: relative;
+    text-align: left;
+}
+
+.form-control.has-icons-left .input,
+.form-control.has-icons-left .select select {
+    padding-left: 2.5em;
+}
+
+.form-control.has-icons-left .icon.is-left {
+    left: 0;
+}
+
+.form-control.has-icons-left .icon,
+.form-control.has-icons-right .icon {
+    color: #dbdbdb;
+    height: 2.5em;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 2.5em;
+    z-index: 4;
+}
+
+.button.is-loading {
+    color: transparent !important;
+    pointer-events: none;
+}
+.button.is-loading::after {
+    position: absolute;
+    left: calc(50% - (1em / 2));
+    top: calc(17% - (1em / 2));
+    position: absolute !important;
+}
+.button.is-loading::after,
+.control.is-loading::after,
+.loader,
+.is-loading::after {
+    -webkit-animation: spinAround 0.5s infinite linear;
+    animation: spinAround 0.5s infinite linear;
+    border: 2px solid #dbdbdb;
+    border-radius: 290486px;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    content: "";
+    display: block;
+    height: 1em;
+    position: relative;
+    width: 1em;
+}
+@-webkit-keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+@keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+.has-text-weight-semibold {
+    font-weight: 600 !important;
+}
+
+.is-size-2 {
+    font-size: 2.5rem !important;
+}
+
+.button.is-fullwidth {
+    display: flex;
+    width: 100%;
+}
+.citric {
+    background-color: #e65100 !important;
+    color: white !important;
+}
+ul {
+    list-style: none;
+}

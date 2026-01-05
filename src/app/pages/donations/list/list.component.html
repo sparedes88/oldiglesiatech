@@ -1,0 +1,291 @@
+<canvas id="image_canvas" hidden #canvas></canvas>
+<div class="container">
+  <div class="row justify-content-end">
+    <div *ngIf="!is_embed" class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+            {{ totalContact || 0 }}
+          </span>
+          <h4 class="col-12 card-title text-center text-citric span-number">
+            Contacts
+          </h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/donation_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+    <div *ngIf="!show_input" class="col-md-12 table-responsive-sm">
+      <table style="width: 100%">
+        <tr>
+          <td style="text-align: center">
+            <h5>
+              Total standard donations: ${{ totals?.total_std?.toFixed(2) }}
+            </h5>
+          </td>
+          <td style="text-align: center">
+            <h5>
+              Total manual donations: ${{ totals?.total_manual?.toFixed(2) }}
+            </h5>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div *ngIf="!show_input" class="col-md-12 table-responsive-sm">
+      <table style="width: 100%">
+        <tr>
+          <td style="text-align: center; vertical-align: middle">
+            <h5>Total ALL donations: ${{ totals?.total_all?.toFixed(2) }}</h5>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <hr *ngIf="!show_input" class="col-12" />
+
+    <div *ngIf="!show_input" class="col-12">
+      <div class="row">
+        <div *ngFor="let total of summary" class="col-3">
+          <h5 class="text-secondary mb-0">
+            {{ total.name }}
+          </h5>
+          <small>
+            {{ total.total | currency }}
+          </small>
+        </div>
+      </div>
+    </div>
+    <div
+      *ngIf="!show_input"
+      [ngClass]="{ 'text-right': !is_embed }"
+      class="col-12 mt-3"
+    >
+      <div class="btn-group">
+        <button *ngIf="is_embed" (click)="goBack()" class="btn btn-sm">
+          <i class="text-citric fa fa-arrow-left"></i> Back
+        </button>
+
+        <button
+          *ngIf="!is_embed"
+          class="btn btn-outline-citric btn-sm"
+          routerLink="/donations/forms"
+          [queryParams]="params ? params : {}"
+        >
+          <i class="fa fa-wpforms"></i> Forms
+        </button>
+        <button
+          *ngIf="!is_embed"
+          class="btn btn-outline-citric btn-sm"
+          routerLink="/donations/categories"
+          [queryParams]="params ? params : {}"
+        >
+          <i class="fa fa-th"></i> Categories
+        </button>
+        <button
+          *ngIf="!stripe_info?.is_possible_client"
+          class="btn btn-success btn-sm ml-2"
+          (click)="openForm()"
+        >
+          Add manual donation
+        </button>
+      </div>
+    </div>
+
+    <div class="col-12 my-2" *ngIf="show_input">
+      <app-manual-donation-form
+        #manual_donation_form
+        (on_refresh)="closeFormEvent($event)"
+      >
+      </app-manual-donation-form>
+    </div>
+    <div *ngIf="!show_input" class="col-md-12 table-responsive-sm">
+      <div [formGroup]="donation_filter_form" class="row col-12 mx-0">
+        <div class="col-12 col-md-3">
+          <div class="form-group">
+            <label class="text-secondary"> From </label>
+            <input type="date" class="form-control" formControlName="from" />
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="form-group">
+            <label class="text-secondary"> To </label>
+            <input type="date" class="form-control" formControlName="to" />
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="form-group">
+            <label class="text-secondary"> Category </label>
+            <select class="form-control" formControlName="category">
+              <option value="">-- None --</option>
+              <option
+                *ngFor="let category of donation_categories"
+                [value]="category.idDonationCategory"
+              >
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="form-group mb-0">
+            <label class="text-secondary"> Search </label>
+            <input type="text" class="form-control" formControlName="search" />
+          </div>
+          <div class="text-right my-2">
+            <button
+              type="button"
+              (click)="getDonations()"
+              class="btn btn-sm btn-success"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-x">
+        <ejs-grid
+          #grid
+          [dataSource]="filtered_donations"
+          height="315px"
+          allowSorting="true"
+          allowFiltering="true"
+          [filterSettings]="filterOptions"
+          allowPaging="true"
+          [pageSettings]="pageSettings"
+          (toolbarClick)="toolbarClick($event)"
+          (queryCellInfo)="queryCellInfo($event)"
+          (pdfQueryCellInfo)="pdfQueryCellInfo($event)"
+          allowPdfExport="true"
+          [showColumnMenu]="true"
+          [showColumnChooser]="true"
+          (columnMenuOpen)="onColumnMenuClick($event)"
+          (columnMenuClick)="onColumnMenuClick($event)"
+          (dataBound)="dataBound()"
+          (pdfExportComplete)="pdfExportComplete()"
+          [allowResizing]="true"
+          [width]="getWidth(grid)"
+        >
+          <!-- [aggregates]="aggregates" -->
+          <e-columns>
+            <e-column
+              minWidth="250px"
+              field="complete_name"
+              width="15%"
+              headerText="Name"
+            >
+            </e-column>
+            <e-column
+              minWidth="150px"
+              field="date"
+              width="15%"
+              headerText="Date"
+            >
+            </e-column>
+            <e-column
+              minWidth="300px"
+              field="email"
+              width="20%"
+              headerText="Email"
+            >
+            </e-column>
+            <e-column
+              minWidth="150px"
+              field="amount"
+              width="10%"
+              headerText="Amount"
+              type="number"
+              format="C2"
+            >
+            </e-column>
+            <e-column
+              minWidth="150px"
+              field="category_name"
+              headerText="Category"
+            >
+            </e-column>
+            <!-- <e-column [visible]="false"
+              field="is_user_assigned"
+              width="10%"
+              headerText="User Assigned"
+              type="text"
+            >
+            </e-column> -->
+            <e-column
+              [visible]="false"
+              field="date"
+              width="20%"
+              headerText="Date"
+            >
+            </e-column>
+            <!-- <e-column [visible]="false" field="is_covered" width="15%" headerText="Fees covered"></e-column> -->
+            <e-column field="donation_type" width="10%" headerText="Type">
+              <ng-template #template let-data>
+                {{ data.donation_type }}
+                <span *ngIf="data.is_recurrent">
+                  <small class="text-citric">
+                    <br />
+                    {{ data.frequency }}
+                  </small>
+                </span>
+              </ng-template>
+            </e-column>
+            <e-column field="configurations" headerText="Configurations">
+              <ng-template #template let-data>
+                <div *ngIf="data?.is_manual" class="btn-group">
+                  <button
+                    (click)="editDonation(data)"
+                    class="btn btn-sm btn-primary"
+                  >
+                    <i class="fa fa-edit"> </i>
+                  </button>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteDonation(data?.id)"
+                  >
+                    <i class="fa fa-trash-alt"></i>
+                  </button>
+                  <!-- <button
+                  class="btn btn-sm btn-warning"
+                  (click)="showLogs(contact)"
+                >
+                  <i class="fa fa-eye"></i>
+                </button> -->
+                </div>
+              </ng-template>
+            </e-column>
+          </e-columns>
+        </ejs-grid>
+      </div>
+      <div class="col-xs-12">
+        <button class="btn btn-primary mb-2" (click)="iframeCodeModal.open()">
+          Get iframe code
+        </button>
+      </div>
+    </div>
+  </div>
+  <ngx-smart-modal #iframeCodeModal identifier="iframeCodeModal">
+    <h4>Insert donations on your page</h4>
+
+    <p>Entry Point</p>
+    <pre style="background-color: whitesmoke; padding: 8px">
+    {{ iframeCode.entry_point }}
+  </pre
+    >
+
+    <div class="form-group mt-1">
+      <label for="selectLang">Select language</label>
+      <select class="form-control" id="selectLang" [(ngModel)]="linkLang">
+        <option value="en">English</option>
+        <option value="es">Spanish</option>
+      </select>
+    </div>
+    <p>Copy this code and paste it on your website</p>
+  </ngx-smart-modal>
+</div>

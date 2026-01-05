@@ -1,0 +1,19 @@
+// .columns-container {
+//   .order-1 {
+//     border-right: 2px solid #ebebeb;
+//   }
+// }
+
+section.app-section {
+  padding: 0 12px;
+}
+
+@media only screen and (max-width: 600px) {
+  .custom-column {
+    margin-bottom: 48px;
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
+}

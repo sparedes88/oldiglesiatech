@@ -1,0 +1,332 @@
+<form #group_form="ngForm" [formGroup]="formGroup">
+  <ng-template [ngIf]="!show_detail">
+    <div class="d-flex justify-content-center" style="margin: 15%">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <ul [hidden]="!show_detail" class="nav nav-tabs">
+    <li class="nav-item">
+      <button
+        class="nav-link"
+        type="button"
+        [ngClass]="{ active: tabIndex == 0 }"
+        (click)="tabIndex = 0"
+      >
+        General information
+      </button>
+    </li>
+    <!-- <li class="nav-item">
+      <button
+        class="nav-link"
+        type="button"
+        [ngClass]="{ active: tabIndex == 1 }"
+        (click)="tabIndex = 1"
+      >
+        Administration
+      </button>
+    </li> -->
+    <!-- <li class="nav-item">
+      <button
+        class="nav-link"
+        type="button"
+        [ngClass]="{ active: tabIndex == 2 }"
+        (click)="tabIndex = 2"
+      >
+        Schedule
+      </button>
+    </li> -->
+  </ul>
+
+  <div [hidden]="!show_detail" class="tab-content mb-3">
+    <div class="row">
+      <div class="col-12">
+        <!-- Name -->
+        <div class="form-group">
+          <label>Name <span class="text-danger"> * </span></label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="title"
+            placeholder="Group name"
+            required
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <!-- Description -->
+        <div class="form-group">
+          <label>Short Description</label>
+          <textarea
+            class="form-control"
+            formControlName="short_description"
+          ></textarea>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <!-- Description -->
+        <div class="form-group">
+          <label>Long Description</label>
+          <textarea
+            class="form-control"
+            formControlName="long_description"
+          ></textarea>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <label class="col-12">
+          <span style="pointer-events: none">
+            Address <span class="text-danger"> * </span>
+          </span>
+          <div class="text-center float-right">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                formControlName="same_as_church"
+                id="defaultCheck2"
+                (change)="setAddressAsOrganization()"
+              />
+              <label class="form-check-label" for="defaultCheck2">
+                <span class="tooltip_">
+                  <span class="tooltiptext">
+                    Check this option to use your organization address in this
+                    group.
+                  </span>
+                  Same address as organization?
+                  <i class="text-secondary fa fa-info-circle"></i>
+                </span>
+              </label>
+            </div>
+          </div>
+        </label>
+        <div class="input-group">
+          <google-address-component
+            *ngIf="init_map"
+            #address_component
+            [value]="formGroup.get('location').value"
+            placeholder="Please type the location info about this group."
+            adressType="address"
+            (setAddress)="getAddress($event)"
+          ></google-address-component>
+        </div>
+        <span
+          class="text-danger error-span"
+          *ngIf="formGroup.get('city').invalid"
+        >
+          * Please fill this info
+        </span>
+      </div>
+      <!-- File -->
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label for="file">Upload a photo</label>
+          <input
+            class="form-control"
+            type="file"
+            id="file"
+            placeholder="Choose file"
+            (change)="handleFileInput($event.target.files)"
+          />
+        </div>
+
+        <!-- <div class="form-group">
+              <div class="mb-1">Create your own design</div>
+              <a class="btn btn-info" (click)="visiblePixieModal = true">
+                Open editor
+                <i class="fa fa-image"></i>
+              </a>
+            </div> -->
+      </div>
+      <!-- <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <label>Wordpress photo</label>
+              <ng-select
+                *ngIf="wpImages.length != 0"
+                [items]="wpImages"
+                bindLabel="slug"
+                placeholder="Select a Wordpress image"
+                bindValue="source_url"
+                [searchable]="true"
+                formControlName="picture"
+                style="text-align: center; height: 30px"
+              >
+                <ng-template ng-option-tmp let-item="item" let-index="index">
+                  <div class="row">
+                    <div class="col-12">
+                      <b>{{ item.slug }}</b>
+                    </div>
+                    <div class="col-12">
+                      <img height="100" [src]="item.source_url" />
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-select>
+            </div>
+          </div> -->
+    </div>
+    <div class="form-row mt-2" [formGroup]="formGroup">
+      <div class="col-md-4 mb-3">
+        <label>Add Categories</label>
+        <ng-multiselect-dropdown
+          placeholder="Categories"
+          [data]="categories"
+          [settings]="selectCatOptions"
+          formControlName="categories"
+        ></ng-multiselect-dropdown>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="form-group">
+          <label>Group Type <span class="text-danger"> * </span></label>
+          <select
+            formControlName="idGroupType"
+            class="form-control"
+            [class.is-invalid]="
+              formGroup.get('idGroupType').touched &&
+              formGroup.get('idGroupType').invalid
+            "
+          >
+            <option [value]="0">-- Select an option --</option>
+            <option *ngFor="let item of group_types" [value]="item.idGroupType">
+              {{ item.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="form-group">
+          <label>Access <span class="text-danger"> * </span></label>
+          <select
+            class="form-control"
+            formControlName="idLevelAccess"
+            [class.is-invalid]="
+              formGroup.get('idLevelAccess').touched &&
+              formGroup.get('idLevelAccess').invalid
+            "
+          >
+            <option [value]="0">-- Select an option --</option>
+            <option *ngFor="let item of access" [value]="item.idNivelAcceso">
+              {{ item.descripcion }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label>Leaders <span class="text-danger"> * </span></label>
+        <ng-multiselect-dropdown
+          placeholder="Leaders"
+          [data]="users"
+          [settings]="selectLeadersOptions"
+          formControlName="leaders"
+        ></ng-multiselect-dropdown>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label>Members</label>
+        <ng-multiselect-dropdown
+          placeholder="Members"
+          [data]="users"
+          [settings]="selectLeadersOptions"
+          formControlName="members"
+        ></ng-multiselect-dropdown>
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col-md-4 mb-3">
+        <label>
+          <span class="tooltip_">
+            <span class="tooltiptext">
+              This gallery will show when you embed this group.
+            </span>
+            Gallery
+            <i class="text-secondary fa fa-info-circle"></i>
+          </span>
+        </label>
+        <ng-multiselect-dropdown
+          placeholder="Select a Gallery or leave empty"
+          [data]="galleries"
+          [settings]="selectGalleryOptions"
+          formControlName="idGallery"
+        ></ng-multiselect-dropdown>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label>
+          <span class="tooltip_">
+            <span class="tooltiptext">
+              This form will show when you embed this group.
+            </span>
+            Contact Form
+            <i class="text-secondary fa fa-info-circle"></i>
+          </span>
+        </label>
+        <ng-multiselect-dropdown
+          placeholder="Select a form or leave empty"
+          [data]="mailing_lists"
+          [settings]="selectGalleryOptions"
+          formControlName="idMailingList"
+        ></ng-multiselect-dropdown>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            formControlName="is_external"
+            id="defaultCheck2"
+            (ngModelChange)="setValidatorForExternal()"
+          />
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                This will open your own register link in a new tab.</span
+              >
+              Join using an external method
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+        </div>
+
+        <div class="form-group" *ngIf="formGroup.get('is_external').value">
+          <label>Group register link</label>
+          <input
+            type="url"
+            class="form-control"
+            formControlName="external_url"
+             [class.is-invalid]="
+              formGroup.get('external_url').touched &&
+              formGroup.get('external_url').invalid
+            "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row text-center">
+    <div class="col-12">
+      <div [hidden]="!show_detail" class="form-group">
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="formGroup.invalid || !show_detail"
+          (click)="submitGroup(formGroup, group_form)"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<fullscreen-modal
+  [(visible)]="visiblePixieModal"
+  (visibilityChange)="visiblePixieModal = $event"
+>
+  <pixie-editor
+    *ngIf="visiblePixieModal"
+    (onExport)="handlePixieExport($event)"
+  ></pixie-editor>
+</fullscreen-modal>

@@ -1,0 +1,502 @@
+<ng-template [ngIf]="loadingPlaylist">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<div class="row justify-content-center m-0" [hidden]="loadingPlaylist">
+  <div
+    class="col-9 col-sm-8 align-self-center text-left pl-md-0"
+    [ngClass]="{
+      'col-md-6': !is_full_width,
+      'col-md-8': is_full_width
+    }"
+  >
+    <h1
+      [ngStyle]="{
+        'text-align': style_settings?.home_title_text_align || 'left',
+        color: style_settings?.home_title_text_color || '#000000',
+        'font-weight': style_settings?.home_title_text_bold || 'bolder'
+      }"
+    >
+      {{ playlist?.name }}
+    </h1>
+    <p>{{ playlist?.description }}</p>
+  </div>
+  <div
+    class="col-12 col-sm-4 col-md-4 align-self-center pr-md-0"
+    *ngIf="show_tab_searchbar"
+  >
+    <div class="search-container float-right">
+      <input
+        type="search"
+        [placeholder]="lang.keys['search'] + ' Videos...'"
+        [(ngModel)]="searchValue"
+      />
+    </div>
+  </div>
+  <app-videoplayer
+    #video_player
+    class="p-0 col-12"
+    *ngIf="selected_file && selected_file?.idMediaType === 1"
+    [src]="selected_file.url"
+    [autoplay]="true"
+    (on_close_video)="closeVideo()"
+    [ngClass]="{ 'col-md-10': !is_standalone && !is_full_width }"
+    [is_full_width]="is_full_width"
+  ></app-videoplayer>
+
+  <app-audio-player
+    #audio_player
+    class="p-0 col-12"
+    *ngIf="selected_file && selected_file?.idMediaType === 2"
+    [src]="selected_file.url"
+    [autoplay]="true"
+    (on_close_video)="closeVideo()"
+    [style_settings]="style_settings"
+    [ngClass]="{ 'col-md-10': !is_standalone && !is_full_width }"
+    [is_full_width]="is_full_width"
+  ></app-audio-player>
+
+  <app-document-viewer
+    #document_viewer
+    class="p-0 col-12"
+    *ngIf="selected_file && selected_file?.idMediaType === 3"
+    [src]="selected_file.url"
+    (on_close_video)="closeVideo()"
+    [style_settings]="style_settings"
+    [ngClass]="{ 'col-md-10': !is_standalone && !is_full_width }"
+    [is_full_width]="is_full_width"
+  >
+  </app-document-viewer>
+
+  <!-- <button (click)="fetchFile()" class="btn btn-success">
+    Try
+  </button> -->
+
+  <div
+    *ngIf="last_video && !selected_file"
+    class="p-0 col-12 last-video"
+    [ngClass]="{ 'col-md-10': !is_standalone && !is_full_width }"
+  >
+    <div (click)="reproduceVideo(last_video)">
+      <!-- [href]="last_video.url" target="_blank" -->
+      <div>
+        <!-- class="video-preview"
+        [ngStyle]="{
+          backgroundImage: 'url(' + getPicture(last_video.thumbnail) + ')'
+        }" -->
+        <img
+          class="video-preview-v1"
+          style="width: 100%; border-radius: 10px"
+          [src]="getPicture(last_video.thumbnail)"
+        />
+        <div
+          class="w-100 ec-bottom-border-radius abs-pos more-forward downlow p-l-spacer-xl p-b-spacer-lg"
+          style="
+            background: linear-gradient(
+              0deg,
+              rgba(24, 24, 24, 0.7) 0%,
+              rgba(12, 0, 51, 0) 100%
+            );
+          "
+        >
+          <!-- Badge -->
+          <small
+            class="ec-rounded p-x-spacer-md p-y-spacer-sm m-b-spacer-md background-trans-light-grey text-white smaller"
+          >
+            Latest Video
+          </small>
+
+          <!-- Title -->
+          <h3
+            class="text-white text-left m-b-spacer-none m-t-spacer-xs bold sec-font"
+          >
+            {{ last_video.title }}
+          </h3>
+
+          <!-- Subtitle -->
+          <h6 *ngIf="last_video.speaker" class="text-gray m-0 m-b-spacer-none">
+            {{ last_video.speaker }}
+            <br />
+            <span>
+              {{ last_video.publish_date | date }}
+            </span>
+          </h6>
+          <p class="sec-title text-gray text-left m-b-spacer-none">
+            {{ last_video.description }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="playlist || is_standalone"
+    class="col-12 mt-3 p-0"
+    [ngClass]="{
+      'col-md-10': !is_standalone && !is_full_width
+    }"
+  >
+    <h3
+      *ngIf="playlist?.featured_videos.length !== 0 && !is_standalone"
+      [ngStyle]="{
+        'text-align': style_settings?.home_title_text_align || 'left',
+        color: style_settings?.home_title_text_color || '#000000',
+        'font-weight': style_settings?.home_title_text_bold || 'bolder'
+      }"
+    >
+      Featured videos
+    </h3>
+    <div *ngIf="playlist?.featured_videos.length !== 0" class="row scroll-row" [ngClass]="{ 'mx-0': is_full_width }">
+      <div
+        *ngFor="let video of playlist?.featured_videos; let index = index"
+        [id]="index"
+        class="col-12 mb-3 align-self-stretch"
+        (click)="reproduceVideo(video)"
+        [ngClass]="{
+          playing_featured: video.idVideo === selected_file?.idVideo,
+          'col-md-12': (playlist?.videos_size || 4) == 12,
+          'col-md-6': (playlist?.videos_size || 4) == 6,
+          'col-md-4': (playlist?.videos_size || 4) == 4,
+          'col-md-3': (playlist?.videos_size || 4) == 3,
+          'pl-0': is_full_width && index % 3 == 0,
+          'p-0': is_full_width && index % 3 == 1,
+          'pr-0': is_full_width && index % 3 == 2
+        }"
+        target="_blank"
+      >
+        <!-- [href]="video.url" -->
+        <!-- [href]="video.url" target="_blank"  -->
+        <a class="row m-0" style="width: 100%">
+          <div
+            class="col-12 new-featured-iframe-container full-width flex flex-column start-xs hover-grow"
+          >
+            <img
+              id="img_1"
+              [alt]="video.title"
+              [src]="getPicture(video.thumbnail)"
+              class="img_1 ec-border-radius ec-box-shadow full-width lazyloaded"
+              onerror="this.onerror=null; this.src='https://iglesiatech.app/assets/img/default-image.jpg'"
+            />
+
+            <img
+              id="img_2"
+              [alt]="video.title"
+              [src]="getPicture(video.thumbnail)"
+              class="img_2 ec-border-radius ec-box-shadow full-width lazyloaded"
+              onerror="this.onerror=null; this.src='https://iglesiatech.app/assets/img/default-image.jpg'"
+            />
+            <!-- <div *ngIf="! .thumbnail" class="rendered" v-html="video.embed_frame"></div> -->
+            <div class="thumbnail rendered"></div>
+          </div>
+          <div class="col-12 align-self-center">
+            <div class="m-t-spacer-sm">
+              <p
+                class="sec-font bold sm-title m-b-spacer-none ln-height-reset ellipsis_2"
+                [ngStyle]="{
+                  'text-align': style_settings?.home_title_text_align || 'left',
+                  color: style_settings?.home_title_text_color || '#000000',
+                  'font-weight':
+                    style_settings?.home_title_text_bold || 'bolder'
+                }"
+              >
+                {{ video.title }}
+              </p>
+              <small
+                class="smaller sec-font bold text-dark half-here ln-height-reset"
+              >
+                {{ video.speaker }}
+                <br />
+                <span>
+                  {{ video.publish_date | date }}
+                </span>
+              </small>
+              <img
+                class="sound-bars"
+                style="display: inline-block"
+                *ngIf="video.idVideo === selected_file?.idVideo"
+                src="/assets/img/sound_bars.gif"
+                alt="Playing actually..."
+              />
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <h3
+      *ngIf="video_array.length !== 0"
+      [ngStyle]="{
+        'text-align': style_settings?.home_title_text_align || 'left',
+        color: style_settings?.home_title_text_color || '#000000',
+        'font-weight': style_settings?.home_title_text_bold || 'bolder'
+      }"
+    >
+      Recent videos
+    </h3>
+    <div class="row" [ngClass]="{ 'mx-0': is_full_width }">
+      <div
+        *ngFor="let video of filteredElements; let index = index"
+        [id]="index"
+        class="col-12 mb-3 align-self-stretch"
+        target="_blank"
+        [ngClass]="{
+          playing: video.idVideo === selected_file?.idVideo,
+          'col-md-12': (playlist?.videos_size || 4) == 12,
+          'col-md-6': (playlist?.videos_size || 4) == 6,
+          'col-md-4': (playlist?.videos_size || 4) == 4,
+          'col-md-3': (playlist?.videos_size || 4) == 3,
+          'pl-0': is_full_width && index % 3 == 0,
+          'p-0': is_full_width && index % 3 == 1,
+          'pr-0': is_full_width && index % 3 == 2
+
+        }"
+        (click)="reproduceVideo(video)"
+      >
+        <!-- [href]="last_video.url" -->
+        <!-- [href]="video.url" target="_blank" -->
+        <a class="row m-0" style="width: 100%; height: 100%">
+          <div class="col-6 pl-0 align-self-center">
+            <img
+              [alt]="video.title"
+              [src]="getPicture(video.thumbnail)"
+              class="recent_video_thumbnail ec-border-radius ec-box-shadow full-width lazyloaded"
+              onerror="this.onerror=null; this.src='https://iglesiatech.app/assets/img/default-image.jpg'"
+            />
+            <!-- <div class="rendered" v-html="video.embed_frame"></div> -->
+            <!-- v-html="video.embed_frame" -->
+          </div>
+          <div class="col-6 p-0 align-self-center">
+            <p
+              style="line-height: 13px"
+              class="sec-font bold sm-title m-b-spacer-none max-w-200 ellipsis_3"
+              [ngStyle]="{
+                'text-align': style_settings?.home_title_text_align || 'left',
+                color: style_settings?.home_title_text_color || '#000000',
+                'font-weight': style_settings?.home_title_text_bold || 'bolder'
+              }"
+            >
+              {{ video.title }}
+            </p>
+            <small class="smaller sec-font bold text-dark half-here">
+              {{ video.speaker }}
+              <br />
+              <span>
+                {{ video.publish_date | date }}
+              </span>
+            </small>
+            <img
+              class="sound-bars"
+              *ngIf="video.idVideo === selected_file?.idVideo"
+              src="/assets/img/sound_bars.gif"
+              alt="Playing actually..."
+            />
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <h3
+      *ngIf="playlist?.audios.length !== 0 && !is_standalone"
+      [ngStyle]="{
+        'text-align': style_settings?.home_title_text_align || 'left',
+        color: style_settings?.home_title_text_color || '#000000',
+        'font-weight': style_settings?.home_title_text_bold || 'bolder'
+      }"
+    >
+      Audios
+    </h3>
+    <div class="row" [ngClass]="{ 'mx-0': is_full_width }">
+      <div
+        *ngFor="let video of filteredAudios; let index = index"
+        [id]="index"
+        class="col-12 mb-3 align-self-stretch"
+        target="_blank"
+        [ngClass]="{
+          playing: video.idVideo === selected_file?.idVideo,
+          'col-md-12': (playlist?.audios_size || 4) == 12,
+          'col-md-6': (playlist?.audios_size || 4) == 6,
+          'col-md-4': (playlist?.audios_size || 4) == 4,
+          'col-md-3': (playlist?.audios_size || 4) == 3,
+          'pl-0': is_full_width && index % 3 == 0,
+          'p-0': is_full_width && index % 3 == 1,
+          'pr-0': is_full_width && index % 3 == 2
+        }"
+        (click)="reproduceAudio(video)"
+      >
+        <!-- [href]="last_video.url" -->
+        <!-- [href]="video.url" target="_blank" -->
+        <a class="row m-0" style="width: 100%; height: 100%">
+          <div class="col-6 pl-0 align-self-center">
+            <img
+              [alt]="video.title"
+              [src]="getPicture(video.thumbnail)"
+              class="recent_video_thumbnail ec-border-radius ec-box-shadow full-width lazyloaded"
+              onerror="this.onerror=null; this.src='https://iglesiatech.app/assets/img/default-image.jpg'"
+            />
+            <!-- <div class="rendered" v-html="video.embed_frame"></div> -->
+            <!-- v-html="video.embed_frame" -->
+          </div>
+          <div class="col-6 p-0 align-self-center">
+            <p
+              style="line-height: 13px"
+              class="sec-font bold sm-title m-b-spacer-none max-w-200 ellipsis_3"
+              [ngStyle]="{
+                'text-align': style_settings?.home_title_text_align || 'left',
+                color: style_settings?.home_title_text_color || '#000000',
+                'font-weight': style_settings?.home_title_text_bold || 'bolder'
+              }"
+            >
+              {{ video.title }}
+            </p>
+            <small class="smaller sec-font bold text-dark half-here">
+              {{ video.speaker }}
+              <br />
+              <span>
+                {{ video.publish_date | date }}
+              </span>
+            </small>
+            <img
+              class="sound-bars"
+              *ngIf="
+                video.idVideo === selected_file?.idVideo &&
+                audio_player?.is_playing
+              "
+              src="/assets/img/sound_bars.gif"
+              alt="Playing actually..."
+            />
+          </div>
+        </a>
+      </div>
+    </div>
+    <h3
+      *ngIf="playlist?.documents.length !== 0 && !is_standalone"
+      [ngStyle]="{
+        'text-align': style_settings?.home_title_text_align || 'left',
+        color: style_settings?.home_title_text_color || '#000000',
+        'font-weight': style_settings?.home_title_text_bold || 'bolder'
+      }"
+    >
+      Documents
+    </h3>
+    <div class="row" [ngClass]="{ 'mx-0': is_full_width }">
+      <div
+        *ngFor="let video of filteredDocuments; let index = index"
+        [id]="index"
+        class="col-12 mb-3 align-self-stretch"
+        target="_blank"
+        [ngClass]="{
+          playing: video.idVideo === selected_file?.idVideo,
+          'col-md-12': (playlist?.documents_size || 4) == 12,
+          'col-md-6': (playlist?.documents_size || 4) == 6,
+          'col-md-4': (playlist?.documents_size || 4) == 4,
+          'col-md-3': (playlist?.documents_size || 4) == 3,
+          'pl-0': is_full_width && index % 3 == 0,
+          'p-0': is_full_width && index % 3 == 1,
+          'pr-0': is_full_width && index % 3 == 2
+        }"
+        (click)="openDocument(video)"
+      >
+        <!-- [href]="last_video.url" -->
+        <!-- [href]="video.url" target="_blank" -->
+        <a class="row m-0" style="width: 100%; height: 100%">
+          <div class="col-6 pl-0 align-self-center">
+            <img
+              [alt]="video.title"
+              [src]="getPicture(video.thumbnail)"
+              class="recent_video_thumbnail ec-border-radius ec-box-shadow full-width lazyloaded"
+              onerror="this.onerror=null; this.src='https://iglesiatech.app/assets/img/default-image.jpg'"
+            />
+            <!-- <div class="rendered" v-html="video.embed_frame"></div> -->
+            <!-- v-html="video.embed_frame" -->
+          </div>
+          <div class="col-6 p-0 align-self-center">
+            <p
+              style="line-height: 13px"
+              class="sec-font bold sm-title m-b-spacer-none max-w-200 ellipsis_3"
+              [ngStyle]="{
+                'text-align': style_settings?.home_title_text_align || 'left',
+                color: style_settings?.home_title_text_color || '#000000',
+                'font-weight': style_settings?.home_title_text_bold || 'bolder'
+              }"
+            >
+              {{ video.title }}
+            </p>
+            <small class="smaller sec-font bold text-dark half-here">
+              {{ video.speaker }}
+              <br />
+              <span>
+                {{ video.publish_date | date }}
+              </span>
+            </small>
+            <!-- <img
+              class="sound-bars"
+              *ngIf="video.idVideo === selected_file?.idVideo"
+              src="/assets/img/sound_bars.gif"
+              alt="Playing actually..."
+            /> -->
+          </div>
+        </a>
+      </div>
+    </div>
+    <ul class="playlist-container">
+      <!-- Old version
+      <li
+          class="video-item"
+          *ngFor="(video, index) in playlist.videos"
+          :key="index"
+        >
+          <div class="row">
+            <div
+              class="col-12 col-md-6 iframe-container"
+              v-html="video.embed_frame"
+            ></div>
+            <div class="col-12 col-md-6">
+              <h3>{{ video.title }}</h3>
+              <h5 class="mb-3px subtitle">{{ video.speaker }}</h5>
+              <h6 class="mt-3px subtitle">
+                {{ moment(video.publish_date).format('lll') }}
+              </h6>
+              <p>{{ video.description }}</p>
+            </div>
+          </div>
+        </li>
+        -->
+      <li
+        style="list-style: none"
+        class="video-container text-center"
+        *ngIf="
+          (!video_array || (!video_array.length && !last_video)) &&
+            !playlist?.audios &&
+            !playlist?.documents!;
+          loadingPlaylist
+        "
+      >
+        <img
+          width="64px"
+          height="64px"
+          style="padding-right: 12px"
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAUCSURBVHic7d1/aNR1HMfx1+d+bqvN/dRt51nabFH+iMqIKP8J+kMs0wqCSGggFAmD/ghCqhGKLJn9GC5Sp5tb6bamm6SToH+sf8SULIqGzMD1AzfP3bybt92P77c/puEf5vzebt/P3ff9evw5+PJ93e7JbvcbICIiIiIiWZRdJzr/6IpHXC5zpV3ny2WGoc4tPfPzWTvO5bHjJACgFDYAaotd58tlSmEbAFsCcNlxEspeDEA4BiAcAxCOAQjHAIRjAMIxAOEYgHAMQDgGIFxazwX01warjZQ/38oxE0mjxOe27bmnnBZPmSVHamrus3KMyz0VWzc4/LfVc6V1jfTVLj4J4Ol0jqU58/0Lg3+stnoQbwKEYwDCMQDhGIBwDEA4BiAcAxCOAQjHAIRjAMIxAOEYgHBqaNVyy88gJU2zzAR8czGI0qOAuEepkNXjPICqsnyQ4tO6WcgHwPJ1yZsA4RiAcAxAOAYgHAMQjgEIxwCEYwDCMQDhGIBwDEA4BiAcAxCOAQjHAIRjAMIxAOEYgHAMQDgGIBwDEI4BCGfbN4bYwV1ahqL1L0IVFCDSdxiJ4Yu6J2U9NbRqhal7RCYonx8Lv+qBd9E9AAAzkcD4oU6EW/fAuDaheV32csxNgO/+2v+ufABQXi+KX3sdwd6jKFy7DnA55qJmlGN+K8rrveXP3WXlqHj/QwTavkTeyodtXpX9HBPATPwPPIjq3W1YsH0HPJWW30HlWGICAAAohbueeRbB7j6UbHoTyufXvUg7WQFcp/LyULLpjen/D9Y8p3uOViIDuMGzoBIVDVtR1bIHvpqluudoITqAG/IfexyBji6Uv/se3MXFuufYigFcp9xuFK1/CcGvj2LeK6+Kudso41Ja4Cqah7K330HwUC/yn3hS95w5xwD+h/feJaj67HNU7myGpzqge86cYQAzKHhqNYJdR1C6uR6uggLdczKOAdwB5fejeGMdFvb0T99tdNBnJDEACzwV81HRsBWBfZ3wL1uue05GMIA0+B9ahsDeA5jfsA3u0jLdc2aFAaTL5cLda9Yi2NOP4o11UL7c/NhEBjBLrsJClG6uR6CjC97gIt1zLGMAGeJbvASlb9XrnmEZA8ggd3m57gmWMYBMMU1E+g/rXmGZo14Uqkv8whBCTY2InT6le4plDGAWjMhVhNv3Y/xgB8xEQvectDCAdBgGoieOI/RpE1JjV3SvmRUGYFHszI8I7fwI8fODuqdkBAO4Q8mRSxhraUZk4BvAdMRbKQAwgBmZk5MId7QhfGAfzKkp3XMyjgHcxrUfTuLyju1I/mP5W3VyBgO4hanB3xFqasTkT2d1T5lzDOAmqfEwwq27Md59EDAM3XNswQAAmMkkrvZ2Y+yLXTCiUd1zbCU+gNjpUwg1NSJ+YUj3FC3EBpAYvogrLc2Y+O5b3VO0EheAGYsh3NmOcHsrzHhc9xzt5ARgmogOHEOo+WOkQpd1r8kazgngNo/OTf5yDqGmRkz99quNg3KDYwJI/vXn9F23m97SlRodRWjXJ4gOHHPUw7eZ5JgXhCRHRzDywRYkRy7BiEQQ3r8Xwy8/j+hxZz12n2mO+ZAoSo9j/gJQehiAcAxAOAYgHAMQjgEIxwCEYwDCMQDhGIBwDEA4BiAcAxCOAQjHAIRjAMIxAOEYgHAMQDgGIBwDEI4BCMcAhGMAwjEA4TyAWad7BBEREREREdnlX3TjGRBZSkqHAAAAAElFTkSuQmCC"
+          alt=""
+        />
+        <h4>{{ lang.keys["empty_playlist"] }}</h4>
+      </li>
+
+      <li
+        style="list-style: none"
+        class="video-container text-center"
+        *ngIf="loadingPlaylist"
+      >
+        <h4>{{ lang.keys["loading_playlist"] }}..</h4>
+      </li>
+    </ul>
+  </div>
+</div>

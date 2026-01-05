@@ -1,0 +1,67 @@
+<div class="row justify-content-start" [formGroup]="form">
+  <div class="col-12 text-right">
+    <button class="btn btn-sm btn-outline-citric" (click)="close()">
+      <i class="fa fa-close"></i> Close
+    </button>
+  </div>
+  <div class="col-12 col-md-8">
+    <div class="form-group">
+      <label>Domain</label>
+      <input
+        readonly
+        type="text"
+        class="form-control"
+        formControlName="package_segment_domain"
+        [class.is-invalid]="
+          form.get('package_segment_domain').touched &&
+          form.get('package_segment_domain').invalid
+        "
+      />
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="form-group">
+      <label>Sequencer</label>
+      <input
+        type="number"
+        class="form-control"
+        formControlName="sequencer"
+        [class.is-invalid]="
+          form.get('sequencer').touched && form.get('sequencer').invalid
+        "
+        [min]="last_package?.sequencer"
+      />
+      <small>
+        The next package should be {{ last_package?.app_package }}
+      </small>
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="form-group">
+      <label>Apple ID <small>(Optional)</small></label>
+      <input type="text" class="form-control" formControlName="apple_id" />
+      <small> If you already know your apple Id write it. </small>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-6">
+    <div class="form-group">
+      <label>Organization <small>(Optional)</small></label>
+      <ng-multiselect-dropdown
+        placeholder="Select the organization to link this identifier"
+        [data]="iglesias"
+        [settings]="selectCatOptions"
+        formControlName="organizations"
+        (onSelect)="setOrganization()"
+        (onSelectAll)="setOrganization()"
+        (onDeSelect)="setOrganization()"
+        (onDeSelectAll)="setOrganization()"
+      ></ng-multiselect-dropdown>
+      <small> You can link this app to an organization. </small>
+    </div>
+  </div>
+
+  <div class="col-12 text-right">
+    <button class="btn btn-sm btn-success" (click)="save()">Save</button>
+  </div>
+</div>

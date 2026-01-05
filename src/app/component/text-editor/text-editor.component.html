@@ -1,0 +1,79 @@
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+
+<div
+  class="row justify-content-end mb-3"
+  *ngIf="
+    currentUser &&
+    currentUser?.isSuperUser &&
+    !toggle_form &&
+    !hide_font_buttons
+  "
+>
+  <div class="col-12 col-md-6 text-right">
+    <button
+      class="btn btn-sm btn-success mr-2"
+      (click)="toggle_form = !toggle_form"
+    >
+      Add font
+    </button>
+    <button class="btn btn-sm btn-citric" routerLink="/content/fonts">
+      Manage fonts
+    </button>
+  </div>
+</div>
+<div
+  class="row"
+  *ngIf="currentUser && currentUser?.isSuperUser && toggle_form"
+  [formGroup]="font_form"
+>
+  <div class="col-3">
+    <div class="form-group">
+      <label>Name <span class="text-danger">*</span> </label>
+      <input formControlName="name" required class="form-control" type="text" />
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="form-group">
+      <label>Font <span class="text-danger">*</span></label>
+      <input
+        type="file"
+        name="font"
+        formControlName="font"
+        class="form-control"
+        accept=".woff, .woff2, .ttf, .otf"
+        (change)="addFontFile($event.target.files[0])"
+      />
+    </div>
+  </div>
+  <div class="col-3 col-md-2 align-self-center">
+    <button class="btn btn-sm btn-success" (click)="print()">Save font</button>
+  </div>
+  <div class="col-3 col-md-2 align-self-center">
+    <button class="btn btn-sm btn-outline-danger" (click)="toggle_form = false">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<quill-editor
+  [(ngModel)]="value"
+  (onEditorCreated)="onEditorCreated($event)"
+  [modules]="modules"
+  [ngClass]="custom_class + (lite ? 'ql-lite' : '')"
+  [ngStyle]="{
+    height: height,
+    'min-height': height
+  }"
+  #quill
+  [theme]="bubble ? 'bubble' : 'snow'"
+  (onEditorChanged)="setValue($event)"
+  (onModelChange)="setValue($event)"
+></quill-editor>
+
+<input
+  type="file"
+  id="{{ identifier }}"
+  hidden
+  (change)="uploadPhoto()"
+  accept="image/*"
+/>

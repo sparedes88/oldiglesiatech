@@ -1,0 +1,504 @@
+<canvas id="image_canvas" hidden #canvas></canvas>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+            {{ totalContact || 0 }}
+          </span>
+          <h4 class="col-12 card-title text-center text-citric span-number">
+            Contacts
+          </h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/contactos_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <div class="col-md-12 text-right">
+      <div class="row mt-2">
+        <div
+          [ngClass]="currentUser.isSuperUser ? 'col-10' : 'col-12'"
+          class="mt-2 text-right"
+        >
+          <div class="btn-group col-6 mb-2 mt-3">
+            <button
+              class="btn btn-outline-citric btn-sm"
+              (click)="addUser(formAddModal, user_form)"
+            >
+              <!-- (click)="formModal.open()" -->
+              <i class="fa fa-user-plus"></i> Add Member
+            </button>
+
+            <button class="btn btn-outline-citric btn-sm" routerLink="import">
+              <i class="fa fa-upload"></i> Import
+            </button>
+
+            <button
+              class="btn btn-outline-citric btn-sm"
+              routerLink="contact-categories"
+            >
+              <i class="fa fa-th"></i> Categories
+            </button>
+
+            <!-- <button
+              class="btn btn-outline-citric btn-sm"
+              routerLink="/mailing-list"
+            >
+              <i class="fa fa-users"></i>
+              Contact Inbox
+            </button> -->
+          </div>
+        </div>
+        <div *ngIf="currentUser.isSuperUser" class="col-2 mt-2 text-right">
+          <div class="btn-group mb-2 mt-3">
+            <button
+              class="btn btn-outline-citric btn-sm"
+              routerLink="all-users"
+            >
+              <i class="fa fa-users"></i> All Users
+            </button>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="row mb-3">
+            <div class="col-12 text-right">
+              <button
+                (click)="budget_displayed = !budget_displayed"
+                class="btn btn-sm btn-secondary"
+              >
+                {{ budget_displayed ? "Hide budget" : "Show budget" }}
+              </button>
+            </div>
+          </div>
+          <div class="row" *ngIf="!show_budget_form && budget_displayed">
+            <div class="col-12 text-right">
+              <button
+                (click)="setBudgetOpenForm()"
+                class="btn btn-sm btn-citric"
+              >
+                Set budget
+              </button>
+            </div>
+            <div class="col-4 text-center">
+              <h5 class="text-citric">Contacts</h5>
+              {{ contacts.length }}
+            </div>
+            <div class="col-4 text-center">
+              <h5 class="text-citric">Annual budget per person</h5>
+              {{ budget?.budget || 0 | currency }}
+              <span class="text-citric" *ngIf="budget.created_at">
+                (Last edited: {{ budget.created_at | date }})
+              </span>
+            </div>
+            <div class="col-4 text-center">
+              <h5 class="text-citric">Total</h5>
+              {{ contacts.length * (budget?.budget || 0) | currency }}
+            </div>
+          </div>
+          <div
+            class="row justify-content-end"
+            [formGroup]="budget_form"
+            *ngIf="show_budget_form && budget_displayed"
+          >
+            <div class="col-5">
+              <div class="form-group">
+                <label for="idGroup"> Budget* </label>
+                <input
+                  type="number"
+                  class="form-control text-right"
+                  formControlName="budget"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-2 col-md-1 text-right align-self-center">
+              <button (click)="saveBudget()" class="btn btn-sm btn-success">
+                Save
+              </button>
+            </div>
+            <div class="col-2 col-md-1 text-right align-self-center">
+              <button
+                (click)="cancelBudgetForm()"
+                class="btn btn-sm btn-outline-citric"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template [ngIf]="loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+
+      <div [hidden]="loading" class="row mt-4 mb-5">
+        <div class="col-xs-4 col-md-6 self-align-center"></div>
+        <div class="col-xs-10 col-md-6 self-align-center">
+          <mat-form-field
+            appearance="outline"
+            class="no-padding"
+            style="width: 100%"
+          >
+            <mat-label>Filter:</mat-label>
+            <input
+              type="text"
+              matInput
+              autofocus
+              (input)="onFilterTextBoxChanged($event)"
+            />
+          </mat-form-field>
+        </div>
+        <div class="col-md-12 table-responsive-sm">
+          <!-- <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table table-striped"
+          >
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Profile</th>
+                <th>First name</th>
+                <th>E-Mail</th>
+                <th>Levels</th>
+                <th>Pending Step</th>
+                <th>Categories</th>
+                <th>Configurations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let contact of contacts">
+                <td routerLink="details/{{ contact.idUsuario }}">
+                  {{ contact.idUsuario }}
+                </td>
+                <td routerLink="details/{{ contact.idUsuario }}">
+                  <img
+                    class="img-contact-foto"
+                    src="{{ getPhoto(contact.foto, contact.sexo) }}"
+                    onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'"
+                  />
+                </td>
+                <td routerLink="details/{{ contact.idUsuario }}">
+                  {{ contact.nombre }} {{ contact.apellido }}
+                </td>
+                <td routerLink="details/{{ contact.idUsuario }}">
+                  {{ contact.email }}
+                </td>
+                <td routerLink="details/{{ contact.idUsuario }}">
+                  {{ contact.nivel }}
+                </td>
+                <td routerLink="details/{{ contact.idUsuario }}">
+                  {{ contact.requisito }}
+                </td>
+                <td routerLink="details/{{ contact.idUsuario }}">
+                  <span
+                    *ngFor="let category of contact.categories"
+                    class="badge badge-pill badge-secondary"
+                  >
+                    {{ category.name }}
+                  </span>
+                  <span *ngIf="contact.categories?.length === 0">
+                    <i> Not categories assigned </i>
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button
+                      routerLink="details/{{ contact.idUsuario }}"
+                      [queryParams]="{ telefono: contact.telefono }"
+                      class="btn btn-sm btn-primary"
+                    >
+                      <i class="fa fa-eye"> </i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteUsuario(contact?.idUsuario)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table> -->
+
+          <ejs-grid
+            #grid
+            [dataSource]="contacts"
+            height="315px"
+            allowSorting="true"
+            allowFiltering="true"
+            [filterSettings]="filterOptions"
+            allowPaging="true"
+            [pageSettings]="pageSettings"
+            [toolbar]="toolbar"
+            (toolbarClick)="toolbarClick($event)"
+            (queryCellInfo)="queryCellInfo($event)"
+            (pdfQueryCellInfo)="pdfQueryCellInfo($event)"
+            (excelQueryCellInfo)="excelQueryCellInfo($event)"
+            allowPdfExport="true"
+            [allowExcelExport]="true"
+            [showColumnMenu]="true"
+            [showColumnChooser]="true"
+            (columnMenuOpen)="onColumnMenuClick($event)"
+            (columnMenuClick)="onColumnMenuClick($event)"
+            (dataBound)="dataBound()"
+            (pdfExportComplete)="pdfExportComplete()"
+            (excelExportComplete)="pdfExportComplete()"
+          >
+            <!-- [aggregates]="aggregates" -->
+            <e-columns>
+              <e-column
+                [visible]="false"
+                (click)="onChange($event)"
+                field="idUsuario"
+                headerText="ID"
+                type="string"
+              >
+              </e-column>
+              <e-column headerText="Profile">
+                <ng-template #template let-data>
+                  <div class="text-center">
+                    <div class="image">
+                      <img
+                        class="responsive-img rounded-circle"
+                        [src]="getPhoto(data.foto, data.sexo)"
+                        alt="avatar"
+                        onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'"
+                      />
+                    </div>
+                  </div>
+                  <!-- <img
+                    class="img-contact-foto"
+                    [src]="getPhoto(data.foto, data.sexo)"
+                    /> -->
+                  <!-- onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'" -->
+                </ng-template>
+              </e-column>
+              <e-column field="full_name" headerText="Name"> </e-column>
+              <e-column field="phone" headerText="Phone">
+                <ng-template #template let-data>
+                  <a [href]="'tel:' + data.phone">
+                    {{ data.phone }}
+                  </a>
+                </ng-template>
+              </e-column>
+              <e-column field="email" headerText="Email">
+                <ng-template #template let-data>
+                  <a [href]="'mailto:' + data.email">
+                    {{ data.email }}
+                  </a>
+                </ng-template>
+              </e-column>
+              <!-- <e-column field="full_address" headerText="Address"> </e-column> -->
+              <e-column
+                field="fechaNacimiento"
+                headerText="Birthday"
+                type="date"
+                format="MMM. dd, yyyy"
+              >
+              </e-column>
+              <!-- <e-column
+                [visible]="false"
+                field="nivel"
+                headerText="Levels"
+              ></e-column> -->
+              <!-- <e-column
+                [visible]="false"
+                field="requisito"
+                headerText="Pending Steps"
+              ></e-column> -->
+              <e-column field="categories" headerText="Categories">
+                <ng-template #filterTemplate let-data>
+                  <!-- <ng-multiselect-dropdown
+                    placeholder="Select categories"
+                    [data]="dropdata"
+                    [settings]="selectCatOptions"
+                    (onSelect)="onChange($event)"
+                  ></ng-multiselect-dropdown> -->
+                  <ejs-dropdownlist
+                    id="dropdown"
+                    [(ngModel)]="data.name"
+                    [enabled]="data.column.allowFiltering"
+                    (change)="onChange($event)"
+                    [dataSource]="dropdata"
+                    [fields]="fields"
+                    [popupHeight]="height"
+                  ></ejs-dropdownlist>
+
+                  <!-- <ejs-dropdownlist
+                    id="dropdown"
+                    [(ngModel)]="data.name"
+                    [dataSource]="dropdata"
+                    [fields]="fields"
+                    [popupHeight]="height"
+                    (change)="onChange($event)"
+                  ></ejs-dropdownlist> -->
+                </ng-template>
+                <ng-template #template let-data>
+                  <div style="white-space: normal">
+                    <span
+                      *ngFor="let category of data.categories"
+                      class="badge badge-pill badge-secondary"
+                    >
+                      {{ category.name }}
+                    </span>
+                    <span *ngIf="data.categories?.length === 0">
+                      <i> Not categories assigned </i>
+                    </span>
+                  </div>
+                </ng-template>
+              </e-column>
+              <e-column field="configurations" headerText="Configurations">
+                <ng-template #template let-data>
+                  <div class="btn-group">
+                    <button
+                      routerLink="details/{{ data.idUsuario }}"
+                      [queryParams]="{ telefono: data.telefono }"
+                      class="btn btn-sm btn-primary"
+                    >
+                      <i class="fa fa-eye"> </i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteUsuario(data?.idUsuario)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                    <!-- <button
+                    class="btn btn-sm btn-warning"
+                    (click)="showLogs(contact)"
+                  >
+                    <i class="fa fa-eye"></i>
+                  </button> -->
+                  </div>
+                </ng-template>
+              </e-column>
+            </e-columns>
+          </ejs-grid>
+        </div>
+
+        <div class="col-xs-6 mb-5">
+          <button class="btn btn-primary mb-2" (click)="iframeCodeModal.open()">
+            Register Embed
+          </button>
+        </div>
+        <div class="col-xs-6 mb-5 ml-2">
+          <button class="btn btn-primary mb-2" (click)="linkModal.open()">
+            Register Link
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Extra large modal -->
+
+<div
+  class="modal fade bd-example-modal-xl"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myExtraLargeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <pdf [contacts]="contacts"> </pdf>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #formModal identifier="formModal" customClass="large-modal">
+  <h4>Add new contact</h4>
+  <member-form
+    (onSubmit)="formModal.close(); getContacts(currentUser['idIglesia'])"
+  ></member-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #editModal
+  identifier="editModal"
+  customClass="large-modal"
+  (onAnyCloseEvent)="selectedContact = undefined"
+>
+  <h4>Edit contact | {{ selectedContact?.nombre }}</h4>
+  <ng-template [ngIf]="selectedContact">
+    <member-form
+      [member]="selectedContact"
+      (onSubmit)="editModal.close(); getContacts(currentUser['idIglesia'])"
+    ></member-form>
+  </ng-template>
+</ngx-smart-modal>
+
+<ngx-smart-modal #iframeCodeModal identifier="iframeCodeModal">
+  <h4>Register Embed</h4>
+  <pre style="background-color: #e2e2e2; padding: 8px">
+    {{ iframeCode.entry_point }}
+  </pre>
+
+  <div>Scripts</div>
+  <pre style="background-color: #e2e2e2; padding: 8px">
+    {{ iframeCode.scripts }}
+  </pre>
+
+  <div class="form-group mt-1">
+    <label for="selectLang">Select language</label>
+    <select class="form-control" id="selectLang" [(ngModel)]="iframeLang">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+    </select>
+  </div>
+
+  <p>Copy this code and paste it on your website</p>
+</ngx-smart-modal>
+
+<ngx-smart-modal #linkModal identifier="linkModal">
+  <h4>Register Link</h4>
+  <pre style="background-color: #e2e2e2; padding: 8px">
+    {{ iframeCode.direct_link }}
+  </pre>
+
+  <div class="form-group mt-1">
+    <label for="selectLang">Select language</label>
+    <select class="form-control" id="selectLang" [(ngModel)]="linkLang">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+    </select>
+  </div>
+
+  <p>Copy this url and paste use it on you website</p>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #formAddModal
+  identifier="formAddModal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-simple-member-form
+    #user_form
+    [iglesias]="iglesias"
+    (onDismiss)="onModalEditDidDismiss(formAddModal, $event)"
+    (onDismissOnlyLoad)="onModalEditOnlyLoadDidDismiss(formAddModal, $event)"
+  >
+  </app-simple-member-form>
+</ngx-smart-modal>

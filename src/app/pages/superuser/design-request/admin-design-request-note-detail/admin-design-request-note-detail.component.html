@@ -1,0 +1,37 @@
+<div class="container page">
+  <ng-template [ngIf]="!design_request_note">
+    <div class="d-flex justify-content-center" style="margin: 15%;">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem;"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div *ngIf="design_request_note">
+    <div class="row header-note">
+      <h4 class="col-12 text-citric">
+        Note Detail #{{ design_request_note?.idDesignRequest }}-{{
+          design_request_note?.idDesignRequestNote
+        }}
+      </h4>
+      <div class="col-12">
+        <h4 class="text-dark">
+          Created at
+          {{ design_request_note?.createdAt | date: "MMM/dd yyyy hh:mm:ss a" }} by
+          {{ design_request_note?.userCreatedBy }}
+        </h4>
+      </div>
+    </div>
+
+    <hr />
+
+    <h4 class="text-muted">
+      Content:
+    </h4>
+    <div *ngIf="design_request_note" class="content-detail-container">
+      <span [innerHtml]="addClass(design_request_note.content)"></span>
+    </div>
+  </div>
+</div>

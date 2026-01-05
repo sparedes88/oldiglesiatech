@@ -1,0 +1,40 @@
+ul {
+    .list-title {
+        background-color: #e65100 !important;
+        font-weight: bold;
+        color: white;
+    }
+}
+
+.builder-scroll {
+    min-height: 0px;
+    max-height: 60vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: 0.3s;
+}
+
+.disabled {
+    cursor: not-allowed !important;
+}
+
+.report-preview-container {
+    max-height: 20vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: 0.3s;
+}
+
+.card-img-top-fixed {
+    object-fit: cover;
+    object-position: left center;
+    height: 200px;
+  }
+  
+  .card-fixed-text {
+    height: 200px;
+  }
+  
+  .card {
+    border: none !important;
+  }

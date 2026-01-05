@@ -1,0 +1,285 @@
+:root {
+    --donation-header-background: #3f3f3f;
+    --donation-active-background: #ddd;
+    --donation-active-text-color: #000;
+}
+@mixin color-opacity($color, $opacity: 0.3) {
+    color: $color; /* The Fallback */
+    color: rgba($color, $opacity);
+}
+
+.page-give__header___8NIoV {
+    // position: absolute;
+    // top: -260px;
+    left: 0;
+    width: 100%;
+    color: #fff;
+    text-align: center;
+    padding: 44px 0 0;
+    background-color: #2d2d2d;
+}
+
+.form-control-container {
+    margin-bottom: 15px;
+}
+
+.page-give__amount___3r4CS {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    position: relative;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-transition: 0.25s;
+    transition: 0.25s;
+    height: 100px;
+}
+
+.index__input-zero-value___3n8Du {
+    color: hsla(0, 0%, 100%, 0.5);
+    caret-color: #fff;
+}
+
+.page-give__input___3O3xP {
+    font-weight: 200;
+    border: 0;
+    line-height: 1;
+    width: 100%;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+    background: transparent;
+    padding: 0;
+    font-size: 60px;
+}
+
+.page-give__decorator___1Z1SH {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    line-height: 1;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.page-give__wrapper___B1pt- {
+    border-bottom: 1px solid #fff;
+    position: relative;
+    z-index: 0;
+    line-height: 1;
+    font-size: 60px;
+}
+
+.page-give__dollar___3yuSE {
+    font-size: 24px;
+    vertical-align: super;
+    position: absolute;
+    left: -24px;
+    text-align: center;
+    display: inline-block;
+    width: 24px;
+}
+
+.page-give__underline___3YWXK {
+    color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.page-give__wrapper___B1pt-.page-give__zero___2i8B3 {
+    border-bottom: 1px solid hsla(0, 0%, 100%, 0.5);
+}
+
+::ng-deep {
+    .test_number_only {
+        .CardBrandIcon-inner--front {
+            font-size: 48px;
+        }
+        .CardNumberField-input-wrapper {
+            left: 5em;
+        }
+    }
+}
+
+.donation-panel {
+    background: #fafafa;
+}
+
+#donation-header {
+    height: 350px;
+    background: var(--donation-header-background);
+    color: var(--donation-header-text-color);
+    justify-content: center;
+    display: flex;
+}
+
+.form-group-container {
+    padding-top: 30px;
+    max-width: 678px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    align-content: baseline;
+}
+
+.amount-control {
+    border: none;
+    background: transparent;
+    color: var(--donation-header-text-color);
+    // border-bottom: 1px solid white;
+    font-size: 80px;
+    text-align: center;
+    &:focus {
+        background: transparent;
+        color: var(--donation-header-text-color);
+        // border-bottom: 1px solid white;
+        box-shadow: none;
+    }
+    &.value-zero {
+        color: var(--donation-header-text-color-zero);
+        opacity: 0.5;
+        caret-color: var(--donation-header-text-color);
+    }
+}
+
+// color: hsla(0, 0%, 100%, 0.5);
+.amount-decorator {
+    font-size: 80px;
+    color: transparent;
+    position: absolute;
+    // width: 100%;
+    top: 0px;
+    border-bottom: 1px solid var(--donation-header-text-color);
+    pointer-events: none;
+    font-weight: bold;
+}
+
+.step-1 {
+    top: -120px;
+    // height: 300px;
+}
+
+.step-2 {
+}
+
+.btn-group {
+    width: 100%;
+    .btn.full {
+        width: 100%;
+        border: 1px solid gainsboro;
+        &.active {
+            border: none;
+            background: var(--donation-active-background);
+            color: var(--donation-active-text-color);
+        }
+        &.round {
+            border-radius: 20px;
+            padding: 10px 0;
+        }
+    }
+}
+
+.new-card {
+    height: 155px;
+    width: 256px;
+    border-radius: 0.84615em;
+    background: linear-gradient(90deg, #c5c5c5, #f3f3f3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.is-loading {
+    color: transparent !important;
+    pointer-events: none;
+    // .tooltip_ {
+    //   display: none !important;
+    // }
+}
+.is-loading::after {
+    position: absolute;
+    left: calc(50% - (1em / 2));
+    top: calc(50% - (1em / 2));
+    position: absolute !important;
+}
+.is-loading::after,
+.control.is-loading::after,
+.loader,
+.is-loading::after {
+    -webkit-animation: spinAround 0.5s infinite linear;
+    animation: spinAround 0.5s infinite linear;
+    border: 2px solid var(--donation-header-background);
+    border-radius: 290486px;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    content: "";
+    display: block;
+    height: 1em;
+    position: relative;
+    width: 1em;
+}
+
+@-webkit-keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+@keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+.brand-logo {
+    max-width: 70px;
+    width: 70px;
+    min-height: 3em;
+    background-repeat: no-repeat;
+    background-size: 17.076923em 39.69230769230769em;
+    display: inline-block;
+    &.amex {
+        background-position: -0.07692307692307693em -0.07692307692307693em;
+        background-image: url(/assets/img/card-logos.svg);
+        width: 3.4615384615384617em;
+        height: 3.4615384615384617em;
+    }
+    &.visa {
+        background-position: -0.07692307692307693em -36.746154em;
+        background-image: url(/assets/img/card-logos.svg);
+    }
+    &.mastercard {
+        background-image: url(/assets/img/card-logos.svg);
+        background-position: -0.07692307692307693em -18.846153846153847em;
+    }
+}

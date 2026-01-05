@@ -1,0 +1,226 @@
+<div [formGroup]="group">
+  <div [formArrayName]="array_name" class="col-12 mt-2">
+    <h5 *ngIf="is_parent" class="text-secondary">Document Content</h5>
+    <div *ngIf="is_parent" class="row">
+      <div class="col-10">Add section</div>
+      <div class="col-2">
+        <button (click)="addParagraph()" class="btn btn-sm btn-success">
+          Add
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div
+        cdkDropList
+        class="drag-list builder-scroll"
+        (cdkDropListDropped)="dropParagraph($event)"
+      >
+        <ng-container
+          *ngFor="let paragraph of paragraphs.controls; let i = index"
+        >
+          <div [formGroupName]="i" class="drag-box row" cdkDrag>
+            <div class="col-8">
+              <p class="m-0">
+                {{ paragraph.value.title }}
+                <br />
+                <small
+                  style="display: inline-block"
+                  [innerHTML]="
+                    paragraph.value.content | safe: 'text' | slice: 0:60
+                  "
+                >
+                </small>
+                <span
+                  *ngIf="
+                    (paragraph.value.content | safe: 'text').toString().length >
+                    60
+                  "
+                >
+                  ...
+                </span>
+              </p>
+              <div class="row">
+                <div
+                  *ngIf="getPicturesToDelete(paragraph).length > 0"
+                  class="col-12 row"
+                >
+                  <div
+                    *ngFor="
+                      let photo of getPicturesToDelete(paragraph);
+                      let i = index
+                    "
+                    class="col-5 gallery-item text-right"
+                    [ngStyle]="{ 'background-image': getBgImage(photo) }"
+                  >
+                    <button
+                      class="btn btn-danger btn-sm"
+                      (click)="deletePhoto(paragraph, photo, i)"
+                    >
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- <div
+                  class="col-6"
+                  *ngFor="let picture of paragraph.value.pictures"
+                >
+                  <img class="picture" [src]="base_url + picture.url" alt="" />
+                </div> -->
+              </div>
+            </div>
+            <div class="col-4 btn-group">
+              <button
+                class="btn btn-sm btn-info ml-2"
+                (click)="openEditModal(paragraph, i)"
+              >
+                <i class="fa fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-danger ml-2"
+                (click)="deleteParagraph(paragraph, i)"
+              >
+                <i class="fa fa-trash-alt"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-success ml-2"
+                (click)="addChildren(paragraph, i)"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="mx-1" *ngIf="paragraph.get('children').value.length > 0">
+            <app-document-paragraph-draglist
+              [group]="paragraph"
+              [array_name]="'children'"
+              [deep_level]="deep_level + 1 + '_' + i"
+              (request_document_detail)="emitToParent()"
+            >
+            </app-document-paragraph-draglist>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #paragraph_in_progress_modal
+  [identifier]="'paragraph_in_progress_modal_' + deep_level"
+  [escapable]="false"
+  [dismissable]="false"
+  [customClass]="'medium-modal'"
+>
+  <div class="row m-0">
+    <span class="red col-12">
+      <small>
+        Please remember save all your changes on the main form.
+      </small>
+    </span>
+    <div class="col-12">
+      <div class="card">
+        <form #group_form="ngForm" [formGroup]="actual_edited_group">
+          <div class="row justify-content-center card-body">
+            <div class="col-12">
+              <div class="form-group">
+                <label>Title</label>
+                <input
+                  type="text"
+                  required
+                  class="form-control mb-1"
+                  placeholder="Enter your paragraph's title."
+                  formControlName="title"
+                  [class.is-invalid]="
+                    actual_edited_group.get('title').dirty &&
+                    actual_edited_group.get('title').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label>Content</label>
+                <text-editor
+                  formControlName="content"
+                  [identifier]="'paragraph-' + 1"
+                ></text-editor>
+                <!-- <textarea
+                  type="text"
+                  required
+                  class="form-control mb-1"
+                  placeholder="Enter a content for this document."
+                  formControlName="content"
+                  [class.is-invalid]="
+                    actual_edited_group.get('content').dirty &&
+                    actual_edited_group.get('content').invalid
+                  "
+                ></textarea> -->
+              </div>
+            </div>
+
+            <span
+              class="red col-12"
+              *ngIf="!actual_edited_group?.get('idParagraph')?.value"
+            >
+              <small>
+                * In order to add images please save this paragraph before.
+              </small>
+            </span>
+
+            <div
+              *ngIf="getPicturesToDelete(actual_edited_group).length > 0"
+              class="col-12 row"
+            >
+              <div
+                *ngFor="
+                  let photo of getPicturesToDelete(actual_edited_group);
+                  let i = index
+                "
+                class="col-3 gallery-item text-right"
+                [ngStyle]="{ 'background-image': getBgImage(photo) }"
+              >
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="deletePhoto(actual_edited_group, photo, i)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div
+              *ngIf="actual_edited_group?.get('idParagraph')?.value"
+              class="col-xs-12 col-md-12"
+            >
+              <div class="form-group">
+                <label for="file">Choose File</label>
+                <input
+                  class="form-control"
+                  type="file"
+                  id="file"
+                  accept="image/*"
+                  [multiple]="true"
+                  [max]="3"
+                  [maxLength]="3"
+                  (change)="handleFileInput($event.target.files)"
+                />
+              </div>
+            </div>
+
+            <div class="col-4 text-center">
+              <button
+                (click)="saveParagraph()"
+                class="btn btn-sm btn-success col-12"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>

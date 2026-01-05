@@ -1,0 +1,75 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-8 align-self-center">
+      <h1 class="text-secondary">Approved Disciplers</h1>
+    </div>
+    <div class="col-12 col-md-4 text-right align-self-center">
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-citric" (click)="close.emit()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="row" [formGroup]="new_disciple_discipler">
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label> Select the disciplers for this user </label>
+        <ng-multiselect-dropdown
+          placeholder="Select at least one discipler"
+          [data]="disciplers"
+          [settings]="selectCatOptions"
+          formControlName="idDisciplers"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label>
+          Contact type
+        </label>
+        <select (change)="getElementsByType()" formControlName="table_reference" class="form-control">
+          <option value="" disabled selected>-- Select an option --</option>
+          <option value="users">Users</option>
+          <option value="mailing_list">Contact Inbox</option>
+        </select>
+      </div>
+      <div *ngIf="getting_elements">
+        <ng-template [ngIf]="getting_elements">
+          <div class="d-flex justify-content-center" style="margin: 15%">
+            <div
+              class="spinner-border text-citric"
+              style="width: 6rem; height: 6rem"
+              role="status"
+            ></div>
+          </div>
+        </ng-template>
+      </div>
+      <div *ngIf="new_disciple_discipler.get('table_reference').value === 'users' && !getting_elements" class="form-group">
+        <label> Select a contact </label>
+        <ng-multiselect-dropdown
+          placeholder="Select an user"
+          [data]="contacts"
+          [settings]="selectUserOptions"
+          formControlName="selected_user"
+        ></ng-multiselect-dropdown>
+      </div>
+      <div *ngIf="new_disciple_discipler.get('table_reference').value === 'mailing_list' && !getting_elements" class="form-group">
+        <label> Select a contact </label>
+        <ng-multiselect-dropdown
+          placeholder="Select an user"
+          [data]="mailing_list_contacts"
+          [settings]="selectContactInboxUserOptions"
+          formControlName="selected_mailing_list"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <div class="col-12 text-right mt-2 mb-3">
+      <button class="btn btn-sm btn-success" (click)="saveNewDisciple()">
+        Submit
+      </button>
+    </div>
+  </div>
+</div>

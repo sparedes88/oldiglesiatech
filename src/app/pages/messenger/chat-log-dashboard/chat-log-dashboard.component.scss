@@ -1,0 +1,55 @@
+.organization-logo {
+    height: 50px;
+    width: auto;
+}
+
+table > thead > th {
+    text-align: center;
+}
+
+.is-loading {
+    color: transparent !important;
+    pointer-events: none;
+    // .tooltip_ {
+    //   display: none !important;
+    // }
+}
+.is-loading::after {
+    position: absolute;
+    left: calc(50% - (1em / 2));
+    top: calc(50% - (1em / 2));
+    position: absolute !important;
+}
+.is-loading::after,
+.control.is-loading::after,
+.loader,
+.is-loading::after {
+    -webkit-animation: spinAround 0.5s infinite linear;
+    animation: spinAround 0.5s infinite linear;
+    border: 2px solid var(--donation-header-background);
+    border-radius: 290486px;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    content: "";
+    display: block;
+    height: 1em;
+    position: relative;
+    width: 1em;
+}
+
+@-webkit-keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+@keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}

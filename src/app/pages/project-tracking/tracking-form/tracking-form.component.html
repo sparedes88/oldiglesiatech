@@ -1,0 +1,369 @@
+<div class="container">
+  <h3 class="mt-1">{{ iglesia?.Nombre }}</h3>
+  <div class="row mt-3">
+    <div class="col-xs-12 col-md-4 col-lg-3">
+      <h4>Steps</h4>
+      <ul class="steps-list">
+        <li
+          [ngClass]="{ active: currentForm == 'first_meeting' }"
+          (click)="currentForm = 'first_meeting'"
+        >
+          1. Reunión Inicial
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'mockup' }"
+          (click)="currentForm = 'mockup'"
+        >
+          2. Logo Creación
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'initial_config' }"
+          (click)="currentForm = 'initial_config'"
+        >
+          3. Contenido - Web
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'revision_meeting_1' }"
+          (click)="currentForm = 'revision_meeting_1'"
+        >
+          4. Proceso - Web
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'revision_meeting_2' }"
+          (click)="currentForm = 'revision_meeting_2'"
+        >
+          5. Entregadas - Web
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'revision_meeting_3' }"
+          (click)="currentForm = 'revision_meeting_3'"
+        >
+          6. Stripe
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'content_development' }"
+          (click)="currentForm = 'content_development'"
+        >
+          7. Dominio Migración
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'mobile_app_development' }"
+          (click)="currentForm = 'mobile_app_development'"
+        >
+          8. Google Business
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'app_delivery' }"
+          (click)="currentForm = 'app_delivery'"
+        >
+          9. App Móvil
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'platform_training' }"
+          (click)="currentForm = 'platform_training'"
+        >
+          10. Panel Iglesia Tech
+        </li>
+        <li
+          [ngClass]="{ active: currentForm == 'web_maintenance' }"
+          (click)="currentForm = 'web_maintenance'"
+        >
+          11. Soporte
+        </li>
+      </ul>
+    </div>
+    <!-- Initial interview -->
+    <div class="col-xs-12 col-md-8 col-md-9">
+      <div [hidden]="currentForm != 'first_meeting'">
+        <div class="row">
+          <div class="col-12">
+            <h4>Reunión inicial</h4>
+            <step-progress-bar
+              [progress]="first_meeting.progress"
+            ></step-progress-bar>
+          </div>
+          <div class="col-xs-12 col-md-4">
+            <mat-form-field appearance="outline" class="w-100 fix-margin">
+              <mat-label>Date</mat-label>
+              <input
+                type="text"
+                matInput
+                [matDatepicker]="datepicker"
+                name="date"
+                [(ngModel)]="first_meeting.start_date"
+              />
+              <mat-datepicker #datepicker></mat-datepicker>
+              <mat-datepicker-toggle [for]="datepicker" matPrefix>
+                <mat-icon color="primary" matDatepickerToggleIcon
+                  >calendar_today</mat-icon
+                >
+              </mat-datepicker-toggle>
+            </mat-form-field>
+          </div>
+          <div class="col-xs-12 col-md-4">
+            <div class="form-group">
+              <label>Dias asignados</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar-check"></i>
+                  </span>
+                </div>
+                <input
+                  type="number"
+                  min="0"
+                  class="form-control"
+                  placeholder="# dás asignados"
+                  [(ngModel)]="first_meeting.days_alloted"
+                  (change)="setStartDate()"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-4">
+            <div class="form-group">
+              <label>Progreso</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar-check"></i>
+                  </span>
+                </div>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  class="form-control"
+                  placeholder="Progreso %"
+                  [(ngModel)]="first_meeting.progress"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label>Descripción</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fa fa-align-left"></i>
+                  </span>
+                </div>
+                <textarea
+                  class="form-control"
+                  placeholder="Notes"
+                  [(ngModel)]="first_meeting.notes"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <button
+              class="btn btn-success"
+              [disabled]="saving"
+              (click)="saveProjectTracking('first_meeting')"
+            >
+              <i class="fa fa-paper-plane"></i>
+              {{ saving ? "Saving..." : "Save" }}
+            </button>
+          </div>
+          <div class="col-12" *ngIf="its_loaded">
+            <div class="form-group" >
+              <label>Enlazar nota existente</label>
+              <div class="input-group" style="width: 100%;">
+                <div class="input-group-prepend" style="width: 90%;">
+                  <ng-select *ngIf="true" [items]="all_notes[0]" bindLabel="descripcion" class="custom" placeholder="Select a note"
+                    bindValue="idNotaIglesia" [searchable]="true" [(ngModel)]="selected_notes[1]"
+                    style="text-align: center; height: 32px; width: 100%; max-height: 32px;" [multiple]="true">
+                    <ng-template ng-option-tmp let-item="item" let-index="index" class="custom">
+                      <div class="notaItemContainer">
+                        <div class="notaItemDate">
+                          <div class="row">
+                            <div class="col-6 text-left">
+                              <span *ngIf="item.user_created_by">
+                                {{ item.user_created_by }}
+                              </span>
+                            </div>
+                            <div class="col-6">
+                              <span class="notaItemDateSpan">
+                                {{ item.fechaCreacion | date: "MMM. dd yyyy" }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <p ion-text color="black" class="notaItemDescripcion" [innerHtml]="item.descripcion | keepHtml"></p>
+                      </div>
+                    </ng-template>
+                  </ng-select>
+                </div>
+                <div class="input-group-append">
+                  <button class="btn btn-success" [disabled]="saving" (click)="addNoteToProjectTracking(1)">
+                    <i class="fa fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="its_loaded" >
+            <app-notes-home [idProjectTracking]="this.projectTrackingId" [idProjectTrackingStep]="1"
+              class="col-4 p-0 form-fixed" [idIglesia]="this.idIglesia" [adminsInit]="adminsInitiated"
+              style="width: 100%; max-width: 100%;" [notes]="linked_notes[0]" [id]="'linked_note_form_'+currentForm">
+            </app-notes-home>
+          </div>
+          <div class="col-12 text-center" *ngIf="!its_loaded" >
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Loop forms -->
+      <ng-container *ngFor="let form of formArray; let i = index">
+        <div [hidden]="currentForm != form.id">
+          <div class="row">
+            <div class="col-12">
+              <h4>{{ form.label }}</h4>
+              <step-progress-bar
+                [progress]="form?.form?.progress"
+              ></step-progress-bar>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="form-group">
+                <label>Fecha de inicio</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Fecha de inicio"
+                    [value]="form?.form.start_date | date: 'MM/dd/yyyy'"
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="form-group">
+                <label>Dias asignados</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="fa fa-calendar-check"></i>
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    class="form-control"
+                    placeholder="# días asignados"
+                    [(ngModel)]="form.form.days_alloted"
+                    (change)="setStartDate()"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="form-group">
+                <label>Progreso</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="fa fa-calendar-check"></i>
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    class="form-control"
+                    placeholder="Progreso %"
+                    [(ngModel)]="form.form.progress"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label (click)="console(form)">Descripción</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="fa fa-align-left"></i>
+                    </span>
+                  </div>
+                  <textarea
+                    class="form-control"
+                    placeholder="Notes"
+                    [(ngModel)]="form.form.notes"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <button
+                class="btn btn-success"
+                [disabled]="saving"
+                (click)="saveProjectTracking(form.id)"
+              >
+                <i class="fa fa-paper-plane"></i>
+                {{ saving ? "Saving..." : "Save" }}
+              </button>
+            </div>
+            <div class="col-12" *ngIf="its_loaded" >
+              <div class="form-group" >
+                <label>Enlazar nota existente</label>
+                <div class="input-group" style="width: 100%;">
+                  <div class="input-group-prepend" style="width: 90%;">
+                    <ng-select *ngIf="true" [items]="all_notes[i+1]" bindLabel="descripcion" class="custom" placeholder="Select a note"
+                      bindValue="idNotaIglesia" [searchable]="true" [(ngModel)]="selected_notes[i+2]"
+                      style="text-align: center; height: 32px; width: 100%; max-height: 32px;" [multiple]="true">
+                      <ng-template ng-option-tmp let-item="item" let-index="index" class="custom">
+                        <div class="notaItemContainer">
+                          <div class="notaItemDate">
+                            <div class="row">
+                              <div class="col-6 text-left">
+                                <span *ngIf="item.user_created_by">
+                                  {{ item.user_created_by }}
+                                </span>
+                              </div>
+                              <div class="col-6">
+                                <span class="notaItemDateSpan">
+                                  {{ item.fechaCreacion | date: "MMM. dd yyyy" }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <p ion-text color="black" class="notaItemDescripcion" [innerHtml]="item.descripcion | keepHtml"></p>
+                        </div>
+                      </ng-template>
+                    </ng-select>
+                  </div>
+                  <div class="input-group-append">
+                    <button class="btn btn-success" [disabled]="saving" (click)="addNoteToProjectTracking(i+2)">
+                      <i class="fa fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12" *ngIf="its_loaded" >
+              <app-notes-home [idProjectTracking]="this.projectTrackingId" [idProjectTrackingStep]="i+2"
+                class="col-4 p-0 form-fixed" [idIglesia]="this.idIglesia" [adminsInit]="adminsInitiated"
+                style="width: 100%; max-width: 100%;" [notes]="linked_notes[i+1]" [id]="'linked_note_form_'+form.id">
+              </app-notes-home>
+            </div>
+            <div class="col-12 text-center" *ngIf="!its_loaded" >
+              <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

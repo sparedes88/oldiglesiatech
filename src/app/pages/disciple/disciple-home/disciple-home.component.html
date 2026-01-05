@@ -1,0 +1,248 @@
+<div class="container">
+  <div
+    [formGroup]="search_filters"
+    *ngIf="!is_a_form_opened"
+    class="row justify-content-end"
+  >
+    <div class="col-12">
+      <h1 class="text-secondary">Disciple Report</h1>
+    </div>
+    <div
+      class="col-12 col-md-4"
+      *ngIf="
+        disciple_user?.idDisciplerAccess === 1 ||
+        currentUser.idUserType === 1 ||
+        currentUser?.isSuperUser
+      "
+    >
+      <div class="form-group">
+        <label>
+          <small class="text-secondary"> Search by discipler </small>
+        </label>
+        <ng-multiselect-dropdown
+          placeholder="Select an user"
+          [data]="approved_disciples"
+          [settings]="selectCatOptions"
+          formControlName="selected_discipler"
+          (onSelect)="getDisciples()"
+          (onDeSelect)="getDisciples()"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="form-group">
+        <label> Search </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="search_input"
+        />
+      </div>
+    </div>
+    <div class="col-12 col-md-4 text-right align-self-end">
+      <div class="btn-group mb-3">
+        <!-- <button class="btn btn-sm btn-outline-citric"></button>
+        <button class="btn btn-sm btn-outline-citric">Search</button> -->
+        <button
+          class="btn btn-sm btn-success mr-2"
+          *ngIf="
+            disciple_user?.idDisciplerAccess === 1 ||
+            currentUser.idUserType === 1 ||
+            currentUser?.isSuperUser
+          "
+          (click)="addNewDiscipler()"
+        >
+          <i class="fa fa-plus"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="print()">Print</button>
+        <button
+          class="btn btn-sm btn-outline-citric"
+          [routerLink]="['categories']"
+          routerLinkActive="router-link-active"
+          *ngIf="currentUser?.idUserType === 1 || currentUser?.isSuperUser"
+        >
+          Category
+        </button>
+        <button
+          *ngIf="currentUser?.idUserType === 1 || currentUser?.isSuperUser"
+          class="btn btn-sm btn-outline-citric"
+          (click)="openApprovedForm()"
+        >
+          Aprroved Discipler
+        </button>
+      </div>
+    </div>
+
+    <div class="col-12 mt-3" [formGroup]="disciples_form">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Disciple</th>
+            <th>Discipler</th>
+            <th>Last Contact</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="disciples">
+          <tr
+            *ngFor="let disciple of filtered_disciples; let i = index"
+            [formGroupName]="i"
+          >
+            <td>
+              {{ disciple.full_name }}
+              <br>
+              <small class="text-secondary">
+                <i>
+                  {{ disciple.origin }}
+                </i>
+              </small>
+            </td>
+            <td [ngClass]="{ clickable: !disciple.edit_mode }">
+              <div
+                *ngIf="!disciple.edit_mode && !disciple.add_mode"
+                (click)="disciple.edit_mode = true; disciple.add_mode = false"
+              >
+                {{ disciple.discipler_full_name }}
+              </div>
+              <div
+                class="btn-group float-right mt-1"
+                *ngIf="
+                  available_users(disciple, false).length > 0 &&
+                  !disciple.add_mode &&
+                  !disciple.edit_mode
+                "
+              >
+                <button
+                  class="btn btn-sm btn-success"
+                  (click)="addNewDiscipleDiscpler(disciple)"
+                >
+                  <i class="fa fa-plus"></i>
+                </button>
+              </div>
+
+              <div class="form-group" *ngIf="disciple.edit_mode">
+                <label>
+                  <small class="text-secondary"> Update discipler </small>
+                </label>
+                <ng-multiselect-dropdown
+                  placeholder="Not assigned"
+                  [data]="available_users(disciple, true)"
+                  [settings]="selectCatOptions"
+                  formControlName="selected_discipler"
+                ></ng-multiselect-dropdown>
+
+                <div class="btn-group float-right mt-1">
+                  <button
+                    class="btn btn-sm btn-secondary mr-2"
+                    (click)="
+                      cancelDiscipler(disciple, disciples_form_array.at(i))
+                    "
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    class="btn btn-sm btn-success"
+                    (click)="
+                      updateDiscipler(disciple, disciples_form_array.at(i))
+                    "
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+              <!-- Add -->
+              <div
+                class="form-group"
+                [formGroup]="new_disciple_discipler"
+                *ngIf="disciple.add_mode"
+              >
+                <label>
+                  <small class="text-secondary"> Assign a new discipler </small>
+                </label>
+                <ng-multiselect-dropdown
+                  placeholder="Select an user"
+                  [data]="available_users(disciple, false)"
+                  [settings]="selectCatOptions"
+                  formControlName="selected_discipler"
+                ></ng-multiselect-dropdown>
+
+                <div class="btn-group float-right mt-1">
+                  <button
+                    class="btn btn-sm btn-secondary mr-2"
+                    (click)="cancelDiscipler(disciple, new_disciple_discipler)"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    class="btn btn-sm btn-success"
+                    (click)="addDiscipler(disciple, new_disciple_discipler)"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </td>
+            <td [ngClass]="{ last_note_deadline: getDayDiff(disciple) > 15 }">
+              <span
+                [ngStyle]="{
+                  'font-style': !disciple.last_note_date ? 'italic' : ''
+                }"
+              >
+                {{ (disciple.last_note_date | date) || "N/A" }}
+                <small *ngIf="disciple.notes_count > 0">
+                  <br />
+                  {{ disciple.last_note_category }}
+                  <br />
+                  {{ getDayDiff(disciple) }} days ago.
+                </small>
+              </span>
+            </td>
+            <td class="text-right">
+              <a
+                [routerLink]="disciple.id + '/notes'"
+                class="clickable span-click mr-2"
+              >
+                {{ disciple.notes_count }}
+              </a>
+              <div class="btn-group">
+                <button
+                  class="btn btn-sm btn-clear-secondary"
+                  (click)="addNote(disciple)"
+                >
+                  <i class="fa fa-plus"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-clear-danger"
+                  (click)="deleteDiscipleDiscipler(disciple)"
+                >
+                  <i class="fa fa-trash text-danger"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Approved Disciplers -->
+  <app-approved-discipler-form
+    *ngIf="show_approved"
+    (close)="show_approved = false; getApprovedDisciplers()"
+  ></app-approved-discipler-form>
+
+  <!-- New Discipler -->
+  <app-disciple-form
+    *ngIf="show_new_disciple"
+    [disciplers]="approved_disciples"
+    (close)="show_new_disciple = false; getDisciples()"
+  ></app-disciple-form>
+
+  <!-- Add note -->
+  <app-disciple-note-form
+    *ngIf="show_add_note_form"
+    [idDiscipleDiscipler]="actual_disciple_disciple_id"
+    (close)="closeNoteForm($event)"
+  >
+  </app-disciple-note-form>
+</div>

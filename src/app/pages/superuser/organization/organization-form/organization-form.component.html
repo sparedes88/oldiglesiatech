@@ -1,0 +1,807 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{ isEdit ? "Edit organization" : "Add organization" }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <mat-horizontal-stepper [linear]="true" #stepper>
+    <!-- Step 1 -->
+    <mat-step [stepControl]="basicInfoForm">
+      <form #basicForm="ngForm" [formGroup]="basicInfoForm">
+        <ng-template matStepLabel>Basic Information</ng-template>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <label>
+              Organization Name:* {{ this.searched_iglesias.length }}
+              <i
+                *ngIf="this.searched_iglesias.length == 0"
+                class="fa fa-check-circle"
+                style="color: dodgerblue"
+              ></i>
+              <i
+                *ngIf="this.searched_iglesias.length != 0"
+                class="fa fa-times-circle"
+                style="color: red"
+              ></i>
+            </label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Organization's Name"
+                [(ngModel)]="organization.Nombre"
+                formControlName="name"
+                required
+                (keyup)="searchInterest()"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fas fa-align-left"></i>
+                </span>
+              </div>
+            </div>
+
+            <span
+              class="text-danger error-span"
+              *ngIf="basicInfoForm.get('name').invalid"
+            >
+              * Please fill this info
+            </span>
+          </div>
+
+          <div class="col-xs-12 col-md-6">
+            <label> Address*: </label>
+            <div class="input-group">
+              <google-address-component
+                *ngIf="init_map"
+                [value]="organization.full_address"
+                placeholder="Please type the address of the organization."
+                adressType="address"
+                (setAddress)="getAddress($event)"
+              ></google-address-component>
+            </div>
+            <span
+              class="text-danger error-span"
+              *ngIf="basicInfoForm.get('city').invalid"
+            >
+              * Please fill this info
+            </span>
+          </div>
+
+          <!-- Language -->
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <label for="language"> Select a default Language</label>
+              <select
+                class="form-control"
+                placeholder="Select a default Language"
+                [(ngModel)]="organization.idIdioma"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                <option
+                  *ngFor="let item of dropdowns?.languages"
+                  [value]="item.idIdioma"
+                >
+                  {{ item.Nombre }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Organization Type -->
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="category"> Select organization type: * </label>
+              <ng-multiselect-dropdown
+                #multi_select_type_of_service
+                placeholder="Select a Service Type"
+                [data]="dropdowns?.service_types"
+                [settings]="selectServiceTypeOptions"
+                (onSelect)="fixId('idTipoServicio', $event)"
+                (onDeSelect)="organization.idTipoServicio = 0"
+                formControlName="type_of_service"
+              ></ng-multiselect-dropdown>
+              <span
+                class="text-danger error-span"
+                *ngIf="
+                  (basicInfoForm.get('type_of_service').touched &&
+                    basicInfoForm.get('type_of_service').invalid) ||
+                  organization.idTipoServicio === 0
+                "
+              >
+                * Please select a valid option
+              </span>
+            </div>
+          </div>
+
+          <div class="col-xs-12 col-md-6">
+            <label> Extra information: </label>
+            <div class="input-group">
+              <textarea
+                class="form-control"
+                cols="30"
+                rows="3"
+                [ngModelOptions]="{ standalone: true }"
+                [(ngModel)]="organization.OtrosDatos"
+                type="text"
+              ></textarea>
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fas fa-align-left"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xs-12 col-md-6">
+            <label> Donate Url: </label>
+            <div class="input-group">
+              <textarea
+                class="form-control"
+                cols="30"
+                rows="2"
+                [ngModelOptions]="{ standalone: true }"
+                [(ngModel)]="organization.donateUrl"
+                type="text"
+              ></textarea>
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fas fa-align-left"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label> Select categories </label>
+              <ng-multiselect-dropdown
+                #multi_select_categories
+                formControlName="categories"
+                placeholder="Select the organization category"
+                [data]="dropdowns?.organization_categories"
+                [settings]="selectGeneralOptions"
+              ></ng-multiselect-dropdown>
+              <!-- (onSelect)="fixTags(multi_select_tags)"
+                (onDeSelect)="fixTags(multi_select_tags)" -->
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label> Select denominations </label>
+              <ng-multiselect-dropdown
+                #multi_select_denominations
+                formControlName="denominations"
+                placeholder="Select the organization denomination(s)"
+                [data]="dropdowns?.denominations"
+                [settings]="selectGeneralOptions"
+              ></ng-multiselect-dropdown>
+              <!-- (onSelect)="fixTags(multi_select_tags)"
+                (onDeSelect)="fixTags(multi_select_tags)" -->
+            </div>
+          </div>
+
+          <div *ngIf="organization.tags" class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label> Select a tag </label>
+              <ng-multiselect-dropdown
+                #multi_select_tags
+                placeholder="Select the organization tags"
+                [data]="dropdowns?.tags"
+                [settings]="selectTagsOptions"
+                (onSelect)="fixTags(multi_select_tags)"
+                (onDeSelect)="fixTags(multi_select_tags)"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="estimated">
+                Country Code <span class="text-danger">*</span>
+              </label>
+              <app-custom-select-country
+                #custom_select_country
+                [return_value]="'callingCode'"
+                formControlName="country_code"
+                [idOrganization]="organization?.idIglesia"
+                [preselected_country_code]="organization?.country_code"
+              >
+              </app-custom-select-country>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="d-flex w-100 justify-content-between">
+              <div class="col-8 align-self-center text-left mb-4 ml-4 mt-4">
+                <input
+                  type="checkbox"
+                  id="site_v2"
+                  name="customRadio"
+                  class="custom-control-input"
+                  formControlName="site_v2"
+                  (click)="toggleV2()"
+                />
+                <span (click)="toggleV2()" class="checkmark"></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="site_v2"
+                  (change)="toggleV2()"
+                >
+                  Use site V2?
+                </label>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="basicInfoForm.get('site_v2').value"
+            class="col-12 col-md-6"
+          >
+            <div class="form-group">
+              <label for="site_v2_url"> Site v2 url </label>
+              <input
+                type="url"
+                id="site_v2_url"
+                class="form-control"
+                formControlName="site_v2_url"
+                [class.is-invalid]="
+                  basicInfoForm.get('site_v2_url').touched &&
+                  basicInfoForm.get('site_v2_url').invalid
+                "
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="d-flex w-100 justify-content-between">
+              <div class="col-8 align-self-center text-left mb-4 ml-4 mt-4">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  name="customRadio"
+                  class="custom-control-input"
+                  formControlName="is_featured"
+                  (click)="toggleFeatured()"
+                />
+                <span (click)="toggleFeatured()" class="checkmark"></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label tooltip_"
+                  for="featured"
+                  (change)="toggleFeatured()"
+                >
+                  Is featured?
+                  <span class="tooltiptext">
+                    This means the app will show as featured on the movil app.
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="show_pipeline" class="col-12 col-md-6">
+            <div class="d-flex w-100 justify-content-between">
+              <div class="col-8 align-self-center text-left mb-4 ml-4 mt-4">
+                <input
+                  type="checkbox"
+                  id="acceptance"
+                  name="customRadio"
+                  class="custom-control-input"
+                  formControlName="add_pipeline"
+                  (click)="togglePipeline()"
+                />
+                <span (click)="togglePipeline()" class="checkmark"></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="acceptance"
+                  (change)="togglePipeline()"
+                >
+                  Add a pipeline?
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- END Row -->
+        </div>
+      </form>
+
+      <app-pipeline-simplified-form
+        [pipeline_form]="basicInfoForm.get('pipeline_form')"
+        *ngIf="basicInfoForm.get('add_pipeline').value"
+        (dismiss_form)="dismissPipeline()"
+      >
+      </app-pipeline-simplified-form>
+
+      <div class="row">
+        <div class="col-3 offset-9">
+          <button
+            *ngIf="isEdit"
+            (click)="saveBasicInfoForm()"
+            class="btn btn-secondary mr-2"
+            [disabled]="basicInfoForm.invalid"
+          >
+            Save
+          </button>
+
+          <button
+            class="btn btn-citric"
+            [disabled]="basicForm.invalid"
+            matStepperNext
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- Step 2 -->
+    <mat-step [stepControl]="paymentInfoForm">
+      <ng-template matStepLabel>Payment Information</ng-template>
+      <form #paymentForm="ngForm" [formGroup]="paymentInfoForm">
+        <div class="row">
+          <!-- Plan -->
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="category"> Select organization plan: * </label>
+              <ng-multiselect-dropdown
+                #multi_select_plan
+                placeholder="Select a Plan"
+                [data]="dropdowns?.plans"
+                [settings]="selectPlanOptions"
+                (onDeSelect)="organization.datosPagosIglesia.idCatalogoPlan = 0"
+                (onSelect)="
+                  organization.datosPagosIglesia.idCatalogoPlan =
+                    $event.idCatalogoPlan
+                "
+                formControlName="idCatalogoPlan"
+              ></ng-multiselect-dropdown>
+              <span
+                class="text-danger error-span"
+                *ngIf="
+                  (paymentInfoForm.get('idCatalogoPlan').touched &&
+                    paymentInfoForm.get('idCatalogoPlan').invalid) ||
+                  organization.datosPagosIglesia?.idCatalogoPlan === 0
+                "
+              >
+                * Please select a valid option
+              </span>
+            </div>
+          </div>
+
+          <!-- Payment Type -->
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="category"> Payment Type: * </label>
+              <ng-multiselect-dropdown
+                #multi_select_payment_type
+                placeholder="Select a Payment Type"
+                [data]="dropdowns?.payment_types"
+                [settings]="selectPaymentOptions"
+                (onDeSelect)="organization.datosPagosIglesia.IdTipoDePago = 0"
+                (onSelect)="
+                  organization.datosPagosIglesia.IdTipoDePago =
+                    $event.idTipoDePago
+                "
+                formControlName="idTipoPago"
+              ></ng-multiselect-dropdown>
+              <span
+                class="text-danger error-span"
+                *ngIf="
+                  (paymentInfoForm.get('idTipoPago').touched &&
+                    paymentInfoForm.get('idTipoPago').invalid) ||
+                  organization.datosPagosIglesia.IdTipoDePago === 0
+                "
+              >
+                * Please select a valid option
+              </span>
+            </div>
+          </div>
+
+          <h5 class="col-12">Coupons Data</h5>
+          <!-- Coupon -->
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="category"> Assign Coupon: </label>
+              <ng-multiselect-dropdown
+                #multi_select_coupon
+                placeholder="Select a Coupon"
+                [data]="dropdowns?.cupones"
+                [settings]="selectCouponOptions"
+                (onDeSelect)="organization.cuponesIglesias.idCupon = 0"
+                (onSelect)="
+                  organization.cuponesIglesias.idCupon = $event.idCupon
+                "
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="row">
+        <div class="col-1 offset-10">
+          <button class="btn btn-light" matStepperPrevious>Back</button>
+        </div>
+        <div class="col-1">
+          <button
+            class="btn btn-citric"
+            [disabled]="paymentForm.invalid"
+            matStepperNext
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- Step 3 -->
+    <mat-step [stepControl]="projectInfoForm">
+      <ng-template matStepLabel>Project Information</ng-template>
+      <form #projectForm="ngForm" [formGroup]="projectInfoForm">
+        <!-- Project Manager -->
+        <div class="row">
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="category"> Project Manager: * </label>
+              <ng-multiselect-dropdown
+                #multi_select_users
+                placeholder="Select an User"
+                [data]="dropdowns?.users"
+                [settings]="selectUsersOptions"
+                (onDeSelect)="
+                  organization.datosProyectoIglesia.idUsuarioSistema = 0
+                "
+                (onSelect)="
+                  organization.datosProyectoIglesia.idUsuarioSistema =
+                    $event.idUsuarioSistema
+                "
+                formControlName="idUsuarioSistema"
+              ></ng-multiselect-dropdown>
+              <span
+                class="text-danger error-span"
+                *ngIf="
+                  (projectInfoForm.get('idUsuarioSistema').touched &&
+                    projectInfoForm.get('idUsuarioSistema').invalid) ||
+                  organization.datosProyectoIglesia.idUsuarioSistema === 0
+                "
+              >
+                * Please select a valid option
+              </span>
+            </div>
+          </div>
+
+          <!-- Project Start Date -->
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="start_date">Project start date:</label>
+              <input
+                type="date"
+                class="form-control"
+                id="start_date"
+                [(ngModel)]="
+                  organization.datosProyectoIglesia.fechaInicioProyecto
+                "
+                placeholder="Project Start Date"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+
+          <!-- Domain Purchase Date -->
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="domain_date">Domain purchase date:</label>
+              <input
+                type="date"
+                class="form-control"
+                id="domain_date"
+                [(ngModel)]="
+                  organization.datosProyectoIglesia.fechaCompraDominio
+                "
+                placeholder="Domain Purchase Date"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+
+          <!-- Domain Provider Link -->
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="domain_provider"> Domain provider link:</label>
+              <input
+                type="url"
+                class="form-control"
+                id="domain_provider"
+                [(ngModel)]="
+                  organization.datosProyectoIglesia.enlaceProveedorDominio
+                "
+                placeholder="Domain Provider Link: "
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+
+          <!-- Domain Provider Link -->
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="domain_user"> Domain provider user: </label>
+              <input
+                type="text"
+                class="form-control"
+                id="domain_user"
+                [(ngModel)]="
+                  organization.datosProyectoIglesia.usuarioProveedorDominio
+                "
+                placeholder="Domain Provider User: "
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+
+          <!-- Domain Provider Link -->
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="domain_pass"> Domain provider password: </label>
+              <input
+                type="text"
+                class="form-control"
+                id="domain_pass"
+                [(ngModel)]="
+                  organization.datosProyectoIglesia.passProveedorDominio
+                "
+                placeholder="Domain Provider Pass: "
+                [ngModelOptions]="{ standalone: true }"
+              />
+            </div>
+          </div>
+          <!-- End Row -->
+        </div>
+      </form>
+      <div class="row">
+        <div class="col-1 offset-10">
+          <button class="btn btn-light" matStepperPrevious>Back</button>
+        </div>
+        <div class="col-1">
+          <button
+            class="btn btn-citric"
+            [disabled]="projectForm.invalid || serverBusy"
+            matStepperNext
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- Step 4. Billing information for donations. Optional-->
+    <mat-step [stepControl]="stripeInfoForm">
+      <ng-template matStepLabel>Stripe info</ng-template>
+      <form #projectForm="ngForm" [formGroup]="projectInfoForm">
+        <!-- Address line 1 -->
+        <div class="row">
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="public_key"
+                >Stripe's Public API Key:
+                {{
+                  this.providedTokens.hasPublicKey &&
+                  this.stripe_info.valid_public_key == 0
+                    ? "Provided"
+                    : ""
+                }}
+                {{
+                  !this.providedTokens.hasPublicKey &&
+                  this.stripe_info.valid_public_key == 0
+                    ? "Not provided"
+                    : ""
+                }}
+                {{ this.stripe_info.valid_public_key == 1 ? "Valid" : "" }}
+                {{ this.stripe_info.valid_public_key == 2 ? "Invalid" : "" }}
+                <i
+                  *ngIf="
+                    this.providedTokens.hasPublicKey &&
+                    this.stripe_info.valid_public_key == 0
+                  "
+                  class="fa fa-check-circle"
+                  style="color: dodgerblue"
+                ></i>
+                <i
+                  *ngIf="
+                    !this.providedTokens.hasPublicKey &&
+                    this.stripe_info.valid_public_key == 0
+                  "
+                  class="fa fa-times-circle"
+                  style="color: red"
+                ></i>
+                <i
+                  *ngIf="this.stripe_info.valid_public_key == 1"
+                  class="fa fa-check-circle"
+                  style="color: limegreen"
+                ></i>
+                <i
+                  *ngIf="this.stripe_info.valid_public_key == 2"
+                  class="fa fa-times-circle"
+                  style="color: orange"
+                ></i>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="public_key"
+                [(ngModel)]="stripe_info.public_key"
+                placeholder="pk_live_..."
+                (ngModelChange)="this.stripe_info.valid_public_key = 0"
+                [ngModelOptions]="{ standalone: true }"
+              />
+              <label
+                *ngIf="
+                  !stripe_info.public_key.startsWith('pk_live_') &&
+                  !this.providedTokens.hasPublicKey
+                "
+                style="color: red"
+              >
+                This not a valid API Key. The key must start with "pk_live_"
+              </label>
+              <label
+                *ngIf="
+                  !stripe_info.public_key.startsWith('pk_live_') &&
+                  this.providedTokens.hasPublicKey
+                "
+                style="color: red"
+              >
+                If you provide another key, it will replace the existing API
+                key. The key must start with "pk_live_"
+              </label>
+            </div>
+            <button
+              class="btn btn-primary"
+              [disabled]="
+                stripe_info.public_key.length == 0 ||
+                !stripe_info.public_key.startsWith('pk_live_')
+              "
+              style="width: min-content"
+              (click)="initializeStripe()"
+            >
+              Check
+            </button>
+          </div>
+
+          <!-- Project Start Date -->
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="public_key"
+                >Stripe's Public API Key:
+                {{
+                  this.providedTokens.hasSecretKey &&
+                  this.stripe_info.valid_secret_key == 0
+                    ? "Provided"
+                    : ""
+                }}
+                {{
+                  !this.providedTokens.hasSecretKey &&
+                  this.stripe_info.valid_secret_key == 0
+                    ? "Not provided"
+                    : ""
+                }}
+                {{ this.stripe_info.valid_secret_key == 1 ? "Valid" : "" }}
+                {{ this.stripe_info.valid_secret_key == 2 ? "Invalid" : "" }}
+                <i
+                  *ngIf="
+                    this.providedTokens.hasPublicKey &&
+                    this.stripe_info.valid_secret_key == 0
+                  "
+                  class="fa fa-check-circle"
+                  style="color: dodgerblue"
+                ></i>
+                <i
+                  *ngIf="
+                    !this.providedTokens.hasSecretKey &&
+                    this.stripe_info.valid_secret_key == 0
+                  "
+                  class="fa fa-times-circle"
+                  style="color: red"
+                ></i>
+                <i
+                  *ngIf="this.stripe_info.valid_secret_key == 1"
+                  class="fa fa-check-circle"
+                  style="color: limegreen"
+                ></i>
+                <i
+                  *ngIf="this.stripe_info.valid_secret_key == 2"
+                  class="fa fa-times-circle"
+                  style="color: orange"
+                ></i>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="secret_key"
+                [(ngModel)]="stripe_info.secret_key"
+                placeholder="sk_live_..."
+                [ngModelOptions]="{ standalone: true }"
+              />
+              <label
+                *ngIf="
+                  !stripe_info.secret_key.startsWith('sk_live_') &&
+                  !this.providedTokens.hasSecretKey
+                "
+                style="color: red"
+              >
+                This not a valid API Key. The key must start with "sk_live_"
+              </label>
+              <label
+                *ngIf="
+                  !stripe_info.secret_key.startsWith('sk_live_') &&
+                  this.providedTokens.hasSecretKey
+                "
+                style="color: red"
+              >
+                If you provide another key, it will replace the existing API
+                key. The key must start with "sk_live_"
+              </label>
+            </div>
+            <button
+              class="btn btn-primary"
+              [disabled]="
+                stripe_info.secret_key.length == 0 ||
+                !stripe_info.secret_key.startsWith('sk_live_')
+              "
+              style="width: min-content"
+              (click)="checkSecretKey()"
+            >
+              Check
+            </button>
+          </div>
+          <!-- End Row -->
+        </div>
+      </form>
+
+      <div class="row">
+        <div class="col-1 offset-10">
+          <button class="btn btn-light" matStepperPrevious>Back</button>
+        </div>
+        <div class="col-1">
+          <button
+            class="btn btn-citric"
+            [disabled]="projectForm.invalid || serverBusy"
+            (click)="submit()"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>

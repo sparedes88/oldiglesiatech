@@ -1,0 +1,147 @@
+<div class="container page">
+  <div class="row">
+    <h2 class="col mb-5 mb-md-0">Chat Log</h2>
+
+    <div class="col text-right">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        <i class="fa fa-chevron-left"></i> Back
+      </button>
+    </div>
+  </div>
+  <hr />
+  <div class="card">
+    <div class="card-header">
+      <h5>About this Log</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12 col-md-4">
+          <h6 class="text-center">
+            Total SMS Sent
+            <br />
+            <span class="text-citric">
+              {{ chat_log?.sms_sent }}
+            </span>
+          </h6>
+        </div>
+        <div class="col-12 col-md-4">
+          <h6 class="text-center">
+            Total SMS Delivered
+            <br />
+            <span class="text-citric">
+              {{ chat_log?.sms_delivered }}
+            </span>
+          </h6>
+        </div>
+        <div class="col-12 col-md-4">
+          <h6 class="text-center">
+            Total SMS Cost
+            <br />
+            <span class="text-citric">
+              {{ chat_log?.total_cost | currency }}
+            </span>
+          </h6>
+        </div>
+      </div>
+      <hr />
+      <p class="text-secondary m-0">
+        <span>
+          <span class="text-citric"> Message </span>
+          <small class="text-secondary" *ngIf="chat_log?.segments">
+            ({{ chat_log?.segments }} SMS)
+          </small>
+          - By <b>{{ chat_log?.created_by_fullname }} </b>
+          <br />
+        </span>
+        {{ chat_log?.message }}
+      </p>
+    </div>
+  </div>
+  <hr />
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Send to</h5>
+        </div>
+        <div>
+          <table
+            style="min-width: 100%"
+            class="table table-striped table-bordered"
+          >
+            <thead *ngIf="chat_log?.users.length > 0">
+              <tr>
+                <th width="50%">Name</th>
+                <th width="50%">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of chat_log?.users">
+                <td>
+                  {{ user.full_name }}
+                </td>
+                <td>
+                  {{ user.twilio_status | titlecase }}
+                  <small class="text-danger" *ngIf="user.error_message">
+                    <div class="text-wrap">
+                      <i class="fa fa-info-circle"></i> {{ user.error_message }}
+                    </div>
+                  </small>
+                </td>
+              </tr>
+              <tr *ngIf="chat_log?.users.length == 0">
+                <td>
+                  <h5 class="text-citric text-center">
+                    There aren't outgoing messages.
+                  </h5>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Answers</h5>
+        </div>
+        <div>
+          <table
+            style="min-width: 100%; width: max-content"
+            class="table table-striped table-bordered"
+          >
+            <thead *ngIf="chat_log?.responses.length > 0">
+              <tr>
+                <th>Name</th>
+                <th>Response</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of chat_log?.responses">
+                <td>
+                  {{ user.full_name }}
+                  <small *ngIf="user.created_at" class="text-secondary">
+                    <br />
+                    {{ user.created_at }}
+                  </small>
+                </td>
+                <td>
+                  {{ user.response }}
+                </td>
+              </tr>
+              <tr *ngIf="chat_log?.responses.length == 0">
+                <td>
+                  <h5 class="text-citric text-center">
+                    There aren't answers yet
+                  </h5>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

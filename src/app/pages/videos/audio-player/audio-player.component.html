@@ -1,0 +1,131 @@
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+<div
+  *ngIf="!hide_buttons"
+  [hidden]="loading"
+  class="row justify-content-end"
+  [ngClass]="{ 'mx-0': is_full_width }"
+>
+  <div class="col-6 col-md-2 mb-2" [ngClass]="{ 'px-0': is_full_width }">
+    <button
+      (click)="on_close_video?.emit()"
+      class="btn btn-sm btn-outline-citric col-12"
+    >
+      Close
+    </button>
+  </div>
+</div>
+
+<div class="row justify-content-center" [ngClass]="{ 'mx-0': is_full_width }">
+  <div class="player">
+    <div class="head">
+      <div
+        class="back"
+        [ngStyle]="{
+          backgroundImage: 'url(' + getPicture(video?.thumbnail) + ')'
+        }"
+      ></div>
+      <div class="front">
+        <div
+          class="back main-back"
+          [ngStyle]="{
+            backgroundImage: 'url(' + getPicture(video?.thumbnail) + ')'
+          }"
+        ></div>
+
+        <div class="avatar">
+          <img [src]="fixUrl(video?.organization_logo)" />
+        </div>
+        <div class="infos">
+          <div class="titulo_song bold">
+            {{ video?.title }}
+          </div>
+          <div class="duracao_song">
+            <i class="fa fa-clock-o" aria-hidden="true">
+              Duration: {{ video?.duration }}</i
+            >
+          </div>
+          <div class="tags">
+            <span>
+              {{ video?.speaker }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="timeline">
+      <input
+        (change)="changeSeek($event)"
+        #soundline
+        type="range"
+        class="soundline"
+        max="100"
+        value="0"
+      />
+      <!-- <div class="soundline"></div> -->
+      <div class="controllers active">
+        <!-- <div class="back"></div> -->
+        <div class="play" (click)="togglePlay()">
+          <i class="fa" [ngClass]="is_playing ? 'fa-pause' : 'fa-play'"></i>
+        </div>
+        <!-- <div class="forward"></div> -->
+        <div class="music-player__playback-settings">
+          <div
+            #volumeBar
+            (click)="handChangeVolume($event)"
+            class="music-player__playback-settings-volume-progress-bar"
+          >
+            <div
+              #volumeStatus
+              class="music-player__playback-settings-volume-progress-bar-state"
+            ></div>
+          </div>
+          <div class="play sound" (click)="muteSong()">
+            <i
+              class="fa"
+              [ngClass]="{
+                'fa-volume-mute': audioContainer?.volume == 0,
+                'fa-volume-up': audioContainer?.volume != 0
+              }"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <audio #audio [src]="safe_src"></audio>
+</div>
+
+<!-- <div>
+  <button onclick="document.getElementById('player').play()">Play</button>
+  <button onclick="document.getElementById('player').pause()">Pausa</button>
+  <button onclick="document.getElementById('player').volume+=0.1">
+    Volumen +
+  </button>
+  <button onclick="document.getElementById('player').volume-=0.1">
+    Volumen -
+  </button>
+</div> -->
+
+<!-- <div class="video-responsive">
+  <iframe
+    src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FDisney%2Fposts%2F10158503020190954&width=500&show_text=false&appId=789955441344979&height=282"
+    width="100%"
+    height="282"
+    style="border: none; overflow: hidden"
+    scrolling="no"
+    frameborder="0"
+    allowfullscreen="true"
+    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+  ></iframe>
+</div> -->

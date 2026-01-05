@@ -1,0 +1,243 @@
+<div class="container page">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+          {{ totalGroups || 0 }}
+        </span>
+        <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/timesheet_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div
+      class="col-8"
+      *ngIf="currentUser.idUsuario === 78 || currentUser.idUsuario === 152
+      || currentUser.idUsuario === 235
+      || currentUser.idUsuario === 275
+      || currentUser.idUsuario === 10721
+      "
+    >
+      <div class="form-group">
+        <label for="category">Users</label>
+        <select
+          class="form-control"
+          [(ngModel)]="idUser"
+          placeholder="Select an user."
+        >
+          <option *ngFor="let item of users" [value]="item.idUsuarioSistema">
+            {{ item.fullName }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div
+      class="col-8"
+      *ngIf="currentUser.idUserType === 1 && !currentUser.isSuperUser"
+    >
+      <div class="form-group">
+        <label for="category">Members</label>
+        <select
+          class="form-control"
+          [(ngModel)]="idUser"
+          placeholder="Select an user."
+        >
+          <option *ngFor="let item of users_2" [value]="item.idUsuarioSistema">
+            {{ item.fullName }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-5">
+      <div class="col-12">
+        <div class="form-group">
+          <label for="from">From</label>
+          <input
+            type="date"
+            class="form-control"
+            placeholder="From"
+            [(ngModel)]="filterDates.start"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="col-5">
+      <div class="col-12">
+        <div class="form-group">
+          <label for="from">To</label>
+          <input
+            type="date"
+            class="form-control"
+            placeholder="End"
+            [(ngModel)]="filterDates.end"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="col-1 align-self-center">
+      <button
+        [disabled]="serverBusy"
+        class="btn btn-outline-citric"
+        (click)="search()"
+      >
+        <mat-icon matPrefix>search</mat-icon>
+      </button>
+    </div>
+    <div class="col-1 align-self-center">
+      <button class="btn btn-outline-citric" (click)="print()">
+        <mat-icon>print</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <h3 class="text-citric">
+    Summary By Project
+  </h3>
+  <div class="row center-fix">
+    <div
+      class="col-height-fix"
+      *ngFor="let item of summary"
+      [ngClass]="{
+        'col-6': summary.length === 2 || summary.length === 7,
+        'col-4':
+          (summary.length % 3 == 0 ? true : null) ||
+          (summary.length % 5 == 0 ? true : null) ||
+          (summary.length > 10 && isPrimeNumber(summary.length)),
+        'col-3':
+          summary.length % 4 == 0 ||
+          (summary.length > 10 && !isPrimeNumber(summary.length)),
+        'col-12': summary.length === 1
+      }"
+    >
+      <div class="row align-items-stretch">
+        <div class="col-12 col-header">
+          <b> {{ item.project }} </b>
+        </div>
+        <br />
+        <div class="col-12">{{ item.workHours | number: "1.2-2" }} Hours</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="text-citric">
+    Summary By Day
+  </h3>
+  <h4>Total Hours: {{ total_workHours | number: "1.2-2" }} h</h4>
+  <div class="row center-fix">
+    <div class="col" *ngFor="let item of summary_by_day">
+      <!-- <b> {{ item.name | slice: 0:2 }} </b> -->
+      <b> {{ item.name | translate | slice: 0:2 }} </b>
+      <br />
+      <div class="row">
+        <div class="col-12">
+          {{ item.workHours | number: "1.2-2" }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+
+  <ul #myTab class="nav nav-pills navbar-citric red" id="myTab" role="tablist">
+    <li class="nav-item" *ngFor="let item of days">
+      <a
+        data-toggle="tab"
+        [ngClass]="day === item.value.toString() ? 'active' : ''"
+        class="nav-link text-citric"
+        id="home-tab"
+        href="#home"
+        role="tab"
+        aria-controls="home"
+        aria-selected="true"
+        (click)="changeDay(item)"
+      >
+        {{ item.name | translate | slice: 0:3 }}
+      </a>
+    </li>
+
+    <div class="col-2 align-self-center" style="position: absolute; right: 15px;">
+      <button class="btn btn-outline-citric" (click)="addTimeSheet()">
+        Add
+      </button>
+    </div>
+  </ul>
+
+  <div class="detail-grid">
+    <div class="row"></div>
+    <div class="row row-divider" *ngFor="let item of getItemsByDay(timesheets)">
+      <div
+        class="col-12"
+        *ngIf="currentUser.idUsuario === 78 || currentUser.idUsuario === 152
+        || currentUser.idUsuario === 235
+        || currentUser.idUsuario === 275
+        || currentUser.idUsuario === 10721
+        "
+      >
+        <h4 ion-text color="citric">
+          {{ item.fullName }}
+        </h4>
+      </div>
+      <div class="col-4 col-padding">
+        <b> Project </b> <br />
+        {{ item.project }}
+        <br />
+        <br />
+        <b> Work Type </b> <br />
+        {{ item.workType }}
+      </div>
+      <div class="col-4">
+        <b> Department </b> <br />
+        {{ item.department }}
+        <br />
+        <br />
+        <b> Work Hours </b> <br />
+        {{ item.workHours | number: "1.2-2" }}
+      </div>
+      <div class="col-4">
+        <span *ngIf="item.associatedDesignRequest !== 0">
+          <b>Request Associated</b> <br />
+          <a
+            class="text-citric"
+            [routerLink]="[
+              '/admin/design-request/detail/',
+              item.associatedDesignRequest
+            ]"
+            [queryParams]="{ origin: 'timesheet' }"
+          >
+            # {{ item.associatedDesignRequest }}
+          </a>
+          <br />
+          <br />
+        </span>
+        <b> Notes </b> <br />
+        {{ item.notes }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #formModal_PT
+  identifier="formModal_PT"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+  (onOpenFinished)="initTimeSheet(time_sheet_form_1)"
+>
+  <app-public-time-sheet-form #time_sheet_form_1 (onDismiss)="onModalDidDismiss($event)">
+  </app-public-time-sheet-form>
+</ngx-smart-modal>

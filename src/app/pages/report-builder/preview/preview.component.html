@@ -1,0 +1,56 @@
+<table class="title-table">
+  <tbody>
+    <tr>
+      <td width="100%" align="center">
+        <h4>{{ report?.title }} Report</h4>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br />
+
+<table class="table mt-2 text-left">
+  <thead>
+    <tr class="text-left">
+      <th *ngFor="let column of report?.cols">
+        {{ column?.title }}
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let row of report?.rows">
+      <td *ngFor="let column of report?.cols">
+
+        <ng-container *ngIf="column.file; else elseNoFile">
+          <img
+          style="max-height: 94px; width: auto;"
+          [src]="fixUrl(row[column.value])"
+          onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+        />
+        </ng-container>
+
+        <ng-template #elseNoFile>
+          <ng-container *ngIf="column.array_field; else textField">
+            <ul *ngIf="row[column.value]?.length > 0">
+              <li *ngFor="let item of row[column.value]">
+                {{ item[column.array_field] }}
+              </li>
+            </ul>
+            <div *ngIf="!row[column.value]?.length">
+              --
+            </div>
+          </ng-container>          
+
+          <ng-template #textField>
+            {{ row[column.value] }}
+          </ng-template>
+        </ng-template>
+        
+        
+        
+      </td>
+    </tr>
+  </tbody>
+</table>

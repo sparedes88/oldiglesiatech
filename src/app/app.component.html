@@ -1,0 +1,18 @@
+<app-menu
+  [hidden]="hide_toolbars"
+  #menu
+  *ngIf="
+    menu_enabled &&
+    user_service.getCurrentUser()
+  "
+  id="mainAppMenu"
+></app-menu>
+
+<router-outlet></router-outlet>
+
+<app-footer
+  [hidden]="hide_toolbars"
+  id="mainFooter"
+  #footer
+  *ngIf="menu_enabled"
+></app-footer>

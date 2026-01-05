@@ -1,0 +1,78 @@
+.group-picture {
+    width: 100%;
+    max-height: 250px;
+    margin: 20px;
+    border: 4px white solid;
+}
+.card-body {
+    .group-picture {
+        margin: unset;
+        border-color: gainsboro;
+        max-width: 420px;
+        cursor: pointer;
+    }
+}
+.quill {
+    max-width: fit-content;
+    max-height: fit-content;
+}
+*[quill-editor-element] {
+    height: 300px;
+}
+.is-loading {
+    color: transparent !important;
+    pointer-events: none;
+    // .tooltip_ {
+    //   display: none !important;
+    // }
+}
+.is-loading::after {
+    position: absolute;
+    left: calc(50% - (1em / 2));
+    top: calc(50% - (1em / 2));
+    position: absolute !important;
+}
+.is-loading::after,
+.control.is-loading::after,
+.loader,
+.is-loading::after {
+    -webkit-animation: spinAround 0.5s infinite linear;
+    animation: spinAround 0.5s infinite linear;
+    border: 2px solid #dbdbdb;
+    border-radius: 290486px;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    content: "";
+    display: block;
+    height: 1em;
+    position: relative;
+    width: 1em;
+    // top: 5px;
+}
+@-webkit-keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+@keyframes spinAround {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+.progress-wrapper {
+    width: 100%;
+}
+.progress-wrapper .progress {
+    width: 4%;
+    padding: 0px 5px 0px 5px;
+}
+.btn-success {
+    background-color: #28a745 !important;
+}

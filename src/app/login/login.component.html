@@ -1,0 +1,271 @@
+<body class="Fondo">
+  <div class="container">
+    <div class="row">
+      <div
+        class="col-xs-12 col-sm-12 col-md-12 col-lg-12 align-items-center color1"
+      ></div>
+    </div>
+    <div class="row justify-content-around">
+      <div
+        class="col-xs-8 col-sm-12 col-md-8 col-lg-6 align-self-center color2 m-2 p-5"
+      >
+        <div class="row">
+          <!-- <div class="col">
+          <img id="logo-iglesia" src="/assets/img/logoColor.png" height="45" />
+        </div> -->
+        </div>
+        <ng-template [ngIf]="formMode == 'enterCorreo'">
+          <form
+            [formGroup]="loginCorreoFormGroup"
+            (submit)="CorreoLogin(loginCorreoFormGroup)"
+          >
+            <div class="row">
+              <div class="col mt-3">
+                <h3
+                  [innerHTML]="
+                    'login.verify_email_or_phone_disclaimer' | translate
+                  "
+                ></h3>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <input
+                  type="text"
+                  class="input"
+                  id="Email"
+                  formControlName="Email"
+                  type="text"
+                  [placeholder]="'login.web_input_placeholder' | translate"
+                  autocomplete="off"
+                  style="width: 100%"
+                />
+              </div>
+            </div>
+            <!-- <div class="row">
+          <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-3 ">
+            <p>Want to register your Organization?. <a routerLink="/register" class=" ml-2 mt-2"> Start.</a> </p>
+          </div>
+        </div> -->
+            <div class="row">
+              <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-4">
+                <!-- <button type="button" class="btn btn-primary" (click)="signInWithFB()">
+              <img src="http://vcmediapartners.com/media/images/facebook-white-icon.svg" style="height: 16px; width: auto;">
+              Sign In With Facebook
+            </button> -->
+                <button
+                  id="summit"
+                  type="summit"
+                  class="btn colorButton"
+                  style="float: right"
+                >
+                  {{ "generals.next" | translate }}
+                </button>
+              </div>
+              <!-- <div class="col-12">
+            Search your organization, <a href="/search">here.</a>
+          </div> -->
+            </div>
+          </form>
+        </ng-template>
+        <ng-template [ngIf]="formMode == 'enterPassword'">
+          <form
+            [formGroup]="loginPasswordFormGroup"
+            (submit)="loginCompleto(loginPasswordFormGroup)"
+          >
+            <div class="row mt-3">
+              <div
+                class="col col-xs-1 col-sm-2 col-md-2 col-lg-2 align-self-center"
+              >
+                <a
+                  [routerLink]=""
+                  class="btn btn-secondary btn-sm"
+                  (click)="backCorreo()"
+                  role="button"
+                >
+                  <span class="glyphicon glyphicon-search"></span>
+                  {{ "generals.back" | translate }}</a
+                >
+              </div>
+              <div
+                class="col col-xs-6 col-sm-10 col-md-10 col-lg-10 align-items-center mt-1"
+              >
+                {{ correoDelUsuario }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <h3>Enter {{'Login_Password' | translate}}</h3>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <input
+                  input
+                  id="pass"
+                  name="pass"
+                  formControlName="Pass"
+                  class="input"
+                  type="password"
+                  [placeholder]="'Login_Password' | translate"
+                  style="width: 100%"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-3">
+                <a [routerLink]="" (click)="goRecoverPassword()" class="mt-2">
+                  {{ "login.forgot_my_password" | translate }}</a
+                >
+              </div>
+            </div>
+            <div class="row">
+              <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2">
+                <button
+                  id="summit"
+                  type="summit"
+                  class="btn btn-primary colorButton mb-2"
+                  style="float: right"
+                >
+                  <span
+                    *ngIf="loading"
+                    class="spinner-grow spinner-grow-sm mb-1"
+                  ></span>
+                  {{ btnLogin | translate }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </ng-template>
+        <ng-template [ngIf]="formMode == 'enterRecoverPassword'">
+          <form [formGroup]="recoverPasswordFormGroup">
+            <div class="row mt-3">
+              <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <a
+                  [routerLink]=""
+                  class="btn btn-secondary btn-sm"
+                  (click)="backPassword()"
+                  role="button"
+                >
+                  {{ "generals.back" | translate }}
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col mt-1">
+                <h3>{{'Miembro_Correo' | translate}}</h3>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <input
+                  id="usuario"
+                  name="email"
+                  type="email"
+                  class="input"
+                  formControlName="email"
+                  type="text"
+                  [placeholder]="'Miembro_Correo' | translate"
+                  autocomplete="off"
+                  style="width: 100%"
+                />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-5">
+                <button
+                  type="summit"
+                  class="btn btn-primary colorButton mb-2"
+                  (click)="
+                    sendRecoveryEmail(recoverPasswordFormGroup) ||
+                      sendingRequest
+                  "
+                  style="float: right"
+                  [disabled]="sendingRequest"
+                >
+                  <span
+                    *ngIf="loading"
+                    class="spinner-grow spinner-grow-sm mb-1"
+                  ></span>
+                  {{ btnRecover | translate }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <ngx-smart-modal
+    #selectUserModal
+    identifier="selectUserModal"
+    (onAnyCloseEvent)="cancelLogin()"
+    [escapable]="false"
+    [dismissable]="false"
+  >
+    <h4 class="text-reset">Select your user</h4>
+    <ng-template [ngIf]="userSelectionList">
+      <ul class="p-0 user-selection-list">
+        <li
+          class="row border-bottom py-2"
+          *ngFor="let user of userSelectionList"
+          (click)="selectLoginUser(user)"
+        >
+          <div class="col-4 col-md-3">
+            <img
+              *ngIf="!user._loading"
+              class="logo"
+              src="{{ prodServerUrl + user.logoPic }}"
+              [alt]="user.nombre + ' ' + user.apellido"
+            />
+          </div>
+          <i *ngIf="user._loading" class="fas fa-circle-notch fa-spin"></i>
+          <div class="col-8 col-md-9 user-details">
+            <div style="width: 100%">
+              <span class="text-reset font-weight-bold">
+                {{ user.nombre }} {{ user.apellido }}
+                <br />
+                <small class="text-secondary">
+                  {{ user.iglesia }}
+                </small>
+              </span>
+              <span class="badge badge-info float-right">
+                {{ user.userType }}
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </ng-template>
+  </ngx-smart-modal>
+
+  <!-- Start of LiveChat (www.livechatinc.com) code -->
+  <script type="text/javascript">
+    window.__lc = window.__lc || {};
+    window.__lc.license = 11515233;
+    (function () {
+      var lc = document.createElement("script");
+      lc.type = "text/javascript";
+      lc.async = true;
+      lc.src =
+        ("https:" == document.location.protocol ? "https://" : "http://") +
+        "cdn.livechatinc.com/tracking.js";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(lc, s);
+    })();
+  </script>
+  <noscript>
+    <a href="https://www.livechatinc.com/chat-with/11515233/" rel="nofollow"
+      >Chat with us</a
+    >, powered by
+    <a
+      href="https://www.livechatinc.com/?welcome"
+      rel="noopener nofollow"
+      target="_blank"
+      >LiveChat</a
+    >
+  </noscript>
+  <!-- End of LiveChat code -->
+</body>

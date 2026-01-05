@@ -1,0 +1,399 @@
+<div class="container page">
+  <div class="row m-0">
+    <h3 class="col-12 col-md-6 text-citric">Administrar apps</h3>
+    <div class="col-6 text-right" *ngIf="!is_any_form_open">
+      <button
+        class="btn btn-sm btn-success mr-2"
+        (click)="openAddVersionForm()"
+      >
+        Add version
+      </button>
+      <button class="btn btn-sm btn-success" (click)="openAddPackageForm()">
+        Add package
+      </button>
+    </div>
+  </div>
+
+  <div class="col-12 text-center">
+    <div class="centerImg">
+      <!-- src="/assets/img/google-play-badge.png" -->
+      <img src="/assets/img/logoColor.png" alt="" />
+    </div>
+    <h1 class="text-muted"></h1>
+  </div>
+
+  <div class="row col-12" *ngIf="!is_any_form_open">
+    <br />
+    <form #filters_form="ngForm" [formGroup]="filtersForm" style="width: 100%">
+      <div class="row col-12">
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization"> Organization </label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select an organization"
+              [data]="iglesias"
+              [settings]="selectOptions"
+              formControlName="idOrganization"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+        <!-- Iglesia, Contactos, Managed by y Plan type. -->
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization"> Plan Type </label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select a Plan"
+              [data]="plans"
+              [settings]="selectPlanOptions"
+              formControlName="idPlanType"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization"> Icons status </label>
+            <select class="form-control" formControlName="is_ready">
+              <option value="all">All</option>
+              <option value="partial">Partial</option>
+              <option value="true">Ready</option>
+              <option value="both">Partial + Ready</option>
+              <option value="false">Not ready</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization"> Store status </label>
+            <select class="form-control" formControlName="platform_ready">
+              <option value="unset">Unset</option>
+              <option value="none">None</option>
+              <option value="android">Android</option>
+              <option value="apple">Apple</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-check" style="display: flex; flex-direction: column">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              formControlName="only_available"
+            />
+            <label class="form-check-label" for="idOrganization">
+              Hide cancelled
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <app-version-form
+    (on_close)="handleClose('show_new_version', $event)"
+    *ngIf="views.show_new_version"
+  ></app-version-form>
+
+  <app-package-form
+    (on_close)="handleClose('show_new_package', $event)"
+    *ngIf="views.show_new_package"
+  ></app-package-form>
+
+  <div [hidden]="is_any_form_open" class="col-md-12 table-responsive-sm">
+    <table
+      datatable
+      [dtOptions]="dtOptions"
+      [dtTrigger]="dtTrigger"
+      class="table table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Picture</th>
+          <th>Organization</th>
+          <th>Plan</th>
+          <th>Last submissions</th>
+          <th>Last Version</th>
+          <th>Configurations</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let package of filtered_versions"
+          [ngClass]="{
+            has_new_icons: package.is_ready,
+            inactive: isInactiveOrTest(package.idCatalogoPlan)
+          }"
+        >
+          <td>
+            <img
+              class="organization-picture"
+              [src]="getPicture(package.picture)"
+              [alt]="package.organization_name || 'N/A'"
+            />
+          </td>
+          <td>
+            <span (click)="copyValue(package.organization_name)">
+              {{ package.organization_name || "N/A" }}
+            </span>
+            <br />
+            <span (click)="copyValue(package.app_package)">
+              {{ package.app_package }}
+            </span>
+            <br />
+            <span
+              *ngIf="current_user.idUsuario == 78"
+              class="clickable"
+              (click)="copyValue(package.idOrganization)"
+            >
+              {{ package.idOrganization }}
+              <br />
+            </span>
+            <span
+              *ngIf="current_user.idUsuario == 78"
+              class="clickable"
+              (click)="copyValue(package.branch)"
+            >
+              {{ package.branch }}
+              <br />
+            </span>
+            <span
+              *ngIf="current_user.idUsuario == 78"
+              class="clickable"
+              (click)="copyValue(package.topic)"
+            >
+              {{ package.topic }}
+              <br />
+            </span>
+            <span
+              *ngIf="current_user.idUsuario == 78"
+              class="clickable"
+              (click)="copyValue(package.icon_name)"
+            >
+              {{ package.icon_name }}
+              <br />
+            </span>
+            <span
+              *ngIf="!package.is_maintained && !package.is_cancelled"
+              class="badge badge-success"
+            >
+              Active
+            </span>
+            <span
+              *ngIf="package.is_maintained"
+              class="badge badge-warning mr-2"
+            >
+              Mainance
+            </span>
+            <span *ngIf="package.is_cancelled" class="badge badge-danger">
+              Cancelled
+            </span>
+
+            <br />
+            <a
+              *ngIf="
+                package?.android_id &&
+                !package.is_cancelled &&
+                !isInactiveOrTest(package.idCatalogoPlan)
+              "
+              [href]="
+                'https://play.google.com/store/apps/details?id=' +
+                package?.android_id
+              "
+              target="_blank"
+              class="text-citric"
+            >
+              <i
+                style="background: rgb(164, 198, 57); color: white"
+                class="fab fa-android bigIcon rounded-circle"
+              ></i>
+            </a>
+            <a
+              *ngIf="
+                package?.apple_id &&
+                !package.is_cancelled &&
+                !isInactiveOrTest(package.idCatalogoPlan)
+              "
+              [href]="'https://apps.apple.com/app/id' + package?.apple_id"
+              target="_blank"
+              class="text-citric"
+            >
+              <i
+                style="background: #000000; color: white"
+                class="fab fa-apple bigIcon rounded-circle"
+              ></i>
+            </a>
+
+            <button
+              *ngIf="current_user.idUsuario === 78"
+              (click)="copyDescription(package, true)"
+              class="btn btn-sm p-0 ml-5"
+            >
+              <i
+                style="background: #000000; color: white"
+                class="fa fa-align-justify bigIcon rounded-circle"
+              ></i>
+            </button>
+            <button
+              *ngIf="current_user.idUsuario === 78"
+              (click)="copyDescription(package)"
+              class="btn btn-sm p-0"
+            >
+              <i
+                style="background: #000000; color: white"
+                class="fa fa-compress bigIcon rounded-circle"
+              ></i>
+            </button>
+
+            <button
+              *ngIf="current_user.idUsuario === 78"
+              (click)="
+                copyValue(package.sequencer + ' ' + package.organization_name)
+              "
+              class="btn btn-sm p-0"
+            >
+              <i
+                style="background: #4d4d4d; color: white"
+                class="fa fa-hashtag bigIcon rounded-circle"
+              ></i>
+            </button>
+
+            <button
+              *ngIf="
+                package?.android_id &&
+                !package.is_cancelled &&
+                !isInactiveOrTest(package.idCatalogoPlan) &&
+                current_user.idUsuario == 78
+              "
+              (click)="copyValue(package?.android_id)"
+              class="btn btn-sm p-0"
+            >
+              <i
+                style="background: rgb(164, 198, 57); color: white"
+                class="fab fa-android bigIcon rounded-circle"
+              ></i>
+            </button>
+
+            <button
+              *ngIf="
+                package?.apple_id &&
+                !package.is_cancelled &&
+                !isInactiveOrTest(package.idCatalogoPlan) &&
+                current_user.idUsuario == 78
+              "
+              (click)="copyValue(package?.apple_id)"
+              class="btn btn-sm p-0"
+            >
+              <i
+                style="background: #000000; color: white"
+                class="fab fa-apple bigIcon rounded-circle"
+              ></i>
+            </button>
+
+            <span
+              *ngIf="current_user.idUsuario == 78 && !package.project_name"
+              class="text-danger"
+              (click)="copyValue(package.idIdentificadorIglesia)"
+            >
+              <br />
+              WARNING: THIS PACKAGE IS NOT SETUP FOR PUSH NOTIF.
+              <br />
+              Use this ID => {{ package.idIdentificadorIglesia }} with this last project ID: {{package.last_firebase_project_id}}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="!package.is_main_app">
+              {{ package.plan_name }}
+            </span>
+            <span class="badge badge-success" *ngIf="package.is_main_app">
+              Iglesia Tech (original)
+            </span>
+          </td>
+          <td>
+            <div class="col-12 mb-2">
+              <h6 class="mb-0">Apple</h6>
+              <small
+                class="text-citric"
+                [ngClass]="{
+                  'font-italic': !package?.last_version_ready_for_apple
+                }"
+              >
+                {{ package?.last_version_ready_for_apple || "None yet" }}
+              </small>
+            </div>
+            <div class="col-12">
+              <h6 class="mb-0">Android</h6>
+              <small
+                class="text-citric"
+                [ngClass]="{
+                  'font-italic': !package?.last_version_ready_for_android
+                }"
+              >
+                {{ package?.last_version_ready_for_android || "None yet" }}
+              </small>
+            </div>
+          </td>
+          <td>
+            {{ package.version || "N/A" }}
+            <small *ngIf="package.version">
+              <br />
+              Ready for:
+              <br />
+              Android
+              <input
+                disabled
+                readonly
+                type="checkbox"
+                [(ngModel)]="package.ready_for_android"
+              />
+              <br />
+              Apple:
+              <input
+                disabled
+                readonly
+                type="checkbox"
+                [(ngModel)]="package.ready_for_apple"
+              />
+            </small>
+          </td>
+          <td>
+            <div class="btn-group">
+              <a [routerLink]="package.idIdentificador">
+                <button class="btn btn-sm btn-info">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </a>
+            </div>
+            <small *ngIf="!package.is_ready && package.partial_ready">
+              <br />
+              <br />
+              New icons in process
+              <br />
+            </small>
+            <button
+              *ngIf="!package.is_ready && package.partial_ready"
+              class="btn btn-sm btn-secondary"
+              (click)="downloadFiles(package, true)"
+            >
+              <i class="fa fa-download"></i>
+            </button>
+            <small *ngIf="package.is_ready">
+              <br />
+              <br />
+              New icons available
+              <br />
+            </small>
+            <button
+              *ngIf="package.is_ready"
+              class="btn btn-sm btn-secondary"
+              (click)="downloadFiles(package, false)"
+            >
+              <i class="fa fa-download"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

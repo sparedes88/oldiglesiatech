@@ -1,0 +1,144 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">Add time sheet.</h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+  </div>
+
+  <ng-template [ngIf]="timesheet.iglesias.length === 0">
+    <div class="d-flex justify-content-center" style="margin: 15%;">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem;"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div *ngIf="timesheet.iglesias.length !== 0">
+    <div class="row align-items-center">
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="work_date">Work Date:</label>
+          <input
+            type="date"
+            class="form-control"
+            placeholder="Work Date"
+            [(ngModel)]="timesheet.workDate"
+          />
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="form-group" style="display: flex; flex-direction: column;">
+          <label for="category">Project</label>
+          <ng-multiselect-dropdown
+            #multi_select
+            placeholder="Select a project"
+            [data]="timesheet?.iglesias"
+            [settings]="selectOptions"
+            (onSelect)="fixIdProject($event)"
+            (onDeSelect)="timesheet.idProject = 0"
+            [disabled]="!currentUser.isSuperUser"
+          ></ng-multiselect-dropdown>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="category">Departament</label>
+          <select
+            class="form-control"
+            [(ngModel)]="timesheet.idDepartment"
+            placeholder="Select a department."
+          >
+            <option
+              *ngFor="let item of timesheet?.departamentos"
+              [value]="item.idDepartamento"
+            >
+              {{ item.nombre }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="category">Work Type</label>
+          <select
+            class="form-control"
+            [(ngModel)]="timesheet.idWorkType"
+            placeholder="Select a work type."
+          >
+            <option
+              *ngFor="let item of timesheet?.workTypes"
+              [value]="item.idWorkType"
+            >
+              {{ item.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="hours">Hours*</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control align-right-fixer"
+            [(ngModel)]="timesheet.workHours"
+            id="hours"
+            placeholder="Hours"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div
+          class="form-group fix-dropdown"
+          style="display: flex; flex-direction: column;"
+        >
+          <label for="category">Relate to Design Request (optional) </label>
+          <ng-multiselect-dropdown
+            placeholder="Select a design request"
+            [data]="timesheet?.requests"
+            [settings]="selectDesignOptions"
+            (onSelect)="timesheet.designRequest = $event"
+            (onDeSelect)="timesheet.designRequest = undefined"
+          ></ng-multiselect-dropdown>
+          <span style="font-size: 12px;" class="text-danger">
+            *If your time sheet solve 2 or more design requests, please submit
+            one time sheet per request.
+          </span>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-12">
+        <div class="form-group">
+          <label for="name">Notes:*</label>
+          <textarea
+            class="form-control"
+            name="notes"
+            cols="30"
+            rows="10"
+            [(ngModel)]="timesheet.notes"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+      <button
+        [disabled]="serverBusy"
+        class="btn btn-citric"
+        (click)="submit(timesheet)"
+      >
+        Update
+      </button>
+    </div>
+  </div>
+</div>

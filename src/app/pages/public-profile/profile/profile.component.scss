@@ -1,0 +1,35 @@
+::ng-deep {
+  .ngucarousel{
+    height: 450px !important;
+  }
+  .ngucarousel-items .item {
+    padding: 0px !important;
+  }
+
+  .slider-arrow {
+    background-color: transparent;
+    border: none;
+    box-shadow: none !important;
+    color: white;
+  }
+  .section-container {
+    .section-item:first-child {
+      background-color: red;
+      app-section {
+        background-color: royalblue;
+        section.app-section,
+        section.app-section::after {
+          padding: 48px 12px 12px !important;
+        }
+      }
+    }
+    .section-item {
+      app-section {
+        section.app-section {
+          padding: 0 12px !important;
+        }
+      }
+    }
+  }
+}
+

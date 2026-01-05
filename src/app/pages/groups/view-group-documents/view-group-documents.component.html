@@ -1,0 +1,156 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      Documents | group: <i>{{ group?.title }} </i>
+    </h4>
+    <div *ngIf="show_dismiss" class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+
+    <div class="col-12 row">
+      <div class="col-3 offset-9">
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success mt-3 mb-3"
+          (click)="uploadPicture(input_file)"
+        >
+          Add Document
+        </button>
+        <div class="col-4" [hidden]="true">
+          <div class="custom-file mb-4">
+            <input
+              #input_file
+              type="file"
+              class="custom-file-input"
+              id="customFile"
+              multiple
+            />
+            <label class="custom-file-label" for="customFile">
+              Choose file
+            </label>
+          </div>
+        </div>
+        <!-- <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+          (click)="print()"
+          [disabled]="show_editable || documents.length === 0"
+        >
+          Print
+        </button> -->
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div [hidden]="show_loading" class="col-12 p-0" style="min-height: 500px">
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="documentStatusForm"
+        style="width: 100%"
+      >
+        <div formArrayName="statuses" class="col-12 p-0">
+          <div
+            class="row"
+            *ngFor="let document of documents; let i = index"
+            [formGroupName]="i"
+          >
+            <div class="col-12" *ngIf="!document.status">
+              <div class="no-records-found mb-2">
+                Document #{{ document.idGroupDocument }} -
+                {{ document.name }} by {{ document.user_deleted_by }} at
+                {{ document.deleted_at | date: "MMM. dd yyyy hh:mm a" }}
+              </div>
+            </div>
+
+            <div *ngIf="document.status" class="col-8 col-md-10">
+              <div *ngIf="!getPermissions()" class="form-group">
+                <div class="form-group">
+                  <label for="estimated" style="width: 100%">
+                    Document Added by {{ document.user_created_by }} at
+                    {{ document.created_at | date: "MMM. dd yyyy" }}
+                  </label>
+                  <input
+                    class="form-control"
+                    placeholder="Document."
+                    type="text"
+                    formControlName="name"
+                    required
+                    [readonly]="!document._editable"
+                    (keydown.enter)="
+                      renameDocument(statuses.controls[i], document)
+                    "
+                  />
+                  <span
+                    *ngIf="document._editable"
+                    class="text-secondary italic"
+                  >
+                    <small> Press "Enter" to save your changes </small>
+                  </span>
+                </div>
+              </div>
+              <div *ngIf="getPermissions()">
+                {{ document.name }}
+              </div>
+            </div>
+            <div
+              *ngIf="document.status"
+              class="col-4 col-md-2 align-self-center"
+            >
+              <div class="btn-group">
+                <button
+                  [ngClass]="{
+                    'btn-info': !document._editable,
+                    'btn-warning': document._editable
+                  }"
+                  class="btn btn-sm fixed-padding"
+                  (click)="toggleEditDocument(statuses.controls[i], document)"
+                >
+                  <i
+                    [ngClass]="{
+                      'fa-pen-square': !document._editable,
+                      'fa-window-close': document._editable
+                    }"
+                    class="fa"
+                  ></i>
+                </button>
+                <button
+                  [disabled]="document._editable"
+                  class="btn btn-sm btn-secondary fixed-padding"
+                  (click)="viewDocument(document)"
+                >
+                  <i class="fa fa-link"></i>
+                </button>
+                <button
+                  [disabled]="document._editable"
+                  class="btn btn-sm btn-success fixed-padding"
+                  (click)="downloadDocument(document)"
+                >
+                  <i class="fa fa-file-download"></i>
+                </button>
+
+                <button
+                  [disabled]="document._editable"
+                  class="btn btn-sm btn-danger fixed-padding"
+                  (click)="deleteDocument(document)"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

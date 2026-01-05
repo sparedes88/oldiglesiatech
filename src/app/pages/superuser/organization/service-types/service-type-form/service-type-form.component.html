@@ -1,0 +1,85 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{
+        service_type?.idTipoServicio
+          ? "Editing " + service_type?.nombre
+          : "Create Service Type"
+      }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div #basic_form="ngForm" [formGroup]="basicInfoForm" style="width: 100%">
+    <div class="row">
+      <div class="col-12">
+        <div class="form-group">
+          <label for="estimated">Name *</label>
+          <input
+            class="form-control"
+            placeholder="Name"
+            type="text"
+            formControlName="nombre"
+            required
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label for="estimated">Description</label>
+          <textarea
+            class="form-control"
+            placeholder="Description"
+            type="text"
+            formControlName="description"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div (click)="showActionSheet(2, input_file_reference)" [formGroup]="basicInfoForm.get('picture')" class="form-group">
+          <label for="estimated">Picture <small>(Recommended size 128x128)</small></label>
+          <input
+            class="form-control"
+            placeholder="Picture url"
+            type="text"
+            formControlName="url"
+            readonly
+          />
+        </div>
+      </div>
+      <input
+        [hidden]="true"
+        #input_file_reference
+        type="file"
+        class="custom-file-input"
+        id="customFile"
+        accept="image/*"
+      />
+      <div *ngIf="image" class="col-12 scrollmenu" style="min-width: 1px; min-height: 120px">
+        <div class="slide-image">
+          <img [src]="fixUrlDesign(image.value)" style="height: 120px" />
+          <button
+            class="btn btn-danger front-element"
+            (click)="removeImage(image)"
+          >
+            x
+          </button>
+        </div>
+      </div>
+
+      <div class="w-100"></div>
+
+      <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+        <button
+          [disabled]="basicInfoForm.invalid || serverBusy"
+          (click)="onRegister()"
+          class="btn btn-citric searchButton"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

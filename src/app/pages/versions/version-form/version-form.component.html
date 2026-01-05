@@ -1,0 +1,85 @@
+<div class="row justify-content-end" [formGroup]="form">
+  <div class="col-12 text-right">
+    <button class="btn btn-sm btn-outline-citric" (click)="close()">
+      <i class="fa fa-close"></i> Close
+    </button>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="form-group">
+      <label>Major</label>
+      <input
+        type="number"
+        class="form-control"
+        formControlName="major"
+        [class.is-invalid]="
+          form.get('major').touched && form.get('major').invalid
+        "
+      />
+      <small class="text-danger" *ngIf="form.get('major').getError('min')">
+        The major version should be greater than {{ last_version.major }}
+      </small>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="form-group">
+      <label>Minor</label>
+      <input
+        type="number"
+        class="form-control"
+        formControlName="minor"
+        [class.is-invalid]="
+          form.get('minor').touched && form.get('minor').invalid
+        "
+      />
+      <small class="text-danger" *ngIf="form.get('minor').getError('min')">
+        The minor version should be greater than {{ last_version.minor }}
+      </small>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="form-group">
+      <label>Patch</label>
+      <input
+        type="number"
+        class="form-control"
+        formControlName="patch"
+        [class.is-invalid]="
+          form.get('patch').touched && form.get('patch').invalid
+        "
+      />
+      <small *ngIf="last_version">
+        * Last version: {{ last_version.version }}
+      </small>
+      <small class="text-danger" *ngIf="form.get('patch').getError('min')">
+        <br />
+        The patch version should be greater than {{ last_version.patch }}
+      </small>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="form-group">
+      <label>Content</label>
+
+      <text-editor
+        #disclaimer_settings_editor
+        [hide_font_buttons]="true"
+        [height]="'300px'"
+        formControlName="change_log"
+      ></text-editor>
+    </div>
+    <!-- (change)="updateSanitizeContent()" -->
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="form-group">
+      <label>Is mandatory?</label>
+      <input
+        type="checkbox"
+        class="form-check-input ml-2"
+        formControlName="is_mandatory"
+      />
+    </div>
+  </div>
+  <div class="col-12 text-right">
+    <button class="btn btn-sm btn-success" (click)="save()">Save</button>
+  </div>
+</div>

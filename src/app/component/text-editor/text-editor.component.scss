@@ -1,0 +1,198 @@
+::ng-deep {
+  .ql-lite {
+    .ql-editor {
+      min-height: auto !important;
+      font-size: 14pt;
+    }
+  }
+  .ql-tooltip {
+    left: 0 !important;
+    z-index: 10000 !important;
+  }
+
+  // #editor-container {
+  //   height: 375px;
+  // }
+
+  .ql-color .ql-picker-options [data-value^="color-picker"]:before {
+    content: "Pick Color";
+  }
+
+  .ql-color .ql-picker-options [data-value^="custom-size-picker"]:before {
+    content: "Size";
+  }
+
+  .ql-color .ql-picker-options [data-value^="color-picker"] {
+    background: none !important;
+    width: 100% !important;
+    height: 25px !important;
+    text-align: center;
+    color: blue;
+    text-decoration: underline;
+  }
+  .ql-color .ql-picker-options [data-value^="custom-size-picker"] {
+    background: none !important;
+    width: 100% !important;
+    height: 25px !important;
+    text-align: center;
+    color: blue;
+    text-decoration: underline;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="8px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="8px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="8px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="8px"]::before {
+    content: "8x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="9px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="9px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="9px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="9px"]::before {
+    content: "9x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="10px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="10px"]::before {
+    content: "10x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="11px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="11px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="11px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="11px"]::before {
+    content: "11x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before {
+    content: "12x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before {
+    content: "14x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before {
+    content: "16x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before {
+    content: "18x";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before {
+    content: "20px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="22px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="22px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="22px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="22px"]::before {
+    content: "22px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="24px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="24px"]::before {
+    content: "24px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="26px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="26px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="26px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="26px"]::before {
+    content: "26px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="28px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="28px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="28px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="28px"]::before {
+    content: "28px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="32px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="32px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="32px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="32px"]::before {
+    content: "32px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="36px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="36px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="36px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="36px"]::before {
+    content: "36px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="42px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="42px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="42px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="42px"]::before {
+    content: "42px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="48px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="48px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="48px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="48px"]::before {
+    content: "48px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="54px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="54px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="54px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="54px"]::before {
+    content: "54px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="68px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="68px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="68px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="68px"]::before {
+    content: "68px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="72px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="72px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="72px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="72px"]::before {
+    content: "72px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="84px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="84px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="84px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="84px"]::before {
+    content: "84px";
+    font-size: 14px !important;
+  }
+  .ql-bubble .ql-picker.ql-size .ql-picker-item[data-value="98px"]::before,
+  .ql-bubble .ql-picker.ql-size .ql-picker-label[data-value="98px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="98px"]::before,
+  .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="98px"]::before {
+    content: "98px";
+    font-size: 14px !important;
+  }
+  quill-editor {
+    display: block;
+  }
+}

@@ -1,0 +1,88 @@
+.dateInputItem {
+  text-align: center;
+  align-items: center;
+  width: 100%;
+  margin-right: 0 !important;
+  display: inline-block;
+  padding-left: 0 !important;
+  .label {
+    flex: 0 1 40%;
+  }
+}
+.col-padding {
+  padding: 0 5px 0 0 !important;
+}
+
+.detail-grid {
+  margin-top: 20px;
+}
+.center-fix {
+  text-align: center !important;
+  div[class^="col"] {
+    border: 1px gainsboro dotted;
+    //padding-bottom: 5px;
+  }
+}
+.col-height-fix {
+  margin-top: 5px;
+}
+.col-height-fix[col-4] {
+  ion-row {
+    align-items: center;
+  }
+  .col-header {
+    min-height: 63px;
+    vertical-align: middle;
+  }
+}
+.col-header {
+  min-height: 46px;
+  margin-bottom: 0 !important;
+}
+
+.row-divider {
+  border-bottom: 2px gainsboro solid;
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+
+.align-items-stretch {
+  align-items: stretch;
+}
+.align-self-center {
+  align-self: center;
+}
+.btn-outline-citric {
+  width: 100%;
+}
+.nav {
+  margin-top: 20px;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: #e65100 !important;
+}
+
+.active {
+  color: white !important;
+}
+
+// a.text-citric:hover,
+a.text-citric:focus {
+  color: white !important;
+}
+
+.card-img-top-fixed {
+  object-fit: cover;
+  object-position: left center;
+  height: 200px;
+}
+
+.card-fixed-text {
+  height: 200px;
+}
+
+.card {
+  border: none !important;
+}

@@ -1,0 +1,70 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row mx-0 mt-2" [hidden]="show_form">
+        <div class="col-9 col-md-10 align-self-center">
+          <h4>Organization Categories</h4>
+        </div>
+        <div *ngIf="currentUser?.isSuperUser" class="mt-2 text-right col-3 col-md-2 align-self-center">
+          <div class="btn-group mb-2 mt-3">
+            <button
+              class="btn btn-outline-citric btn-sm"
+              (click)="addCategory(category_form)"
+            >
+              <i class="fa fa-user-plus"></i> Add Category
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4 mb-5">
+        <div [hidden]="show_form" class="col-md-12 table-responsive-sm">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table table-striped"
+          >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Configurations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let category of categories">
+                <td>
+                  {{ category.name }}
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button
+                      class="btn btn-sm btn-warning"
+                      (click)="editCategory(category_form, category)"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteCategory(category?.id)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-12" [hidden]="!show_form">
+          <app-organization-category-form
+            (dismiss_form)="dismissCategoryForm($event)"
+            style="width: 100%;"
+            #category_form
+          >
+          </app-organization-category-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

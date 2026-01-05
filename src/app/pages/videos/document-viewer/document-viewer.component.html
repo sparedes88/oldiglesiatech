@@ -1,0 +1,56 @@
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+<div
+  *ngIf="!hide_buttons"
+  [hidden]="loading"
+  class="row justify-content-end"
+  [ngClass]="{ 'mx-0': is_full_width }"
+>
+  <div class="col-2 mb-2" [ngClass]="{ 'px-0': is_full_width }">
+    <button
+      (click)="on_close_video?.emit()"
+      class="btn btn-sm btn-outline-citric col-12"
+    >
+      Close
+    </button>
+  </div>
+</div>
+<ngx-extended-pdf-viewer
+  *ngIf="document && !loading"
+  [src]="document"
+  useBrowserLocale="true"
+  height="80vh"
+  [showDownloadButton]="true"
+  [showOpenFileButton]="false"
+  [language]="'es-MX'"
+  [showBookmarkButton]="false"
+>
+</ngx-extended-pdf-viewer>
+<div
+  class="w-100 ec-bottom-border-radius abs-pos more-forward downlow p-l-spacer-xl p-b-spacer-lg"
+>
+  <!-- Title -->
+  <h3 class="text-dark text-left m-b-spacer-none m-t-spacer-xs bold sec-font">
+    {{ video?.title }}
+  </h3>
+
+  <!-- Subtitle -->
+  <h6 *ngIf="video?.speaker" class="text-gray m-0 m-b-spacer-none">
+    {{ video?.speaker }}
+  </h6>
+  <p class="sec-title text-gray text-left m-b-spacer-none">
+    {{ video?.description }}
+  </p>
+</div>
+
+<hr />

@@ -1,0 +1,89 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{ todo?.idToDo ? "Edit ToDo" : "Add ToDo" }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+
+  <form class="col-12" #event_form="ngForm" [formGroup]="todo_form">
+    <div class="row">
+      <!-- Left panel -->
+      <div class="row col-12">
+        <!-- Name -->
+        <div class="col-12 col-md-6">
+          <label>Name*</label>
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="ToDo's Name"
+              formControlName="name"
+              required
+              [class.is-invalid]="
+                todo_form.get('name').touched && todo_form.get('name').invalid
+              "
+            />
+            <div class="input-group-append">
+              <span class="input-group-text">
+                <i class="fas fa-align-left"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="mb-3">
+            <label>Type *</label>
+            <!-- (change)="onSelectFrequency()" -->
+            <select
+              formControlName="idToDoType"
+              class="form-control"
+              required
+              [class.is-invalid]="
+                todo_form.get('idToDoType').touched &&
+                todo_form.get('idToDoType').invalid
+              "
+            >
+              <option value="0">-- Select one option --</option>
+              <option *ngFor="let item of types" [value]="item.idToDoType">
+                {{ item.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="col-12">
+          <label>Description*</label>
+          <div class="input-group mb-3">
+            <textarea
+              type="text"
+              class="form-control"
+              placeholder="About this todo..."
+              formControlName="description"
+              required
+              [class.is-invalid]="
+                todo_form.get('description').touched &&
+                todo_form.get('description').invalid
+              "
+            ></textarea>
+            <div class="input-group-append">
+              <span class="input-group-text">
+                <i class="fas fa-align-left"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5 col-12 text-right">
+          <button
+            [disabled]="todo_form.invalid"
+            (click)="saveToDo()"
+            class="btn btn-sm btn-success mr-3"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

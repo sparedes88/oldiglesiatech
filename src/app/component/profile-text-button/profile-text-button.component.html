@@ -1,0 +1,307 @@
+<div class="row mt-4">
+  <div class="col-12 col-md-8" [formGroup]="form">
+    <div class="col-12">
+      <h5>Select an option:</h5>
+      <div class="form-check">
+        <input
+          formControlName="type"
+          (change)="onPrintEvent($event)"
+          class="form-check-input"
+          type="radio"
+          id="upload"
+          value="upload"
+          checked
+        />
+        <label class="form-check-label" for="upload">
+          Upload your own button
+        </label>
+      </div>
+      <div class="form-check ml-3">
+        <input
+          formControlName="type"
+          (change)="onPrintEvent($event)"
+          class="form-check-input"
+          type="radio"
+          id="design"
+          value="design"
+        />
+        <label class="form-check-label" for="design">
+          Design your own button
+        </label>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="row">
+        <div class="col-12 mt-2" *ngIf="is_upload">
+          <input
+            hidden
+            #input_button
+            type="file"
+            name="photo"
+            class="form-control"
+            accept="image/*"
+            (change)="selectAndUploadFile($event.target.files[0])"
+          />
+          <button
+            class="btn btn-sm btn-secondary"
+            (click)="input_button.click()"
+          >
+            Add image
+          </button>
+        </div>
+
+        <div class="col-12 mt-2" *ngIf="!is_upload && step_1_filled">
+          <h5>Style:</h5>
+          <div class="row">
+            <div class="col-12" *ngIf="step_1_filled">
+              <div
+                *ngIf="has_text"
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Button Text</label>
+                <input
+                  type="text"
+                  formControlName="text"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="border_radius_range" color="gray">
+                  Corners
+                  <span class="float-right">
+                    <small class="text-secondary">
+                      {{ form.get("border_radius").value }}px
+                    </small>
+                  </span>
+                </label>
+                <input
+                  type="range"
+                  class="custom-range"
+                  min="0"
+                  max="30"
+                  step="1"
+                  id="border_radius_range"
+                  formControlName="border_radius"
+                />
+              </div>
+            </div>
+            <!-- Colors -->
+            <div class="col-6 col-md-4" *ngIf="!is_upload && step_1_filled">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Background</label>
+                <input
+                  type="color"
+                  formControlName="color_background"
+                  class="form-control"
+                  style="width: 50px; height: 40px"
+                />
+              </div>
+            </div>
+            <div
+              class="col-6 col-md-4 align-self-end"
+              *ngIf="!is_upload && step_1_filled"
+            >
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Text</label>
+                <input
+                  type="color"
+                  formControlName="color_text"
+                  class="form-control"
+                  style="width: 50px; height: 40px"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12" *ngIf="step_2_filled">
+          <div [ngClass]="{ 'mt-2': is_upload }" class="form-group">
+            <h5>Placement:</h5>
+            <select
+              class="form-control"
+              placeholder="Select an option"
+              formControlName="placement"
+            >
+              <option value="" disabled selected>-- Select an option --</option>
+              <option value="left">Left</option>
+              <option value="center">Center</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-12" *ngIf="step_3_filled">
+          <h5>Select linking type:</h5>
+          <div class="form-check">
+            <input
+              formControlName="link_type"
+              (change)="onChangeLinkType($event)"
+              class="form-check-input"
+              type="radio"
+              id="external"
+              value="external"
+              checked
+            />
+            <label class="form-check-label" for="external">
+              External Link
+            </label>
+          </div>
+          <div class="form-check ml-3">
+            <input
+              formControlName="link_type"
+              (change)="onChangeLinkType($event)"
+              class="form-check-input"
+              type="radio"
+              id="internal"
+              value="internal"
+            />
+            <label class="form-check-label" for="internal">
+              Internal Link
+            </label>
+          </div>
+        </div>
+
+        <div class="col-12 mt-2">
+          <div class="form-group" *ngIf="is_external && step_4_filled">
+            <input
+              type="url"
+              class="form-control"
+              placeholder="Please type your link here"
+              formControlName="link"
+            />
+          </div>
+          <div *ngIf="!is_external && step_4_filled">
+            <div class="form-group">
+              <label class="text-secondary">
+                Select the internal module you want to redirect:
+              </label>
+              <select
+                class="form-control"
+                formControlName="internal_module"
+                (change)="setNextStep()"
+              >
+                <option value="" selected disabled>
+                  -- Select an internal link
+                </option>
+                <option
+                  *ngFor="let option of internal_options"
+                  [value]="option.idModule"
+                >
+                  {{ option.name }}
+                </option>
+              </select>
+            </div>
+            <div
+              *ngIf="
+                form.get('internal_module').value &&
+                form.get('internal_module').value != 200
+              "
+              class="form-group"
+              [hidden]="headers.length === 1"
+            >
+              <label class="text-secondary">
+                Select a
+                {{
+                  form.get("internal_module").value == 10 ||
+                  form.get("internal_module").value == 201
+                    ? "category"
+                    : "tab"
+                }}:
+              </label>
+              <select
+                class="form-control"
+                formControlName="internal_header"
+                (change)="setHeaderOption()"
+              >
+                <option value="" selected disabled>-- Select an option</option>
+                <option *ngFor="let option of headers" [value]="option.id">
+                  {{ option.name }}
+                </option>
+              </select>
+            </div>
+            <div
+              *ngIf="
+                form.get('internal_header').value ||
+                (form.get('internal_module').value &&
+                  form.get('internal_module').value == 200)
+              "
+              class="form-group"
+              [hidden]="options.length === 1"
+            >
+              <label class="text-secondary">
+                Select the
+                {{
+                  form.get("internal_module").value == 201
+                    ? "article"
+                    : form.get("internal_module").value == 200
+                    ? "network"
+                    : "element"
+                }}
+                to redirect:
+              </label>
+              <select
+                class="form-control"
+                formControlName="internal_id"
+                (change)="setOption()"
+              >
+                <option value="" selected disabled>-- Select an option</option>
+                <option *ngFor="let option of options" [value]="option[idName]">
+                  {{ option[nameKey] }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <button
+            class="btn btn-sm btn-success"
+            [disabled]="!step_5_filled"
+            (click)="insertButton()"
+          >
+            Insert button
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4 align-self-start">
+    <div class="card" style="height: 100%">
+      <div class="card-header">Button preview</div>
+      <div class="py-2">
+        <div
+          *ngIf="step_1_filled"
+          [ngClass]="'text-' + form.get('placement').value"
+        >
+          <a
+            [href]="form.get('link').value"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <button class="btn btn-button-test" [ngStyle]="getStyle()">
+              <span *ngIf="has_text">
+                {{ form.get("text").value }}
+              </span>
+            </button>
+          </a>
+        </div>
+
+        <h4 *ngIf="!step_1_filled" class="text-center text-citric">
+          Select an style option
+        </h4>
+      </div>
+    </div>
+  </div>
+</div>

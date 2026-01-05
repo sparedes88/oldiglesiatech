@@ -1,0 +1,68 @@
+.organization-picture {
+    height: 60px;
+}
+ngx-dropzone,
+.custom-dropzone {
+    margin: 20px;
+}
+
+.custom-dropzone {
+    height: 250px;
+    background: #333;
+    color: #fff;
+    border: 5px dashed rgb(235, 79, 79);
+    border-radius: 5px;
+    font-size: 20px;
+}
+
+.custom-dropzone.ngx-dz-hovered {
+    border: 5px solid rgb(235, 79, 79);
+}
+
+.error-dropzone {
+    background-color: #fdeced;
+    border: 1px solid #d3071c;
+    ngx-dropzone-label {
+        color: #d3071c;
+    }
+}
+
+#myTabContent {
+    width: 100%;
+}
+.square,
+.rectangle {
+    justify-content: center;
+    overflow: hidden;
+    margin: auto;
+    width: 20vh;
+    height: 20vh;
+}
+
+.rectangle {
+    width: 40vh;
+}
+.tooltip_ .tooltiptext {
+    width: 340px;
+    margin-left: -170px;
+    text-align: justify;
+}
+.tooltip_hide .tooltiptext {
+    display: none;
+}
+.bigIcon {
+    padding: 0;
+    font-size: 25px;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    text-decoration: none;
+    margin: 5px 5px 5px 5px;
+    vertical-align: top;
+    display: inline-block;
+    line-height: 35px;
+    color: white;
+}
+.rounded {
+    border-radius: 50%;
+}

@@ -1,0 +1,413 @@
+<div class="container page">
+  <h2 class="mb-5 mb-md-0">
+    Inventory
+    <div class="float-right">
+      <button class="btn btn-sm btn-outline-success mr-2" (click)="print()">
+        Print
+      </button>
+      <button
+        class="btn btn-sm btn-outline-citric mr-2"
+        routerLink="/inventory/optional-fields"
+      >
+        Optional Fields
+      </button>
+      <button
+        class="btn btn-sm btn-outline-citric mr-2"
+        routerLink="/inventory/products"
+      >
+        Products
+      </button>
+      <button
+        class="btn btn-sm btn-success"
+        (click)="
+          addInventory(add_inventory_place_modal, add_inventory_place_form)
+        "
+      >
+        <i class="fa fa-plus"></i> Add location
+      </button>
+    </div>
+  </h2>
+  <hr />
+
+  <div
+    style="width: 100%"
+    class="row justify-content-end"
+    [formGroup]="filter_form"
+  >
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label> Product Type </label>
+        <ng-multiselect-dropdown
+          placeholder="Select a product type."
+          [data]="dropdowns.products"
+          [settings]="select_options.product_type"
+          formControlName="product_type"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label> Category </label>
+        <ng-multiselect-dropdown
+          placeholder="Select a category."
+          [data]="dropdowns.categories"
+          [settings]="select_options.category"
+          formControlName="category"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label> Location </label>
+        <ng-multiselect-dropdown
+          placeholder="Select a place."
+          [data]="dropdowns.places"
+          [settings]="select_options.place"
+          formControlName="place"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label> Optional fields </label>
+        <ng-multiselect-dropdown
+          placeholder="Select the optional fields you want to filter."
+          [data]="dropdowns.optional_fields"
+          [settings]="select_options.optional_fields"
+          formControlName="optional_fields"
+        >
+          <ng-template #optionSelectedTemplate let-option="option" let-id="id">
+            <div>
+              <!-- <img
+                [src]="getItems[id].image"
+                style="width: 18px; margin-right: 2px"
+              /> -->
+              {{ option }}
+            </div>
+          </ng-template>
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-3 text-right">
+      <button (click)="search()" class="btn btn-sm btn-outline-citric">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <hr />
+
+  <ng-template [ngIf]="loading">
+    <div
+      class="d-flex justify-content-center"
+      style="margin-top: 15%; margin-bottom: 15%"
+    >
+      <div
+        style="
+          height: 120px;
+          width: 120px;
+          font-size: 15px;
+          border-width: 0.45em;
+        "
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div class="row" [hidden]="loading">
+    <div class="col-12 scroll-x" *ngFor="let inventory_place of places">
+      <div class="row">
+        <div class="col-12 col-md-5">
+          <h3 *ngIf="!inventory_place.editing" class="m-0">
+            {{ inventory_place.name }}
+            <button
+              class="btn btn-sm mr-1"
+              (click)="editMainValues(inventory_place)"
+            >
+              <i class="fa fa-edit text-info"> </i>
+            </button>
+            <button
+              class="btn btn-sm"
+              (click)="deleteInventoryPlace(inventory_place)"
+            >
+              <i class="fa fa-trash-alt text-danger"> </i>
+            </button>
+          </h3>
+          <p
+            class="m-0 text-secondary"
+            *ngIf="inventory_place.description && !inventory_place.editing"
+          >
+            {{ inventory_place.description }}
+          </p>
+          <div
+            *ngIf="inventory_place.editing"
+            [formGroup]="inventory_place.form"
+          >
+            <div class="form-group">
+              <label> Name <span class="text-danger">*</span></label>
+              <input
+                class="form-control"
+                type="text"
+                formControlName="name"
+                [class.is-invalid]="
+                  inventory_place.form.get('name').touched &&
+                  inventory_place.form.get('name').invalid
+                "
+              />
+            </div>
+            <div class="form-group">
+              <label>Short description</label>
+              <textarea
+                type="text"
+                class="form-control mb-1"
+                placeholder="Enter a description for this inventory."
+                formControlName="description"
+                [readonly]="getPermissions()"
+                [class.is-invalid]="
+                  inventory_place.form.get('description').dirty &&
+                  inventory_place.form.get('description').invalid
+                "
+              ></textarea>
+              <div class="btn-group float-right">
+                <button
+                  [disabled]="inventory_place.form.get('name').invalid"
+                  class="btn btn-sm"
+                  (click)="saveMainValue(inventory_place)"
+                >
+                  <i class="fa fa-save text-success"> </i></button
+                ><button
+                  class="btn btn-sm"
+                  (click)="cancelMainValue(inventory_place)"
+                >
+                  <i class="fa fa-close text-danger"> </i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-7 text-right">
+          <button
+            *ngIf="!getPermissions()"
+            class="btn btn-sm btn-outline-success mr-2"
+            (click)="printProducts(inventory_place)"
+            [disabled]="inventory_place.products.length === 0 || printing"
+          >
+            {{ printing ? "Please wait..." : "Print QRs" }}
+          </button>
+
+          <button
+            class="btn btn-sm btn-outline-success"
+            *ngIf="!getPermissions()"
+            (click)="
+              openModalAddProducts(
+                inventory_place,
+                add_products_to_inventory_modal,
+                add_products_to_inventory_place_form
+              )
+            "
+          >
+            Add Product
+          </button>
+        </div>
+      </div>
+      <hr />
+      <div class="row justify-content-end">
+        <div
+          [ngClass]="{
+            'col-md-6': inventory_place.categories?.length === 0,
+            'col-md-4': inventory_place.categories?.length !== 0
+          }"
+          class="col-6 text-center"
+        >
+          <h4 class="m-0">
+            <span class="text-citric"> Products </span>
+            <br />{{ inventory_place.total_products }}
+          </h4>
+        </div>
+        <div
+          [ngClass]="{
+            'col-md-6': inventory_place.categories?.length === 0,
+            'col-md-4': inventory_place.categories?.length !== 0
+          }"
+          class="col-6 text-center"
+        >
+          <h4 class="m-0">
+            <span class="text-citric"> Total </span>
+            <br />{{ inventory_place.total_worth | currency }}
+          </h4>
+        </div>
+        <div
+          class="col-12 col-md-4"
+          *ngIf="inventory_place.categories?.length != 0"
+        >
+          <h4 class="m-0">
+            {{
+              inventory_place.categories?.length > 1 ? "Categories" : "Category"
+            }}
+          </h4>
+          <div *ngFor="let category of inventory_place.categories">
+            <span class="text-citric"> {{ category.name }} </span>
+            : {{ category.total }}
+          </div>
+        </div>
+      </div>
+
+      <table
+        *ngIf="inventory_place.products.length > 0"
+        class="table row-border hover table-striped"
+      >
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th *ngIf="!getPermissions()">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of inventory_place.products; let i = index">
+            <td>
+              <div class="wrapper">
+                <img class="image--cover" [src]="fixUrl(product)" />
+              </div>
+            </td>
+            <td>
+              <span class="text-citric">
+                {{ product.product_name }}
+              </span>
+              <small *ngIf="product.optional_fields?.length > 0">
+                <br />
+                <span *ngFor="let op_field of product.optional_fields">
+                  <span
+                    *ngIf="!op_field.incomplete && op_field.value"
+                    class="badge badge-secondary mr-1"
+                  >
+                    {{ op_field.value }}
+                  </span>
+                  <ul *ngIf="op_field.incomplete" class="text-danger m-0 pl-3">
+                    <li>
+                      <b>
+                        {{ op_field.name }}
+                        is incomplete.
+                      </b>
+                    </li>
+                  </ul>
+                </span>
+              </small>
+            </td>
+
+            <td>
+              {{ product.category_name }}
+            </td>
+            <td class="text-right">
+              {{ product.price_bought_at | currency }}
+            </td>
+
+            <td *ngIf="!getPermissions()">
+              <div class="btn-group">
+                <button
+                  class="btn btn-secondary ml-2"
+                  data-toggle="modal"
+                  data-target="#exampleModalCenter"
+                  (click)="showQR(product)"
+                >
+                  <i class="fa fa-qrcode"></i>
+                </button>
+
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteProduct(product)"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+              <!-- <div class="form-check">
+                <input
+                  [ngModelOptions]="{ standalone: true }"
+                  [(ngModel)]="product.print_qr"
+                  type="checkbox"
+                  class="form-check-input"
+                />
+                <label class="form-check-label"> Print QR </label>
+              </div> -->
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="text-right">Total Worth</th>
+            <th class="text-right">
+              {{ inventory_place.total_worth | currency }}
+            </th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h4
+        class="text-center text-danger"
+        *ngIf="inventory_place.products.length == 0"
+      >
+        {{ inventory_place.name }} hasn't products
+        <span *ngIf="has_filters"> with these filters </span>.
+      </h4>
+
+      <hr />
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #qr_product_detail_modal
+  identifier="qr_product_detail_modal"
+  customClass="fixed-modal-padding"
+  (onAnyCloseEvent)="product_on_detail = undefined"
+>
+  <app-inventory-product-detail
+    [idInventoryPlace]="product_on_detail.idInventoryPlace"
+    [idInventoryPlaceProduct]="product_on_detail.idInventoryPlaceProduct"
+    *ngIf="product_on_detail"
+    (on_refresh)="refreshItems($event)"
+  >
+  </app-inventory-product-detail>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #add_products_to_inventory_modal
+  identifier="add_products_to_inventory_modal"
+  customClass="large-modal fixed-modal-padding"
+  [closable]="false"
+  [dismissable]="false"
+  [escapable]="false"
+>
+  <!-- <h4>Edit contact | {{ selectedContact?.nombre }}</h4> -->
+  <app-add-products-to-inventory-place-form
+    #add_products_to_inventory_place_form
+    (onDismiss)="
+      onModalQuantityDidDismiss(add_products_to_inventory_modal, $event)
+    "
+  ></app-add-products-to-inventory-place-form>
+  <!-- [product]="selectedContact" -->
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #add_inventory_place_modal
+  identifier="add_inventory_place_modal"
+  customClass="large-modal"
+  [escapable]="false"
+  [closable]="false"
+  [dismissable]="false"
+>
+  <app-inventory-place-form
+    #add_inventory_place_form
+    (onDismiss)="
+      onModalDidDismiss(
+        add_inventory_place_modal,
+        add_inventory_place_form,
+        $event
+      )
+    "
+  ></app-inventory-place-form>
+</ngx-smart-modal>

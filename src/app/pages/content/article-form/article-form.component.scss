@@ -1,0 +1,69 @@
+::ng-deep {
+  .table td {
+    padding: 0 !important;
+  }
+
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+  }
+  .mat-slide-toggle.mat-checked .mat-ripple-element {
+    background-color: #28a745 !important;
+  }
+
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+    background-color: rgba(40, 167, 69, 0.54);
+  }
+}
+
+.border-image {
+  border-radius: 8px;
+  border: 3px solid gainsboro;
+  height: 150px;
+  width: 350px;
+}
+// .img_size {
+//     height: 150px;
+//     width: 350px;
+// }
+.border-image.hx2 {
+  height: 300px;
+  width: 350px;
+}
+
+.mar-square {
+  max-width: 300px;
+  border: 1px solid gainsboro;
+  margin: auto auto;
+}
+
+.pad-square {
+  height: 114px;
+  border: 1px solid gainsboro;
+}
+
+.square-selected {
+  background: aliceblue;
+  .pad-square {
+    background: white;
+  }
+}
+
+.ig-fixed {
+  width: 95px;
+  .form-control {
+    text-align: right;
+    padding: 0;
+    max-width: 40px;
+    font-size: small;
+  }
+  .input-group-append {
+    height: 33.5px;
+  }
+}
+.py-fix {
+  height: 38px;
+}
+.border-bottom {
+  border-bottom: 1px solid gainsboro;
+}

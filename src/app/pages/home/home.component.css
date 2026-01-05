@@ -1,0 +1,57 @@
+#logo-iglesia-home {
+  width: auto;
+  height: 120px;
+  display: block;
+  margin: auto;
+}
+
+.logo-iglesia-home {
+  margin-top: 50px;
+}
+
+#row1, #row2 {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.mini-container {
+  background-color: #202020;
+  height: 10em;
+  width: 10em;
+  padding-top: 1.5em;
+  border-radius: 15px;
+  margin-top: 25px;
+  text-align: center;
+}
+
+.mini-container:hover {
+  background-color: #a82703;
+  transition: background-color ease-in 0.5s;
+  border-radius: 15px;
+}
+
+.images-home-card {
+  height: auto;
+  width: 110px;
+  margin-bottom: -18px;
+}
+
+label {
+  font-size: 20px;
+  color: #9E9EA0;
+  text-align: center;
+}
+
+.la {
+  font-size: 15px;
+  color: #9E9EA0;
+  text-align: center;
+}
+
+#la {
+  margin-bottom: -24px;
+}
+.disabled{
+  pointer-events: none;
+  opacity: 0.4;
+}

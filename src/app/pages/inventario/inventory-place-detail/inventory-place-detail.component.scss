@@ -1,0 +1,35 @@
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: white !important;
+    border-bottom: 1px #e65100 solid !important;
+    border-right: 0px solid;
+}
+.btn-citric:not(:disabled):not(.disabled).active {
+    color: white !important;
+}
+
+.nav-pills .nav-link {
+    border-radius: unset;
+}
+
+.active {
+    color: #e65100 !important;
+}
+
+// a.text-citric:hover,
+a.text-citric:focus {
+    color: #e65100 !important;
+}
+.category-span {
+    padding: 4px;
+    margin: 2px 0;
+    border-radius: 5px;
+    text-decoration: underline;
+}
+
+.image--cover {
+    width: 70px;
+    height: auto;
+    object-fit: cover;
+    object-position: center center;
+}

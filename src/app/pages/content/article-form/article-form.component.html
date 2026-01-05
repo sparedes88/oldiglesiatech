@@ -1,0 +1,2136 @@
+<div class="container page">
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        id="design-view-tab"
+        data-toggle="pill"
+        href="#design-view"
+        role="tab"
+        aria-controls="design-view"
+        aria-selected="true"
+      >
+        Design
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link active"
+        id="block-view-tab"
+        data-toggle="pill"
+        href="#block-view"
+        role="tab"
+        aria-controls="block-view"
+        aria-selected="true"
+      >
+        Content
+      </a>
+    </li>
+  </ul>
+  <!-- Block View -->
+  <div class="row">
+    <div class="col-12 col-md-4">
+      <div class="tab-content" id="pills-tabContent">
+        <div
+          class="tab-pane fade"
+          id="design-view"
+          role="tabpanel"
+          aria-labelledby="design-view-tab"
+        >
+          <div class="row" [formGroup]="header_design_form">
+            <div class="col-12">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="show_title"
+                />
+                <label class="form-check-label"> Show title </label>
+              </div>
+            </div>
+            <div class="col-12" *ngIf="header_design_form.get('show_title').value">
+              <div class="form-group">
+                <label class="form-check-label"> Vertical Position </label>
+                <select
+                  class="form-control"
+                  formControlName="title_vertical_position"
+                >
+                  <option value="base">Top</option>
+                  <option value="center">Center</option>
+                  <option value="end">Bottom</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label>
+                  Round corners
+                  <small class="text-secondary">
+                    {{ header_design_form.get("border_radius").value }}px
+                  </small>
+                </label>
+                <input
+                  class="form-control"
+                  type="range"
+                  max="50"
+                  min="0"
+                  formControlName="border_radius"
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <h6>Please specify how to design your article</h6>
+              <div class="row">
+                <div class="col-6 mt-2">
+                  <!-- <input
+                    hidden
+                    #input_button
+                    type="file"
+                    name="photo"
+                    class="form-control"
+                    accept="image/*"
+                    (change)="selectAndUploadFile($event.target.files[0])"
+                  /> -->
+                  <button
+                    class="btn btn-sm btn-secondary"
+                    (click)="addCover()"
+                    [disabled]="
+                      header_design_form.get('design_style').value != 'graphic'
+                    "
+                  >
+                    Add image
+                  </button>
+                  <div class="col-12 col-md-4" [hidden]="true">
+                    <div class="custom-file mb-4">
+                      <input
+                        #input_articulo_cover_file
+                        accept="image/*"
+                        type="file"
+                        class="custom-file-input"
+                        id="customFile"
+                      />
+                      <label class="custom-file-label" for="customFile"
+                        >Choose file</label
+                      >
+                    </div>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      formControlName="design_style"
+                      class="form-check-input"
+                      type="radio"
+                      id="graphic"
+                      value="graphic"
+                      checked
+                    />
+                    <label class="form-check-label" for="graphic">
+                      Upload a graphic
+                    </label>
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div class="form-check ml-3">
+                    <input
+                      formControlName="design_style"
+                      class="form-check-input"
+                      type="radio"
+                      id="hex"
+                      value="hex"
+                    />
+                    <label class="form-check-label" for="hex">
+                      Color selector
+                    </label>
+                  </div>
+                  <div class="form-check ml-3">
+                    <input
+                      formControlName="design_style"
+                      class="form-check-input"
+                      type="radio"
+                      id="gradient"
+                      value="gradient"
+                    />
+                    <label class="form-check-label" for="gradient">
+                      Gradient
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="col-12 row"
+              *ngIf="header_design_form.get('design_style').value == 'gradient'"
+              formGroupName="gradient_options"
+            >
+              <div class="col-12">
+                <h6>Select gradient style</h6>
+                <div class="form-check ml-3">
+                  <input
+                    formControlName="type"
+                    class="form-check-input"
+                    type="radio"
+                    id="linear"
+                    value="linear"
+                  />
+                  <label class="form-check-label" for="linear"> Lineal </label>
+                </div>
+                <div class="form-check ml-3">
+                  <input
+                    formControlName="type"
+                    class="form-check-input"
+                    type="radio"
+                    id="radial"
+                    value="radial"
+                  />
+                  <label class="form-check-label" for="radial"> Radial </label>
+                </div>
+              </div>
+              <div class="col-12" *ngIf="is_linear">
+                <div class="form-group">
+                  <label>
+                    Degrees
+                    <small class="text-secondary">
+                      {{ gradient_options.get("degrees").value }}°
+                    </small>
+                  </label>
+                  <input
+                    type="range"
+                    formControlName="degrees"
+                    min="0"
+                    max="360"
+                  />
+                </div>
+              </div>
+              <div formArrayName="colors" class="col-12">
+                <div
+                  *ngFor="
+                    let color of colors.controls;
+                    let i = index;
+                    let f = first
+                  "
+                  class="row border-bottom"
+                  [formGroupName]="i"
+                >
+                  <div class="col-3 pr-0 align-self-end py-2">
+                    <div class="form-group m-0">
+                      <input
+                        type="color"
+                        formControlName="hex_color"
+                        class="form-control p-0"
+                        (change)="verifyHex(color)"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-4 align-self-end py-2">
+                    <div class="form-group mb-0">
+                      <label *ngIf="f" class="text-secondary text-center">
+                        HEX
+                      </label>
+                      <input
+                        type="text"
+                        formControlName="hex_color"
+                        class="form-control"
+                        (change)="verifyHex(color)"
+                        (keydown.enter)="verifyHex(color, true)"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-3 align-self-end py-2">
+                    <div class="form-group mb-0">
+                      <label *ngIf="f" class="text-secondary text-center">
+                        %
+                      </label>
+                      <input
+                        type="text"
+                        formControlName="degrees"
+                        class="form-control"
+                        (change)="checkPercent(color)"
+                        (keydown)="preventEvent($event, color, 'alpha')"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-2 text-center align-self-end">
+                    <button
+                      [disabled]="colors.controls.length < 3"
+                      class="btn btn-sm mb-4"
+                      (click)="deleteColor(i)"
+                    >
+                      <i class="fa fa-close text-danger"></i>
+                    </button>
+                  </div>
+
+                  <!-- <div class="col-3">
+                    <div class="form-group text-center">
+                      <input
+                        formControlName="r"
+                        type="text"
+                        class="form-control px-0 text-center"
+                        (input)="checkValue(color, 'r')"
+                      />
+                      <label class="text-center"> R </label>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="form-group text-center">
+                      <input
+                        formControlName="g"
+                        type="text"
+                        class="form-control px-0 text-center"
+                        (input)="checkValue(color, 'g')"
+                      />
+                      <label> G </label>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="form-group text-center">
+                      <input
+                        formControlName="b"
+                        type="text"
+                        class="form-control px-0 text-center"
+                        (input)="checkValue(color, 'b')"
+                      />
+                      <label> B </label>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="form-group text-center">
+                      <input
+                        formControlName="alpha"
+                        type="text"
+                        class="form-control px-0 text-center"
+                      />
+                      <label> Alpha </label>
+                    </div>
+                  </div> -->
+                </div>
+                <div class="text-center mt-2">
+                  <button (click)="addColor()" class="btn btn-sm btn-success">
+                    Add color
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="col-12"
+              *ngIf="header_design_form.get('design_style').value == 'hex'"
+            >
+              <div class="form-group">
+                <label> Background color </label>
+                <input
+                  class="form-control"
+                  type="color"
+                  formControlName="color_hex"
+                />
+              </div>
+            </div>
+
+            <div class="col-12 mt-3">
+              <h6>Please define padding</h6>
+
+              <div
+                class="row mar-square"
+                [ngClass]="{ 'square-selected': !is_padding }"
+              >
+                <div
+                  [formGroup]="margin"
+                  class="col-12 text-center row justify-content-center mx-0"
+                >
+                  <span
+                    *ngIf="editable_option !== 'margin.top'"
+                    class="clickable"
+                    (click)="setEditable('margin.top')"
+                  >
+                    {{ margin.get("top").value }}px
+                  </span>
+                  <div
+                    class="input-group ig-fixed"
+                    *ngIf="editable_option === 'margin.top'"
+                  >
+                    <input
+                      formControlName="top"
+                      type="number"
+                      class="form-control"
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text p-0 px-1">px</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  [formGroup]="margin"
+                  class="col-2 text-right row mx-0 justify-content-end align-self-center py-fix px-0"
+                >
+                  <span
+                    *ngIf="editable_option !== 'margin.left'"
+                    class="clickable mx-2"
+                    (click)="setEditable('margin.left')"
+                  >
+                    {{ margin.get("left").value }}px
+                  </span>
+                  <div
+                    class="input-group ig-fixed"
+                    *ngIf="editable_option === 'margin.left'"
+                  >
+                    <input
+                      formControlName="left"
+                      type="number"
+                      class="form-control text-center"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="col-8 pad-square"
+                  [ngClass]="{ 'square-selected': is_padding }"
+                >
+                  <div class="row">
+                    <div
+                      [formGroup]="padding"
+                      class="col-12 text-center row justify-content-center mx-0 py-fix"
+                    >
+                      <span
+                        *ngIf="editable_option !== 'padding.top'"
+                        class="clickable"
+                        (click)="setEditable('padding.top')"
+                      >
+                        {{ padding.get("top").value }}px
+                      </span>
+                      <div
+                        class="input-group ig-fixed"
+                        *ngIf="editable_option === 'padding.top'"
+                      >
+                        <input
+                          formControlName="top"
+                          type="number"
+                          class="form-control"
+                        />
+                        <div class="input-group-append">
+                          <span class="input-group-text p-0 px-1">px</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      [formGroup]="padding"
+                      class="col-6 text-left row mx-0 align-self-center py-fix"
+                    >
+                      <span
+                        *ngIf="editable_option !== 'padding.left'"
+                        class="clickable"
+                        (click)="setEditable('padding.left')"
+                      >
+                        {{ padding.get("left").value }}px
+                      </span>
+                      <div
+                        class="input-group ig-fixed"
+                        *ngIf="editable_option === 'padding.left'"
+                      >
+                        <input
+                          formControlName="left"
+                          type="number"
+                          class="form-control text-left"
+                        />
+                        <div class="input-group-append">
+                          <span class="input-group-text p-0 px-1 p-0">px</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      [formGroup]="padding"
+                      class="col-6 text-right row mx-0 justify-content-end align-self-center py-fix"
+                    >
+                      <span
+                        *ngIf="editable_option !== 'padding.right'"
+                        class="clickable"
+                        (click)="setEditable('padding.right')"
+                      >
+                        {{ padding.get("right").value }}px
+                      </span>
+                      <div
+                        class="input-group ig-fixed"
+                        *ngIf="editable_option === 'padding.right'"
+                      >
+                        <input
+                          formControlName="right"
+                          type="number"
+                          class="form-control text-left"
+                        />
+                        <div class="input-group-append">
+                          <span class="input-group-text p-0 px-1 p-0">px</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      [formGroup]="padding"
+                      class="col-12 text-center row justify-content-center mx-0 py-fix align-self-end"
+                    >
+                      <span
+                        *ngIf="editable_option !== 'padding.bottom'"
+                        class="clickable"
+                        style="position: absolute; bottom: 0"
+                        (click)="setEditable('padding.bottom')"
+                      >
+                        {{ padding.get("bottom").value }}px
+                      </span>
+                      <div
+                        class="input-group ig-fixed"
+                        *ngIf="editable_option === 'padding.bottom'"
+                      >
+                        <input
+                          formControlName="bottom"
+                          type="number"
+                          class="form-control"
+                        />
+                        <div class="input-group-append">
+                          <span class="input-group-text p-0 px-1">px</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  [formGroup]="margin"
+                  class="col-2 text-right row mx-0 justify-content-end align-self-center py-fix px-0"
+                >
+                  <span
+                    *ngIf="editable_option !== 'margin.right'"
+                    class="clickable mx-2"
+                    (click)="setEditable('margin.right')"
+                  >
+                    {{ margin.get("right").value }}px
+                  </span>
+                  <div
+                    class="input-group ig-fixed"
+                    *ngIf="editable_option === 'margin.right'"
+                  >
+                    <input
+                      formControlName="right"
+                      type="number"
+                      class="form-control text-center"
+                    />
+                  </div>
+                </div>
+                <div
+                  [formGroup]="margin"
+                  class="col-12 text-center row justify-content-center mx-0"
+                >
+                  <span
+                    *ngIf="editable_option !== 'margin.bottom'"
+                    class="clickable"
+                    (click)="setEditable('margin.bottom')"
+                  >
+                    {{ margin.get("bottom").value }}px
+                  </span>
+                  <div
+                    class="input-group ig-fixed"
+                    *ngIf="editable_option === 'margin.bottom'"
+                  >
+                    <input
+                      formControlName="bottom"
+                      type="number"
+                      class="form-control"
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text p-0 px-1">px</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane fade show active"
+          id="block-view"
+          role="tabpanel"
+          aria-labelledby="block-view-tab"
+        >
+          <div class="row align-items-center">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="linked">Link to another view:</label>
+                <select
+                  (change)="changeTab($event)"
+                  class="form-control"
+                  [(ngModel)]="article.idTemplate"
+                >
+                  <option
+                    *ngFor="let item of templates"
+                    [value]="item.idTemplate"
+                  >
+                    {{ item.nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label for="name">Title:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  placeholder="Article's name"
+                  [(ngModel)]="article.titulo"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <div *ngIf="article.idTemplate !== 0" class="row align-items-center">
+            <div class="row" *ngIf="template?.idTemplate === 10">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+              <div class="col-12">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label for="idOrganization">
+                    Select the categories groups to display on template.
+                  </label>
+                  <ng-multiselect-dropdown
+                    #multi_select
+                    placeholder="Nothing select, the template will be empty"
+                    [data]="categories"
+                    [settings]="selectOptions"
+                  ></ng-multiselect-dropdown>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 11">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="playlist_template_form"
+                class="row"
+              >
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select the playlist's tabs.
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_select_playlists
+                      formControlName="selected_items"
+                      placeholder="Nothing select... None playlist will be opened as default"
+                      [data]="playlists"
+                      [settings]="select_community_options"
+                      (onSelect)="fixPlaylist($event)"
+                      (onSelectAll)="fixPlaylist($event)"
+                      (onDeSelect)="fixPlaylist($event)"
+                      (onDeSelectAll)="fixPlaylist($event)"
+                    ></ng-multiselect-dropdown>
+                    <small class="text-danger">
+                      This template only will show tabs with items set them up.
+                    </small>
+                  </div>
+                </div>
+                <h5 class="col-12 text-muted">General Settings</h5>
+                <div class="ws-100"></div>
+
+                <div style="margin-left: 28px !important" class="col-6">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <input
+                      type="checkbox"
+                      id="display_description"
+                      name="display_description_radio"
+                      class="custom-control-input"
+                      formControlName="display_description"
+                      [checked]="
+                        playlist_template_form.get('display_description').value
+                      "
+                      (click)="
+                        toggleAcceptace(
+                          playlist_template_form,
+                          'display_description'
+                        )
+                      "
+                    />
+                    <span
+                      class="checkmark"
+                      (click)="
+                        toggleAcceptace(
+                          playlist_template_form,
+                          'display_description'
+                        )
+                      "
+                    ></span>
+                    <label
+                      style="cursor: pointer"
+                      class="custom-control-label"
+                      for="display_description"
+                    >
+                      Display description and speaker?
+                    </label>
+                  </div>
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <input
+                      type="checkbox"
+                      id="show_tab_searchbar"
+                      name="show_tab_searchbar_radio"
+                      class="custom-control-input"
+                      formControlName="show_tab_searchbar"
+                      [checked]="
+                        playlist_template_form.get('show_tab_searchbar').value
+                      "
+                      (click)="
+                        toggleAcceptace(
+                          playlist_template_form,
+                          'show_tab_searchbar'
+                        )
+                      "
+                    />
+                    <span
+                      class="checkmark"
+                      (click)="
+                        toggleAcceptace(
+                          playlist_template_form,
+                          'show_tab_searchbar'
+                        )
+                      "
+                    ></span>
+                    <label
+                      style="cursor: pointer"
+                      class="custom-control-label"
+                      for="show_tab_searchbar"
+                    >
+                      Display searchbar?
+                    </label>
+                  </div>
+                </div>
+
+                <div class="ws-100"></div>
+                <h5 class="col-12 text-muted">Square Settings</h5>
+                <div class="ws-100"></div>
+                <div class="col-6">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="button_border_radius_range" color="gray">
+                      Button Border Radius
+                      {{
+                        playlist_template_form.get("button_border_radius")
+                          .value
+                      }}px
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="50"
+                      step="1"
+                      id="button_border_radius_range"
+                      formControlName="button_border_radius"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="button_spacing_range" color="gray">
+                      Button Spacing
+                      {{ playlist_template_form.get("button_spacing").value }}
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="20"
+                      step="0.25"
+                      id="button_spacing_range"
+                      formControlName="button_spacing"
+                    />
+                  </div>
+                </div>
+
+                <div class="ws-100"></div>
+                <h5 class="col-12 text-muted">Shadow Settings</h5>
+                <div class="ws-100"></div>
+                <div class="col-1">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label>Color</label>
+                    <input
+                      type="color"
+                      formControlName="shadow_color"
+                      class="form-control"
+                      style="width: 50px; height: 40px"
+                    />
+                    <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+                  </div>
+                </div>
+
+                <div class="col-5">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="shadow_spread_range" color="gray">
+                      Spread
+                      {{ playlist_template_form.get("shadow_spread").value }}
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      id="shadow_spread_range"
+                      formControlName="shadow_spread"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-5">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="shadow_blur_range" color="gray">
+                      Blur
+                      {{ playlist_template_form.get("shadow_blur").value }}
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="3"
+                      step="0.05"
+                      id="shadow_blur_range"
+                      formControlName="shadow_blur"
+                    />
+                  </div>
+                </div>
+
+                <div class="ws-100"></div>
+                <h5 class="col-12 text-muted">Title Settings</h5>
+                <div class="ws-100"></div>
+                <div class="col-1">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label>Color</label>
+                    <input
+                      type="color"
+                      formControlName="title_text_color"
+                      class="form-control"
+                      style="width: 50px; height: 40px"
+                    />
+                    <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+                  </div>
+                </div>
+
+                <div class="col-5">
+                  <div class="form-group">
+                    <label for="title_text_align" color="gray"> Align </label>
+                    <select
+                      class="form-control"
+                      id="title_text_align"
+                      formControlName="title_text_align"
+                    >
+                      <option value="left">Left</option>
+                      <option value="center">Center</option>
+                      <option value="right">Right</option>
+                      <option value="justify">Justify</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-5">
+                  <div class="form-group">
+                    <label for="title_text_bold" color="gray"> Bold </label>
+                    <select
+                      class="form-control"
+                      id="title_text_bold"
+                      formControlName="title_text_bold"
+                    >
+                      <option value="100">100</option>
+                      <option value="200">200</option>
+                      <option value="300">300</option>
+                      <option value="400">400</option>
+                      <option value="500">500</option>
+                      <option value="600">600</option>
+                      <option value="700">700</option>
+                      <option value="800">800</option>
+                      <option value="900">900</option>
+                      <option value="bold">Bold</option>
+                      <option value="bolder">Bolder</option>
+                      <option value="lighter">Lighter</option>
+                      <option value="normal">Normal</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!--  -->
+
+                <div
+                  class="ws-100"
+                  [hidden]="!show_display_description_on_playlist"
+                ></div>
+                <h5
+                  class="col-12 text-muted"
+                  [hidden]="!show_display_description_on_playlist"
+                >
+                  Text Settings
+                </h5>
+                <div
+                  class="ws-100"
+                  [hidden]="!show_display_description_on_playlist"
+                ></div>
+
+                <div
+                  class="col-3"
+                  [hidden]="!show_display_description_on_playlist"
+                >
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label>Description Text Color</label>
+                    <input
+                      type="color"
+                      formControlName="description_text_color"
+                      class="form-control"
+                      style="width: 50px; height: 40px"
+                    />
+                    <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 13">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="giving_template_form"
+                class="row"
+              >
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label stacked color="gray"> Header text </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Place the text which will show at the top of screen."
+                      formControlName="header_text"
+                    />
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label stacked color="gray"> Subheader text </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Place the text which will show at center of screen."
+                      formControlName="subheader_text"
+                    />
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label stacked color="gray"> Button text </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Place the text of the giving button."
+                      formControlName="button_text"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label stacked color="gray"> Giving site url </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Paste here the url of your donations site."
+                      formControlName="donation_url"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-10">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                    (click)="uploadPicture(input_file)"
+                  >
+                    <label stacked color="gray"> Background picture </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      readonly
+                      placeholder="Click here to select a picture"
+                      formControlName="background_picture"
+                    />
+                  </div>
+                </div>
+                <div class="col-2 align-self-center">
+                  <button
+                    class="btn btn-sm btn-success"
+                    (click)="addDefaultImage()"
+                  >
+                    Reset to default image
+                  </button>
+                </div>
+
+                <div class="col-12 col-md-4" [hidden]="true">
+                  <div class="custom-file mb-4">
+                    <input
+                      #input_file
+                      accept="image/*"
+                      type="file"
+                      class="custom-file-input"
+                      id="customFile"
+                    />
+                    <label class="custom-file-label" for="customFile"
+                      >Choose file</label
+                    >
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 14">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="booking_template_form"
+                class="row"
+              >
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select the calendar to display on template.
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_select_bookings
+                      placeholder="Nothing select... the template will be empty"
+                      [data]="bookings"
+                      [settings]="select_booking_options"
+                      (onSelect)="fixBooking($event)"
+                      (onDeSelect)="clearBookingForm()"
+                    ></ng-multiselect-dropdown>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 15">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="community_box_template_form"
+                class="row"
+              >
+                <div style="margin-left: 28px !important" class="col-2">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <input
+                      type="checkbox"
+                      id="display_header"
+                      name="display_header_radio"
+                      class="custom-control-input"
+                      formControlName="display_header"
+                      [checked]="
+                        community_box_template_form.get('display_header').value
+                      "
+                      (click)="
+                        toggleAcceptace(
+                          community_box_template_form,
+                          'display_header'
+                        )
+                      "
+                    />
+                    <span
+                      class="checkmark"
+                      (click)="
+                        toggleAcceptace(
+                          community_box_template_form,
+                          'display_header'
+                        )
+                      "
+                    ></span>
+                    <label
+                      style="cursor: pointer"
+                      class="custom-control-label"
+                      for="display_header"
+                    >
+                      Display title?
+                    </label>
+                  </div>
+                </div>
+                <div class="col-9">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select the community to display on template.
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_select_community_boxes
+                      placeholder="Nothing select... the template will be empty"
+                      formControlName="selected_items"
+                      [data]="communityBoxes"
+                      [settings]="select_community_options"
+                      (onSelect)="fixCommunity($event)"
+                      (onSelectAll)="fixCommunity($event)"
+                      (onDeSelect)="fixCommunity($event)"
+                      (onDeSelectAll)="fixCommunity($event)"
+                    ></ng-multiselect-dropdown>
+                    <small class="text-danger">
+                      This template only will show tabs with items set them up.
+                    </small>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 17">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="grid_template_form"
+                class="row mt-4"
+              >
+                <h5 class="col-12 text-muted">General Settings</h5>
+                <div class="ws-100"></div>
+
+                <div style="margin-left: 28px !important" class="col-4">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <input
+                      type="checkbox"
+                      id="display_header"
+                      name="display_header_radio"
+                      class="custom-control-input"
+                      formControlName="display_header"
+                      [checked]="grid_template_form.get('display_header').value"
+                      (click)="
+                        toggleAcceptace(grid_template_form, 'display_header')
+                      "
+                    />
+                    <span
+                      class="checkmark"
+                      (click)="
+                        toggleAcceptace(grid_template_form, 'display_header')
+                      "
+                    ></span>
+                    <label
+                      style="cursor: pointer"
+                      class="custom-control-label"
+                      for="display_header"
+                    >
+                      Display header?
+                    </label>
+                  </div>
+                </div>
+                <div class="col-4">
+                  Blocks per row
+                  <div class="form-check custom-radio form-check-inline ml-3">
+                    <input
+                      formControlName="blocks_per_row"
+                      class="form-check-input custom-control-input"
+                      type="radio"
+                      id="inlineRadio1"
+                      value="1"
+                      [checked]="
+                        grid_template_form.get('blocks_per_row').value === 1
+                      "
+                    />
+                    <label
+                      class="form-check-label custom-control-label"
+                      for="inlineRadio1"
+                    >
+                      1
+                    </label>
+                  </div>
+                  <div class="form-check custom-radio form-check-inline">
+                    <input
+                      formControlName="blocks_per_row"
+                      class="form-check-input custom-control-input"
+                      type="radio"
+                      id="inlineRadio2"
+                      value="2"
+                      [checked]="
+                        grid_template_form.get('blocks_per_row').value === 2
+                      "
+                    />
+                    <label
+                      class="form-check-label custom-control-label"
+                      for="inlineRadio2"
+                    >
+                      2
+                    </label>
+                  </div>
+                </div>
+                <div class="ws-100"></div>
+                <h5 class="col-12 text-muted">Buttons Settings</h5>
+                <div class="ws-100"></div>
+                <div class="col-6">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="button_border_radius_range" color="gray">
+                      Button Border Radius
+                      {{
+                        grid_template_form.get("button_border_radius").value
+                      }}%
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="50"
+                      step="1"
+                      id="button_border_radius_range"
+                      formControlName="button_border_radius"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-6">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="button_spacing_range" color="gray">
+                      Button Spacing
+                      {{ grid_template_form.get("button_spacing").value }}
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="20"
+                      step="0.25"
+                      id="button_spacing_range"
+                      formControlName="button_spacing"
+                    />
+                  </div>
+                </div>
+
+                <div class="ws-100"></div>
+                <h5 class="col-12 text-muted">Shadow Settings</h5>
+                <div class="ws-100"></div>
+                <div class="col-1">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label>Color</label>
+                    <input
+                      type="color"
+                      formControlName="shadow_color"
+                      class="form-control"
+                      style="width: 50px; height: 40px"
+                    />
+                    <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+                  </div>
+                </div>
+
+                <div class="col-5">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="shadow_spread_range" color="gray">
+                      Spread
+                      {{ grid_template_form.get("shadow_spread").value }}
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      id="shadow_spread_range"
+                      formControlName="shadow_spread"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-5">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="shadow_blur_range" color="gray">
+                      Blur {{ grid_template_form.get("shadow_blur").value }}
+                    </label>
+                    <input
+                      type="range"
+                      class="custom-range"
+                      min="0"
+                      max="3"
+                      step="0.05"
+                      id="shadow_blur_range"
+                      formControlName="shadow_blur"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 18">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="link_template_form"
+                class="row"
+              >
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label stacked color="gray"> Site Link: </label>
+                    <input
+                      type="url"
+                      required
+                      class="form-control"
+                      placeholder="Place here the site's url (including http or https)."
+                      formControlName="link_page"
+                    />
+                  </div>
+
+                  <mat-slide-toggle
+                    style="margin: 10px 0"
+                    class="col-2"
+                    labelPosition="before"
+                    formControlName="open_external"
+                  >
+                    Open using a browser?
+                  </mat-slide-toggle>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 20">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="gallery_template_form"
+                class="row"
+              >
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select the gallery to display on template.
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_select_galleries
+                      formControlName="selected_items"
+                      placeholder="Nothing select... the template will be empty"
+                      [data]="galleries"
+                      [settings]="select_community_options"
+                      (onSelect)="fixGallery($event)"
+                      (onSelectAll)="fixGallery($event)"
+                      (onDeSelect)="fixGallery($event)"
+                      (onDeSelectAll)="fixGallery($event)"
+                    ></ng-multiselect-dropdown>
+                    <small class="text-danger">
+                      This template only will show tabs with items set them up.
+                    </small>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 21">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="mailing_list_template_form"
+                class="row"
+              >
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select the contact inbox to display on template.
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_select_mailing_list_boxes
+                      formControlName="selected_items"
+                      placeholder="Nothing select... the template will be empty"
+                      [data]="mailingLists"
+                      [settings]="select_community_options"
+                      (onSelect)="fixMailingList($event)"
+                      (onSelectAll)="fixMailingList($event)"
+                      (onDeSelect)="fixMailingList($event)"
+                      (onDeSelectAll)="fixMailingList($event)"
+                    ></ng-multiselect-dropdown>
+                    <small class="text-danger">
+                      This template only will show tabs with items set them up.
+                    </small>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-group">
+                    <label for="mailing_language" color="gray">
+                      Language
+                    </label>
+                    <select
+                      class="form-control"
+                      id="mailing_language"
+                      formControlName="mailing_language"
+                    >
+                      <option value="es">Español</option>
+                      <option value="en">English</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 25">
+              <h6 class="col-12 text-citric">
+                This template requires extra info:
+              </h6>
+
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="subcategories_template_form"
+                class="row"
+              >
+                <div class="col-12">
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idOrganization">
+                      Select the headers you want to display on template.
+                    </label>
+                    <ng-multiselect-dropdown
+                      formControlName="selected_items"
+                      #multi_select_subcategories
+                      placeholder="Nothing select... the template will be empty"
+                      [data]="subcategories_headers"
+                      [settings]="select_subcategories_options"
+                      (onSelect)="fixSubcategories($event)"
+                      (onSelectAll)="fixSubcategories($event)"
+                      (onDeSelect)="fixSubcategories($event)"
+                      (onDeSelectAll)="fixSubcategories($event)"
+                    ></ng-multiselect-dropdown>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="row" *ngIf="template?.idTemplate === 26">
+              <form
+                style="width: 100%"
+                #basicForm="ngForm"
+                [formGroup]="detail_template_form"
+              >
+                <div class="col-12">
+                  <div class="form-group">
+                    <label>Submodule* </label>
+                    <select
+                      required
+                      class="form-control mb-1"
+                      placeholder="Enter your tab's name."
+                      formControlName="link_module_id"
+                      [class.is-invalid]="
+                        detail_template_form.get('link_module_id').dirty &&
+                        detail_template_form.get('link_module_id').invalid
+                      "
+                      (change)="resetItemID($event)"
+                    >
+                      <option
+                        *ngFor="let head_item of header_submodules"
+                        [value]="head_item.id"
+                      >
+                        {{ head_item.name }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div
+                  class="col-12"
+                  *ngIf="detail_template_form.get('link_module_id').value > 0"
+                >
+                  <div class="form-group">
+                    <label>Item to show* </label>
+                    <select
+                      type="text"
+                      required
+                      class="form-control mb-1"
+                      placeholder="Enter your tab's name."
+                      formControlName="element_id"
+                      [class.is-invalid]="
+                        detail_template_form.get('element_id').dirty &&
+                        detail_template_form.get('element_id').invalid
+                      "
+                    >
+                      <option
+                        *ngFor="let head_item of items"
+                        [value]="head_item[detail_item_properties.id_key]"
+                      >
+                        {{ head_item[detail_item_properties.name_key] }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- <div class="col-12 text-center mt-3">
+          <button
+            type="button"
+            (click)="saveTemplate(template)"
+            class="btn btn-sm btn-success"
+          >
+            Submit
+          </button>
+        </div> -->
+          </div>
+          <div class="row align-items-center">
+            <div class="col-4">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="hide_title"
+                  name="hide_title"
+                  class="custom-control-input"
+                  [(ngModel)]="article.hide_title"
+                  [checked]="article.hide_title"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                <span
+                  class="checkmark"
+                  (click)="article.hide_title = !article.hide_title"
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="hide_title"
+                >
+                  Hide title
+                </label>
+              </div>
+              <!-- <div class="form-group" style="display: flex; flex-direction: column">
+            <input
+              type="checkbox"
+              id="hide_category"
+              name="hide_category"
+              class="custom-control-input"
+              [(ngModel)]="article.hide_category"
+              [checked]="article.hide_category"
+              [ngModelOptions]="{ standalone: true }"
+            />
+            <span
+              class="checkmark"
+              (click)="article.hide_category = !article.hide_category"
+            ></span>
+            <label
+              style="cursor: pointer"
+              class="custom-control-label"
+              for="hide_category"
+            >
+              Hide category
+            </label>
+          </div> -->
+            </div>
+            <div class="col-4">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="hide_picture"
+                  name="hide_picture"
+                  class="custom-control-input"
+                  [(ngModel)]="article.hide_picture"
+                  [checked]="article.hide_picture"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                <span
+                  class="checkmark"
+                  (click)="article.hide_picture = !article.hide_picture"
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="hide_picture"
+                >
+                  Hide picture
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <input
+                  type="checkbox"
+                  id="hide_header"
+                  name="hide_header"
+                  class="custom-control-input"
+                  [(ngModel)]="article.hide_header"
+                  [checked]="article.hide_header"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                <span
+                  class="checkmark"
+                  (click)="article.hide_header = !article.hide_header"
+                ></span>
+                <label
+                  style="cursor: pointer"
+                  class="custom-control-label"
+                  for="hide_header"
+                >
+                  Hide breadcrumb
+                  <small>(Only movil)</small>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-3 col-md-3">
+              <button
+                class="fix-button-heigh btn btn-outline-citric dropdown-toggle"
+                color="citric"
+                id="dropdownMenuButton"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Add Media Type
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a
+                  class="dropdown-item"
+                  *ngFor="let item of filtered_media_types"
+                  (click)="dismiss(item)"
+                >
+                  {{ item.nombre }}
+                </a>
+              </div>
+            </div>
+            <!-- <div class="col-3 col-md-3">
+              <button
+                class="fix-button-heigh btn btn-outline-citric"
+                color="citric"
+                (click)="addCover()"
+              >
+                Add Cover
+              </button>
+              <br />
+              <span style="font-size: 12px; position: absolute">
+                Recommended size: 1000x428
+              </span>
+              <div class="col-12 col-md-4" [hidden]="true">
+                <div class="custom-file mb-4">
+                  <input
+                    #input_articulo_cover_file
+                    accept="image/*"
+                    type="file"
+                    class="custom-file-input"
+                    id="customFile"
+                  />
+                  <label class="custom-file-label" for="customFile"
+                    >Choose file</label
+                  >
+                </div>
+              </div>
+            </div> -->
+            <!-- <div class="col-6 col-md-6">
+          <ng-select
+            *ngIf="wpImages.length != 0"
+            [items]="wpImages"
+            bindLabel="slug"
+            placeholder="Select a Wordpress image"
+            bindValue="guid.rendered"
+            [searchable]="true"
+            [(ngModel)]="article.slider"
+            style="text-align: center; height: 30px"
+          >
+            <ng-template ng-option-tmp let-item="item" let-index="index">
+              <div class="row">
+                <div class="col-12">
+                  <b>{{ item.slug }}</b>
+                </div>
+                <div class="col-12">
+                  <img height="100" [src]="item.guid.rendered" />
+                </div>
+              </div>
+            </ng-template>
+          </ng-select>
+          <br />
+        </div> -->
+            <!-- <div class="col-8 col-md-8">
+          <div class="form-group">
+            <label for="name">Slider:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              [(ngModel)]="article.slider"
+              [disabled]="true"
+            />
+          </div>
+        </div> -->
+            <!-- <div class="col-6 text-center" [ngClass]="">
+              <div class="form-group">
+                <img
+                  id="art_img_cover"
+                  [src]="fixUrl(article.slider)"
+                  alt=""
+                  (error)="changeSource($event, article.slider)"
+                  [ngClass]="{ hx2: article.height_zoom == 2 }"
+                  style="object-fit: cover; object-position: top center"
+                  class="border-image"
+                />
+              </div>
+            </div> -->
+
+            <div *ngIf="!came_from_profile" class="col-12 col-md-12">
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select
+                  class="form-control"
+                  [(ngModel)]="article.idCategoriaArticulo"
+                  placeholder="Sex"
+                >
+                  <option
+                    *ngFor="let item of categorias"
+                    [value]="item.idCategoriaArticulo"
+                  >
+                    {{ item.nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 row">
+              <mat-slide-toggle
+                *ngIf="article.idTemplate == 0"
+                style="margin: 10px 0"
+                class="col-2"
+                labelPosition="before"
+                [(ngModel)]="article.show_category"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                Show Category?
+              </mat-slide-toggle>
+
+              <mat-slide-toggle
+                *ngIf="article.idTemplate == 0"
+                style="margin: 10px 0"
+                class="col-2"
+                labelPosition="before"
+                [(ngModel)]="article.show_author"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                Show Author?
+              </mat-slide-toggle>
+
+              <mat-slide-toggle
+                *ngIf="article.idTemplate == 0"
+                style="margin: 10px 0"
+                class="col-2"
+                labelPosition="before"
+                [(ngModel)]="article.show_publish_date"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                Show Publish date?
+              </mat-slide-toggle>
+
+              <mat-slide-toggle
+                *ngIf="article.idTemplate == 0"
+                style="margin: 10px 0"
+                class="col-2"
+                labelPosition="before"
+                [(ngModel)]="article.display_as_wordpress"
+                [ngModelOptions]="{ standalone: true }"
+              >
+                Display Wordpress Article?
+              </mat-slide-toggle>
+            </div>
+
+            <div *ngIf="article.display_as_wordpress" class="col-8 row m-0">
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="name">"Show More" button text:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="show_more_text"
+                    [(ngModel)]="article.show_more_text"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="name">Wordpress Article:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="wordpress_link"
+                    [(ngModel)]="article.wordpress_link"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="article.idTemplate == 0 || article.idTemplate == 18"
+              class="col-12"
+            >
+              <div class="form-group">
+                <label for="name"> Segments/Article Media:</label>
+              </div>
+
+              <table
+                datatable
+                [dtOptions]="dtOptions"
+                [dtTrigger]="dtTrigger"
+                class="table row-border hover"
+              >
+                <thead>
+                  <tr>
+                    <th>Sort</th>
+                    <th>Media Type</th>
+                    <th>Configurations</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of article.segments; let i = index">
+                    <td>
+                      {{ i + 1 }}
+                    </td>
+                    <td>
+                      <h6 class="text-citric">
+                        {{ item.mediaType }}
+                      </h6>
+                      {{ item.idMediaType === 4 ? item.summary : item.titulo }}
+                    </td>
+                    <td>
+                      <button
+                        (click)="editMediaType(item)"
+                        class="btn btn-warning ml-2"
+                      >
+                        <i class="fa fa-edit"> </i>
+                      </button>
+                      <button
+                        class="btn btn-danger ml-2"
+                        (click)="deleteMediaType(item)"
+                      >
+                        <i class="fa fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+              <ng-template [ngIf]="loading">
+                <div class="d-flex justify-content-center" style="margin: 15%">
+                  <div
+                    class="spinner-border text-citric"
+                    style="width: 3rem; height: 3rem"
+                    role="status"
+                  ></div>
+                </div>
+              </ng-template>
+              <button
+                *ngIf="!loading"
+                [disabled]="loading"
+                round
+                clasS="btn btn-citric"
+                (click)="saveArticulo()"
+              >
+                {{ article.idArticulo ? "Update" : "Save" }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-8">
+      <div class="card">
+        <div class="card-title">
+          <h4>Preview</h4>
+        </div>
+
+        <app-article
+          (set_header)="setTitle($event)"
+          #page_articulo
+          [is_preview]="true"
+          [articulo]="article"
+        ></app-article>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #editModal
+  [dismissable]="false"
+  identifier="editModal"
+  customClass="large-modal"
+  (onAnyCloseEvent)="selectedMediaType = undefined"
+  (onOpenFinished)="getPictureFromInput()"
+>
+  <h4>Edit Media Type</h4>
+  <div class="row" *ngIf="selectedMediaType">
+    <div class="col-12">
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="name">Title</label>
+          <input
+            class="form-control"
+            [(ngModel)]="selectedMediaType.titulo"
+            type="text"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedMediaType.idMediaType !== 1" class="col-12">
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label for="url">Url</label>
+          <input
+            class="form-control"
+            [(ngModel)]="selectedMediaType.url"
+            type="text"
+          />
+        </div>
+      </div>
+    </div>
+    <div *ngIf="selectedMediaType.idMediaType === 1" class="col-12">
+      <div class="col-12 col-md-4">
+        <div class="custom-file mb-4">
+          <input
+            #input_file
+            accept="image/*"
+            type="file"
+            class="custom-file-input"
+            id="customFile"
+          />
+          <label class="custom-file-label" for="customFile">Choose file</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+      <button
+        *ngIf="selectedMediaType.idMediaType === 1"
+        class="btn btn-citric"
+        (click)="updateInternalImage()"
+      >
+        Update
+      </button>
+      <button
+        *ngIf="selectedMediaType.idMediaType === 2"
+        class="btn btn-citric"
+        (click)="updateVideo()"
+      >
+        Update
+      </button>
+      <button
+        *ngIf="selectedMediaType.idMediaType === 3"
+        class="btn btn-citric"
+        (click)="updateLink()"
+      >
+        Update
+      </button>
+      <button
+        *ngIf="selectedMediaType.idMediaType === 5"
+        class="btn btn-citric"
+        (click)="updateExternalImage()"
+      >
+        Update
+      </button>
+    </div>
+  </div>
+  <!-- <ng-template *ngIf="selectedMediaType"> </ng-template> -->
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #editContentModal
+  dismissable="false"
+  identifier="editContentModal"
+  customClass="large-modal"
+  (onOpenFinished)="loadEditor(editor)"
+  (onAnyCloseEvent)="selectedMediaType = undefined"
+>
+  <h4>Edit Media Type</h4>
+  <!-- Create toolbar container -->
+  <!-- <div id="toolbar"></div>
+  <div #editor id="editor"></div> -->
+  <div class="row justify-content-end mb-3">
+    <div class="col-12 col-md-6 text-right">
+      <button class="btn btn-sm btn-success" (click)="openButtonModal()">
+        Insert button
+      </button>
+    </div>
+  </div>
+  <text-editor
+    *ngIf="selectedMediaType"
+    #editor
+    [(ngModel)]="selectedMediaType.content"
+  ></text-editor>
+  <div class="row">
+    <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+      <button class="btn btn-citric" (click)="updateContent()">Update</button>
+    </div>
+  </div>
+  <!-- <ng-template *ngIf="selectedMediaType"> </ng-template> -->
+</ngx-smart-modal>
+<div class="alert alert-danger" *ngIf="message" role="alert">
+  {{ message }}
+</div>
+
+<ngx-smart-modal
+  #selectMediaItemModal
+  dismissable="false"
+  identifier="selectMediaItemModal"
+  customClass="large-modal"
+  (onAnyCloseEvent)="selectedMediaType = undefined"
+>
+  <h4>Edit Media Type</h4>
+
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="form-group" *ngIf="selectedMediaType">
+        <label>
+          Select
+          {{
+            selectedMediaType.idMediaType == 6
+              ? " an audio"
+              : selectedMediaType.idMediaType == 7
+              ? " a document"
+              : " a video"
+          }}
+        </label>
+        <select
+          [(ngModel)]="selectedMediaType.idMediaItem"
+          name="idMediaType"
+          class="form-control"
+        >
+          <option
+            *ngFor="let media_item of media_items"
+            [value]="media_item.idVideo"
+          >
+            {{ media_item.title }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-4 col-md-2 text-center">
+      <button class="btn btn-citric" (click)="updateMediaItem()">Update</button>
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #generate_button_modal_in_article
+  identifier="generate_button_modal_in_article"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <app-profile-text-button
+    *ngIf="selectedMediaType"
+    [idOrganization]="article.idIglesia || user?.idIglesia"
+    [is_model]="true"
+    [style]="style_settings"
+    (on_add)="insertButtonV2($event)"
+  >
+  </app-profile-text-button>
+</ngx-smart-modal>

@@ -1,0 +1,78 @@
+<div id="scroll-x" class="scroll-x row mx-0" *ngIf="items.length > 1">
+  <div (click)="scroll(-100)" id="scroll-left" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-left"></i>
+  </div>
+  <div (click)="scroll(100)" id="scroll-right" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-right"></i>
+  </div>
+  <!-- {{items | json}} -->
+  <div
+    class="col-6 col-sm-4 col-md-3 my-4"
+    *ngFor="let group_type of items"
+    [routerLink]="[actual_page + '/' + group_type.id]"
+    (click)="setGroupType(group_type)"
+    [ngClass]="{
+      clickable: view_mode !== 'edition',
+      active: is_active(group_type)
+    }"
+  >
+    <div
+      style="height: 100%; align-items: center"
+      class="roundedDiv mb-3 shadow row mx-0"
+      (mouseover)="group_type.is_hover = true"
+      (mouseleave)="group_type.is_hover = false"
+      [ngStyle]="{
+        'background-color':
+          is_active(group_type)
+            ? group_type.active_background_color || '#e4e4e4'
+            : group_type.is_hover
+            ? group_type.hover_background_color || '#dddddd'
+            : group_type.background_color || '#ffffff',
+        color: group_type.font_color || '#000000',
+        'font-style': group_type.font_style || 'unset',
+        'font-size': group_type.font_size || '14px',
+        'font-weight': group_type.font_weight || 'normal',
+        'text-align': group_type.text_align || 'center'
+      }"
+    >
+      <div class="col-12">
+        {{ group_type.name }}
+      </div>
+      <!-- <div class="col-12" *ngIf="!loading && view_mode === 'edition'">
+        <span class="red" *ngIf="group_type.photos.length === 0">
+          This group_type doesn't have photos.
+        </span>
+        <span *ngIf="group_type.photos.length !== 0">
+          {{ group_type.photos.length }} photos to show.
+        </span>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<ng-template [ngIf]="loading && !display_load">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<!-- [elements]="iglesia.groups" -->
+<app-groups-embed
+  #groups_embed
+  [idOrganization]="idOrganization"
+  [style_settings]="selected_group_type"
+  [group_type_id]="selected_group_type.idGroupType"
+  [group_category_id]="selected_group_type.idGroupCategory"
+  [title]="selected_group_type.name"
+  [title_style_settings]="style_settings"
+  [make_request]="true"
+>
+</app-groups-embed>
+<!-- <app-group_type #group_type_embed [idgroup_type]="selected_group_type.id"></app-group_type> -->

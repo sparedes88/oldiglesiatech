@@ -1,0 +1,58 @@
+<div class="container page">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a routerLink="/home">Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/process">Process</a>
+      </li>
+      <li class="breadcrumb-item active">
+        {{ level.descripcion }}
+      </li>
+    </ol>
+  </nav>
+
+  <h2>{{ level.descripcion }}</h2>
+  <hr />
+
+  <div class="row">
+    <div class="col-md-4">
+      <b>Description</b>
+    </div>
+    <div class="col-md-4">
+      <b>Status</b>
+    </div>
+    <div class="col-md-4">
+      <b>Actions</b>
+    </div>
+  </div>
+  <div cdkDropList class="example-list mb-5" (cdkDropListDropped)="drop($event)">
+    <div class="example-box" *ngFor="let step of level?.requisitos; let i = index" cdkDrag>
+      <div class="row" style="width: 100%;">
+        <div class="col-md-4">
+          {{ step.descripcion }}
+        </div>
+        <div class="col-md-4">
+          <span
+            class="badge"
+            [ngClass]="{
+              'badge-success': level.estatus,
+              'badge-warning': !level.estatus
+            }"
+          >
+            {{ level.estatus ? "Active" : "Inactive" }}
+          </span>
+        </div>
+        <div class="col-md-4">
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="deleteStep(i)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

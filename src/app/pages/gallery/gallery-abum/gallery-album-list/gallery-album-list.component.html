@@ -1,0 +1,71 @@
+<div class="container mt-2">
+  <div class="row">
+    <div class="col-xs-6 col-md-6">
+      <h4 *ngIf="!hide_header">Albums</h4>
+    </div>
+    <div class="col-xs-6 col-md-6 text-right">
+      <a class="btn btn-primary" [routerLink]="['/galleries/albums/create']">
+        Add album
+      </a>
+    </div>
+  </div>
+
+  <hr *ngIf="!hide_header" />
+
+  <table
+    datatable
+    [dtOptions]="dtOptions"
+    [dtTrigger]="dtTrigger"
+    class="table row-border hover mt-4"
+  >
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Settings</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let album of albums">
+        <!-- routerLink="/groups/details/{{ group.idGroup }}" -->
+        <td>
+          {{ album.name }}
+        </td>
+        <td>
+          {{ album.description }}
+        </td>
+        <td>
+          <div class="btn-group">
+            <a
+              class="btn btn-primary btn-sm"
+              routerLink="/albums/details/{{ album.id }}"
+            >
+              <i class="fa fa-eye"></i>
+            </a>
+            <a
+              class="btn btn-success btn-sm"
+              routerLink="/albums/edit/{{ album.id }}"
+            >
+              <i class="fa fa-edit"></i>
+            </a>
+            <button [disabled]="album.is_default"
+              class="btn btn-danger btn-sm opacity-fix"
+              (click)="deleteAlbum(album)"
+            >
+            <span [ngClass]="{ tooltip_ : album.is_default}">
+              <span *ngIf="album.is_default" class="tooltiptext"> This is your default album and can't be deleted. </span>
+              <i class="fa fa-trash"></i>
+            </span>
+            </button>
+            <!-- <button
+              class="btn btn-info btn-sm"
+              (click)="openAlbumIframe(album.id)"
+            >
+              <i class="fa fa-code"></i>
+            </button> -->
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

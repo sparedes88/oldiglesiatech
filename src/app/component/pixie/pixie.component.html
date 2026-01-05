@@ -1,0 +1,223 @@
+<div style="min-height: 70vh;" id="pixieEditor"></div>
+
+<div class="modal-overlay" [hidden]="!showExportForm">
+  <div class="pix-modal form-modal">
+    <h4>
+      {{ templateId ? "Update Template" : "Export template" }}
+    </h4>
+
+    <form [formGroup]="exportForm" (submit)="exportAsTemplate(exportForm)">
+      <div class="form-group">
+        <label>Title</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Template title"
+          formControlName="title"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="file">Preview</label>
+        <input
+          class="form-control"
+          type="file"
+          accept="image/*"
+          id="file"
+          (change)="handleFileInput($event.target.files)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select required class="form-control" formControlName="category">
+          <option value="default">Default</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <button
+          class="btn btn-primary mr-1"
+          type="submit"
+          [disabled]="exportForm.invalid || uploading"
+        >
+          {{ uploading ? "Uploading..." : "Save template" }}
+        </button>
+        <button
+          type="button"
+          (click)="showExportForm = false"
+          class="btn btn-danger"
+          [disabled]="uploading"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" [hidden]="!showTemplatedModal">
+  <div class="pix-modal templates-modal">
+    <div class="text-right float-right">
+      <button class="btn btn-link" (click)="showTemplatedModal = false">
+        X
+      </button>
+    </div>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [ngClass]="{ active: tabIndex == 0 }"
+          (click)="tabIndex = 0"
+          >Templates</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [ngClass]="{ active: tabIndex == 1 }"
+          (click)="tabIndex = 1"
+          >Gallery</a
+        >
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div
+        class="tab-pane"
+        [ngClass]="{ active: tabIndex == 0 }"
+        *ngIf="tabIndex == 0"
+      >
+        <div class="row">
+          <div class="col-xs-6 col-md-6">
+            <h4>Template gallery</h4>
+          </div>
+        </div>
+        <div class="row">
+          <div
+            class="col-xs-6 col-md-4 col-lg-3 clickable card"
+            *ngFor="let template of templates"
+            (click)="setTemplate(template)"
+          >
+            <img
+              class="responsive-img"
+              [src]="template.thumbnail_file"
+              [alt]="template.title"
+            />
+            <div>
+              <b>{{ template.title }}</b>
+            </div>
+            <small>{{ template.category }}</small>
+          </div>
+        </div>
+      </div>
+      <div
+        class="tab-pane"
+        [ngClass]="{ active: tabIndex == 1 }"
+        *ngIf="tabIndex == 1"
+      >
+        <div class="row mt-1">
+          <div class="col-xs-12 col-md-12 text-right">
+            <button
+              class="btn btn-primary"
+              *ngIf="currentUser.isSuperUser"
+              (click)="showGalleryForm = true"
+            >
+              Upload photo
+            </button>
+          </div>
+          <div
+            class="col-xs-4 col-md-3 clickable card"
+            *ngFor="let item of galleryItems"
+          >
+            <img
+              [src]="serverUrl + item.photo"
+              [alt]="item.title"
+              class="responsive-img"
+              (click)="loadImage(item)"
+            />
+            <div class="row mt-1">
+              <div class="col-xs-6 col-md-6">
+                <h5>{{ item.title }}</h5>
+              </div>
+              <div class="col-xs-6 col-md-6 text-right">
+                <button
+                  *ngIf="currentUser.isSuperUser"
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteGalleryItem(item.id)"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <small>{{ item.category }}</small>
+          </div>
+        </div>
+
+        <div class="row center-xs" *ngIf="!galleryItems?.length">
+          <div class="col-xs-12 col-md-12 text-center">
+            <h4 class="mt-4">Gallery is empty</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" [hidden]="!showGalleryForm">
+  <div class="pix-modal form-modal">
+    <h4>
+      Upload photo
+    </h4>
+
+    <form [formGroup]="galleryForm" (submit)="saveGalleryPhoto(galleryForm)">
+      <div class="form-group">
+        <label>Title</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Photo title"
+          formControlName="title"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="file">photo</label>
+        <input
+          class="form-control"
+          type="file"
+          accept="image/*"
+          id="file"
+          (change)="handleFileInputGallery($event.target.files)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select required class="form-control" formControlName="category">
+          <option value="default">Default</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <button
+          class="btn btn-primary mr-1"
+          type="submit"
+          [disabled]="galleryForm.invalid || uploading"
+        >
+          {{ uploading ? "Uploading..." : "Save photo" }}
+        </button>
+        <button
+          type="button"
+          (click)="showGalleryForm = false"
+          class="btn btn-danger"
+          [disabled]="uploading"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

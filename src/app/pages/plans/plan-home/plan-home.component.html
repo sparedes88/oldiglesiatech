@@ -1,0 +1,86 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row mt-2" [hidden]="show_form">
+        <div
+          [ngClass]="currentUser.isSuperUser ? 'col-10' : 'col-12'"
+          class="mt-2 text-right"
+        >
+          <div class="btn-group col-2 mb-2 mt-3">
+            <button
+              class="btn btn-outline-citric btn-sm"
+              (click)="addPlan(plan_form)"
+            >
+              <i class="fa fa-user-plus"></i> Add Plan
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4 mb-5">
+        <div [hidden]="show_form" class="col-md-12 table-responsive-sm">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table table-striped"
+          >
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Monthly Price</th>
+                <th>Initial Payment</th>
+                <th>Configurations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let plan of plans">
+                <td>
+                  {{ plan.idCatalogoPlan }}
+                </td>
+                <td>
+                  {{ plan.nombre }}
+                </td>
+                <td>
+                  {{ plan.descripcion }}
+                </td>
+                <td>
+                  {{ plan.precioMes | currency }}
+                </td>
+                <td>
+                  {{ plan.cuotaInicial | currency }}
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button
+                      class="btn btn-sm btn-warning"
+                      (click)="editPlan(plan_form, plan)"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="deletePlan(plan?.idCatalogoPlan)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-12" [hidden]="!show_form">
+          <app-plan-form
+            (dismiss_form)="dismissPlanForm($event)"
+            style="width: 100%;"
+            #plan_form
+          >
+          </app-plan-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

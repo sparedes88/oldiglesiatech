@@ -1,0 +1,142 @@
+.card-body {
+  .group-picture {
+    margin: unset;
+    border: 2px solid gainsboro;
+    max-width: 420px;
+    cursor: pointer;
+    width: 100%;
+  }
+}
+
+.circular-button {
+  max-width: 40px;
+  max-height: 40px;
+  border-radius: 50%;
+  padding-left: 8px;
+}
+.btn.disabled,
+.btn:disabled {
+  opacity: 0.65 !important;
+}
+.align-center-fixer {
+  text-align: center !important;
+}
+
+div.scrollmenu {
+  // background-color: #333;
+  overflow: auto;
+  white-space: nowrap;
+  padding-top: 15px;
+}
+
+div.scrollmenu div {
+  display: inline-block;
+  color: #262d62;
+  text-align: center;
+  padding: 14px;
+  text-decoration: none;
+  //   width: 150px;
+  min-height: 150px;
+  max-height: 150px;
+  vertical-align: top;
+  h6 {
+    white-space: pre-line !important;
+  }
+}
+
+div.scrollmenu div:hover {
+  background-color: rgb(230, 230, 230);
+}
+
+.slide-image {
+  height: 100%;
+  // width: 50%;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  img {
+    z-index: 1;
+    height: 100px;
+    width: auto;
+    padding: 0 10px;
+  }
+  button {
+    max-width: 28px !important;
+    max-height: 28px !important;
+    width: 28px !important;
+    height: 28px;
+    padding: 0 !important;
+  }
+}
+
+.front-element {
+  position: absolute !important;
+  // top: 5px !important;
+  right: 10px !important;
+  z-index: 3 !important;
+  background-color: red !important;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+}
+a.front-element {
+  color: white;
+  text-align: center;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Tooltip container */
+.tooltip_ {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip_ .tooltiptext {
+  visibility: hidden;
+  width: 180px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -90px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip_ .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip_:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+.form-control-with-delete {
+  width: calc(100% - 24px);
+}
+.del-button {
+  position: absolute;
+  right: 12px;
+  top: 4px;
+}

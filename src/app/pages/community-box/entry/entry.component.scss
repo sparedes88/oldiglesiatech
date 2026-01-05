@@ -1,0 +1,40 @@
+$citric-color: #e65100;
+
+.entry-container {
+  cursor: pointer;
+  text-align: center;
+
+  .head-tag {
+    min-height: 26px;
+    margin-bottom: 6px;
+  }
+  .avatar-container img.avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 150px;
+  }
+  .main-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: $citric-color;
+  }
+  .sub-title {
+    font-size: 15px;
+    font-weight: bold;
+  }
+  .categories {
+  }
+  .description {
+    margin-bottom: 6px;
+  }
+  .location {
+    i.fa {
+      color: $citric-color;
+    }
+  }
+  .social-links {
+    .social-icon {
+      color: $citric-color;
+    }
+  }
+}

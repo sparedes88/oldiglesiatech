@@ -1,0 +1,713 @@
+<div class="container">
+  <div class="row mt-2">
+    <div class="col-xs-7 col-md-7">
+      <h2 class="text-citric mt-2">
+        {{ document_id ? "Update" : "Create" }} Document
+      </h2>
+    </div>
+    <div class="col-5 text-center align-self-center">
+      <button
+        class="btn btn-sm btn-outline-citric"
+        routerLink="/document-builder"
+      >
+        Back
+      </button>
+      <!-- <button
+        *ngIf="document_id"
+        (click)="getDocument()"
+        class="btn btn-sm btn-outline-citric"
+      >
+        Refresh
+      </button> -->
+    </div>
+  </div>
+  <hr />
+  <div class="row m-0">
+    <div class="col-12">
+      <div class="row m-0">
+        <div class="col-12 col-md-6">
+          <div class="card">
+            <form #group_form="ngForm" [formGroup]="document_form">
+              <div class="row card-body">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label>Name</label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control mb-1"
+                      placeholder="Enter your document's name."
+                      formControlName="name"
+                      [class.is-invalid]="
+                        document_form.get('name').dirty &&
+                        document_form.get('name').invalid
+                      "
+                    />
+                    <!-- <span style="display: block; text-align: right">
+                      <button
+                        type="button"
+                        *ngIf="
+                          document_form.get('name').dirty &&
+                          (currentUser?.isSuperUser ||
+                            currentUser?.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="resetForm(document_form, 'name')"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          document_form.get('name').dirty &&
+                          (currentUser?.isSuperUser ||
+                            currentUser?.idUserType === 1)
+                        "
+                        [disabled]="
+                          document_form.get('name').invalid &&
+                          currentUser?.isSuperUser
+                        "
+                        (click)="updateValue(document_form, 'name')"
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span> -->
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-group">
+                    <label>Description</label>
+                    <textarea
+                      type="text"
+                      required
+                      class="form-control mb-1"
+                      placeholder="Enter a description for this document."
+                      formControlName="description"
+                      [class.is-invalid]="
+                        document_form.get('description').dirty &&
+                        document_form.get('description').invalid
+                      "
+                    ></textarea>
+                    <!-- <span style="display: block; text-align: right">
+                      <button
+                        type="button"
+                        *ngIf="
+                          document_form.get('description').dirty &&
+                          (currentUser?.isSuperUser ||
+                            currentUser?.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="resetForm(document_form, 'description')"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          document_form.get('description').dirty &&
+                          (currentUser?.isSuperUser ||
+                            currentUser?.idUserType === 1)
+                        "
+                        [disabled]="
+                          document_form.get('description').invalid &&
+                          currentUser?.isSuperUser
+                        "
+                        (click)="updateValue(document_form, 'description')"
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span> -->
+                  </div>
+                </div>
+                <hr class="w-100" />
+
+                <div class="btn-group col-12">
+                  <button
+                    (click)="settings_obj.menu_option = 'content'"
+                    class="btn btn-sm"
+                    [ngClass]="{
+                      active: settings_obj.menu_option === 'content'
+                    }"
+                  >
+                    Content
+                  </button>
+                  <button
+                    (click)="settings_obj.menu_option = 'settings'"
+                    class="btn btn-sm"
+                    [ngClass]="{
+                      active: settings_obj.menu_option === 'settings'
+                    }"
+                  >
+                    Settings
+                  </button>
+                </div>
+                <div
+                  class="col-12 mt-2"
+                  [hidden]="settings_obj.menu_option !== 'settings'"
+                >
+                  <h5 class="text-secondary">Document Settings</h5>
+
+                  <div [formGroup]="settings_form" class="row m-0">
+                    <div class="btn-group col-12">
+                      <button
+                        (click)="settings_obj.submenu_option = 'body'"
+                        class="btn btn-sm col-6"
+                        [ngClass]="{
+                          active: settings_obj.submenu_option === 'body'
+                        }"
+                      >
+                        Body
+                      </button>
+                      <button
+                        (click)="settings_obj.submenu_option = 'cover'"
+                        class="btn btn-sm col-6"
+                        [ngClass]="{
+                          active: settings_obj.submenu_option === 'cover'
+                        }"
+                      >
+                        Cover Page
+                      </button>
+                    </div>
+
+                    <div
+                      class="col-12 mt-2 m-0 row"
+                      [hidden]="settings_obj.submenu_option !== 'body'"
+                    >
+                      <div class="col-9 p-0">
+                        <h6 class="text-secondary">Title Size</h6>
+                        <div class="form-group">
+                          <label for="marital">Unit</label>
+                          <select
+                            (change)="updateForm('title')"
+                            [(ngModel)]="settings_obj.title_size_unit"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="form-control mb-1"
+                          >
+                            <option value="px">Pixels</option>
+                            <option value="%">Percent</option>
+                            <option value="em">Em</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="marital">
+                            Size ({{ settings_obj.title_size_size
+                            }}{{ settings_obj.title_size_unit }})
+                          </label>
+                          <input
+                            (change)="updateForm('title')"
+                            *ngIf="settings_obj.title_size_unit !== '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="20"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.title_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+
+                          <input
+                            (change)="updateForm('title')"
+                            *ngIf="settings_obj.title_size_unit === '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="100"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.title_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div
+                          class="form-group"
+                          style="display: flex; flex-direction: column"
+                        >
+                          <label>
+                            <span class="tooltip_">
+                              <span class="tooltiptext">
+                                Pick the title color
+                              </span>
+                              Color
+                              <i class="text-secondary fa fa-info-circle"></i>
+                            </span>
+                          </label>
+                          <input
+                            type="color"
+                            formControlName="title_color"
+                            class="form-control"
+                            style="width: 50px; height: 40px"
+                            [class.is-invalid]="
+                              settings_form.get('title_color').dirty &&
+                              settings_form.get('title_color').invalid
+                            "
+                          />
+                        </div>
+                      </div>
+
+                      <div class="col-12 p-0">
+                        <h6 class="text-secondary">Body Size</h6>
+                        <div class="form-group">
+                          <label for="marital">Unit</label>
+                          <select
+                            (change)="updateForm('text')"
+                            [(ngModel)]="settings_obj.text_size_unit"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="form-control mb-1"
+                          >
+                            <option value="px">Pixels</option>
+                            <option value="%">Percent</option>
+                            <option value="em">Em</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="marital">
+                            Size ({{ settings_obj.text_size_size
+                            }}{{ settings_obj.text_size_unit }})
+                          </label>
+                          <input
+                            *ngIf="settings_obj.text_size_unit !== '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="20"
+                            step="1"
+                            id="button_border_radius_range"
+                            (change)="updateForm('text')"
+                            [(ngModel)]="settings_obj.text_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+
+                          <input
+                            *ngIf="settings_obj.text_size_unit === '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="100"
+                            step="1"
+                            id="button_border_radius_range"
+                            (change)="updateForm('text')"
+                            [(ngModel)]="settings_obj.text_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+                        </div>
+
+                        <div class="form-group">
+                          <label for="marital">Alignment</label>
+                          <select
+                            formControlName="text_alignment"
+                            class="form-control mb-1"
+                          >
+                            <option value="left">
+                              <i class="fa fa-align-left"></i> Left
+                            </option>
+                            <option value="center">
+                              <i class="fa fa-align-center"></i> Center
+                            </option>
+                            <option value="justify">
+                              <i class="fa fa-align-justify"></i> Justify
+                            </option>
+                            <option value="right">
+                              <i class="fa fa-align-right"></i>Right
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="col-12 mt-2 m-0 row"
+                      [hidden]="settings_obj.submenu_option !== 'cover'"
+                    >
+                      <div class="col-9 p-0">
+                        <h6 class="text-secondary">Date</h6>
+                        <div class="form-group">
+                          <label for="marital">Unit</label>
+                          <select
+                            (change)="updateForm('cover_date')"
+                            [(ngModel)]="settings_obj.cover_date_size_unit"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="form-control mb-1"
+                          >
+                            <option value="px">Pixels</option>
+                            <option value="%">Percent</option>
+                            <option value="em">Em</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="marital">
+                            Size ({{ settings_obj.cover_date_size_size
+                            }}{{ settings_obj.cover_date_size_unit }})
+                          </label>
+                          <input
+                            (change)="updateForm('cover_date')"
+                            *ngIf="settings_obj.cover_date_size_unit !== '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="20"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.cover_date_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+
+                          <input
+                            (change)="updateForm('cover_date')"
+                            *ngIf="settings_obj.cover_date_size_unit === '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="100"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.cover_date_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label for="marital">Alignment</label>
+                          <select
+                            formControlName="cover_date_alignment"
+                            class="form-control mb-1"
+                          >
+                            <option value="left">
+                              <i class="fa fa-align-left"></i> Left
+                            </option>
+                            <option value="center">
+                              <i class="fa fa-align-center"></i> Center
+                            </option>
+                            <option value="justify">
+                              <i class="fa fa-align-justify"></i> Justify
+                            </option>
+                            <option value="right">
+                              <i class="fa fa-align-right"></i>Right
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div
+                          class="form-group"
+                          style="display: flex; flex-direction: column"
+                        >
+                          <label>
+                            <span class="tooltip_">
+                              <span class="tooltiptext">
+                                Pick the date color
+                              </span>
+                              Color
+                              <i class="text-secondary fa fa-info-circle"></i>
+                            </span>
+                          </label>
+                          <input
+                            type="color"
+                            formControlName="cover_date_color"
+                            class="form-control"
+                            style="width: 50px; height: 40px"
+                            [class.is-invalid]="
+                              settings_form.get('cover_date_color').dirty &&
+                              settings_form.get('cover_date_color').invalid
+                            "
+                          />
+                        </div>
+                      </div>
+                      <div class="col-9 p-0">
+                        <h6 class="text-secondary">Name</h6>
+                        <div class="form-group">
+                          <label for="marital">Unit</label>
+                          <select
+                            (change)="updateForm('cover_name')"
+                            [(ngModel)]="settings_obj.cover_name_size_unit"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="form-control mb-1"
+                          >
+                            <option value="px">Pixels</option>
+                            <option value="%">Percent</option>
+                            <option value="em">Em</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="marital">
+                            Size ({{ settings_obj.cover_name_size_size
+                            }}{{ settings_obj.cover_name_size_unit }})
+                          </label>
+                          <input
+                            (change)="updateForm('cover_name')"
+                            *ngIf="settings_obj.cover_name_size_unit !== '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="100"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.cover_name_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+
+                          <input
+                            (change)="updateForm('cover_name')"
+                            *ngIf="settings_obj.cover_name_size_unit === '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="100"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.cover_name_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label for="marital">Alignment</label>
+                          <select
+                            formControlName="cover_name_alignment"
+                            class="form-control mb-1"
+                          >
+                            <option value="left">
+                              <i class="fa fa-align-left"></i> Left
+                            </option>
+                            <option value="center">
+                              <i class="fa fa-align-center"></i> Center
+                            </option>
+                            <option value="justify">
+                              <i class="fa fa-align-justify"></i> Justify
+                            </option>
+                            <option value="right">
+                              <i class="fa fa-align-right"></i>Right
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div
+                          class="form-group"
+                          style="display: flex; flex-direction: column"
+                        >
+                          <label>
+                            <span class="tooltip_">
+                              <span class="tooltiptext">
+                                Pick the name color
+                              </span>
+                              Color
+                              <i class="text-secondary fa fa-info-circle"></i>
+                            </span>
+                          </label>
+                          <input
+                            type="color"
+                            formControlName="cover_name_color"
+                            class="form-control"
+                            style="width: 50px; height: 40px"
+                            [class.is-invalid]="
+                              settings_form.get('cover_name_color').dirty &&
+                              settings_form.get('cover_name_color').invalid
+                            "
+                          />
+                        </div>
+                      </div>
+                      <div class="col-9 p-0">
+                        <h6 class="text-secondary">Description</h6>
+                        <div class="form-group">
+                          <label for="marital">Unit</label>
+                          <select
+                            (change)="updateForm('cover_description')"
+                            [(ngModel)]="settings_obj.cover_description_size_unit"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="form-control mb-1"
+                          >
+                            <option value="px">Pixels</option>
+                            <option value="%">Percent</option>
+                            <option value="em">Em</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="marital">
+                            Size ({{ settings_obj.cover_description_size_size
+                            }}{{ settings_obj.cover_description_size_unit }})
+                          </label>
+                          <input
+                            (change)="updateForm('cover_description')"
+                            *ngIf="settings_obj.cover_description_size_unit !== '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="20"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.cover_description_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+
+                          <input
+                            (change)="updateForm('cover_description')"
+                            *ngIf="settings_obj.cover_description_size_unit === '%'"
+                            type="range"
+                            class="custom-range"
+                            min="1"
+                            max="100"
+                            step="1"
+                            id="button_border_radius_range"
+                            [(ngModel)]="settings_obj.cover_description_size_size"
+                            [ngModelOptions]="{ standalone: true }"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label for="marital">Alignment</label>
+                          <select
+                            formControlName="cover_description_alignment"
+                            class="form-control mb-1"
+                          >
+                            <option value="left">
+                              <i class="fa fa-align-left"></i> Left
+                            </option>
+                            <option value="center">
+                              <i class="fa fa-align-center"></i> Center
+                            </option>
+                            <option value="justify">
+                              <i class="fa fa-align-justify"></i> Justify
+                            </option>
+                            <option value="right">
+                              <i class="fa fa-align-right"></i>Right
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div
+                          class="form-group"
+                          style="display: flex; flex-direction: column"
+                        >
+                          <label>
+                            <span class="tooltip_">
+                              <span class="tooltiptext">
+                                Pick the description color
+                              </span>
+                              Color
+                              <i class="text-secondary fa fa-info-circle"></i>
+                            </span>
+                          </label>
+                          <input
+                            type="color"
+                            formControlName="cover_description_color"
+                            class="form-control"
+                            style="width: 50px; height: 40px"
+                            [class.is-invalid]="
+                              settings_form.get('cover_description_color').dirty &&
+                              settings_form.get('cover_description_color').invalid
+                            "
+                          />
+                        </div>
+                      </div>
+
+                        
+
+                    </div>
+                    <!-- <div class="col-3">
+                      <div
+                        class="form-group"
+                        style="display: flex; flex-direction: column"
+                      >
+                        <label>
+                          <span class="tooltip_">
+                            <span class="tooltiptext">
+                              Pick the body color
+                            </span>
+                            Color <i class="text-secondary fa fa-info-circle"></i>
+                          </span>
+                        </label>
+                        <input
+                          type="color"
+                          formControlName="title_color"
+                          class="form-control"
+                          style="width: 50px; height: 40px"
+                          [class.is-invalid]="
+                            settings_form.get('title_color').dirty &&
+                            settings_form.get('title_color').invalid
+                          "
+                        />
+                      </div>
+                    </div> -->
+                  </div>
+                </div>
+
+                <app-document-paragraph-draglist
+                  [hidden]="settings_obj.menu_option !== 'content'"
+                  [group]="document_form"
+                  [array_name]="'paragraphs'"
+                  [is_parent]="true"
+                  [deep_level]="0"
+                  class="w-100 mb-1"
+                  (request_document_detail)="getDocument()"
+                >
+                </app-document-paragraph-draglist>
+
+                <div class="col-12 text-center">
+                  <button
+                    (click)="saveDocument()"
+                    [disabled]="server_busy"
+                    class="btn btn-sm btn-success"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="text-secondary">Preview</h5>
+
+              <app-document-builder-preview
+                [settings]="settings_form.value"
+                [document]="document_form.value"
+                [is_preview]="true"
+                [showing_page]="settings_obj.submenu_option"
+              ></app-document-builder-preview>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  [closable]="false"
+  [escapable]="false"
+  [dismissable]="false"
+  #choose_after_action
+  identifier="choose_after_action"
+>
+  <div class="text-center">
+    <h4>Document Saved</h4>
+    <div class="buttons text-center">
+      <a
+        class="btn btn-success"
+        (click)="choose_after_action.close()"
+        [routerLink]="['/document-builder/detail/', document_id]"
+      >
+        View Document
+      </a>
+      <button
+        class="btn btn-primary"
+        (click)="handleModalClose(choose_after_action)"
+      >
+        Keep editing
+      </button>
+    </div>
+  </div>
+</ngx-smart-modal>

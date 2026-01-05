@@ -1,0 +1,68 @@
+<div class="container">
+  <h4>Project Tracking Log</h4>
+  <table
+    datatable
+    [dtOptions]="dtOptions"
+    [dtTrigger]="dtTrigger"
+    class="table"
+  >
+    <thead>
+      <tr>
+        <th class="hidden">Organization</th>
+        <th width="140">Step</th>
+        <th>Start Date</th>
+        <th width="64">Days Alloted</th>
+        <th width="140">Notes</th>
+        <th>Created by</th>
+        <th>Created at</th>
+        <th>Updated by</th>
+        <th>Updated at</th>
+        <th>#</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let projectTracking of projectTrackingLog">
+        <tr *ngFor="let field of fields; let idx = index">
+          <td>{{ projectTracking.iglesia }}</td>
+          <td>{{ idx + 1 }}. {{ field.title }}</td>
+          <td>
+            {{ projectTracking[field.key]?.start_date | date: "mediumDate" }}
+          </td>
+          <td>
+            {{ projectTracking[field.key]?.days_alloted }}
+          </td>
+          <td>
+            {{ projectTracking[field.key]?.notes }}
+          </td>
+          <td>
+            {{
+              projectTracking[field.key]?.created_by ||
+                projectTracking[field.key]?.updated_by ||
+                "--"
+            }}
+          </td>
+          <td>
+            {{
+              projectTracking[field.key]?.created_at ||
+                projectTracking[field.key]?.updated_at | date: "MMM dd yyyy" || "--"
+            }}
+          </td>
+          <td>
+            {{ projectTracking[field.key]?.updated_by }}
+          </td>
+          <td>
+            {{ projectTracking[field.key]?.updated_at | date: "MMM dd yyyy" }}
+          </td>
+          <td>
+            <button
+              class="btn btn-success btn-sm"
+              (click)="editStep('[field.key]', projectTracking.idIglesia)"
+            >
+              <i class="fa fa-edit"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>

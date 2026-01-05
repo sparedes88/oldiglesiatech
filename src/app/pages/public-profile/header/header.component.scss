@@ -1,0 +1,138 @@
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 22px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 300;
+  background-color: white;
+  min-height: 106px;
+
+  .tab-btn {
+    border: none;
+    font-weight: bold;
+  }
+
+  .dual-logo {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0px;
+  }
+
+  img.logo {
+    width: auto;
+    height: auto;
+  }
+
+  .secondary-logo {
+    max-width: 210px;
+    height: auto;
+  }
+
+  button.active {
+    background-color: #4a72b2;
+    color: white;
+  }
+
+  button.btn.btn-light {
+    font-weight: bold;
+  }
+
+  .sub-pages {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    min-height: 32px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    list-style: none;
+    padding: 0px;
+    left: 0;
+    transition: 0.3s;
+    li {
+      transition: 0.3s;
+      padding: 12px 12px;
+      cursor: pointer;
+      &:hover {
+        background-color: rgb(211, 211, 211);
+      }
+    }
+  }
+
+  .tab-btn-container:hover .sub-pages {
+    display: block;
+  }
+
+  .social-icon {
+    background-color: transparent;
+    border: none;
+    font-size: x-large;
+  }
+
+  .burger-btn {
+    display: none;
+    position: absolute;
+    right: 12px;
+  }
+
+  .mobile-menu {
+    height: 100vh;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.973);
+    overflow-y: hidden;
+    z-index: 302;
+    top: 0;
+    right: 150vw;
+    position: fixed;
+    padding: 12px;
+    transition: 0.5s;
+    opacity: 0;
+
+    &.show {
+      right: 1vw;
+      opacity: 1;
+    }
+
+    .tabs-list {
+      list-style-type: none;
+      padding: 0px;
+
+      li {
+        padding: 24px 12px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        border-bottom: 2px solid #e9e9e9;
+
+        &:hover {
+          background-color: whitesmoke;
+        }
+      }
+    }
+  }
+
+  /* Extra small devices (phones, 600px and down) */
+  @media only screen and (max-width: 600px) {
+    .tabs-container {
+      display: none;
+    }
+
+    .social-links {
+      display: none;
+    }
+
+    .burger-btn {
+      display: block;
+    }
+
+    .secondary-logo {
+      display: none;
+    }
+  }
+}

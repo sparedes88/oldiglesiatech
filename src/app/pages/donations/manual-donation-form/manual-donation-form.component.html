@@ -1,0 +1,48 @@
+<div class="float-right">
+  <button (click)="dismiss()" class="btn btn-sm btn-secondary">Cancel</button>
+</div>
+<div class="row mx-0" [formGroup]="form_group">
+  <div class="col-12 col-md-6">
+    <div class="form-group" style="display: flex; flex-direction: column">
+      <label for="idOrganization"> User </label>
+      <ng-multiselect-dropdown
+        #multi_select
+        placeholder="Select an user"
+        [data]="contacts"
+        [settings]="selectOptions"
+        (onSelect)="setEmail($event)"
+        formControlName="selected_user"
+      ></ng-multiselect-dropdown>
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="form-group">
+      <label> Date </label>
+      <input type="date" class="form-control" formControlName="date" />
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="form-group">
+      <label> Amount </label>
+      <input type="number" class="form-control" formControlName="amount" />
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="form-group">
+      <label> Category </label>
+      <select class="form-control" formControlName="idDonationCategory">
+        <option value="">-- None --</option>
+        <option
+          *ngFor="let category of categories"
+          [value]="category.idDonationCategory"
+        >
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-12 text-center">
+    <button class="btn btn-sm btn-success" (click)="submit()">Save</button>
+  </div>
+</div>

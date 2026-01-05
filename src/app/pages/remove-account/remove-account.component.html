@@ -1,0 +1,51 @@
+<div class="container" *ngIf="!current_user">
+  <app-standalone-account-login
+    [idOrganization]="idOrganization"
+    [handle_as_template]="true"
+    (on_login_success)="setUser($event)"
+  ></app-standalone-account-login>
+</div>
+
+<div class="container mt-4" *ngIf="current_user">
+  <h3>Delete my account</h3>
+  <hr />
+  <h5 class="text-secondary">
+    Hi, {{ current_user.nombre }} {{ current_user.apellido }}
+  </h5>
+  <p class="text-justify">
+    You are about to delete your account. This means that your user information
+    (categories, groups, processes, event attendance) will be deleted.
+  </p>
+  <p class="text-justify mt-3">
+    Please confirm the deletion of your account by copying and pasting the
+    following text in the text box.
+  </p>
+  <span class="text-justify text-danger">
+    {{ confirmation_form.get("uuid").value }}
+  </span>
+
+  <div class="row" [formGroup]="confirmation_form">
+    <div class="col-12 col-md-4">
+      <div class="form-group mb-0">
+        <input
+          type="text"
+          formControlName="uuid_confirm"
+          class="form-control"
+          [class.is-invalid]="
+            confirmation_form.get('uuid_confirm').touched &&
+            confirmation_form.get('uuid_confirm').invalid
+          "
+          [placeholder]="confirmation_form.get('uuid').value"
+        />
+      </div>
+    </div>
+  </div>
+
+  <hr />
+  <button class="btn btn-sm btn-outline-danger mb-2" (click)="requestDelete()">
+    Delete my account
+  </button>
+  <button class="btn btn-sm btn-secondary mb-2 float-right" (click)="goToMyProfile()">
+    Go back to my profile
+  </button>
+</div>

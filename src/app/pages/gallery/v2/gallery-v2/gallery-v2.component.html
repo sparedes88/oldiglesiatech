@@ -1,0 +1,91 @@
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+<div *ngIf="!loading" class="gallery-container">
+  <div class="text-center">
+    <h3
+      [ngStyle]="{
+        'text-align': style_settings?.home_title_text_align || 'center',
+        color: style_settings?.home_title_text_color || '#000000',
+        'font-weight': style_settings?.home_title_text_bold || 'bolder'
+      }"
+    >
+      {{ gallery.name }}
+    </h3>
+    <span>{{ gallery.description }}</span>
+  </div>
+
+  <div
+    class="row"
+    [ngClass]="style_settings?.is_full_width ? 'mx-0' : ''"
+    *ngIf="is_from_album"
+  >
+    <div class="col-12 text-right">
+      <button class="btn btn-sm btn-outline-citric" (click)="close()">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <div
+    [ngClass]="style_settings?.is_full_width ? 'mx-0' : ''"
+    class="row justify-content-center"
+  >
+    <div
+      [ngClass]="{
+        'horizontal-scroll': show_horizontal,
+        'justify-content-center': !show_horizontal,
+        'col-12': style_settings?.is_full_width,
+        'col-10': !style_settings?.is_full_width
+      }"
+      class="row mt-1 mx-0 px-2 py-4 main-img-container"
+    >
+      <div
+        #container_div
+        class="col-11 col-sm-12 col-md-6 col-lg-4 p-1"
+        (click)="openPhoto(photo, i)"
+        *ngFor="let photo of gallery?.pictures; let i = index"
+        style="padding: 0px"
+        [ngStyle]="calculateHeight(container_div)"
+      >
+        <div class="img-container">
+          <div class="img-display">
+            <div
+              #self_div
+              class="bg-img"
+              [ngStyle]="getNewStyle(photo, self_div)"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #photoModal identifier="photoModal" customClass="medium-modal">
+  <ngb-carousel class="mt-4" #carousel>
+    <ng-template
+      [id]="'id_' + i"
+      ngbSlide
+      *ngFor="let image of gallery?.pictures; let i = index"
+    >
+      <div class="picsum-img-wrapper">
+        <div
+          class="bg-img-2"
+          [ngStyle]="{ 'background-image': getUrlBack(image) }"
+        >
+          <img class="responsive-img" [src]="getSrc(image)" />
+        </div>
+      </div>
+    </ng-template>
+  </ngb-carousel>
+</ngx-smart-modal>

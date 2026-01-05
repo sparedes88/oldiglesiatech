@@ -1,0 +1,58 @@
+<div id="scroll-x" class="scroll-x row mx-0" *ngIf="community_boxes.length > 1">
+  <div (click)="scroll(-100)" id="scroll-left" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-left"></i>
+  </div>
+  <div (click)="scroll(100)" id="scroll-right" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-right"></i>
+  </div>
+  <!-- {{community_boxes | json}} -->
+  <div
+    [routerLink]="[actual_page + '/community_box/' + community_box.id]"
+    class="col-6 col-sm-4 col-md-3 my-4"
+    *ngFor="let community_box of community_boxes"
+    (click)="setCommunityBox(community_box)"
+    [ngClass]="{
+      clickable: view_mode !== 'edition',
+      active: selected_community_box?.id === community_box.id
+    }"
+  >
+    <div
+      style="height: 100%; align-items: center"
+      class="roundedDiv mb-3 shadow row mx-0"
+      (mouseover)="community_box.is_hover = true"
+      (mouseleave)="community_box.is_hover = false"
+      [ngStyle]="{
+        'background-color':
+          selected_community_box?.id ===
+          community_box.id
+            ? community_box.active_background_color || '#e4e4e4'
+            : community_box.is_hover
+            ? community_box.hover_background_color || '#dddddd'
+            : community_box.background_color || '#ffffff',
+        color: community_box.font_color || '#000000',
+        'font-style': community_box.font_style || 'unset',
+        'font-size': community_box.font_size || '14px',
+        'font-weight': community_box.font_weight || 'normal',
+        'text-align': community_box.text_align || 'center'
+      }"
+    >
+      <div class="col-12">
+        {{ community_box.name }}
+      </div>
+      <!-- <div class="col-12" *ngIf="!loading && view_mode === 'edition'">
+        <span class="red" *ngIf="community_box.photos.length === 0">
+          This community_box doesn't have photos.
+        </span>
+        <span *ngIf="community_box.photos.length !== 0">
+          {{ community_box.photos.length }} photos to show.
+        </span>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<app-view
+  #community_box_embed
+  [communityId]="selected_community_box.id"
+  [display_new_style]="selected_community_box.display_new_style"
+></app-view>

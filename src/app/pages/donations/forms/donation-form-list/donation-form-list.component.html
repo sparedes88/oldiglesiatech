@@ -1,0 +1,345 @@
+<div class="container">
+  <div class="row">
+    <div *ngIf="!is_embed" class="col-12 col-md-8 align-self-center">
+      <h1 class="text-secondary">Forms</h1>
+    </div>
+    <div class="col-12 text-left align-self-center">
+      <div class="btn-group">
+        <button (click)="goBack()" class="btn btn-sm">
+          <i class="text-citric fa fa-arrow-left"></i> Back
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-12 text-right">
+      <button
+        *ngIf="!show_form"
+        class="btn btn-sm btn-success"
+        (click)="openAddForm()"
+      >
+        Add
+      </button>
+      <button
+        *ngIf="show_form"
+        class="btn btn-sm btn-secondary"
+        (click)="show_form = false"
+      >
+        Cancel
+      </button>
+    </div>
+    <ng-template [ngIf]="is_loading">
+      <div class="col-12 text-center">
+        <div class="d-flex justify-content-center" style="margin: 15%">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div
+      *ngIf="!show_form"
+      class="col-12 mt-2"
+      [hidden]="records.length === 0 || is_loading"
+    >
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of records">
+            <td>
+              {{ record.name }}
+            </td>
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-sm btn-secondary"
+                  (click)="selected_id = record.id; embed_donation_link.open()"
+                >
+                  <i class="fa fa-link"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-info"
+                  (click)="openEditForm(record)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteItem(record)"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      class="col-12"
+      [hidden]="records.length != 0 || show_form || is_loading"
+    >
+      <h3 class="text-center text-secondary">
+        There isn't any form created yet.
+      </h3>
+    </div>
+    <div *ngIf="show_form" class="col-12">
+      <div
+        class="row mx-0 justify-content-center"
+        [formGroup]="donation_form_form"
+      >
+        <div class="col-12 col-md-8 mt-2">
+          <h4>Form</h4>
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group">
+                <label> Form name <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  formControlName="name"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="col-12 row" formGroupName="setup">
+              <div class="col-12">
+                <div class="form-group">
+                  <label>
+                    Default amount <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    formControlName="default_amount"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group">
+                  <label> Give title <span class="text-danger">*</span> </label>
+                  <input
+                    type="text"
+                    formControlName="header_give_title"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-group">
+                  <label>
+                    Donation gift label <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="donation_gift_type_label"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group">
+                  <label>
+                    Donation type message <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="donation_type_label"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <h5 class="text-secondary">Header</h5>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label> Background </label>
+                  <input
+                    type="color"
+                    class="form-control"
+                    formControlName="header_background"
+                  />
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label> Text </label>
+                  <input
+                    type="color"
+                    class="form-control"
+                    formControlName="header_text_color"
+                  />
+                </div>
+              </div>
+              <hr class="col-12" />
+              <div class="col-12">
+                <h5 class="text-secondary">Active Buttons</h5>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label> Background </label>
+                  <input
+                    type="color"
+                    class="form-control"
+                    formControlName="active_background"
+                  />
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label> Text </label>
+                  <input
+                    type="color"
+                    class="form-control"
+                    formControlName="active_text_color"
+                  />
+                </div>
+              </div>
+              <hr class="col-12" />
+
+              <div class="col-12">
+                <div class="form-group">
+                  <label>Default category</label>
+                  <select
+                    required
+                    class="form-control"
+                    formControlName="defaultIdDonationCategory"
+                  >
+                    <option
+                      [value]="item.idDonationCategory"
+                      *ngFor="let item of categories"
+                    >
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h4>Email</h4>
+          <div class="row" formGroupName="setup">
+            <div class="col-12">
+              <div class="form-group">
+                <label>
+                  Email subject <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="email_subject"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label>
+                  Thank you disclaimer <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="thank_you_disclaimer"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label>
+                  Frequency disclaimer header <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="frequency_disclaimer_header"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label>
+                  Concept message <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="concept_message"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="col-12 text-center">
+              <button
+                [disabled]="loading"
+                class="btn btn-sm btn-success"
+                (click)="submitForm()"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #embed_donation_link identifier="embed_donation_link">
+  <h4>Embed this form</h4>
+  <div class="row justify-content-center">
+    <div class="col-10 text-center">
+      <small class="text-secondary">
+        Share this QR with someone by clicking on it or ask to scan it using the
+        app to join to the event.
+      </small>
+    </div>
+    <div class="col-8 text-center">
+      <ngx-qrcode
+        #qr_code
+        class="col-2"
+        (click)="shareQR(qr_code)"
+        style="width: 50px; height: 50px"
+        [qrc-value]="iframeCode.link"
+        [qrc-class]="'qrItemResize-dash'"
+        qrc-errorCorrectionLevel="M"
+      >
+      </ngx-qrcode>
+      <button (click)="shareQR(qr_code)" class="btn btn-sm btn-citric">
+        Copy QR
+      </button>
+    </div>
+    <div class="col-12">
+      <h5 class="text-center my-3">Or</h5>
+      <small class="text-secondary mb-2">
+        Copy this url and paste use it on you website
+      </small>
+      <pre
+        class="mb-0"
+        style="background-color: #e2e2e2; padding: 8px; white-space: normal"
+      >
+        <a [href]="iframeCode.link" target="_blank">{{ iframeCode.link }}</a>
+      </pre>
+    </div>
+  </div>
+</ngx-smart-modal>

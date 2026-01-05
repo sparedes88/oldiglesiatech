@@ -1,0 +1,472 @@
+<div class="container">
+  <div *ngIf="!loading" class="row">
+    <div class="col-md-12">
+      <div class="row mt-2">
+        <div class="col-2 mt-3">
+          <button
+            class="btn btn-sm btn-citric"
+            type="button"
+            [routerLink]="back_url"
+          >
+            <i class="fa fa-arrow-left"></i> Back
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form *ngIf="!loading" [formGroup]="contact_form" class="row mt-3">
+    <div *ngIf="!is_v2" class="col-12">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label>Date</label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="created_at_date"
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label>Hour</label>
+            <input
+              type="time"
+              class="form-control"
+              formControlName="created_at_time"
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label> First Name <span class="text-danger"> * </span></label>
+            <input
+              type="text"
+              required
+              class="form-control mb-1"
+              placeholder="First Name"
+              formControlName="first_name"
+              [class.is-invalid]="
+                contact_form.get('first_name').dirty &&
+                contact_form.get('first_name').invalid
+              "
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label> Last Name <span class="text-danger"> * </span> </label>
+            <input
+              type="text"
+              required
+              class="form-control mb-1"
+              placeholder="Last Name"
+              formControlName="last_name"
+              [class.is-invalid]="
+                contact_form.get('last_name').dirty &&
+                contact_form.get('last_name').invalid
+              "
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label> Email </label>
+            <input
+              type="text"
+              class="form-control mb-1"
+              placeholder="Email"
+              formControlName="email"
+              [class.is-invalid]="
+                contact_form.get('email').dirty &&
+                contact_form.get('email').invalid
+              "
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="form-group">
+            <label for="estimated">
+              Country Code <span class="text-danger">*</span>
+            </label>
+            <app-custom-select-country
+              [return_value]="'callingCode'"
+              formControlName="country_code"
+              [idOrganization]="mailingList?.idIglesia"
+              [preselected_country_code]="
+                contact_form.get('country_code').value
+              "
+            >
+            </app-custom-select-country>
+          </div>
+        </div>
+        <div class="col-12 col-md-3">
+          <div class="form-group">
+            <label> Phone </label>
+            <input
+              type="text"
+              class="form-control mb-1"
+              placeholder="(000) 000-0000"
+              formControlName="phone"
+              mask="(000) 000-0000"
+              [dropSpecialCharacters]="false"
+              [class.is-invalid]="
+                contact_form.get('phone').dirty &&
+                contact_form.get('phone').invalid
+              "
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idUserType"> Groups </label>
+            <ng-multiselect-dropdown
+              #multi_groups_select
+              placeholder="Select the groups the user is interested for"
+              [data]="groups"
+              [settings]="selectGroupOptions"
+              formControlName="groups_array"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idUserType"> Events </label>
+            <ng-multiselect-dropdown
+              #multi_events_select
+              placeholder="Select the events the user is interested for"
+              [data]="events"
+              [settings]="selectEventOptions"
+              formControlName="events_array"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label>
+              <span class="tooltip_">
+                <span
+                  style="font-style: italic"
+                  class="tooltiptext tooltiptextBottom"
+                >
+                  This response could be empty if the form has this field turned
+                  off.
+                </span>
+                {{
+                  mailingList?.setup?.question_1_text || "Question 1 text unset"
+                }}
+              </span>
+            </label>
+            <input
+              type="text"
+              class="form-control mb-1"
+              [placeholder]="
+                mailingList?.setup?.question_1_text || 'Question 1 text unset'
+              "
+              formControlName="question_1_answer"
+              [class.is-invalid]="
+                contact_form.get('question_1_answer').dirty &&
+                contact_form.get('question_1_answer').invalid
+              "
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label>
+              <span class="tooltip_">
+                <span
+                  style="font-style: italic"
+                  class="tooltiptext tooltiptextBottom"
+                >
+                  This response could be empty if the form has this field turned
+                  off.
+                </span>
+                {{
+                  mailingList?.setup?.question_2_text || "Question 2 text unset"
+                }}
+              </span>
+            </label>
+            <input
+              type="text"
+              class="form-control mb-1"
+              [placeholder]="
+                mailingList?.setup?.question_2_text || 'Question 2 text unset'
+              "
+              formControlName="question_2_answer"
+              [class.is-invalid]="
+                contact_form.get('question_2_answer').dirty &&
+                contact_form.get('question_2_answer').invalid
+              "
+            />
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label>
+              <span class="tooltip_">
+                <span
+                  style="font-style: italic"
+                  class="tooltiptext tooltiptextBottom"
+                >
+                  This response could be empty if the form has this field turned
+                  off.
+                </span>
+                {{ mailingList?.setup?.message_text || "Message text unset" }}
+              </span>
+            </label>
+            <textarea
+              type="text"
+              class="form-control mb-1"
+              [placeholder]="
+                mailingList?.setup?.message_text || 'Message text unset'
+              "
+              formControlName="message"
+              [class.is-invalid]="
+                contact_form.get('message').dirty &&
+                contact_form.get('message').invalid
+              "
+            ></textarea>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label>
+              <span class="tooltip_">
+                <span
+                  style="font-style: italic"
+                  class="tooltiptext tooltiptextBottom"
+                >
+                  This response could be empty if the form has this field turned
+                  off.
+                </span>
+                {{
+                  mailingList?.setup?.custom_text || "Custom field text unset"
+                }}
+              </span>
+            </label>
+            <textarea
+              type="text"
+              class="form-control mb-1"
+              [placeholder]="
+                mailingList?.setup?.custom_placeholder ||
+                'Custom field placeholder unset'
+              "
+              formControlName="custom_answer"
+              [class.is-invalid]="
+                contact_form.get('custom_answer').dirty &&
+                contact_form.get('custom_answer').invalid
+              "
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="is_v2" class="col-12 col-md-6">
+      <div class="form-group">
+        <label>Date</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="created_at_date"
+        />
+      </div>
+    </div>
+    <div *ngIf="is_v2" class="col-12 col-md-6">
+      <div class="form-group">
+        <label>Hour</label>
+        <input
+          type="time"
+          class="form-control"
+          formControlName="created_at_time"
+        />
+      </div>
+    </div>
+    <div
+      *ngIf="is_v2 && mailingList?.inputs"
+      class="col-12"
+      formArrayName="inputs"
+    >
+      <div
+        *ngFor="let input of inputs_array.controls; let i = index"
+        ƒ
+        [formGroupName]="i"
+        class="form-group"
+      >
+        <label>
+          <span
+            [ngClass]="{
+              'text-danger':
+                (input.value.idMailingListInputType === 4 ||
+                  input.value.idMailingListInputType === 5) &&
+                (input.get('value').touched || input.get('value').dirty) &&
+                input.get('value').invalid
+            }"
+          >
+            {{ input.value.label }}
+          </span>
+        </label>
+        <div *ngIf="input.value.idMailingListInputType == 4">
+          <div class="form-check" *ngFor="let option of input.value.options">
+            <input
+              [checked]="option.checked"
+              class="form-check-input"
+              type="checkbox"
+              (change)="setCheckedValues(input, option, $event)"
+            />
+            <label class="form-check-label">
+              {{ option.name }}
+            </label>
+          </div>
+        </div>
+        <div *ngIf="input.value.idMailingListInputType == 5">
+          <div
+            class="form-check"
+            *ngFor="let option of input.value.options; let f = first"
+          >
+            <input
+              formControlName="value"
+              class="form-check-input"
+              type="radio"
+              [id]="option.value"
+              [value]="option.value"
+            />
+            <label class="form-check-label" [for]="option.value">
+              {{ option.name }}
+            </label>
+          </div>
+        </div>
+        <textarea
+          formControlName="value"
+          class="form-control"
+          [placeholder]="input.value.placeholder || ''"
+          *ngIf="input.value.idMailingListInputType == 2"
+          [class.is-invalid]="
+            (input.get('value').touched || input.get('value').dirty) &&
+            input.get('value').invalid
+          "
+        >
+        </textarea>
+        <input
+          formControlName="value"
+          class="form-control"
+          [placeholder]="input.value.placeholder || ''"
+          *ngIf="input.value.idMailingListInputType == 1"
+          type="text"
+          [class.is-invalid]="
+            (input.get('value').touched || input.get('value').dirty) &&
+            input.get('value').invalid
+          "
+        />
+        <!-- <div
+                class="p-0 col-12"
+                [ngClass]="{ 'col-md-6 px-md-2': !show_as_minimal }"
+              >
+                <div class="form-group">
+                  <label for="estimated">
+                    Country Code <span class="text-danger">*</span>
+                  </label>
+                  <app-custom-select-country
+                    [return_value]="'callingCode'"
+                    formControlName="country_code"
+                    [idOrganization]="idIglesia"
+                    [preselected_country_code]="phone.get('country_code').value"
+                  >
+                  </app-custom-select-country>
+                </div>
+              </div> -->
+
+        <input
+          formControlName="value"
+          class="form-control mb-1"
+          [placeholder]="input.value.placeholder || '(999) 999-9999'"
+          *ngIf="input.value.idMailingListInputType == 9"
+          type="tel"
+          [dropSpecialCharacters]="false"
+          mask="(000) 000-0000"
+          [class.is-invalid]="
+            (input.get('value').touched || input.get('value').dirty) &&
+            input.get('value').invalid
+          "
+        />
+
+        <input
+          formControlName="value"
+          class="form-control"
+          [placeholder]="input.value.placeholder || 'your@email.com'"
+          *ngIf="input.value.idMailingListInputType == 10"
+          type="email"
+          [class.is-invalid]="
+            (input.get('value').touched || input.get('value').dirty) &&
+            input.get('value').invalid
+          "
+        />
+        <input
+          formControlName="value"
+          class="form-control"
+          [placeholder]="input.value.placeholder"
+          *ngIf="input.value.idMailingListInputType == 3"
+          type="number"
+          [class.is-invalid]="
+            (input.get('value').touched || input.get('value').dirty) &&
+            input.get('value').invalid
+          "
+        />
+        <input
+          formControlName="value"
+          class="form-control"
+          [placeholder]="input.value.placeholder"
+          *ngIf="input.value.idMailingListInputType == 11"
+          type="url"
+          [class.is-invalid]="
+            (input.get('value').touched || input.get('value').dirty) &&
+            input.get('value').invalid
+          "
+        />
+
+        <small
+          class="text-danger"
+          *ngIf="
+            input.value.idMailingListInputType == 11 &&
+            input.get('value').hasError('invalidUrl')
+          "
+        >
+          Please enter a valid url.
+        </small>
+
+        <small *ngIf="input.value.show_hint">
+          {{ input.value.hint }}
+        </small>
+      </div>
+    </div>
+
+    <div class="col-12 text-center mb-3">
+      <button
+        [disabled]="contact_form.invalid"
+        class="btn btn-sm btn-success"
+        (click)="updateUser()"
+      >
+        Submit
+      </button>
+    </div>
+  </form>
+
+  <ng-template [ngIf]="loading">
+    <div
+      class="d-flex justify-content-center col-12"
+      style="margin-top: 10%; margin-bottom: 10%"
+    >
+      <div
+        style="
+          height: 120px;
+          width: 120px;
+          font-size: 15px;
+          border-width: 0.45em;
+        "
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+</div>

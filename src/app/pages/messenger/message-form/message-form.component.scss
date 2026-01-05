@@ -1,0 +1,15 @@
+img.img-cover {
+    border-radius: 10px;
+    background: gainsboro;
+    height: 100%;
+    width: 100%;
+    border: 2px solid #e65100;
+    object-fit: cover;
+    object-position: center;
+}
+
+.img-container {
+    width: 200px;
+    height: 130px;
+    display: inline-block;
+}

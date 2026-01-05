@@ -1,0 +1,320 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      Activities | Event: <i>{{ group_event?.name }} </i>
+    </h4>
+    <div *ngIf="show_dismiss" class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+
+    <div class="col-12 row">
+      <div class="col-3 offset-9">
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success mt-3 mb-3"
+          (click)="activateForm()"
+          [disabled]="show_editable"
+        >
+          Add Activity
+        </button>
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+          (click)="print()"
+          [disabled]="show_editable || activities.length === 0"
+        >
+          Print
+        </button>
+      </div>
+      <div *ngIf="show_editable" class="col-12">
+        <form
+          #activity_form="ngForm"
+          [formGroup]="activityForm"
+          style="width: 100%;"
+          class="row"
+        >
+          <div class="col-8">
+            <div class="form-group">
+              <label for="estimated">Activity *</label>
+              <input
+                class="form-control"
+                placeholder="Activity description."
+                type="text"
+                formControlName="description"
+                required
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-group">
+              <label for="estimated">Time* (minutes)</label>
+              <input
+                class="form-control"
+                placeholder="Time (in minutes)."
+                type="text"
+                formControlName="activity_duration"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="col-4 mb-3">
+            <label>Team: *</label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select a team"
+              [data]="groups"
+              [settings]="selectTeamOptions"
+              (onSelect)="fixIdGroup($event)"
+              (onDeSelect)="
+                activityForm.patchValue({
+                  idGroupTeam: undefined,
+                  idUserVolunteers: undefined
+                })
+              "
+            ></ng-multiselect-dropdown>
+            <!-- formControlName="idGroupTeam" -->
+          </div>
+
+          <div class="col-4">
+            <div class="form-group">
+              <label for="estimated">Resources</label>
+              <input
+                class="form-control"
+                placeholder="Resources to use."
+                type="text"
+                formControlName="resources"
+              />
+            </div>
+          </div>
+
+          <div class="col-4 mb-3">
+            <label>Volunteers: *</label>
+            <ng-multiselect-dropdown
+              #multi_select_users
+              placeholder="Select the volunteers"
+              [data]="users"
+              [settings]="selectUserOptions"
+              (onSelect)="fixUsersValues($event)"
+              (onDeSelect)="fixUsersValues($event)"
+            ></ng-multiselect-dropdown>
+            <!-- formControlName="idGroupTeam" -->
+          </div>
+
+          <div class="col-8">
+            <div class="form-group">
+              <label for="estimated">Notes</label>
+              <textarea
+                class="form-control"
+                placeholder="Notes about this activity"
+                type="text"
+                formControlName="notes"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="col-4 align-self-center" *ngIf="!getPermissions()">
+            <button
+              class="btn btn-sm btn-light"
+              (click)="uploadPicture(input_file)"
+            >
+              Attach documents
+            </button>
+          </div>
+
+          <div class="col-4" [hidden]="true">
+            <div class="custom-file mb-4">
+              <input
+                #input_file
+                type="file"
+                class="custom-file-input"
+                id="customFile"
+                multiple
+              />
+              <label class="custom-file-label" for="customFile"
+                >Choose file</label
+              >
+            </div>
+          </div>
+        </form>
+        <span
+          style="display: block; text-align: right; width: 100%;"
+          class="mb-2"
+        >
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            class="btn btn-sm btn-muted"
+            (click)="deactivateForm()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            [disabled]="activityForm.invalid && !getPermissions()"
+            (click)="addActivity(activityForm)"
+            class="btn btn-sm btn-success"
+          >
+            Save
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12" style="min-height: 500px;">
+      <table
+        mat-table
+        #table
+        [dataSource]="activities"
+        class="mat-elevation-z8 table row-border hover table-striped"
+        cdkDropList
+        [cdkDropListData]="activities"
+        (cdkDropListDropped)="dropTable($event)"
+      >
+        <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="activity">
+          <th mat-header-cell *matHeaderCellDef>Activity</th>
+          <td mat-cell *matCellDef="let event">
+            <span class="text-citric">
+              {{ event.description }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="time">
+          <th mat-header-cell *matHeaderCellDef>Time</th>
+          <td mat-cell *matCellDef="let event">
+            {{ event.activity_duration }}
+          </td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <ng-container matColumnDef="notes">
+          <th mat-header-cell *matHeaderCellDef>Notes</th>
+          <td mat-cell *matCellDef="let event">{{ event.notes }}</td>
+        </ng-container>
+
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="teams_involved">
+          <th mat-header-cell *matHeaderCellDef>Teams Involved</th>
+          <td mat-cell *matCellDef="let event">
+            {{ event.group_name }}
+            <br />
+            <br />
+            <span *ngIf="event.members.length > 0">
+              <b>
+                Team Members
+              </b>
+              <br />
+              <li *ngFor="let member of event.members">
+                {{ member.name }} {{ member.lastName }} (<span
+                  class="text-citric"
+                >
+                  {{ member.is_leader ? "Leader" : "Member" }} </span
+                >)
+              </li>
+            </span>
+            <span *ngIf="event.members.length === 0">
+              <i>
+                Volunteers not selected. At least 1 volunteer is needed. Please
+                update.
+              </i>
+            </span>
+          </td>
+        </ng-container>
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="resources">
+          <th mat-header-cell *matHeaderCellDef>Resources</th>
+          <td mat-cell *matCellDef="let event">{{ event.resources }}</td>
+        </ng-container>
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="files">
+          <th mat-header-cell *matHeaderCellDef>Documents</th>
+          <td mat-cell *matCellDef="let event">
+            <li *ngFor="let file of event.files">
+              <a [href]="getUrl(file.url)" target="_blank">
+                {{ file.name }}
+              </a>
+            </li>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="time_start">
+          <th mat-header-cell *matHeaderCellDef>Time Start</th>
+          <td mat-cell *matCellDef="let event">{{ event.time_start }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="time_end">
+          <th mat-header-cell *matHeaderCellDef>Time End</th>
+          <td mat-cell *matCellDef="let event">{{ event.time_end }}</td>
+        </ng-container>
+
+        <ng-container *ngIf="!getPermissions()" matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let event">
+            <div class="btn-group">
+              <button
+                (click)="updateActivity(event)"
+                [disabled]="show_editable"
+                class="btn btn-sm btn-info fixed-padding"
+              >
+                <i class="fa fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-danger fixed-padding"
+                (click)="deleteActivity(event)"
+                [disabled]="show_editable"
+              >
+                <i class="fa fa-trash-alt"></i>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          cdkDrag
+          [cdkDragData]="row"
+        ></tr>
+      </table>
+
+      <span
+        style="display: block; text-align: right; width: 100%;"
+        class="mb-2"
+        *ngIf="checkSort()"
+      >
+        <span>
+          Update activities sort:
+        </span>
+        <button
+          type="button"
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-muted"
+          (click)="resetSort()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          *ngIf="!getPermissions()"
+          [disabled]="!checkSort()"
+          (click)="saveSort()"
+          class="btn btn-sm btn-success"
+        >
+          Save
+        </button>
+      </span>
+    </div>
+  </div>
+</div>

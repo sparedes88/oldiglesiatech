@@ -1,0 +1,376 @@
+<div
+  class="row header align-items-center"
+  [ngClass]="currentUser.idTipoServicio === 1 ? 'bg-citric' : 'navbar-business'"
+>
+  <div class="col-1"></div>
+  <div class="col-11">
+    <h4 class="text-light">
+      {{ inventory_place.name }}
+    </h4>
+    <p>
+      <span class="text-muted bg-light category-span">
+        {{ inventory_place.description }}
+      </span>
+    </p>
+  </div>
+  <!-- <div
+    *ngIf="currentUser.isSuperUser || currentUser.idUserType === 1"
+    class="col-2"
+  >
+    <button class="btn btn-light" (click)="openUpdateGroup(editFormModal)">
+      Update
+    </button>
+  </div> -->
+</div>
+
+<div dropzone="false" class="row" style="margin-right: unset">
+  <!-- Side menu. -->
+  <div class="col-3 col-md-3">
+    <div class="menu-container">
+      <div
+        class="nav flex-column nav-pills navbar-light bg-light"
+        id="v-pills-tab"
+        role="tablist"
+        aria-orientation="vertical"
+      >
+        <a
+          class="nav-link active text-muted padding-fixed"
+          id="v-pills-home-tab"
+          data-toggle="pill"
+          href="#v-pills-home"
+          role="tab"
+          aria-controls="v-pills-home"
+          aria-selected="true"
+        >
+          Home
+        </a>
+        <a
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-products-tab"
+          data-toggle="pill"
+          href="#v-pills-products"
+          role="tab"
+          aria-controls="v-pills-products"
+          aria-selected="false"
+        >
+          Products (
+          <span class="text-citric" id="products-count">
+            {{ inventory_place?.products.length }}
+          </span>
+          )
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Containers -->
+  <div class="col-12 col-md-9" [hidden]="show_detail">
+    <ng-template [ngIf]="!show_detail">
+      <div class="d-flex justify-content-center" style="margin: 140px">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="col-12 col-md-9" [hidden]="!show_detail">
+    <div class="tab-content" id="v-pills-tabContent">
+      <div class="row justify-content-end">
+        <div class="col-12 text-right mt-3">
+          <button class="btn btn-sm btn-outline-citric" routerLink="/inventory">
+            <i class="fa fa-chevron-left"></i> Back
+          </button>
+        </div>
+      </div>
+      <!-- Home Tab -->
+      <div
+        class="tab-pane fade show active"
+        id="v-pills-home"
+        role="tabpanel"
+        aria-labelledby="v-pills-home-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-12 mb-3">
+            General Info
+            <div class="card">
+              <form #inventory_place_form="ngForm" [formGroup]="formInventory">
+                <div class="row card-body">
+                  <div class="col-12">
+                    <div class="form-inventory_place">
+                      <label>Name* </label>
+                      <input
+                        type="text"
+                        required
+                        class="form-control mb-1"
+                        placeholder="Enter your name's inventory_place."
+                        [readonly]="getPermissions()"
+                        formControlName="name"
+                        [class.is-invalid]="
+                          formInventory.get('name').dirty &&
+                          formInventory.get('name').invalid
+                        "
+                      />
+                      <span style="display: block; text-align: right">
+                        <button
+                          type="button"
+                          *ngIf="
+                            formInventory.get('name').dirty &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formInventory, 'name')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            formInventory.get('name').dirty &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          [disabled]="
+                            formInventory.get('name').invalid &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          (click)="updateValue(formInventory, 'name')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-inventory_place">
+                      <label>Short description</label>
+                      <textarea
+                        type="text"
+                        class="form-control mb-1"
+                        placeholder="Enter a description for this inventory."
+                        formControlName="description"
+                        [readonly]="getPermissions()"
+                        [class.is-invalid]="
+                          formInventory.get('description').dirty &&
+                          formInventory.get('description').invalid
+                        "
+                      ></textarea>
+                      <span style="display: block; text-align: right">
+                        <button
+                          type="button"
+                          *ngIf="
+                            formInventory.get('description').dirty &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formInventory, 'description')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            formInventory.get('description').dirty &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          [disabled]="
+                            formInventory.get('description').invalid &&
+                            (currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          (click)="updateValue(formInventory, 'description')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Tab -->
+      <div
+        class="tab-pane fade"
+        id="v-pills-products"
+        role="tabpanel"
+        aria-labelledby="v-pills-products-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-2 offset-6 text-right">
+            <button
+              *ngIf="!getPermissions()"
+              class="btn btn-sm btn-outline-success"
+              (click)="printProducts()"
+              [disabled]="selected_products.length === 0 || printing"
+            >
+              {{ printing ? "Please wait..." : "Print QRs" }}
+            </button>
+          </div>
+          <div class="col-2">
+            <button
+              class="btn btn-sm btn-outline-success"
+              *ngIf="!getPermissions()"
+              (click)="
+                openModalAddProducts(
+                  add_products_to_inventory_modal,
+                  add_products_to_inventory_place_form
+                )
+              "
+            >
+              Add Product
+            </button>
+          </div>
+          <div class="col-12 mb-3">
+            Products
+            <div class="card">
+              <div class="row card-body">
+                <form
+                  #product_type_form="ngForm"
+                  [formGroup]="formInventory"
+                  style="width: 100%"
+                >
+                  <div formArrayName="products" class="col-12">
+                    <!-- datatable
+                      [dtOptions]="dtOptions"
+                      [dtTrigger]="dtTrigger" -->
+                    <table class="table row-border hover table-striped">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Name</th>
+                          <th>Price</th>
+                          <th *ngIf="!getPermissions()">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="
+                            let product of inventory_place.products;
+                            let i = index
+                          "
+                          [formGroupName]="i"
+                        >
+                          <td>
+                            <div class="wrapper">
+                              <img
+                                class="image--cover"
+                                [src]="fixUrl(product)"
+                              />
+                            </div>
+                          </td>
+                          <td>
+                            <span class="text-citric">
+                              {{ product.product_name }}
+                            </span>
+                            <small *ngIf="product.optional_fields?.length > 0">
+                              <br />
+                              <span
+                                *ngFor="let op_field of product.optional_fields"
+                                class="badge badge-secondary mr-1"
+                              >
+                                {{ op_field.value }}
+                              </span>
+                            </small>
+                          </td>
+
+                          <td class="text-right">
+                            {{ product.price_bought_at | currency }}
+                          </td>
+
+                          <td *ngIf="!getPermissions()">
+                            <div class="btn-group">
+                              <button
+                                class="btn btn-secondary ml-2"
+                                data-toggle="modal"
+                                data-target="#exampleModalCenter"
+                                (click)="showQR(product)"
+                              >
+                                <i class="fa fa-qrcode"></i>
+                              </button>
+
+                              <button
+                                class="btn btn-sm btn-danger"
+                                (click)="deleteProduct(product)"
+                              >
+                                <i class="fa fa-trash-alt"></i>
+                              </button>
+                            </div>
+                            <div class="form-check">
+                              <input
+                                [ngModelOptions]="{ standalone: true }"
+                                [(ngModel)]="product.print_qr"
+                                type="checkbox"
+                                class="form-check-input"
+                              />
+                              <label class="form-check-label"> Print QR </label>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th colspan="2" class="text-right">Total Worth</th>
+                          <th class="text-right">
+                            {{ inventory_place.total_worth | currency }}
+                          </th>
+                          <th></th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #add_products_to_inventory_modal
+  identifier="add_products_to_inventory_modal"
+  customClass="large-modal fixed-modal-padding"
+  [closable]="false"
+  [dismissable]="false"
+  [escapable]="false"
+>
+  <!-- <h4>Edit contact | {{ selectedContact?.nombre }}</h4> -->
+  <app-add-products-to-inventory-place-form
+    #add_products_to_inventory_place_form
+    (onDismiss)="
+      onModalQuantityDidDismiss(add_products_to_inventory_modal, $event)
+    "
+  ></app-add-products-to-inventory-place-form>
+  <!-- [product]="selectedContact" -->
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #qr_product_detail_modal
+  identifier="qr_product_detail_modal"
+  customClass="fixed-modal-padding"
+  (onAnyCloseEvent)="product_on_detail = undefined"
+>
+  <app-inventory-product-detail
+    [idInventoryPlace]="inventory_id"
+    [idInventoryPlaceProduct]="product_on_detail.idInventoryPlaceProduct"
+    *ngIf="product_on_detail"
+    (on_refresh)="refreshItems($event)"
+  >
+  </app-inventory-product-detail>
+</ngx-smart-modal>

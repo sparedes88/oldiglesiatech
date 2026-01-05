@@ -1,0 +1,480 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~ngx-smart-modal/ngx-smart-modal";
+@import "~ngx-toastr/toastr";
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@import "~quill/dist/quill.core.css";
+@import "~quill/dist/quill.snow.css";
+@import "~quill/dist/quill.bubble.css";
+@import "assets/quill-styles.css";
+
+@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-calendars/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-dropdowns/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-navigations/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-angular-grids/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-lists/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-angular-dropdowns/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-icons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-richtexteditor/styles/material.css";
+
+$theme-colors: (
+  "citric": #e65100
+);
+
+:root {
+  --be-primary-default: #e65100;
+  --be-primary-lighter: rgba(230, 81, 0, 0.54);
+  --be-hint-text: rgba(0, 0, 0, 0.38);
+  --be-background: white;
+  --be-text: black;
+  --header_background_color: #e65100;
+  --subheader_background_color: #ff7529;
+  --subheader_background_color_hover: #ededed;
+  --ezlink_background: #fff;
+  --donation-header-background: #3f3f3f;
+  --donation-header-text-color: #ffffff;
+  --donation-header-text-color-zero: rgba(var(--donation-header-text-color), 0.5);
+  --donation-active-background: #ddd;
+  --donation-active-text-color: #000;
+  --progress-bar-color: #6ce59c;
+  --progress-bar-color-tint: #7be8a6;
+  --progress-bar-color-shade: #5fca89;
+}
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+
+.lh-0 {
+  line-height: 0 !important;
+}
+
+.ql-editor {
+  min-height: 100px;
+}
+
+.page {
+  padding-top: 8px;
+}
+
+img.responsive,
+img.responsive-img {
+  width: 100%;
+  height: auto;
+}
+
+img.circle {
+  border-radius: 100%;
+}
+
+.is-flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.w-100 {
+  width: 100%;
+}
+.w-50 {
+  width: 50%;
+}
+
+.vh-centered,
+.is-vh-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-centered,
+.centered-text {
+  text-align: center;
+}
+
+.property-box-list,
+.property-box {
+  margin: 10px 0px;
+}
+
+.badge-group .badge {
+  margin-right: 4px;
+}
+
+.large-modal {
+  max-width: none !important;
+}
+
+.full-modal {
+  max-width: none !important;
+}
+
+.medium-modal {
+  max-width: 60vw !important;
+}
+
+@media (max-width: 600px) {
+  .medium-modal {
+    max-width: none !important;
+  }
+}
+
+.fixed-modal-padding {
+  .nsm-content {
+    padding: 0 !important;
+  }
+}
+
+.full-screen-modal {
+  max-width: none !important;
+  .nsm-content {
+    min-height: 90vh !important;
+  }
+}
+
+.full-screen-modal.forced-fullscreen {
+  .nsm-content {
+    margin: 0px !important;
+    padding: 0px !important;
+  }
+}
+
+.tall-modal {
+  min-height: 800px !important;
+}
+
+/* Datatables buttons overrides */
+.dt-buttons {
+}
+.dataTables_length {
+  float: left;
+  margin-top: 1em;
+}
+
+/* buttons overrides */
+
+.btn-tech {
+  background-color: #ff3800;
+  color: white;
+  border-color: #ff3800;
+  &:hover {
+    color: white;
+    background-color: #e43100;
+  }
+}
+
+.fix-disabled {
+  .btn.disabled,
+  .btn:disabled {
+    opacity: 1 !important;
+  }
+}
+
+.fix-dropdown {
+  span.dropdown-btn,
+  ng-multiselect-dropdown {
+    max-height: 76px !important;
+  }
+  .selected-item {
+    max-height: 48px;
+    overflow: hidden;
+  }
+}
+
+.attachment-link {
+  width: 100%;
+  // background-color: #17a2b8;
+  // color: white;
+  // padding: 3px 12px;
+  // border-radius: 11px;
+}
+
+.error-span {
+  font-size: 11px;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.pull-right {
+  float: right;
+}
+
+// Global colors
+.dark-blue {
+  color: #73879c;
+}
+.blue {
+  color: #3498db;
+}
+.blue-darker {
+  color: #20175f;
+}
+.red {
+  color: #cc3030;
+}
+.green {
+  color: #1abb9c;
+}
+.orange {
+  color: #e75b26 !important;
+}
+.samson-primary {
+  color: #19306c !important;
+}
+.pink {
+  color: #ff1493 !important;
+}
+
+// Text modifiers
+.text-centered,
+.text-center,
+.centered-text {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.small-text,
+.text-small {
+  font-size: x-small;
+}
+
+.medium-text,
+.text-medium {
+  font-size: small;
+}
+
+.card-fixed-text {
+  position: absolute;
+  width: 100%;
+  height: 150px;
+  margin: 0;
+}
+
+.card-img-top-fixed {
+  height: 150px;
+  object-fit: cover;
+}
+
+.span-number {
+  align-self: center;
+  text-align: center;
+  color: white;
+  font-size: 60px;
+  text-shadow: 2px 2px 8px #000000;
+}
+
+.bold,
+.strong {
+  font-weight: bold;
+}
+
+.card-fixed-text.opacity-layer {
+  /* opacity: 0.8; */
+  background: rgba(10, 10, 10, 0.2);
+}
+
+div.card[routerLink] {
+  cursor: pointer;
+}
+div.card[routerLink]:hover {
+  background: whitesmoke;
+}
+
+div.card.cursor {
+  cursor: pointer;
+}
+div.card.cursor:hover {
+  background: whitesmoke;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+// Quill
+.ql-align-center {
+  text-align: center;
+}
+
+.ql-align-right {
+  text-align: right;
+}
+
+.ql-align-justify {
+  text-align: justify;
+}
+
+.ql-size-huge {
+  font-size: 24pt;
+}
+
+.btn p {
+  margin: 0px !important;
+}
+
+.fix-nav-height {
+  min-height: 60px !important;
+  .row {
+    min-height: 60px !important;
+  }
+}
+
+.scroll-x {
+  overflow-x: scroll;
+}
+
+.mat-autocomplete-panel {
+  background: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  z-index: 2000;
+}
+.cdk-overlay-container {
+  z-index: 1500 !important;
+}
+
+// @font-face {
+//   font-family: 'Demiela';
+//   font-style: normal;
+//   font-weight: 400;
+//   src: url('https://iglesia-tech-api.e2api.com/img/iglesiaTech/GeneralTopicIglesiaPrueba/fonts/Demiela_FreeVersion.ttf') format('truetype');
+// }
+
+@font-face {
+  font-family: "Palette Mosaic";
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/palettemosaic/v5/AMOIz4aBvWuBFe3TohdW6YZ9MFi34dpL426-mLl4ST6t88LoxPCeMR7tc7XFh18.3.woff2)
+    format("woff2");
+  unicode-range: U+fa10, U+fa12-fa6d, U+fb00-fb04, U+fe10-fe19, U+fe30-fe42, U+fe44-fe52, U+fe54-fe66, U+fe68-fe6b,
+    U+ff02, U+ff04, U+ff07, U+ff51, U+ff5b, U+ff5d, U+ff5f-ff60, U+ff66, U+ff69, U+ff87, U+ffa1-ffbe, U+ffc2-ffc7,
+    U+ffca-ffcf, U+ffd2-ffd6;
+}
+
+@font-face {
+  font-family: "Inspiration";
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/inspiration/v1/x3dkckPPZa6L4wIg5cZOEsoOlyvHBwszI2Y.woff2) format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Inspiration";
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/inspiration/v1/x3dkckPPZa6L4wIg5cZOEsoPlyvHBwszI2Y.woff2) format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Inspiration";
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/inspiration/v1/x3dkckPPZa6L4wIg5cZOEsoBlyvHBwsz.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+app-ezlink-home {
+  background-color: var(--ezlink_background);
+  background: var(--ezlink_background);
+  display: block;
+}
+
+.share-modal {
+  max-width: 380px !important;
+  height: 540px;
+  .nsm-content {
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 20px;
+    height: 100%;
+  }
+}
+
+.tooltip_ {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip_ .tooltiptext {
+  visibility: hidden;
+  width: 180px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -90px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip_ .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip_:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.text-green {
+  color: #17cab3 !important;
+}
+
+.btn-outline-green {
+  color: #17cab3;
+  // border-color: rgb(23, 202, 179);
+  border-color: #17cab3;
+  &:hover {
+    color: #fff;
+    background-color: #17cab3;
+    border-color: #17cab3;
+  }
+  &:focus {
+    box-shadow: 0 0 0 0rgba (23, 202, 179, 0.5);
+  }
+}
+
+.pre-line {
+  white-space: pre-line;
+}

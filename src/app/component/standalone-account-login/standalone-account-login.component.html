@@ -1,0 +1,59 @@
+<app-get-started
+  *ngIf="!actual_user_status && actual_user_status !== 'display_already_member'"
+  [get_started_form]="full_form.get('get_started_form')"
+  [currentUser]="currentUser"
+  [group_event]="{
+    idOrganization: idOrganization
+  }"
+  (user_status)="getUserStatus($event)"
+  [header_message]="'login.verify_email_or_phone_disclaimer' | translate"
+  [login_text_button]="'Login_Button' | translate"
+>
+</app-get-started>
+
+<app-login-portal
+  *ngIf="
+    actual_user_status == 'checked_in_organization' ||
+    actual_user_status == 'checked_not_available'
+  "
+  [currentUser]="currentUser"
+  [group_event]="{
+    idOrganization: idOrganization
+  }"
+  [close_button_text]="'generals.back' | translate"
+  [close_button_position]="'bottom'"
+  [close_button_alignment]="'center'"
+  [full_form]="full_form"
+  [login_form]="full_form.get('login_form')"
+  (cancel_login)="cancelForm()"
+  (login_response)="loginResponse($event)"
+  (open_reset)="openResetPassword($event)"
+></app-login-portal>
+
+<div *ngIf="actual_user_status === 'checked_ok'">
+  <app-create-account-portal
+    [full_form]="full_form"
+    [register_form]="full_form.get('register_form')"
+    [currentUser]="currentUser"
+    [group_event]="{
+      idOrganization: idOrganization
+    }"
+    [is_not_event]="true"
+    (cancel_login)="cancelRegister()"
+    (register_response)="loginResponse($event)"
+  >
+  </app-create-account-portal>
+</div>
+
+<div *ngIf="actual_user_status === 'reset_password'">
+  <app-reset-password
+    [full_form]="full_form"
+    [login_form]="full_form.get('login_form')"
+    [currentUser]="currentUser"
+    [group_event]="{
+      idOrganization: idOrganization
+    }"
+    (cancel_login)="getUserStatus($event)"
+  >
+  </app-reset-password>
+</div>

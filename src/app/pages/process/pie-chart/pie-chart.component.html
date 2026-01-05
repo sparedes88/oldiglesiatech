@@ -1,0 +1,213 @@
+<div class="row">
+  <div class="col-4">
+    <form [formGroup]="idProcessForm">
+      <div class="row">
+        <div [ngClass]="process ? 'col-10' : 'col-12'" class="form-group">
+          <label>Process *</label>
+          <select
+            formControlName="idProcess"
+            (change)="loadChart($event)"
+            (ngModelChange)="loadChart($event)"
+            class="form-control"
+          >
+            <option
+              *ngFor="let process of processList"
+              [value]="process.idProcess"
+            >
+              {{ process.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-2" class="text-right align-self-center mt-3" *ngIf="process">
+          <button
+            (click)="makeRefresh('process')"
+            class="btn btn-sm btn-success"
+          >
+            <i class="fa fa-sync"></i>
+          </button>
+        </div>
+      </div>
+      <div *ngIf="process" class="form-group">
+        <label>Level *</label>
+        <select
+          (change)="onChangeLevel($event)"
+          formControlName="idLevel"
+          class="form-control"
+        >
+          <!-- <option [value]="null">All</option> -->
+          <option *ngFor="let step of levels" [value]="step.idNivel">
+            {{ step.name }}
+          </option>
+        </select>
+      </div>
+      <div *ngIf="level && level.idNivel !== 0" class="form-group">
+        <label>Step *</label>
+        <select
+          (change)="loadUserForStep($event)"
+          formControlName="idStep"
+          class="form-control"
+        >
+          <option [value]="null">All</option>
+          <option *ngFor="let step of steps" [value]="step.idRequisito">
+            {{ step.descripcion }}
+          </option>
+        </select>
+      </div>
+      <div *ngIf="step && level?.idNivel !== 0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="loading">
+              <td class="text-center" align="center">
+                <h4>Loading...</h4>
+              </td>
+            </tr>
+            <tr *ngFor="let step of users">
+              <td *ngIf="!loading">
+                <h4 *ngIf="users.length > 1">
+                  {{ step.name }}
+                </h4>
+                <ul class="list-group builder-scroll">
+                  <li
+                    class="list-group-item"
+                    *ngFor="let contact of step.users"
+                  >
+                    <div class="row">
+                      <div
+                        [routerLink]="'/contact/details/' + contact.idUser"
+                        class="col-xs-10 col-md-10 clickable"
+                      >
+                        {{ contact.name }}
+                        <br *ngIf="contact.groups" />
+                        <small *ngIf="contact.groups"
+                          >({{ contact.groups }})</small
+                        >
+                      </div>
+                      <div class="col-xs-2 col-md-2 text-right">
+                        <mat-slide-toggle
+                          [ngModelOptions]="{ standalone: true }"
+                          [(ngModel)]="contact.cumplido"
+                          (change)="
+                            toggleStepStatus(
+                              contact.idUser,
+                              contact.cumplido,
+                              contact.idRequisito
+                            )
+                          "
+                          color="primary"
+                        ></mat-slide-toggle>
+                      </div>
+                    </div>
+                  </li>
+                  <li
+                    class="list-group-item disabled"
+                    *ngIf="!step.users.length"
+                  >
+                    No contacts assigned
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div
+        style="overflow-y: scroll; height: 300px; margin-right: -15px"
+        *ngIf="level?.idNivel === 0"
+      >
+        <table class="table">
+          <thead>
+            <tr>
+              <th width="33.33%">Unassigned Contacts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="loading">
+              <td class="text-center" align="center">
+                <h4>Loading...</h4>
+              </td>
+            </tr>
+            <tr *ngIf="!loading">
+              <td>
+                <ul class="list-group">
+                  <li class="list-group-item">
+                    <div class="form-group">
+                      <label>Search</label>
+                      <input
+                        type="search"
+                        class="form-control"
+                        placeholder="Type contact name"
+                        [(ngModel)]="contactSearchValue"
+                        [ngModelOptions]="{ standalone: true }"
+                      />
+                    </div>
+                  </li>
+                  <li
+                    class="list-group-item"
+                    *ngFor="let contact of filteredUserProcess"
+                  >
+                    <div class="row">
+                      <div class="col-xs-10 col-md-10">
+                        {{ contact.name }}
+                      </div>
+                      <div class="col-xs-2 col-md-2 text-right">
+                        <mat-slide-toggle
+                          [(ngModel)]="contact.assigned"
+                          (change)="
+                            toggleAssignStatus(contact.idUser, contact.assigned)
+                          "
+                          color="primary"
+                          [ngModelOptions]="{ standalone: true }"
+                        ></mat-slide-toggle>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+  <div class="col-8">
+    <h4 *ngIf="!process?.idProcess" class="text-danger text-center">
+      Please select a process first.
+    </h4>
+
+    <ejs-accumulationchart
+      (pointClick)="pointClick($event)"
+      id="container"
+      width="92%"
+      [legendSettings]="legendSettings"
+      [title]="title"
+      [enableAnimation]="enableAnimation"
+      [center]="center"
+      [tooltip]="tooltip"
+      (tooltipRender)="tooltipRender($event)"
+    >
+      <e-accumulation-series-collection>
+        <e-accumulation-series
+          [name]="process?.name"
+          [dataSource]="pieData"
+          xName="x"
+          yName="y"
+          [startAngle]="startAngle"
+          [endAngle]="endAngle"
+          innerRadius="0%"
+          radius="70%"
+          [explode]="explode"
+          explodeOffset="10%"
+          [explodeIndex]="0"
+          [dataLabel]="datalabel"
+          [pointColorMapping]="map"
+        >
+        </e-accumulation-series>
+      </e-accumulation-series-collection>
+    </ejs-accumulationchart>
+  </div>
+</div>

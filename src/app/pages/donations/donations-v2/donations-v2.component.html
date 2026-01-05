@@ -1,0 +1,361 @@
+<div *ngIf="!not_stripe" class="donation-panel" [formGroup]="main_form">
+  <div
+    id="donation-header"
+    class="donation-header"
+    *ngIf="actual_step == 'step_1'"
+    [formGroup]="donation_form"
+  >
+    <div class="form-group-container row mx-0 justify-content-center">
+      <div class="col-12 p-0 text-center">
+        <h1>
+          {{ donation_setup?.header_give_title || "Quiero donar" }}
+        </h1>
+      </div>
+      <div class="col-12 p-0 row mx-0 justify-content-center">
+        <input
+          [ngClass]="{
+            'value-zero':
+              main_form.get('donation_form').get('amount').value == 0
+          }"
+          class="form-control amount-control"
+          type="tel"
+          formControlName="amount"
+          (keydown)="preventEvent($event)"
+          (keyup)="formatNumber($event)"
+        />
+        <div class="amount-decorator">
+          <span class="amount-underline">
+            {{
+              main_form.get("donation_form").get("amount_mask").value || "0.00"
+            }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mx-0 justify-content-center">
+    <div class="form-group-container">
+      <div
+        class="card step-1"
+        [formGroup]="donation_form"
+        *ngIf="actual_step == 'step_1'"
+      >
+        <div class="card-body">
+          <div class="row error-message" *ngIf="error_message">
+            <div class="col-12">
+              <h6 class="text-danger">
+                {{ error_message }}
+              </h6>
+            </div>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <label>
+                {{
+                  donation_setup?.donation_gift_type_label || "Tipo de regalo"
+                }}
+              </label>
+              <br />
+              <div class="btn-group">
+                <button
+                  [ngClass]="{
+                    active:
+                      donation_form.get('periodicity').value === 'only_once'
+                  }"
+                  class="btn full"
+                  (click)="setPeriodicity('only_once')"
+                >
+                  Dar una vez
+                </button>
+                <button
+                  [ngClass]="{
+                    active:
+                      donation_form.get('periodicity').value === 'recurrent'
+                  }"
+                  class="btn full"
+                  (click)="setPeriodicity('recurrent')"
+                >
+                  Configurar recurrente
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="col-12 mt-2"
+              *ngIf="donation_form.get('periodicity').value === 'recurrent'"
+              [formGroup]="recurring_form"
+            >
+              <div class="form-group">
+                <label> Frecuencia </label>
+                <select formControlName="frequency" class="form-control">
+                  <option
+                    [value]="frequency.id"
+                    *ngFor="let frequency of frequencies"
+                  >
+                    {{ frequency.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-12 mt-2" *ngIf="categories.length > 0">
+              <div class="form-group">
+                <label>
+                  {{
+                    donation_setup?.donation_type_label || "Tipo de donación"
+                  }}
+                </label>
+                <select
+                  class="form-control"
+                  formControlName="donation_type"
+                  (change)="error_message = undefined"
+                >
+                  <option hidden selected>
+                    -- ¿A dónde debería ir tu donación? --
+                  </option>
+                  <option
+                    *ngFor="let category of categories"
+                    [value]="category.idDonationCategory"
+                  >
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="col-12 p-0" />
+
+            <div class="col-10 col-sm-5 text-center btn-group">
+              <button class="btn full active round" (click)="nextStep()">
+                Siguiente
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="card step-2"
+        [formGroup]="contact_form"
+        *ngIf="actual_step == 'step_2'"
+      >
+        <div class="card-body">
+          <div class="row error-message" *ngIf="error_message">
+            <div class="col-12">
+              <h6 class="text-danger">
+                {{ error_message }}
+              </h6>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <h5 class="mb-0">INFORMACIÓN DE CONTACTO</h5>
+              <h6>Por favor, proporcione su nombre y un correo electrónico.</h6>
+            </div>
+
+            <hr class="col-12 p-0" />
+            <div class="col-12 col-md-6">
+              <div class="form-group">
+                <label> Nombre </label>
+                <input
+                  formControlName="first_name"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="form-group">
+                <label> Apellido </label>
+                <input
+                  formControlName="last_name"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="col-12 justify-self-start">
+              <div class="form-group">
+                <label> Email </label>
+                <input
+                  formControlName="email"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <hr class="col-12 p-0" />
+
+            <div
+              class="btn-group col-10 col-sm-4 offset-2 offset-sm-4 text-center"
+            >
+              <button class="btn full active round" (click)="nextStep()">
+                Siguiente
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card step_3" *ngIf="actual_step == 'step_3'">
+        <div class="card-body">
+          <!-- Loading customer -->
+          <ng-template [ngIf]="!customer_loaded">
+            <div
+              class="d-flex justify-content-center col-12"
+              style="margin-top: 10%; margin-bottom: 10%"
+            >
+              <div
+                style="
+                  height: 120px;
+                  width: 120px;
+                  font-size: 15px;
+                  border-width: 0.45em;
+                "
+                class="spinner-border text-citric"
+                role="status"
+              ></div>
+            </div>
+          </ng-template>
+
+          <div class="row" *ngIf="customer_loaded">
+            <div class="col-12" *ngIf="!add_new_payment">
+              <h5 class="mb-0">Confirme su donación</h5>
+              <h6>
+                Usted está donando ${{ donation_form.get("amount").value
+                }}<span *ngIf="organization"> a {{ organization.Nombre }}</span
+                >.
+              </h6>
+              <div class="row justify-content-start">
+                <div class="col-6 text-left">
+                  <button class="btn" (click)="backToStep1()">
+                    <span class="text-secondary">
+                      <i class="fa fa-chevron-left"></i> Quiero modificar mi
+                      donación
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12" *ngIf="add_new_payment">
+              <h5 class="mb-0">Nuevo método de pago</h5>
+              <h6>Agregue una nueva tarjeta para realizar su donación.</h6>
+              <div class="row justify-content-start">
+                <div class="col-4 text-left">
+                  <button class="btn" (click)="closeNewCardForm()">
+                    <span class="text-secondary">
+                      <i class="fa fa-chevron-left"></i> Volver
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <hr class="col-12 p-0" />
+            <div class="row col-12" [hidden]="add_new_payment">
+              <div
+                class="col-12 col-md-6 row mx-0 justify-content-center mb-3"
+                *ngFor="let card of payment_methods.controls"
+              >
+                <app-card-ui
+                  (click)="selectCard(card)"
+                  [card_number]="card.get('last4').value"
+                  [brand]="card.get('brand').value"
+                  [exp_month]="card.get('exp_month').value"
+                  [exp_year]="card.get('exp_year').value"
+                  [selected]="card.get('selected').value"
+                ></app-card-ui>
+              </div>
+              <div class="col-12 col-md-6 row mx-0 justify-content-center mb-3">
+                <button
+                  class="new-card btn"
+                  [ngClass]="{ 'is-loading': !elements_loaded }"
+                  [disabled]="!elements_loaded"
+                  (click)="add_new_payment = true"
+                >
+                  <span> Nueva tarjeta </span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row" [hidden]="!add_new_payment">
+            <div class="col-12 col-md-8 row mx-0">
+              <div class="col-12">
+                <div class="form-group">
+                  <label> Número de tarjeta</label>
+                  <div #card_info_number></div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label> Expiración </label>
+                  <div #card_info_exp></div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label> CVV </label>
+                  <div #card_info_cvv></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 d-none d-md-block row mx-0">
+              <div class="col-12">Supported</div>
+              <div class="brand-logo mastercard"></div>
+              <div class="brand-logo visa"></div>
+              <div class="brand-logo amex"></div>
+            </div>
+            <!-- <div class="col-6 col-sm-4" [formGroup]="payment_info">
+              <div class="form-group">
+                <label> Código postal </label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  formControlName="zip_code"
+                />
+              </div>
+            </div> -->
+          </div>
+
+          <hr class="col-12 p-0" *ngIf="customer_loaded" />
+          <div class="col-12" *ngIf="customer_loaded">
+            <div class="row mx-0 justify-content-center">
+              <div class="col-10 col-sm-4 text-center">
+                <div class="btn-group">
+                  <button
+                    *ngIf="add_new_payment"
+                    class="btn full active round"
+                    (click)="addNewPayment()"
+                  >
+                    Siguiente
+                  </button>
+                  <button
+                    *ngIf="!add_new_payment"
+                    class="btn full active round"
+                    (click)="confirmDonation()"
+                    [disabled]="processing_payment"
+                    [ngClass]="{ 'is-loading': processing_payment }"
+                  >
+                    Donar ${{ donation_form.get("amount").value }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="not_stripe" class="credit-card">
+  <div class="row mt-3">
+    <div class="col-6">
+      <h5 id="title_setting">{{ organization?.Nombre }}</h5>
+    </div>
+  </div>
+  <h3 class="col-12 red text-center">
+    Esta organización no tiene vinculada una cuenta de Stripe.
+  </h3>
+</div>

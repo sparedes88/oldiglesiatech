@@ -1,0 +1,799 @@
+<div class="container page">
+  <div class="col-12 col-md-4" [hidden]="true">
+    <div class="custom-file mb-4">
+      <input
+        #inputLogo
+        accept="image/*"
+        type="file"
+        class="custom-file-input"
+        id="customFile"
+      />
+      <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+  </div>
+  <div [hidden]="show_form">
+    <div class="row m-0">
+      <h3 class="col-12 col-md-6 text-citric">
+        {{ "Iglesias_Management" | translate }}
+      </h3>
+      <div class="col-6 text-right btn-group">
+        <a
+          class="btn btn-outline-citric"
+          [routerLink]="['/project-tracking/log']"
+        >
+          Tracking log
+        </a>
+        <button
+          class="btn btn-outline-citric"
+          (click)="goToAddOrganization(organization_form)"
+        >
+          Add Organization
+        </button>
+
+        <button class="btn btn-outline-citric" routerLink="service_types">
+          Service Types <i class="fa fa-chevron-right"></i>
+        </button>
+      </div>
+      <!-- <div
+      class="col-3"
+      *ngIf="
+        currentUser.idUsuario === 78 ||
+        currentUser.idUsuario === 152 ||
+        currentUser.idUsuario === 2352 ||
+        currentUser.idUsuario === 276
+      "
+    >
+      <button class="btn btn-outline-citric" routerLink="planning">
+        View Planning
+      </button>
+    </div> -->
+    </div>
+
+    <hr />
+
+    <div>
+      <div class="centerImg">
+        <!-- src="/assets/img/google-play-badge.png" -->
+        <img src="/assets/img/logoColor.png" alt="" />
+      </div>
+      <h1 class="text-muted"></h1>
+    </div>
+
+    <app-map
+      *ngIf="!show_loader && pins.length !== 0"
+      [locations]="pins"
+      [height]="500"
+      [drop_with_delay]="true"
+      [allow_street_view]="false"
+    ></app-map>
+
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header> Summary </mat-expansion-panel-header>
+        <div class="right-align">
+          <span class="active-back">Active</span>
+          <span class="delete-back">Deleted</span>
+        </div>
+
+        <div class="row text-center">
+          <div class="col-4" *ngFor="let item of summary">
+            <b> {{ item.tipoServicio }} </b>
+            <br />
+            <div class="row col-12">
+              <div class="col-3 offset-3 active text-success">
+                {{ item.activas }}
+              </div>
+              <div class="col-3 offset-3 delete">
+                {{ item.eliminadas }}
+              </div>
+            </div>
+            <div
+              *ngIf="
+                currentUser.idUsuario === 78 || currentUser.idUsuario === 152
+              "
+              class="row offset-3 col-9 text-success"
+            >
+              Total of active: {{ item.precioMesActivas | currency }}
+            </div>
+            <div
+              *ngIf="
+                currentUser.idUsuario === 78 || currentUser.idUsuario === 152
+              "
+              class="row offset-3 col-9 delete"
+            >
+              Total of inactive: {{ item.precioMesEliminadas | currency }}
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="col-12">
+      <div class="row mb-3 justify-content-end">
+        <mat-slide-toggle
+          style="margin: 10px 0"
+          class="col-2"
+          labelPosition="before"
+          (change)="toggleAll($event)"
+          #mat_all
+          [(ngModel)]="show_test_or_inactive"
+        >
+          Show test organizations
+        </mat-slide-toggle>
+      </div>
+    </div>
+
+    <ng-template class="col-12" [ngIf]="show_loader">
+      <div class="d-flex justify-content-center" style="margin: 15%">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+
+    <div class="row col-12" [hidden]="show_loader">
+      <br />
+      <form
+        #filters_form="ngForm"
+        [formGroup]="filtersForm"
+        style="width: 100%"
+      >
+        <div class="row col-12">
+          <div class="col-12 col-md-6 col-lg-3">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization"> Organization </label>
+              <ng-multiselect-dropdown
+                #multi_select
+                placeholder="Select an organization"
+                [data]="iglesias"
+                [settings]="selectOptions"
+                formControlName="idOrganization"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+          <!-- Iglesia, Contactos, Managed by y Plan type. -->
+          <div class="col-12 col-md-6 col-lg-3">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization"> Plan Type </label>
+              <ng-multiselect-dropdown
+                #multi_select
+                placeholder="Select a Plan"
+                [data]="dropdowns?.plans"
+                [settings]="selectPlanOptions"
+                formControlName="idPlanType"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization"> Managed by </label>
+              <ng-multiselect-dropdown
+                #multi_select_users
+                placeholder="Select an User"
+                [data]="dropdowns?.users"
+                [settings]="selectUsersOptions"
+                formControlName="managed_by"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization"> Contact </label>
+              <ng-multiselect-dropdown
+                #multi_select_users
+                placeholder="Select a contact"
+                [data]="dropdowns?.contacts"
+                [settings]="selectContactsOptions"
+                formControlName="idContacto"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization"> Service Type </label>
+              <ng-multiselect-dropdown
+                #multi_select_users
+                placeholder="Select a service type"
+                [data]="dropdowns?.service_types"
+                [settings]="selectServiceTypeOptions"
+                formControlName="idTipoServicio"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <label for="idOrganization"> States </label>
+              <ng-multiselect-dropdown
+                #multi_select_users
+                placeholder="Select a state"
+                [data]="states"
+                [settings]="selectStateOptions"
+                formControlName="state"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+
+          <div class="col-12 text-right align-self-center mb-4">
+            <button
+              class="col-3 btn btn-outline-citric"
+              (click)="searchWithFilters()"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="col-12 scroll-x">
+      <table
+        [hidden]="show_loader || filtered_iglesias.length === 0"
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        class="table row-border hover"
+      >
+        <thead>
+          <tr>
+            <th width="75px">ID</th>
+            <th width="75px">Logo</th>
+            <th>QR</th>
+            <th>Name</th>
+            <th>Contacts</th>
+            <th>Tags</th>
+            <th>Manage by</th>
+            <th>Plan</th>
+            <th>Monthly cost</th>
+            <th>Messages</th>
+            <th>Lastest note</th>
+            <th>Configurations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let iglesia of filtered_iglesias">
+            <td (click)="selectIglesia(iglesia)">
+              {{ iglesia.idIglesia }}
+            </td>
+            <td (click)="updateLogo(iglesia)">
+              <div class="imgContainer">
+                <img class="imgLogo" [src]="iglesia.Logo" alt="" />
+              </div>
+            </td>
+            <td (click)="selectIglesia(iglesia)">
+              <ngx-qrcode
+                style="width: 50px; height: 50px"
+                [qrc-value]="iglesia.topic"
+                [qrc-class]="'qrItemResize'"
+                qrc-errorCorrectionLevel="M"
+              >
+              </ngx-qrcode>
+              <!-- <br /> -->
+              <span class="text-citric" style="font-size: 10px">
+                To share, please make right click and copy.
+              </span>
+            </td>
+            <td
+              class="clickable"
+              (click)="toggleEditableField(iglesia, 'nombre')"
+            >
+              <div
+                *ngIf="
+                  iglesia._editableField == 'nombre';
+                  else organizationName
+                "
+              >
+                <mat-form-field appearance="outline">
+                  <input
+                    type="text"
+                    [(ngModel)]="iglesia.Nombre"
+                    matInput
+                    required
+                    autofocus
+                    (keydown.enter)="updateIglesia(iglesia)"
+                  />
+                </mat-form-field>
+
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label for="category"> Select organization type: * </label>
+                  <ng-multiselect-dropdown
+                    #multi_select_type_of_service
+                    placeholder="Select a Service Type"
+                    [data]="dropdowns?.service_types"
+                    [settings]="selectServiceTypeOptions"
+                    (onDeSelect)="iglesia.idTipoServicio = 0"
+                    (onSelect)="
+                      iglesia.idTipoServicio = $event.idTipoServicio;
+                      updateIglesia(iglesia)
+                    "
+                    [(ngModel)]="iglesia.tipos_servicios"
+                  ></ng-multiselect-dropdown>
+                </div>
+
+                <div class="col-xs-12">
+                  <label> Address: </label>
+                  <div class="input-group">
+                    <google-address-component
+                      *ngIf="true"
+                      [value]="iglesia.full_address"
+                      placeholder="Please type the address of the organization."
+                      adressType="address"
+                      (setAddress)="getAddress($event, iglesia)"
+                    ></google-address-component>
+                  </div>
+                  <button
+                    (click)="saveAddress(iglesia)"
+                    *ngIf="iglesia.address"
+                    class="btn btn-sm btn-success float-right mt-2"
+                  >
+                    Save Address
+                  </button>
+                </div>
+              </div>
+              <ng-template #organizationName>
+                <div class="iglesiaItemBody">
+                  {{ iglesia.Nombre }} <br />
+                  <p ion-text color="gray">
+                    <b>
+                      {{ iglesia.tipoServicio }}
+                    </b>
+                  </p>
+
+                  <small
+                    class="text-danger bold"
+                    *ngIf="!iglesia.lat || !iglesia.lng"
+                  >
+                    Warning: This organization doesn't have a map pin! Click
+                    here to update the address.
+                  </small>
+                </div>
+              </ng-template>
+            </td>
+            <td class="clickable" (click)="goToContacts(iglesia)">
+              <li *ngFor="let agenda of iglesia.agendaContactos">
+                {{ agenda.nombre + " " + agenda.apellido }}
+              </li>
+            </td>
+            <td
+              class="clickable"
+              (click)="toggleEditableField(iglesia, 'tags')"
+            >
+              <div
+                *ngIf="iglesia._editableField == 'tags'; else organizationTags"
+              >
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select a tag </label>
+                  <ng-multiselect-dropdown
+                    #multi_select_tags
+                    placeholder="Select the organization tags"
+                    [data]="dropdowns?.tags"
+                    [settings]="selectTagsOptions"
+                    (onSelect)="fixTags(iglesia, multi_select_tags)"
+                    (onDeSelect)="fixTags(iglesia, multi_select_tags)"
+                    [(ngModel)]="iglesia.tags"
+                  ></ng-multiselect-dropdown>
+                </div>
+                <button
+                  class="btn btn-sm btn-success float-right"
+                  (click)="updateIglesia(iglesia)"
+                >
+                  Save
+                </button>
+              </div>
+              <ng-template #organizationTags>
+                <span
+                  ion-text
+                  *ngFor="let tag of iglesia.tags"
+                  [ngStyle]="{
+                    background: tag.color ? '#' + tag.color : '#6c757d'
+                  }"
+                  class="tag"
+                >
+                  {{ tag.nombre }}
+                </span>
+              </ng-template>
+            </td>
+
+            <td
+              class="clickable"
+              (click)="toggleEditableField(iglesia, 'project_manager')"
+            >
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+                *ngIf="
+                  iglesia._editableField == 'project_manager';
+                  else organizationManager
+                "
+              >
+                <label for="category"> Project Manager: * </label>
+                <ng-multiselect-dropdown
+                  #multi_select_users
+                  placeholder="Select an User"
+                  [data]="dropdowns?.users"
+                  [settings]="selectUsersOptions"
+                  (onDeSelect)="
+                    iglesia.datosProyectoIglesia.idUsuarioSistema = 0
+                  "
+                  (onSelect)="
+                    iglesia.datosProyectoIglesia.idUsuarioSistema =
+                      $event.idUsuarioSistema;
+                    updateIglesia(iglesia)
+                  "
+                  [(ngModel)]="iglesia.datosProyectoIglesia.users"
+                ></ng-multiselect-dropdown>
+                <!-- <span
+                  class="text-danger error-span"
+                  *ngIf="
+                    (projectInfoForm.get('idUsuarioSistema').touched &&
+                      projectInfoForm.get('idUsuarioSistema').invalid) ||
+                    iglesia.datosProyectoIglesia.idUsuarioSistema === 0
+                  "
+                >
+                  * Please select a valid option
+                </span> -->
+              </div>
+              <ng-template #organizationManager>
+                <span
+                  [ngClass]="iglesia.manager ? 'text-muted' : 'text-error-span'"
+                >
+                  {{ iglesia.manager || "Without manager" }}
+                </span>
+              </ng-template>
+            </td>
+            <td
+              class="clickable"
+              (click)="toggleEditableField(iglesia, 'plan')"
+            >
+              <div
+                *ngIf="iglesia._editableField == 'plan'; else organizationPlan"
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="category"> Select organization plan: * </label>
+                <ng-multiselect-dropdown
+                  #multi_select_plan
+                  placeholder="Select a Plan"
+                  [data]="dropdowns?.plans"
+                  [settings]="selectPlanOptions"
+                  (onDeSelect)="iglesia.datosPagosIglesia.idCatalogoPlan = 0"
+                  (onSelect)="
+                    iglesia.datosPagosIglesia.idCatalogoPlan =
+                      $event.idCatalogoPlan;
+                    updateIglesia(iglesia)
+                  "
+                  [(ngModel)]="iglesia.datosPagosIglesia.plans"
+                ></ng-multiselect-dropdown>
+                <!-- <span
+                class="text-danger error-span"
+                *ngIf="
+                  (paymentInfoForm.get('idCatalogoPlan').touched &&
+                    paymentInfoForm.get('idCatalogoPlan').invalid) ||
+                  organization.datosPagosIglesia?.idCatalogoPlan === 0
+                "
+              >
+                * Please select a valid option
+              </span> -->
+              </div>
+              <ng-template #organizationPlan>
+                <span
+                  [ngClass]="
+                    iglesia.plan_type ? 'text-muted' : 'text-error-span'
+                  "
+                >
+                  {{ iglesia.plan_type || "Without plan selected" }}
+                </span>
+              </ng-template>
+            </td>
+            <td class="clickable" (click)="selectIglesia(iglesia)">
+              {{ iglesia.monthly_cost | currency }}
+            </td>
+            <td (click)="selectIglesia(iglesia)">
+              <h6 class="text-center">
+                <span class="text-citric">
+                  {{ iglesia.sms_count }}
+                </span>
+                <br />
+                <span style="font-size: small"> SMS this month </span>
+              </h6>
+
+              <h6 class="text-center">
+                <span class="text-citric">
+                  {{ iglesia.email_count }}
+                </span>
+                <br />
+                <span style="font-size: small"> Emails this month </span>
+              </h6>
+              <h6 class="text-center">
+                <span class="text-citric">
+                  {{ iglesia.chat_count }}
+                </span>
+                <br />
+                <span style="font-size: small"> Chats this month </span>
+              </h6>
+            </td>
+
+            <td class="clickable" (click)="displayNotePopup(iglesia.last_note)">
+              <span
+                [ngClass]="{
+                  delete: afterLastMonth(iglesia.last_note.fechaCreacion)
+                }"
+                *ngIf="iglesia.last_note.user_created_by"
+              >
+                By: {{ iglesia.last_note.user_created_by }} at
+                {{ iglesia.last_note.fechaCreacion | date }}
+              </span>
+              <span *ngIf="!iglesia.last_note.user_created_by">
+                <i> No notes yet </i>
+              </span>
+            </td>
+
+            <td>
+              <div class="btn-group">
+                <button
+                  (click)="selectIglesia(iglesia)"
+                  class="btn btn-sm btn-primary ml-2"
+                >
+                  <i class="fa fa-sign-in-alt"> </i>
+                </button>
+                <button
+                  class="btn btn-sm btn-citric ml-2"
+                  (click)="openEditModal(iglesia, organization_form)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div [hidden]="!show_form">
+    <div class="progress-bar-container">
+      <!-- <project-progress-bar
+        *ngIf="show_form && notes_form?.idIglesia && !show_loader"
+        [idIglesia]="notes_form?.idIglesia"
+      ></project-progress-bar> -->
+    </div>
+
+    <ng-template class="col-12" [ngIf]="show_loader">
+      <div class="d-flex justify-content-center" style="margin: 15%">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+    <div class="tabs-container" [hidden]="show_loader">
+      <button
+        class="btn btn-outline-citric pull-right"
+        (click)="onModalDidDismiss()"
+      >
+        <i class="fa fa-times"></i>
+      </button>
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [ngClass]="{ active: currentTabIndex == 0 }"
+            (click)="currentTabIndex = 0"
+            >Details</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [ngClass]="{ active: currentTabIndex == 1 }"
+            (click)="currentTabIndex = 1"
+            >Notes</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [ngClass]="{ active: currentTabIndex == 2 }"
+            (click)="currentTabIndex = 2"
+            >Progress report</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [ngClass]="{ active: currentTabIndex == 3 }"
+            (click)="currentTabIndex = 3"
+            >Gantt</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [ngClass]="{ active: currentTabIndex == 4 }"
+            (click)="currentTabIndex = 4"
+          >
+            Church Contact Information
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div
+          class="tab-pane fade"
+          [ngClass]="{ 'show active': currentTabIndex == 0 }"
+        >
+          <app-organization-form
+            [ngClass]="{ 'col-8': !hide_notes_form, 'col-12': hide_notes_form }"
+            class="p-0 form-fixed"
+            [hidden]="show_loader"
+            #organization_form
+            (onDismiss)="onModalDidDismiss($event)"
+          >
+          </app-organization-form>
+        </div>
+        <div
+          class="tab-pane fade"
+          [ngClass]="{ 'show active': currentTabIndex == 1 }"
+        >
+          <app-notes-home
+            [hidden]="show_loader || hide_notes_form"
+            class="col-4 p-0 form-fixed"
+            #notes_form
+          >
+          </app-notes-home>
+        </div>
+        <div
+          class="tab-pane fade"
+          [ngClass]="{ 'show active': currentTabIndex == 2 }"
+        >
+          <project-tracking-form
+            #project_tracking_form
+            *ngIf="show_form && !show_loader"
+          ></project-tracking-form>
+        </div>
+        <div
+          class="tab-pane fade"
+          [ngClass]="{ 'show active': currentTabIndex == 3 }"
+        >
+          <project-progress-chart
+            #project_progress_chart
+            *ngIf="show_form && !show_loader && currentTabIndex == 3"
+          >
+          </project-progress-chart>
+        </div>
+
+        <div
+          class="tab-pane fade"
+          [ngClass]="{ 'show active': currentTabIndex == 4 }"
+        >
+          <app-organization-contact-info-form
+            [hidden]="show_loader || hide_notes_form"
+            class="col-4 p-0 form-fixed"
+            #contact_info
+            [contact_type]="1"
+            name="Contact Info"
+            description="Please notice this info will be shown in the contact inbox embed frame."
+          >
+          </app-organization-contact-info-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #contacts_modal
+  identifier="contacts_modal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-contacts-form
+    (dismiss_form)="dismissContactForm($event)"
+    style="width: 100%"
+    #contact_form_2
+  >
+  </app-contacts-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal #note_modal identifier="note_modal" [closable]="false">
+  <div class="row">
+    <div class="col-10"></div>
+    <div class="col-2">
+      <button class="btn btn-sm btn-outline-citric" (click)="dismissNote()">
+        Close
+      </button>
+    </div>
+  </div>
+  <div class="notaItemContainer">
+    <div class="notaItemDate">
+      <div class="row">
+        <div class="col-6 text-left">
+          <span *ngIf="nota.user_created_by">
+            {{ nota.user_created_by }}
+          </span>
+        </div>
+        <div class="col-6">
+          <span class="notaItemDateSpan">
+            {{ nota.fechaCreacion | date: "MMM. dd yyyy" }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <p
+      ion-text
+      color="black"
+      class="notaItemDescripcion"
+      [innerHtml]="nota.descripcion | keepHtml"
+    ></p>
+  </div>
+</ngx-smart-modal>
+
+<!-- <ngx-smart-modal
+  #formSpinnerModal
+  identifier="formSpinnerModal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <div class="container page">
+    <ng-template [ngIf]="show_loader">
+      <div class="d-flex justify-content-center" style="margin: 15%;">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem;"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+  </div>
+</ngx-smart-modal> -->
+
+<!-- <ngx-smart-modal
+  #formModal
+  identifier="formModal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <ng-template [ngIf]="show_loader">
+    <div class="d-flex justify-content-center" style="margin: 15%;">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem;"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+  <app-organization-form
+    [hidden]="show_loader"
+    #organization_form
+    (onDismiss)="onModalDidDismiss($event)"
+  >
+  </app-organization-form>
+</ngx-smart-modal> -->

@@ -1,0 +1,2189 @@
+<div>
+  <div class="container-fluid" style="padding-left: 0px; padding-right: 0px">
+    <div class="row" style="margin: 0px !important">
+      <!-- <div
+    class="col-xs-12 col-md-3 col-lg-2 sidebar"
+    [ngClass]="{ 'hidden-xs': hideSidebar }"
+  >
+    <div class="flex-guide">
+      <h4>Guides</h4>
+      <button class="btn btn-light" (click)="hideSidebar = !hideSidebar">
+        <i class="fa fa-chevron-left"></i>
+      </button>
+    </div>
+
+    <ul class="list-group">
+      <li class="list-group-item" [ngClass]="{ incomplete: !user?.logoPic }">
+        1. Add your logo
+      </li>
+      <li
+        class="list-group-item"
+        [ngClass]="{ incomplete: !iglesia?.subportada }"
+      >
+        2. Add your banner
+      </li>
+    </ul>
+
+    <h4>Contacts</h4>
+
+    <ul class="list-group">
+      <li
+        class="list-group-item"
+        [ngClass]="{ incomplete: dashboard?.contacts?.length < 1 }"
+      >
+        1. Add a Contact
+      </li>
+      <li
+        class="list-group-item"
+        [ngClass]="{ incomplete: dashboard?.contacts?.length < 1 }"
+      >
+        2. Edit Contacts
+      </li>
+      <li
+        class="list-group-item"
+        [ngClass]="{ incomplete: dashboard?.contacts?.length < 1 }"
+      >
+        3. Import
+      </li>
+    </ul>
+  </div> -->
+
+      <!-- <p class="text-center" style="margin-bottom: 20px;">
+        Click and drag the image around
+      </p>
+      <div class="container-test">
+        <div class="range-slider">
+          <input
+            class="slider-zoom"
+            type="range"
+            step="1"
+            min="20"
+            max="99"
+            value="70"
+            (change)="changeZoom($event)"
+          />
+        </div>
+        <div class="image-container">
+          <div
+            class="pattern-background-image"
+            [ngStyle]="{
+              'background-image': getCover()
+            }"
+            (mousedown)="mouseDown($event)"
+            ></div>
+            <!-- (mouseup)="mouseUp($event)"
+            (mousemove)="mouseMove($event)" ->
+        </div>
+      </div> -->
+
+      <div
+        class="col-12"
+        [ngClass]="{
+          'full-row': hideSidebar
+        }"
+        style="padding-left: 0px; padding-right: 0px"
+      >
+        <div class="main-dashboard">
+          <!-- BANNER AREA -->
+
+          <div
+            *ngIf="!show_loading"
+            #rectangle_sizable
+            class="rectangle banner-container"
+            mwlResizable
+            [enableGhostResize]="true"
+            (resizeEnd)="onResizeEnd($event)"
+            [ngStyle]="{
+              height: header_menu_settings.dashboard_height + 'px',
+              'background-image': getCover(),
+              'z-index': '' + (is_modal_open ? '0' : 'unset')
+            }"
+          >
+            <!-- [ngStyle]="{ height: iglesia.header_menu_settings.height + 'px' }" -->
+            <button
+              *ngIf="!show_loading"
+              class="btn btn-light edit-cover-btn"
+              (click)="addCover()"
+              [disabled]="uploadingCover"
+            >
+              <i *ngIf="!uploadingCover" class="fa fa-edit"></i>
+              <i *ngIf="uploadingCover" class="fa fa-spinner fa-spin"></i>
+            </button>
+
+            <div
+              class="resize-handle-bottom"
+              mwlResizeHandle
+              [resizeEdges]="{ bottom: true }"
+            ></div>
+          </div>
+
+          <!-- *ngIf="loading_summary" -->
+          <app-skeleton
+            *ngIf="show_loading"
+            id="skeleton-header"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="false"
+            [ngStyle]="{
+              height: header_menu_settings.dashboard_height + 'px'
+            }"
+          ></app-skeleton>
+
+          <div
+            class="organization-logo"
+            [ngStyle]="{
+              top:
+                'calc(' + header_menu_settings.dashboard_height + 'px - 40px)',
+              'z-index': '' + (is_modal_open ? '0' : '14')
+            }"
+          >
+            <div class="logo-container-v2">
+              <img
+                *ngIf="!show_loading"
+                class="logo_container_ad"
+                [src]="iglesia?.Logo"
+                alt=""
+                onerror="this.onerror=null; this.src='/assets/img/logoColor.png'"
+              />
+              <app-skeleton
+                *ngIf="show_loading"
+                id="skeleton-header"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="false"
+                class="logo_container_ad"
+              ></app-skeleton>
+            </div>
+            <button
+              *ngIf="!show_loading"
+              class="btn btn-light edit-logo-btn"
+              (click)="updateLogo()"
+              [disabled]="uploadingLogo"
+            >
+              <i *ngIf="!uploadingLogo" class="fa fa-edit"></i>
+              <i *ngIf="uploadingLogo" class="fa fa-spinner fa-spin"></i>
+            </button>
+          </div>
+
+          <!-- <div
+            class="logo-container logo_container_ad"
+            [ngStyle]="{
+              top:
+                'calc(' + header_menu_settings.dashboard_height + 'px - 40px)'
+            }"
+          >
+            <button
+              class="btn btn-light edit-logo-btn"
+              (click)="updateLogo()"
+              [disabled]="uploadingLogo"
+            >
+              <i *ngIf="!uploadingLogo" class="fa fa-edit"></i>
+              <i *ngIf="uploadingLogo" class="fa fa-spinner fa-spin"></i>
+            </button>
+            <div class="logo-container-overflow logo_container_ad">
+              <img
+                *ngIf="!show_loading"
+                class="logo_container_ad"
+                [src]="iglesia?.Logo"
+                alt=""
+                onerror="this.onerror=null; this.src='/assets/img/logoColor.png'"
+              />
+              <app-skeleton
+                *ngIf="show_loading"
+                id="skeleton-header"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="false"
+                class="logo_container_ad"
+              ></app-skeleton>
+            </div>
+          </div> -->
+
+          <!-- <div
+            class="banner-container"
+            [ngStyle]="{ 'background-image': getCover() }"
+          >
+            <button
+              class="btn btn-light edit-cover-btn"
+              (click)="addCover()"
+              [disabled]="uploadingCover"
+            >
+              <i *ngIf="!uploadingCover" class="fa fa-edit"></i>
+              <i *ngIf="uploadingCover" class="fa fa-spinner fa-spin"></i>
+            </button>
+
+            <div class="logo-container logo_container_ad">
+              <button
+                class="btn btn-light edit-logo-btn"
+                (click)="updateLogo()"
+                [disabled]="uploadingLogo"
+              >
+                <i *ngIf="!uploadingLogo" class="fa fa-edit"></i>
+                <i *ngIf="uploadingLogo" class="fa fa-spinner fa-spin"></i>
+              </button>
+              <div class="logo-container-overflow logo_container_ad">
+                <img
+                  class="logo_container_ad"
+                  [src]="iglesia?.Logo"
+                  alt=""
+                  onerror="this.onerror=null; this.src='/assets/img/logoColor.png'"
+                />
+              </div>
+            </div>
+          </div> -->
+          <div class="row m-0">
+            <div
+              class="col-xs-12 col-md-4"
+              style="text-align: center; padding-top: 40px; padding-left: 120px"
+            ></div>
+            <div class="col-xs-12 col-md-4">
+              <div class="qr-selector">
+                <div
+                  *ngIf="!is_possible_client"
+                  [hidden]="show_loading"
+                  class="row"
+                >
+                  <span class="col-8 align-self-center text-right">
+                    Copy this QR clicking on it and share it:
+                  </span>
+                  <ngx-qrcode
+                    #qr_code
+                    class="col-2"
+                    (click)="shareQR(qr_code)"
+                    style="width: 50px; height: 50px"
+                    [qrc-value]="getRedirectUrl()"
+                    [qrc-class]="'qrItemResize-dash'"
+                    qrc-errorCorrectionLevel="M"
+                  >
+                  </ngx-qrcode>
+
+                  <div *ngIf="iglesia" class="col-12">
+                    <div class="form-group">
+                      <label class="text-secondary">
+                        Paste here your redirection URL.
+                        <small>(Press enter to save changes)</small>
+                      </label>
+                      <input
+                        (keydown.enter)="saveRedirectionUrl()"
+                        [(ngModel)]="iglesia.redirect_url"
+                        type="text"
+                        class="form-control"
+                      />
+                      <small
+                        style="width: 100%; display: block; white-space: nowrap"
+                      >
+                        This is your url:
+                        <a target="_blank" [href]="getRedirectUrl()">
+                          {{ getRedirectUrl() }}
+                        </a>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="show_loading" class="row">
+                  <div class="col-8">
+                    <app-skeleton
+                      id="body-without-header"
+                      [show_body]="true"
+                      [show_img]="false"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                  </div>
+                  <div class="col-2">
+                    <app-skeleton
+                      id="skeleton-qr"
+                      [show_body]="false"
+                      [show_img]="true"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                  </div>
+                  <div class="col-12">
+                    <div *ngIf="show_loading">
+                      <app-skeleton
+                        style="display: block"
+                        class="skeleton-button-as-text mb-2"
+                        [show_img]="false"
+                        [show_body]="false"
+                        [show_footer]="false"
+                        [show_button]="true"
+                        [show_input]="false"
+                      ></app-skeleton>
+
+                      <app-skeleton
+                        id="skeleton-input"
+                        [show_img]="false"
+                        [show_body]="false"
+                        [show_footer]="false"
+                        [show_button]="false"
+                        [show_input]="true"
+                      ></app-skeleton>
+
+                      <app-skeleton
+                        class="skeleton-button-as-text"
+                        [show_img]="false"
+                        [show_body]="false"
+                        [show_footer]="false"
+                        [show_button]="true"
+                        [show_input]="false"
+                      ></app-skeleton>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div
+                class="iglesiaSelector"
+                *ngIf="!is_possible_client || user?.isSuperUser"
+              >
+                <ng-multiselect-dropdown
+                  *ngIf="!show_loading"
+                  [placeholder]="'Select an Organization'"
+                  [data]="iglesias || []"
+                  [settings]="selectOpts"
+                  (onSelect)="selectIglesia($event)"
+                  [(ngModel)]="selectedIglesia"
+                >
+                </ng-multiselect-dropdown>
+
+                <app-skeleton
+                  id="skeleton-input"
+                  *ngIf="show_loading"
+                  [show_img]="false"
+                  [show_body]="false"
+                  [show_footer]="false"
+                  [show_button]="false"
+                  [show_input]="true"
+                ></app-skeleton>
+              </div>
+
+              <div
+                *ngIf="is_possible_client && user?.isSuperUser"
+                class="form-group my-2"
+              >
+                <button
+                  class="btn btn-success btn-sm"
+                  (click)="openSettingsModal()"
+                >
+                  Open Disclaimer settings
+                </button>
+                <br />
+                <small>
+                  <i class="fa fa-info-circle"></i>
+                  This is a possible client.
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="row mx-0" *ngIf="show_loading">
+          </div> -->
+          <div *ngIf="show_loading" class="row m-0 justify-content-center mt-4">
+            <div class="col-12 col-md-10 modules">
+              <app-skeleton
+                id="skeleton-h2"
+                class="skeleton-button-as-text"
+                [show_img]="false"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="true"
+                [show_input]="false"
+              ></app-skeleton>
+            </div>
+            <div class="w-100"></div>
+            <div class="col-2">
+              <app-skeleton
+                class="skeleton-button-as-text"
+                [show_img]="false"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="true"
+                [show_input]="false"
+              ></app-skeleton>
+            </div>
+            <div class="col-2">
+              <app-skeleton
+                class="skeleton-button-as-text"
+                [show_img]="false"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="true"
+                [show_input]="false"
+              ></app-skeleton>
+            </div>
+            <div class="col-2">
+              <app-skeleton
+                class="skeleton-button-as-text"
+                [show_img]="false"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="true"
+                [show_input]="false"
+              ></app-skeleton>
+            </div>
+            <div class="col-2">
+              <app-skeleton
+                class="skeleton-button-as-text"
+                [show_img]="false"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="true"
+                [show_input]="false"
+              ></app-skeleton>
+            </div>
+            <div class="col-2">
+              <app-skeleton
+                class="skeleton-button-as-text"
+                [show_img]="false"
+                [show_body]="false"
+                [show_footer]="false"
+                [show_button]="true"
+                [show_input]="false"
+              ></app-skeleton>
+            </div>
+            <div class="w-100"></div>
+            <div class="col-12 col-md-10 mt-4">
+              <div class="row justify-content-center">
+                <!-- Content -->
+                <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                  <div class="card">
+                    <app-skeleton
+                      id="skeleton-banner"
+                      [show_body]="false"
+                      [show_img]="true"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                    <!-- <img
+                      class="card-img-top card-img-top-fixed"
+                      src="/assets/img/content_banner_new.png"
+                    /> -->
+                    <div class="card-body">
+                      <h5 class="card-title text-center text-citric">
+                        <app-skeleton
+                          class="skeleton-button-as-text"
+                          [show_img]="false"
+                          [show_body]="false"
+                          [show_footer]="false"
+                          [show_button]="true"
+                          [show_input]="false"
+                        ></app-skeleton>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                  <div class="card">
+                    <app-skeleton
+                      id="skeleton-banner"
+                      [show_body]="false"
+                      [show_img]="true"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                    <!-- <img
+                      class="card-img-top card-img-top-fixed"
+                      src="/assets/img/content_banner_new.png"
+                    /> -->
+                    <div class="card-body">
+                      <h5 class="card-title text-center text-citric">
+                        <app-skeleton
+                          class="skeleton-button-as-text"
+                          [show_img]="false"
+                          [show_body]="false"
+                          [show_footer]="false"
+                          [show_button]="true"
+                          [show_input]="false"
+                        ></app-skeleton>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                  <div class="card">
+                    <app-skeleton
+                      id="skeleton-banner"
+                      [show_body]="false"
+                      [show_img]="true"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                    <!-- <img
+                      class="card-img-top card-img-top-fixed"
+                      src="/assets/img/content_banner_new.png"
+                    /> -->
+                    <div class="card-body">
+                      <h5 class="card-title text-center text-citric">
+                        <app-skeleton
+                          class="skeleton-button-as-text"
+                          [show_img]="false"
+                          [show_body]="false"
+                          [show_footer]="false"
+                          [show_button]="true"
+                          [show_input]="false"
+                        ></app-skeleton>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="w-100"></div>
+                <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                  <div class="card">
+                    <app-skeleton
+                      id="skeleton-banner"
+                      [show_body]="false"
+                      [show_img]="true"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                    <!-- <img
+                      class="card-img-top card-img-top-fixed"
+                      src="/assets/img/content_banner_new.png"
+                    /> -->
+                    <div class="card-body">
+                      <h5 class="card-title text-center text-citric">
+                        <app-skeleton
+                          class="skeleton-button-as-text"
+                          [show_img]="false"
+                          [show_body]="false"
+                          [show_footer]="false"
+                          [show_button]="true"
+                          [show_input]="false"
+                        ></app-skeleton>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                  <div class="card">
+                    <app-skeleton
+                      id="skeleton-banner"
+                      [show_body]="false"
+                      [show_img]="true"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                    <!-- <img
+                      class="card-img-top card-img-top-fixed"
+                      src="/assets/img/content_banner_new.png"
+                    /> -->
+                    <div class="card-body">
+                      <h5 class="card-title text-center text-citric">
+                        <app-skeleton
+                          class="skeleton-button-as-text"
+                          [show_img]="false"
+                          [show_body]="false"
+                          [show_footer]="false"
+                          [show_button]="true"
+                          [show_input]="false"
+                        ></app-skeleton>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                  <div class="card">
+                    <app-skeleton
+                      id="skeleton-banner"
+                      [show_body]="false"
+                      [show_img]="true"
+                      [show_footer]="false"
+                      [show_button]="false"
+                    ></app-skeleton>
+                    <!-- <img
+                      class="card-img-top card-img-top-fixed"
+                      src="/assets/img/content_banner_new.png"
+                    /> -->
+                    <div class="card-body">
+                      <h5 class="card-title text-center text-citric">
+                        <app-skeleton
+                          class="skeleton-button-as-text"
+                          [show_img]="false"
+                          [show_body]="false"
+                          [show_footer]="false"
+                          [show_button]="true"
+                          [show_input]="false"
+                        ></app-skeleton>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <ng-template [ngIf]="show_loading">
+            <div class="d-flex justify-content-center" style="margin: 140px">
+              <div
+                class="spinner-border text-citric"
+                style="width: 6rem; height: 6rem"
+                role="status"
+              ></div>
+            </div>
+          </ng-template> -->
+
+          <div
+            [hidden]="show_loading"
+            class="row mx-0"
+            [ngStyle]="{ 'margin-top': is_possible_client ? '85px' : 0 }"
+          >
+            <div class="modules col-12 row mx-0 justify-content-center">
+              <div class="col-12 col-md-10">
+                <h2 style="color: black; left: 29%; bottom: 0">
+                  {{ user.iglesia }}
+                </h2>
+              </div>
+              <mat-tab-group
+                class="col-12 col-md-10"
+                [dynamicHeight]="true"
+                (selectedTabChange)="changedTab($event)"
+              >
+                <mat-tab *ngIf="is_possible_client" label="Finance Dashboard">
+                  <app-finance-dashboard
+                    #finance_dashboard
+                    [idOrganization]="iglesia?.idIglesia"
+                  ></app-finance-dashboard>
+                </mat-tab>
+                <mat-tab *ngIf="!is_possible_client" label="Administration">
+                  <div class="row justify-content-center">
+                    <!-- <div
+                      *ngIf="user.isSuperUser"
+                      class="mt-3 pt-3 pb-4 mb-4 col-12 row"
+                    >
+                      <div class="col-4">
+                        <h2 class="text-center">
+                          <span class="text-citric fs-60">
+                            {{ iglesia.sms_count }}
+                          </span>
+                          <br />
+                          <h5>SMS Sent this month</h5>
+                        </h2>
+                      </div>
+                      <div class="col-4">
+                        <h2 class="text-center">
+                          <span class="text-citric fs-60">
+                            {{ iglesia.email_count }}
+                          </span>
+                          <br />
+                          <h5>Emails Sent this month</h5>
+                        </h2>
+                      </div>
+                      <div class="col-4">
+                        <h2 class="text-center">
+                          <span class="text-citric fs-60">
+                            {{ iglesia.chat_count }}
+                          </span>
+                          <br />
+                          <h5>Chats Sent this month</h5>
+                        </h2>
+                      </div>
+                    </div> -->
+                    <!-- Contacts -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card" routerLink="/contact">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number">
+                            {{ dashboard?.users || 0 }}
+                          </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/contactos_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Contacts
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Proccesses -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card" routerLink="/process">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number">
+                            {{ dashboard?.processes || 0 }}
+                          </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/processes_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Process
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Groups -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card" routerLink="/groups">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number">
+                            {{ dashboard?.groups || 0 }}
+                          </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/groups_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Groups
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="w-100"></div>
+
+                    <!-- Events -->
+                    <!-- routerLink="/groups/events" -->
+                    <div
+                      class="col-xs-6 col-md-4 col-lg-3 mb-3"
+                      (click)="select_action_event_modal.open()"
+                    >
+                      <div class="card">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number">
+                            {{ dashboard?.events || 0 }}
+                          </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/events_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Events
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Teams -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/groups/teams">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number">
+                            {{ dashboard?.teams || 0 }}
+                          </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/all_users_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Team
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Donations -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card" routerLink="/donations/list">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number">
+                            {{ dashboard?.donations || 0 }}
+                          </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/donation_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Donations
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+
+                <!-- Build -->
+                <mat-tab *ngIf="!is_possible_client" label="Build">
+                  <div class="row justify-content-center">
+                    <!-- Content -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card" [routerLink]="'/content'">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/content_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            App builder
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Report Builder -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/report-builder">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/report_builder_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Report builder
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Site builder -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div
+                        class="card cursor"
+                        routerLink="/organization-profile/main/{{
+                          user.idIglesia
+                        }}/inicio"
+                      >
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/site_builder_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Site builder V1
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="w-100"></div>
+                    <div
+                      class="col-xs-6 col-md-3 col-lg-3 mb-3"
+                      [ngClass]="{ disabled: wait_click_duda }"
+                      (click)="handleSiteBuilderClick()"
+                    >
+                      <div class="card cursor">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/site_builder_banner_new_v2.jpeg"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Site builder V2
+                            <button
+                              *ngIf="site_has_duda_settings"
+                              class="btn btn-sm"
+                              (click)="openSiteIdModal($event)"
+                            >
+                              <i class="fa fa-cog text-info"></i>
+                            </button>
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Contact Inbox -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/contact-forms/v1">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/mailing_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Visitor Inbox
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Document builder -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/document-builder">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/document_builder_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Document builder
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="w-100"></div>
+
+                    <!-- Document builder -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/discipler-builder">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/processes_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Disciplers builder
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Form Builder -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/contact-forms/v2">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/form_builder_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Forms Builder
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Article manager -->
+                    <!-- <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div
+                        class="card cursor"
+                        routerLink="/document-builder"
+                      >
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/document_builder_banner.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Article Manager
+                          </h5>
+                        </div>
+                      </div>
+                    </div> -->
+                  </div>
+                </mat-tab>
+
+                <!-- Tools -->
+                <mat-tab *ngIf="!is_possible_client" label="Tools">
+                  <div class="row justify-content-center">
+                    <!-- Videos -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/videos">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/videos_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Media
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Galleries -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div
+                        class="card cursor"
+                        routerLink="/galleries/home"
+                        [queryParams]="{ tab: 'galleries' }"
+                      >
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/gallery_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Galleries
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Directory -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/community-box">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/directory_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Directory
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="w-100"></div>
+                    <!-- Booking -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/booking">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/calendar_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Booking
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" [routerLink]="'/ezlink-manager'">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/photo_editor_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Ez Link
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" [routerLink]="'/sync-site/add'">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/frame_settings_banner.jpeg"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Frame Settings
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+
+                <!-- Manage -->
+                <mat-tab *ngIf="!is_possible_client" label="Manage">
+                  <div class="row justify-content-center">
+                    <!-- Manage users -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/contact/all-users">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/manager_users_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Manage Users
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Timesheet -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div
+                        class="card cursor"
+                        [routerLink]="getRouterTimesheet(user)"
+                      >
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/timesheet_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Timesheet
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Design Request -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div
+                        class="card cursor"
+                        [routerLink]="getRouterDesign(user)"
+                      >
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/tickets_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Tickets
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="w-100"></div>
+
+                    <!-- Inventory -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/inventory">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/inventory_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Inventory
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/billing">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/billing_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Billing
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+
+                <!-- Communicate -->
+                <mat-tab *ngIf="!is_possible_client" label="Communicate">
+                  <div class="row justify-content-center">
+                    <!-- Push Notification -->
+                    <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+                      <div
+                        class="card"
+                        (click)="
+                          showPushNotificationsModal(push_notification_form)
+                        "
+                      >
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/push_notification_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Notifications
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Post Distribute -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/wordpress">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/post_distribute_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Post Distribute
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Contact Inbox -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/contact-forms/v1">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/mailing_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Visitor Inbox
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="w-100"></div>
+
+                    <!-- Chat/email/sms -->
+                    <div class="col-xs-6 col-md-3 col-lg-3 mb-3">
+                      <div class="card cursor" routerLink="/messenger/chats">
+                        <div class="card-fixed-text opacity-layer"></div>
+                        <div class="card-fixed-text row">
+                          <span class="col-12 span-number"> </span>
+                        </div>
+                        <img
+                          class="card-img-top card-img-top-fixed"
+                          src="/assets/img/chat_banner_new.png"
+                        />
+                        <div class="card-body">
+                          <h5 class="card-title text-center text-citric">
+                            Chat/email/sms
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+
+                <!-- Training -->
+                <mat-tab *ngIf="!is_possible_client" label="Training">
+                  <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+                  <link
+                    rel="stylesheet"
+                    href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css"
+                  />
+                  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script> -->
+                  <link
+                    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap"
+                    rel="stylesheet"
+                  />
+                  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script> -->
+                  <link
+                    rel="stylesheet"
+                    href="https://iglesia-tech-api.e2api.com/api/iglesiaTechApp/public/styles"
+                  />
+                  <!-- <script src="https://iglesia-tech-api.e2api.com/api/iglesiaTechApp/public/playlists/scripts"></script> -->
+                  <div id="appPlaylist"></div>
+                </mat-tab>
+
+                <!-- TODOs -->
+                <mat-tab *ngIf="!is_possible_client" [label]="to_do_label">
+                  <div class="row">
+                    <div class="col-12" [hidden]="!show_todo_loading">
+                      <ng-template [ngIf]="show_todo_loading">
+                        <div
+                          class="d-flex justify-content-center"
+                          style="margin: 140px"
+                        >
+                          <div
+                            class="spinner-border text-citric"
+                            style="width: 6rem; height: 6rem"
+                            role="status"
+                          ></div>
+                        </div>
+                      </ng-template>
+                    </div>
+                  </div>
+
+                  <div
+                    *ngIf="!show_todo_loading"
+                    [formGroup]="todos_form_group"
+                    class="row justify-content-center"
+                  >
+                    <div class="col-11 row">
+                      <div class="col-9">
+                        <h3 class="text-citric">To Do's</h3>
+                      </div>
+                      <div *ngIf="user.isSuperUser" class="col-3">
+                        <button
+                          *ngIf="!show_todo_form"
+                          class="btn btn-sm btn-success"
+                          (click)="addTodo()"
+                        >
+                          Add task
+                        </button>
+                      </div>
+                    </div>
+
+                    <div *ngIf="show_todo_form" class="col-12">
+                      <app-todo-form
+                        #todo_form
+                        [types]="todo_types"
+                        style="width: 100%"
+                        (cancel_form)="cancelForm($event)"
+                        (submit_form)="updateTodos($event)"
+                      ></app-todo-form>
+                    </div>
+                    <div *ngIf="!show_todo_form" class="col-10 col-md-8">
+                      <div class="to-do-container to-do-container-header row">
+                        <div class="col-1 align-self-center">
+                          <span class="vertical-align"> Accomplished </span>
+                        </div>
+                        <div class="col-1 align-self-center">
+                          <span class="vertical-align vertical-align-fixed">
+                            Reviewed
+                          </span>
+                        </div>
+                        <div class="col-6 align-self-center">Details</div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="col-2 col-md-4 align-self-center"
+                      *ngIf="user.isSuperUser && !show_todo_form"
+                    >
+                      <div class="to-do-container to-do-container-header row">
+                        <div class="col-12 text-center align-self-center">
+                          <span> Actions </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="!show_todo_form"
+                      class="col-10 col-md-8"
+                      formArrayName="todos"
+                    >
+                      <div
+                        *ngFor="
+                          let to_do of todos_array.controls;
+                          let i = index
+                        "
+                        class="to-do-container row"
+                        [ngClass]="{
+                          complete: todos[i].accomplished && todos[i].reviewed,
+                          accomplished:
+                            todos[i].accomplished && !todos[i].reviewed,
+                          unanswered: !todos[i].accomplished
+                        }"
+                      >
+                        <div class="col-2 float-custom text-center">
+                          <small class="text-citric">
+                            {{ getActualStatus(todos[i]) }}
+                          </small>
+                        </div>
+                        <div class="col-1 align-self-center">
+                          <span *ngIf="todos[i].accomplished">
+                            <i
+                              style="color: #1abb9c !important"
+                              class="far fa-check-circle"
+                            ></i>
+                          </span>
+                        </div>
+                        <div class="col-1 align-self-center">
+                          <span *ngIf="todos[i].reviewed">
+                            <i
+                              style="color: #1abb9c !important"
+                              class="far fa-check-circle"
+                            ></i>
+                          </span>
+                        </div>
+                        <div class="col-4 align-self-center">
+                          {{ todos[i].name }}
+                          <small *ngIf="todos[i].accomplished">
+                            <br />
+                            <span class="text-secondary">
+                              Accomplished by:
+                              {{ todos[i].accomplished_by_name }}
+                            </span>
+                          </small>
+                          <small *ngIf="todos[i].reviewed">
+                            <br />
+                            <span class="text-secondary">
+                              Reviewed by:
+                              {{ todos[i].reviewed_by_name }}
+                            </span>
+                          </small>
+                        </div>
+                        <div class="col-2 align-self-center">
+                          <button
+                            class="btn btn-outline-secondary btn-sm"
+                            (click)="uploadToDoResources(to_do)"
+                            *ngIf="
+                              !todos[i].reviewed && todos[i].idToDoType === 1
+                            "
+                          >
+                            {{ todos[i].idToDoType === 1 ? "Upload" : "" }}
+                          </button>
+                        </div>
+                        <div
+                          [formGroupName]="i"
+                          class="col-4 align-self-center"
+                        >
+                          <div
+                            *ngIf="todos[i].idToDoType === 1"
+                            class="form-group"
+                          >
+                            <!-- <label>Name* </label> -->
+                            <textarea
+                              type="text"
+                              required
+                              formControlName="value"
+                              class="form-control mb-1"
+                              [placeholder]="todos[i].description"
+                              readonly
+                            ></textarea>
+                            <mat-hint>
+                              <small class="text-secondary">
+                                You can't edit this value directly. Please
+                                upload a file.
+                              </small>
+                            </mat-hint>
+                            <!-- formControlName="name" -->
+                          </div>
+                          <div
+                            *ngIf="todos[i].idToDoType === 2"
+                            class="form-group"
+                          >
+                            <!-- <label>Name* </label> -->
+                            <textarea
+                              type="text"
+                              required
+                              formControlName="value"
+                              class="form-control mb-1"
+                              [placeholder]="todos[i].description"
+                              [readonly]="todos[i].reviewed"
+                            ></textarea>
+                            <!-- formControlName="name" -->
+                          </div>
+                          <div
+                            *ngIf="todos[i].idToDoType === 3"
+                            class="form-group"
+                          >
+                            <!-- <label>Name* </label> -->
+                            <input
+                              type="text"
+                              required
+                              mask="(000) 000-0000"
+                              [dropSpecialCharacters]="false"
+                              formControlName="value"
+                              class="form-control mb-1"
+                              [placeholder]="todos[i].description"
+                              [readonly]="todos[i].reviewed"
+                            />
+                            <!-- formControlName="name" -->
+                          </div>
+
+                          <div class="col-12">
+                            <button
+                              *ngIf="to_do.dirty"
+                              [disabled]="to_do.invalid"
+                              class="btn btn-sm btn-success"
+                              (click)="accomplishTodo(to_do)"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="col-2 col-md-4 align-self-center"
+                      *ngIf="user.isSuperUser && !show_todo_form"
+                    >
+                      <div
+                        *ngFor="
+                          let to_do of todos_array.controls;
+                          let i = index
+                        "
+                        class="to-do-container row"
+                        [ngClass]="{
+                          complete: todos[i].accomplished && todos[i].reviewed,
+                          accomplished:
+                            todos[i].accomplished && !todos[i].reviewed,
+                          unanswered: !todos[i].accomplished
+                        }"
+                      >
+                        <div class="col-6 align-self-center">
+                          <a
+                            [href]="serverURL + todos[i].value"
+                            target="_blank"
+                          >
+                            <button
+                              class="btn btn-outline-secondary btn-sm"
+                              *ngIf="
+                                todos[i].accomplished &&
+                                todos[i].idToDoType === 1
+                              "
+                            >
+                              {{ todos[i].idToDoType === 1 ? "View" : "" }}
+                            </button>
+                          </a>
+                        </div>
+                        <div class="col-6 align-self-center">
+                          <div class="btn-group">
+                            <button
+                              class="btn btn-sm btn-info"
+                              (click)="updateToDo(todos[i])"
+                            >
+                              <i class="fa fa-edit"></i>
+                            </button>
+                            <button
+                              class="btn btn-sm btn-danger"
+                              (click)="deleteToDo(todos[i])"
+                            >
+                              <i class="fa fa-trash"></i>
+                            </button>
+                            <button
+                              class="btn btn-outline-success btn-sm btn-outline-fixed"
+                              *ngIf="!todos[i].reviewed"
+                              [disabled]="!todos[i].accomplished"
+                              (click)="reviewTodo(to_do)"
+                            >
+                              Complete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-tab>
+
+                <!-- <mat-tab label="Chat">
+                  <table style="width: 100%;" *ngIf="isChat" >
+                    <tr>
+                      <td>
+                        <button
+                        class="btn btn-sm btn-primary float-left"
+                        style="margin-left: 12px; margin-top: 12px;"
+                        routerLink="/messenger/log"
+                      >
+                        Send messages
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                      </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <chat #chatTag id="chatTag1" class="mt-2"></chat>
+                      </td>
+                    </tr>
+                  </table>
+                </mat-tab> -->
+              </mat-tab-group>
+            </div>
+          </div>
+
+          <!-- MODULES AREA -> Uncomment for general comment.
+      <div class="modules">
+        <div class="row justify-content-center">
+          <!-- Contacts -> Uncomment for general comment.
+          <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+            <div class="module-card">
+              <div
+                class="item title-area clickable"
+                (click)="contactsModal.open()"
+              >
+                {{ dashboard?.contacts?.length || 0 }} Contacts
+              </div>
+              <div class="item divider"></div>
+              <!-- Delete requested by Niurka -> Uncomment for general comment.
+              <!-- <div class="item actions-area">
+                <div class="action-item">
+                  <a
+                    [routerLink]="['.']"
+                    routerLinkActive="router-link-active"
+                    (click)="contactFormModal.open()"
+                  >
+                    Add
+                  </a>
+                </div>
+                <div class="action-item">
+                  <a [routerLink]="['/contact/import']">
+                    Import
+                  </a>
+                </div>
+              </div> -> Uncomment for general comment.
+            </div>
+          </div>
+
+          <!-- Process -> Uncomment for general comment.
+          <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+            <div class="module-card">
+              <div class="item title-area clickable" routerLink="/process">
+                <!-- (click)="processListModal.open()" -> Uncomment for general comment.
+                {{ dashboard?.processes?.length || 0 }} Processes
+              </div>
+              <div class="item divider"></div>
+              <!-- Delete requested by Niurka -> Uncomment for general comment.
+              <!-- <div class="item actions-area">
+                <div class="action-item">
+                  <a
+                    [routerLink]="['.']"
+                    routerLinkActive="router-link-active"
+                    (click)="processFormModal.open()"
+                  >
+                    Add Process
+                  </a>
+                </div>
+                <div class="action-item">
+                  <a
+                    [routerLink]="['.']"
+                    routerLinkActive="router-link-active"
+                    (click)="levelListModal.open()"
+                  >
+                    View Levels
+                  </a>
+                </div>
+              </div> -> Uncomment for general comment.
+            </div>
+          </div>
+
+          <!-- Groups -> Uncomment for general comment.
+          <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+            <div class="module-card">
+              <div
+                class="item title-area clickable"
+                (click)="groupsModal.open()"
+              >
+                {{ dashboard?.groups?.length || 0 }} Groups
+              </div>
+              <div class="item divider"></div>
+              <!-- Delete requested by Niurka -> Uncomment for general comment.
+              <!-- <div class="item actions-area centered">
+                <div class="action-item">
+                  <a
+                    [routerLink]="['.']"
+                    routerLinkActive="router-link-active"
+                    (click)="groupFormModal.open()"
+                  >
+                    Add
+                  </a>
+                </div>
+              </div> -> Uncomment for general comment.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULES AREA NEXT ROW -> Uncomment for general comment.
+      <div class="modules no-margin">
+        <div class="row justify-content-center">
+          <!-- Design request -> Uncomment for general comment.
+          <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+            <div class="module-card">
+              <div
+                class="item title-area clickable"
+                [routerLink]="getRouterDesign(user)"
+                routerLinkActive="router-link-active"
+              >
+                Design Requests
+              </div>
+              <div class="item divider"></div>
+              <!-- Delete requested by Niurka -> Uncomment for general comment.
+              <!-- <div class="item actions-area centered centered">
+                <div class="action-item">
+                  <a
+                    [routerLink]="['.']"
+                    routerLinkActive="router-link-active"
+                    (click)="designRequestFormModal.open()"
+                  >
+                    Add
+                  </a>
+                </div>
+              </div> -> Uncomment for general comment.
+            </div>
+          </div>
+
+          <!-- Timesheets -> Uncomment for general comment.
+          <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+            <div class="module-card">
+              <div
+                class="item title-area clickable"
+                [routerLink]="getRouterTimesheet(user)"
+                routerLinkActive="router-link-active"
+              >
+                Timesheets
+              </div>
+              <div class="item divider"></div>
+              <!-- Delete requested by Niurka -> Uncomment for general comment.
+              <!-- <div class="item actions-area centered">
+                <div class="action-item">
+                  <a
+                    [routerLink]="['.']"
+                    routerLinkActive="router-link-active"
+                    (click)="timeSheetFormModal.open()"
+                  >
+                    Add
+                  </a>
+                </div>
+              </div> -> Uncomment for general comment.
+            </div>
+          </div>
+
+          <!-- Push Notifications -> Uncomment for general comment.
+          <div class="col-xs-6 col-md-4 col-lg-3 mb-3">
+            <div class="module-card">
+              <div class="item title-area">
+                Push Notifications
+              </div>
+              <div class="item divider"></div>
+              <div class="item actions-area centered">
+                <div class="action-item">
+                  <a
+                    [routerLink]="['.']"
+                    routerLinkActive="router-link-active"
+                    (click)="showPushNotificationsModal()"
+                  >
+                    Send
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+       -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ngx-smart-modal
+  #makePushModal
+  identifier="makePushModal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <push-notification
+    #push_notification_form
+    (onDismiss)="dismissPushModal($event)"
+  >
+  </push-notification>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #site_id_info_modal
+  identifier="site_id_info_modal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+  (onAnyCloseEvent)="show_setting_component = false"
+>
+  <app-duda-settings
+    *ngIf="show_setting_component"
+    [is_modal]="true"
+    (on_close)="closeSiteIdModal()"
+    (on_refresh)="checkDudaSettings()"
+  ></app-duda-settings>
+</ngx-smart-modal>
+
+<!-- CONTACTS MODAL -->
+<!-- <ngx-smart-modal
+  #contactsModal
+  identifier="contactsModal"
+  customClass="large-modal"
+>
+  <app-contact *ngIf="contactsModal.isVisible()"></app-contact>
+</ngx-smart-modal> -->
+
+<!-- CONTACT FORM MODAL -->
+<!-- <ngx-smart-modal
+  #contactFormModal
+  identifier="contactFormModal"
+  customClass="large-modal"
+>
+  <member-form
+    (onSubmit)="contactFormModal.close(); getTotalContacts()"
+    *ngIf="contactFormModal.isVisible()"
+  >
+  </member-form>
+</ngx-smart-modal> -->
+
+<!-- GROUPS MODAL -->
+<!-- <ngx-smart-modal
+  #groupsModal
+  identifier="groupsModal"
+  customClass="large-modal"
+>
+  <app-list-groups *ngIf="groupsModal.isVisible()"></app-list-groups>
+</ngx-smart-modal> -->
+
+<!-- GROUP FORM MODAL -->
+<!-- <ngx-smart-modal
+  #groupFormModal
+  identifier="groupFormModal"
+  customClass="large-modal"
+>
+  <group-form
+    (submit)="getTotalGroups(); groupFormModal.close()"
+    *ngIf="groupFormModal.isVisible()"
+  ></group-form>
+</ngx-smart-modal> -->
+
+<!-- PROCESS FORM MODAL -->
+<!-- <ngx-smart-modal #processFormModal_1 identifier="processFormModal_1">
+  <app-process-form
+    (onSubmit)="getTotalProcesses(); processFormModal_1.close()"
+    *ngIf="processFormModal_1.isVisible()"
+  ></app-process-form>
+</ngx-smart-modal> -->
+
+<!-- PROCESS LIST MODAL -->
+<!-- <ngx-smart-modal
+  #processListModal
+  identifier="processListModal"
+  customClass="large-modal"
+>
+  <app-process-list *ngIf="processListModal.isVisible()"></app-process-list>
+</ngx-smart-modal> -->
+
+<!-- LEVEL LIST MODAL -->
+<!-- <ngx-smart-modal
+  #levelListModal
+  identifier="levelListModal"
+  customClass="large-modal"
+>
+  <app-list-levels *ngIf="levelListModal.isVisible()"></app-list-levels>
+</ngx-smart-modal> -->
+
+<!-- STEP LIST MODAL -->
+<!-- <ngx-smart-modal
+  #stepsListModal
+  identifier="stepsListModal"
+  customClass="large-modal"
+>
+  <app-steps *ngIf="stepsListModal.isVisible()"></app-steps>
+</ngx-smart-modal> -->
+
+<!-- TIMESHEET FORM MODAL -->
+<!-- <ngx-smart-modal
+  #timeSheetFormModal
+  identifier="timeSheetFormModal"
+  customClass="large-modal"
+>
+  <app-time-sheet-form
+    (submit)="timeSheetFormModal.close()"
+    *ngIf="timeSheetFormModal.isVisible()"
+  ></app-time-sheet-form>
+</ngx-smart-modal> -->
+
+<div class="col-12 col-md-4" [hidden]="true">
+  <div class="custom-file mb-4">
+    <input
+      #input_file
+      accept="image/*"
+      type="file"
+      class="custom-file-input"
+      id="customFile"
+    />
+    <label class="custom-file-label" for="customFile">Choose file</label>
+  </div>
+</div>
+
+<div class="col-12 col-md-4" [hidden]="true">
+  <div class="custom-file mb-4">
+    <input
+      #inputLogo
+      accept="image/*"
+      type="file"
+      class="custom-file-input"
+      id="customFile"
+    />
+    <label class="custom-file-label" for="customFile">Choose file</label>
+  </div>
+</div>
+
+<div class="col-12 col-md-4" [hidden]="true">
+  <div class="custom-file mb-4">
+    <input
+      #input_to_do
+      accept="*/*"
+      type="file"
+      class="custom-file-input"
+      id="customFile"
+    />
+    <label class="custom-file-label" for="customFile">Choose file</label>
+  </div>
+</div>
+
+<!-- SELECT ACTION FORM MODAL -->
+<ngx-smart-modal
+  #select_action_event_modal
+  identifier="select_action_event_modal"
+  [closable]="false"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <div class="container" style="min-height: 700px">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-fixed-text opacity-layer"></div>
+          <div class="card-fixed-text row">
+            <h4 class="col-11" style="color: white"></h4>
+            <div class="col-1">
+              <button
+                class="btn btn-citric btn-sm"
+                (click)="select_action_event_modal.close()"
+              >
+                X
+              </button>
+            </div>
+          </div>
+          <img
+            class="card-img-top card-img-top-fixed"
+            src="/assets/img/events_banner_new.png"
+          />
+        </div>
+      </div>
+
+      <div class="modules">
+        <div class="row justify-content-center">
+          <div class="col-12">
+            <h5 class="text-citric">Please select an action:</h5>
+          </div>
+
+          <div class="col-12 col-md-4 mb-3">
+            <div class="card" routerLink="/groups/events">
+              <div class="card-fixed-text opacity-layer"></div>
+              <div class="card-fixed-text row">
+                <span class="col-12 span-number"> </span>
+              </div>
+              <img
+                class="card-img-top card-img-top-fixed"
+                src="/assets/img/view_events_banner_new.png"
+                onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+              />
+              <div class="card-body">
+                <h5 class="card-title text-center text-citric">View Events</h5>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4 mb-3">
+            <div
+              class="card"
+              (click)="
+                selectOption(
+                  select_event_modal,
+                  select_action_event_modal,
+                  select_event_form,
+                  'activities'
+                )
+              "
+            >
+              <div class="card-fixed-text opacity-layer"></div>
+              <div class="card-fixed-text row">
+                <span class="col-12 span-number"> </span>
+              </div>
+              <img
+                class="card-img-top card-img-top-fixed"
+                src="/assets/img/event_planning_banner_new.png"
+                onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+              />
+              <div class="card-body">
+                <h5 class="card-title text-center text-citric">Planning</h5>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4 mb-3">
+            <div
+              class="card"
+              (click)="
+                selectOption(
+                  select_event_modal,
+                  select_action_event_modal,
+                  select_event_form,
+                  'reviews'
+                )
+              "
+            >
+              <div class="card-fixed-text opacity-layer"></div>
+              <div class="card-fixed-text row">
+                <span class="col-12 span-number"> </span>
+              </div>
+              <img
+                class="card-img-top card-img-top-fixed"
+                src="/assets/img/event_review_banner_new.png"
+                onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+              />
+              <div class="card-body">
+                <h5 class="card-title text-center text-citric">Reviews</h5>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4 mb-3">
+            <div
+              class="card"
+              (click)="
+                selectOption(
+                  select_event_modal,
+                  select_action_event_modal,
+                  select_event_form,
+                  'finances'
+                )
+              "
+            >
+              <div class="card-fixed-text opacity-layer"></div>
+              <div class="card-fixed-text row">
+                <span class="col-12 span-number"> </span>
+              </div>
+              <img
+                class="card-img-top card-img-top-fixed"
+                src="/assets/img/event_finance_banner_new.png"
+                onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+              />
+              <div class="card-body">
+                <h5 class="card-title text-center text-citric">Finance</h5>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4 mb-3">
+            <div
+              class="card"
+              (click)="
+                selectOption(
+                  select_event_modal,
+                  select_action_event_modal,
+                  select_event_form,
+                  'attendances'
+                )
+              "
+            >
+              <div class="card-fixed-text opacity-layer"></div>
+              <div class="card-fixed-text row">
+                <span class="col-12 span-number"> </span>
+              </div>
+              <img
+                class="card-img-top card-img-top-fixed"
+                src="/assets/img/event_attendance_banner_new.png"
+                onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+              />
+              <div class="card-body">
+                <h5 class="card-title text-center text-citric">Attendance</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<!-- SELECT EVENT FORM MODAL -->
+<ngx-smart-modal
+  #select_event_modal
+  identifier="selectEventFormModal"
+  [closable]="false"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <app-select-events
+    #select_event_form
+    (select_event)="selectEvent(select_event_modal, $event)"
+  >
+  </app-select-events>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #client_disclaimer_modal
+  identifier="clientDisclaimerModal"
+  [closable]="false"
+  [dismissable]="false"
+  customClass="full-modal"
+>
+  <app-organization-disclaimer
+    #organization_disclaimer
+    [handle_as_modal]="true"
+    (on_close)="client_disclaimer_modal.close()"
+  >
+  </app-organization-disclaimer>
+</ngx-smart-modal>
+<ngx-smart-modal
+  #client_disclaimer_settings_modal
+  identifier="clientDisclaimerSettingsModal"
+  [closable]="false"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <app-organization-disclaimer-settings
+    (on_close)="client_disclaimer_settings_modal.close()"
+    #organization_disclaimer_settings
+  >
+  </app-organization-disclaimer-settings>
+</ngx-smart-modal>

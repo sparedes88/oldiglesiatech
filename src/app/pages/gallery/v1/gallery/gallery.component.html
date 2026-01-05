@@ -1,0 +1,171 @@
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+<div *ngIf="!loading" class="gallery-container">
+  <div class="text-center">
+    <h3
+      [ngStyle]="{
+        'text-align': style_settings?.home_title_text_align || 'center',
+        color: style_settings?.home_title_text_color || '#000000',
+        'font-weight': style_settings?.home_title_text_bold || 'bolder'
+      }"
+    >
+      {{ gallery.name }}
+    </h3>
+    <span>{{ gallery.description }}</span>
+  </div>
+
+  <div
+    [ngClass]="style_settings?.is_full_width ? 'mx-0' : ''"
+    class="row justify-content-center"
+  >
+    <div
+      [ngClass]="{
+        'horizontal-scroll': show_horizontal,
+        'justify-content-center': !show_horizontal,
+        'col-12': style_settings?.is_full_width,
+        'col-10': !style_settings?.is_full_width
+      }"
+      class="row mt-1 mx-0 px-2 py-4 main-img-container"
+    >
+      <div
+        class="col-xs-12 col-sm-12 col-md-6 col-lg-4 p-1"
+        *ngFor="let photo of gallery?.photos; let i = index"
+        style="padding: 0px"
+      >
+        <div class="img-container">
+          <div class="img-display">
+            <div
+              (click)="openPhoto(photo, i)"
+              class="bg-img"
+              [ngStyle]="{ 'background-image': getUrlBack(photo) }"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #photoModal identifier="photoModal" customClass="medium-modal">
+  <!-- <img
+    *ngIf="photoModal.isVisible()"
+    [src]="selectedPhoto"
+    alt=""
+    class="responsive-img mt-4"
+    (click)="openPhoto(photo)"
+  /> -->
+  <ngb-carousel class="mt-4" #carousel>
+    <ng-template
+      [id]="i"
+      ngbSlide
+      *ngFor="let image of gallery?.photos; let i = index"
+    >
+      <div class="picsum-img-wrapper">
+        <div
+          class="bg-img-2"
+          [ngStyle]="{ 'background-image': getUrlBack(image) }"
+        >
+          <img class="responsive-img" [src]="image" />
+        </div>
+      </div>
+    </ng-template>
+  </ngb-carousel>
+
+  <!-- <div id="galleryCarousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+      <li
+        *ngFor="let photo of gallery?.photos; let i = index"
+        data-target="#galleryCarousel"
+        (click)="goToSlide(i)"
+        class="active"
+      ></li>
+    </ol>
+    <div class="carousel-inner">
+      <div
+        *ngFor="let photo of gallery?.photos; let i = index"
+        [ngClass]="{ active: i === 0 }"
+        class="carousel-item"
+      >
+        <img
+          *ngIf="photoModal.isVisible()"
+          [src]="photo"
+          alt=""
+          class="responsive-img mt-4"
+        />
+      </div>
+    </div>
+    <a
+      class="carousel-control-prev"
+      href="#galleryCarousel"
+      role="button"
+      data-slide="prev"
+    >
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a
+      class="carousel-control-next"
+      href="#galleryCarousel"
+      role="button"
+      data-slide="next"
+    >
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div> -->
+
+  <!-- <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+      <li
+        *ngFor="let slide of slides; let i = index"
+        [class.active]="i === 0"
+        (click)="carousel.slideTo(i)"
+      ></li>
+    </ol>
+    <div class="carousel-inner">
+      <div
+        *ngFor="let slide of slides; let i = index"
+        class="carousel-item"
+        [class.active]="i === 0"
+      >
+        <img
+          class="d-block w-100"
+          src="{{ slide.image }}"
+          alt="{{ slide.caption }}"
+        />
+        <div class="carousel-caption d-none d-md-block">
+          <h5>{{ slide.caption }}</h5>
+          <p>{{ slide.description }}</p>
+        </div>
+      </div>
+    </div>
+    <a
+      class="carousel-control-prev"
+      href="#myCarousel"
+      role="button"
+      data-slide="prev"
+    >
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a
+      class="carousel-control-next"
+      href="#myCarousel"
+      role="button"
+      data-slide="next"
+    >
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div> -->
+</ngx-smart-modal>

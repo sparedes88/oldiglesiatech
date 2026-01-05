@@ -1,0 +1,27 @@
+.summary {
+  display: inline-block;
+  width: 90%;
+  font-weight: 600;
+  font-size: 50px;
+}
+
+.card-img-top-fixed {
+  object-fit: cover;
+  object-position: left center;
+  height: 200px;
+}
+
+.card-fixed-text {
+  height: 200px;
+}
+
+.card {
+  border: none !important;
+}
+
+h4.span-number {
+  align-self: center;
+  text-align: center;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 8px #ffffff;
+}

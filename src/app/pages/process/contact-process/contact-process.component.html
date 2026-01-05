@@ -1,0 +1,91 @@
+<h4>Contacts in Process: {{ process.name }}</h4>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th width="33.33%">
+        Assigned Contacts
+      </th>
+      <th width="33.33%">
+        Completed
+      </th>
+      <th width="33.33%">
+        Pending
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngIf="loading">
+      <td colspan="3" class="text-center" align="center">
+        <h4>Loading...</h4>
+      </td>
+    </tr>
+    <tr *ngIf="!loading">
+      <td>
+        <ul class="list-group builder-scroll">
+          <li class="list-group-item">
+            <div class="form-group">
+              <label>Search</label>
+              <input
+                type="search"
+                class="form-control"
+                placeholder="Type contact name"
+                [(ngModel)]="contactSearchValue"
+              />
+            </div>
+          </li>
+          <li class="list-group-item" *ngFor="let contact of filteredUserProcess">
+            <div class="row">
+              <div class="col-xs-10 col-md-10">
+                {{ contact.name }}
+              </div>
+              <div class="col-xs-2 col-md-2 text-right">
+                <mat-slide-toggle
+                  [(ngModel)]="contact.assigned"
+                  (change)="
+                    toggleAssignStatus(contact.idUser, contact.assigned)
+                  "
+                  color="primary"
+                ></mat-slide-toggle>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </td>
+      <td>
+        <ul class="list-group builder-scroll">
+          <li
+            class="list-group-item"
+            *ngFor="let contact of completedUsersProcess"
+          >
+            <div class="row">
+              <div class="col-xs-10 col-md-10">
+                {{ contact.name }} {{ contact.lastName }} 
+                <br *ngIf="contact.groups">
+                <small *ngIf="contact.groups">({{contact.groups}})</small>
+              </div>
+              <div class="col-xs-2 col-md-2 text-right"></div>
+            </div>
+          </li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li
+            class="list-group-item"
+            *ngFor="let contact of pendingUserProcess"
+          >
+            <div class="row">
+              <div class="col-xs-10 col-md-10">
+                {{ contact.name }} {{ contact.lastName }}
+                <br *ngIf="contact.groups">
+                <small *ngIf="contact.groups">({{contact.groups}})</small>
+              </div>
+              <div class="col-xs-2 col-md-2 text-right"></div>
+            </div>
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>

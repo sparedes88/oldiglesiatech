@@ -1,0 +1,69 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{
+        category?.idCategoriaMiembro
+          ? "Editing " + category?.descripcion
+          : "Create Category"
+      }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div #basic_form="ngForm" [formGroup]="basicInfoForm" style="width: 100%">
+    <div class="row">
+      <div class="col-12">
+        <div class="form-group">
+          <label for="estimated">Name *</label>
+          <input
+            class="form-control"
+            placeholder="Name"
+            type="text"
+            formControlName="nombre"
+            required
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label for="estimated">Description</label>
+          <textarea
+            class="form-control"
+            placeholder="Description"
+            type="text"
+            formControlName="descripcion"
+          ></textarea>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label for="estimated">Sort this category</label>
+          <select
+            class="form-control"
+            placeholder="Sort type"
+            type="text"
+            formControlName="sort_type"
+          >
+            <option value="date_asc">First created first</option>
+            <option value="date_desc">Last created first</option>
+            <option value="alpha_asc">Alphabetical</option>
+            <option value="alpha_desc">Reverse alphabetical</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="w-100"></div>
+
+      <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+        <button
+          [disabled]="basicInfoForm.invalid || serverBusy"
+          (click)="onRegister()"
+          class="btn btn-citric searchButton"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

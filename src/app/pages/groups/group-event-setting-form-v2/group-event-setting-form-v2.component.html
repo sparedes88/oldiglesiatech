@@ -1,0 +1,975 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{
+        group_event.idGroupEvent
+          ? "Edit Event #" + group_event.name
+          : "Add Event"
+      }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div [hidden]="is_loading" class="row">
+    <div class="col-12">
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <a
+            class="nav-item nav-link active"
+            id="nav-general-tab"
+            data-toggle="tab"
+            href="#nav-general"
+            role="tab"
+            aria-controls="nav-general"
+            aria-selected="true"
+          >
+            General
+          </a>
+          <a
+            class="nav-item nav-link"
+            id="nav-details-tab"
+            data-toggle="tab"
+            href="#nav-details"
+            role="tab"
+            aria-controls="nav-details"
+            aria-selected="false"
+          >
+            Details
+          </a>
+          <a
+            class="nav-item nav-link"
+            id="nav-style-tab"
+            data-toggle="tab"
+            href="#nav-style"
+            role="tab"
+            aria-controls="nav-style"
+            aria-selected="false"
+          >
+            Style
+          </a>
+          <!-- <a
+            class="nav-item nav-link"
+            id="nav-preview-tab"
+            data-toggle="tab"
+            href="#nav-preview"
+            role="tab"
+            aria-controls="nav-preview"
+            aria-selected="false"
+          >
+            Preview
+          </a> -->
+        </div>
+      </nav>
+
+      <div class="tab-content pt-2" id="nav-tabContent">
+        <div
+          class="tab-pane fade show active"
+          id="nav-general"
+          role="tabpanel"
+          aria-labelledby="nav-general-tab"
+        >
+          <div class="row" [formGroup]="form_group_v2">
+            <div class="col-12 col-md-12">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="selected_group"> Group* </label>
+                <ng-multiselect-dropdown
+                  #multi_select
+                  placeholder="Select a group"
+                  [data]="groups"
+                  [settings]="selectOptions"
+                  [formControl]="form_group_v2.controls['selected_group']"
+                  [class.is-invalid]="
+                    form_group_v2.get('selected_group').touched &&
+                    form_group_v2.get('selected_group').invalid
+                  "
+                ></ng-multiselect-dropdown>
+                <!-- formControlName="selected_group" -->
+              </div>
+            </div>
+
+            <div class="col-12 col-md-12">
+              <label>Title</label>
+              <div class="input-group mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Event's Name"
+                  formControlName="title"
+                  required
+                  [class.is-invalid]="
+                    form_group_v2.get('title').touched &&
+                    form_group_v2.get('title').invalid
+                  "
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fas fa-align-left"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div formGroupName="settings" class="col-12 row p-0 mx-0">
+              <div
+                [hidden]="
+                  settings_form.get('frequency')?.value === 'custom' &&
+                  custom_form?.get('frequency')?.value == 'custom'
+                "
+                class="col-12"
+              >
+                <div class="form-group">
+                  <label> Event date </label>
+                  <input
+                    type="date"
+                    formControlName="event_date"
+                    class="form-control"
+                    (change)="verifyStartDate()"
+                    [class.is-invalid]="
+                      settings_form.get('event_date').touched &&
+                      settings_form.get('event_date').invalid
+                    "
+                  />
+                </div>
+              </div>
+
+              <div
+                class="col-12"
+                [hidden]="
+                  settings_form.get('frequency')?.value === 'custom' &&
+                  custom_form?.get('frequency')?.value == 'custom'
+                "
+              >
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    formControlName="event_as_range"
+                    id="event_as_range"
+                    (change)="handleMultiDay()"
+                  />
+                  <label class="custom-control-label" for="event_as_range">
+                    My event lasts several days
+                  </label>
+                </div>
+              </div>
+
+              <div
+                [hidden]="
+                  settings_form.get('frequency')?.value === 'custom' &&
+                  custom_form?.get('frequency')?.value == 'custom'
+                "
+                class="col-12"
+                *ngIf="settings_form.get('event_as_range').value"
+              >
+                <div class="form-group">
+                  <label> Event end on </label>
+                  <input
+                    type="date"
+                    formControlName="date_end"
+                    class="form-control"
+                    [min]="settings_form.get('event_date').value"
+                    [class.is-invalid]="
+                      settings_form.get('date_end').touched &&
+                      settings_form.get('date_end').invalid
+                    "
+                  />
+                </div>
+              </div>
+
+              <div
+                class="col-12"
+                [hidden]="
+                  settings_form.get('frequency')?.value === 'custom' &&
+                  custom_form?.get('frequency')?.value == 'custom'
+                "
+              >
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    formControlName="all_day"
+                    id="all_day"
+                    (change)="handleAllDay()"
+                  />
+                  <label class="custom-control-label" for="all_day">
+                    All day
+                  </label>
+                </div>
+              </div>
+
+              <div
+                class="col-12 row mt-2"
+                *ngIf="!settings_form.get('all_day').value"
+              >
+                <div
+                  [hidden]="
+                    settings_form.get('frequency')?.value === 'custom' &&
+                    custom_form?.get('frequency')?.value == 'custom' &&
+                    custom_form?.get('each_date_has_time')?.value
+                  "
+                  class="col-12 col-md-6"
+                >
+                  <div class="form-group mb-0">
+                    <label> Starts at:</label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      formControlName="start_time"
+                      required
+                    />
+                  </div>
+                </div>
+                <div
+                  [hidden]="
+                    settings_form.get('frequency')?.value === 'custom' &&
+                    custom_form?.get('frequency')?.value == 'custom' &&
+                    custom_form?.get('each_date_has_time')?.value
+                  "
+                  class="col-12 col-md-6"
+                >
+                  <div class="form-group mb-0">
+                    <label> Ends at:</label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      formControlName="end_time"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    formControlName="repeat"
+                    id="repeat"
+                    (change)="handleRepeat()"
+                  />
+                  <label class="custom-control-label" for="repeat">
+                    Repeat this event
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-12" *ngIf="settings_form.get('repeat').value">
+                <div class="form-group">
+                  <label for="frequency"> Repeats </label>
+                  <select
+                    class="form-control"
+                    id="frequency"
+                    formControlName="frequency"
+                    (change)="handleFrequency()"
+                  >
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+
+                <div
+                  formGroupName="custom"
+                  *ngIf="settings_form.get('frequency').value === 'custom'"
+                >
+                  <hr />
+                  <h6 class="text-secondary">Custom settings</h6>
+                  <div class="form-group">
+                    <label>Frequency</label>
+                    <select
+                      class="form-control"
+                      id="frequency"
+                      formControlName="frequency"
+                      (change)="handleCustomFrequency()"
+                    >
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="yearly">Yearly</option>
+                      <option value="custom">Specific Dates</option>
+                    </select>
+                  </div>
+                  <div
+                    [hidden]="custom_form.get('frequency').value == 'yearly'"
+                    *ngIf="custom_form.get('frequency').value != 'custom'"
+                    class="form-group"
+                  >
+                    <label
+                      >Every {{ custom_form.get("every").value }}
+                      {{ granularity_name }}</label
+                    >
+                    <input
+                      type="number"
+                      formControlName="every"
+                      class="form-control"
+                      min="1"
+                      [class.is-invalid]="
+                        custom_form.get('every').touched &&
+                        custom_form.get('every').invalid
+                      "
+                    />
+                    <small
+                      class="text-danger"
+                      *ngIf="
+                        custom_form.get('every').hasError('min') ||
+                        custom_form.get('every').hasError('max')
+                      "
+                    >
+                      * Between 1 and
+                      {{ custom_form.get("every").getError("max").max }}
+                    </small>
+                  </div>
+                  <!-- Custom Weekly -->
+                  <div *ngIf="custom_form.get('frequency').value === 'weekly'">
+                    <button
+                      *ngFor="let day of days"
+                      class="btn btn-sm btn-day type mx-1"
+                      [ngClass]="{
+                        active: isActiveItem(day.index, 'active_days')
+                      }"
+                      (click)="toggleItem(day.index, 'active_days')"
+                    >
+                      {{ day.name }}
+                    </button>
+                  </div>
+
+                  <!-- Custom monthly -->
+                  <div *ngIf="custom_form.get('frequency').value === 'monthly'">
+                    <div class="form-group">
+                      <select
+                        class="form-control"
+                        formControlName="custom_every"
+                        (change)="handleCustomEvery()"
+                      >
+                        <option value="each">
+                          Each {{ getDayForDate() }} of each month
+                        </option>
+                        <option value="on_date">On</option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Custom yearly -->
+                  <div *ngIf="custom_form.get('frequency').value === 'yearly'">
+                    <div class="flex-wrap is-flex justify-content-around mb-2">
+                      <button
+                        *ngFor="let month of months"
+                        class="btn btn-sm btn-day btn-month mt-1"
+                        [ngClass]="{
+                          active: isActiveItem(month.index, 'active_months')
+                        }"
+                        (click)="toggleItem(month.index, 'active_months')"
+                      >
+                        {{ month.name }}
+                      </button>
+                    </div>
+
+                    <div class="form-group">
+                      <select
+                        class="form-control"
+                        formControlName="custom_every"
+                        (change)="handleCustomEvery()"
+                      >
+                        <option value="each">
+                          The {{ getDateName() }} of the month
+                        </option>
+                        <option value="first">First</option>
+                        <option value="second">Second</option>
+                        <option value="third">Third</option>
+                        <option value="fourth">Fourth</option>
+                        <option value="fifth">Fifth</option>
+                        <option value="last">Last</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Position and granularity -->
+                  <div *ngIf="custom_form.get('custom_every')?.value != 'each'">
+                    <div
+                      [hidden]="custom_form.get('frequency').value === 'yearly'"
+                      *ngIf="custom_form.get('position')"
+                      class="form-group"
+                    >
+                      <select class="form-control" formControlName="position">
+                        <option value="first">First</option>
+                        <option value="second">Second</option>
+                        <option value="third">Third</option>
+                        <option value="fourth">Fourth</option>
+                        <option value="fifth">Fifth</option>
+                        <option value="last">Last</option>
+                      </select>
+                    </div>
+                    <div
+                      class="form-group"
+                      *ngIf="custom_form.get('granularity')"
+                    >
+                      <select
+                        class="form-control"
+                        formControlName="granularity"
+                      >
+                        <option value="day">Day</option>
+                        <option value="weekday">Weekday</option>
+                        <option value="weekend_day">Weekend Day</option>
+                        <option value="sunday">Sunday</option>
+                        <option value="monday">Monday</option>
+                        <option value="tuesday">Tuesday</option>
+                        <option value="wednesday">Wednesday</option>
+                        <option value="thursday">Thursday</option>
+                        <option value="friday">Friday</option>
+                        <option value="saturday">Saturday</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- custom dates -->
+                  <div *ngIf="custom_form.get('frequency').value === 'custom'">
+                    <div class="custom-control custom-switch">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        formControlName="each_date_has_time"
+                        id="each_date_has_time"
+                      />
+                      <label
+                        class="custom-control-label"
+                        for="each_date_has_time"
+                      >
+                        Each date has it own time
+                      </label>
+                    </div>
+                  </div>
+                  <div
+                    *ngIf="custom_form.get('frequency').value === 'custom'"
+                    formArrayName="custom_dates"
+                  >
+                    <div
+                      class="row"
+                      *ngFor="
+                        let input_control of custom_dates_array.controls;
+                        let i = index;
+                        let f = first;
+                        let l = last
+                      "
+                      [formGroupName]="i"
+                    >
+                      <div class="col-12 mt-1" [ngClass]="{ 'mb-1': l }">
+                        <label *ngIf="f"> Dates </label>
+                        <input
+                          [ngClass]="{
+                            'form-control-with-delete': !f
+                          }"
+                          type="date"
+                          formControlName="date"
+                          class="form-control"
+                        />
+                        <button
+                          class="btn btn-sm del-button"
+                          *ngIf="!f"
+                          (click)="removeCustomDate(i)"
+                        >
+                          <i class="fa fa-close text-danger"></i>
+                        </button>
+                      </div>
+                      <div
+                        class="col-6"
+                        *ngIf="custom_form.get('each_date_has_time').value"
+                      >
+                        <!-- <label>From*</label> -->
+                        <input
+                          type="time"
+                          class="form-control"
+                          formControlName="start_time"
+                          required
+                        />
+                      </div>
+                      <div
+                        *ngIf="custom_form.get('each_date_has_time').value"
+                        class="col-6"
+                      >
+                        <input
+                          type="time"
+                          class="form-control"
+                          formControlName="end_time"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <button
+                      class="btn btn-sm btn-secondary"
+                      type="button"
+                      (click)="addCustomDate()"
+                    >
+                      <i class="fa fa-plus"></i> Add date
+                    </button>
+                    <hr />
+                  </div>
+                  <hr />
+                </div>
+                <div
+                  class="form-group"
+                  [hidden]="
+                    settings_form.get('frequency')?.value === 'custom' &&
+                    custom_form?.get('frequency')?.value == 'custom'
+                  "
+                >
+                  <label for="ends_on"> When will it stop repeating </label>
+                  <select
+                    class="form-control"
+                    formControlName="ends_on"
+                    (change)="setEnding()"
+                  >
+                    <option value="never">Never</option>
+                    <option value="after">After <small>n</small> events</option>
+                    <option value="on_date">On date</option>
+                  </select>
+
+                  <small
+                    class="text-danger"
+                    *ngIf="settings_form.get('ends_on').value == 'never'"
+                  >
+                    * If you select 'never', events will be created for the next
+                    {{ never_setup }}. This may take a while.
+                  </small>
+                </div>
+
+                <div
+                  *ngIf="settings_form.get('ends_on').value == 'after'"
+                  class="form-group"
+                >
+                  <label for="">Repeat for <small>n</small> times</label>
+                  <input
+                    type="number"
+                    formControlName="repeat_count"
+                    class="form-control"
+                    min="1"
+                    max="100"
+                    placeholder="How many times this event will be repeated"
+                    [class.is-invalid]="
+                      settings_form.get('repeat_count').touched &&
+                      settings_form.get('repeat_count').invalid
+                    "
+                  />
+                  <small
+                    class="text-danger"
+                    *ngIf="
+                      settings_form.get('repeat_count').hasError('min') ||
+                      settings_form.get('repeat_count').hasError('max')
+                    "
+                  >
+                    * Between 1 and 100.
+                  </small>
+                </div>
+                <div
+                  *ngIf="settings_form.get('ends_on').value == 'on_date'"
+                  class="form-group"
+                >
+                  <label for="">Repeat until this date</label>
+                  <input
+                    type="date"
+                    formControlName="repeat_until"
+                    class="form-control"
+                    [min]="settings_form.get('event_date').value"
+                    [class.is-invalid]="
+                      settings_form.get('repeat_until').touched &&
+                      settings_form.get('repeat_until').invalid
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane fade"
+          id="nav-details"
+          role="tabpanel"
+          aria-labelledby="nav-details-tab"
+        >
+          <div class="row" [formGroup]="detail_form">
+            <!-- Description -->
+            <div class="col-12 col-md-12">
+              <label>Description</label>
+              <div class="input-group mb-3">
+                <textarea
+                  rows="5"
+                  class="form-control"
+                  formControlName="description"
+                  placeholder="Write a description for the new event"
+                  [class.is-invalid]="
+                    detail_form.get('description').touched &&
+                    detail_form.get('description').invalid
+                  "
+                ></textarea>
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fas fa-align-left"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-12">
+              <div class="mb-3">
+                <label>Publish status*</label>
+                <select
+                  formControlName="publish_status"
+                  class="form-control"
+                  required
+                  [class.is-invalid]="
+                    detail_form.get('publish_status').touched &&
+                    detail_form.get('publish_status').invalid
+                  "
+                >
+                  <option disabled selected>-- Select one option --</option>
+                  <option value="publish">Publish</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 col-md-12">
+              <label class="col-12 px-0">
+                <span style="pointer-events: none">
+                  Location <small class="text-secondary">(Optional)</small>
+                </span>
+                <div class="text-center float-right">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      formControlName="same_address_as_church"
+                      id="defaultCheck2"
+                      (change)="setOrganizationAddress()"
+                    />
+                    <label class="form-check-label" for="defaultCheck2">
+                      <span class="tooltip_">
+                        <span class="tooltiptext">
+                          Check this option to use the same address that your
+                          organization.
+                        </span>
+                        Same address as organization?
+                        <i class="text-secondary fa fa-info-circle"></i>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </label>
+              <div class="input-group mb-3">
+                <google-address-component
+                  #address_component
+                  [readonly]="detail_form.value.same_address_as_church"
+                  *ngIf="init_map"
+                  [value]="detail_form.get('full_address').value"
+                  placeholder="Please type the location info about this event."
+                  adressType="address"
+                  (setAddress)="getAddress($event)"
+                  (on_reload)="reloadMap()"
+                ></google-address-component>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="custom-control custom-switch">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  formControlName="has_live_url"
+                  id="has_live_url"
+                  (change)="validateCostInput('has_live_url', 'live_event_url')"
+                />
+                <label class="custom-control-label" for="has_live_url">
+                  My event has a live transmition (or video url)
+                </label>
+              </div>
+            </div>
+
+            <div
+              class="col-12 col-md-12"
+              *ngIf="detail_form.get('has_live_url').value"
+            >
+              <label>Transmission/Video url</label>
+              <div class="input-group mb-3">
+                <textarea
+                  rows="5"
+                  class="form-control"
+                  formControlName="live_event_url"
+                  placeholder="Paste here your transmission url (including http://)"
+                  [class.is-invalid]="
+                    detail_form.get('live_event_url').touched &&
+                    detail_form.get('live_event_url').invalid
+                  "
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="custom-control custom-switch">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  formControlName="has_cost"
+                  id="has_cost"
+                  (change)="validateCostInput('has_cost', 'ticket_cost')"
+                />
+                <label class="custom-control-label" for="has_cost">
+                  This event will cost
+                </label>
+              </div>
+            </div>
+
+            <!-- Cost -->
+            <div
+              *ngIf="detail_form.get('has_cost').value"
+              class="col-12 col-md-12"
+            >
+              <label>Event cost</label>
+              <div class="input-group mb-3">
+                <input
+                  class="form-control"
+                  formControlName="ticket_cost"
+                  placeholder="How much does a ticket for this event cost?"
+                  type="number"
+                  [class.is-invalid]="
+                    detail_form.get('ticket_cost').touched &&
+                    detail_form.get('ticket_cost').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <!-- Capacity -->
+
+            <div class="col-12">
+              <div class="custom-control custom-switch">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  formControlName="has_capacity"
+                  id="has_capacity"
+                  (change)="validateCostInput('has_capacity', 'capacity')"
+                />
+                <label class="custom-control-label" for="has_capacity">
+                  My event has limited capacity
+                </label>
+              </div>
+            </div>
+
+            <div
+              class="col-12 col-md-12"
+              *ngIf="detail_form.get('has_capacity').value"
+            >
+              <label>Capacity</label>
+              <div class="input-group mb-3">
+                <input
+                  rows="5"
+                  class="form-control"
+                  formControlName="capacity"
+                  placeholder="How many people do you expect?"
+                  type="number"
+                  [class.is-invalid]="
+                    detail_form.get('capacity').touched &&
+                    detail_form.get('capacity').invalid
+                  "
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane fade"
+          id="nav-style"
+          role="tabpanel"
+          aria-labelledby="nav-style-tab"
+          [formGroup]="style_form"
+        >
+          Style
+
+          <div class="card">
+            <div class="row card-body">
+              <img
+                [src]="fixUrl(style_form.get('picture').value)"
+                [alt]="group_event.name"
+                class="group-picture mb-1"
+                (click)="uploadPicture(input_file)"
+              />
+              <span class="col-12" style="font-size: 12px">
+                Recommended size: 1000x428
+              </span>
+              <div class="col-12 text-center">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-citric"
+                  (click)="uploadPicture(input_file)"
+                >
+                  Upload image
+                </button>
+              </div>
+              <div class="col-12 text-center">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [value]="help_request"
+                    [(ngModel)]="help_request"
+                    [ngModelOptions]="{ standalone: true }"
+                    id="defaultCheck1"
+                    (change)="initOrResetForm($event)"
+                  />
+                  <label class="form-check-label" for="defaultCheck1">
+                    Need Help with Design? Click here!
+                  </label>
+                </div>
+              </div>
+              <!-- <div class="col-12 text-center">
+                <ng-select
+                  *ngIf="wpImages.length != 0"
+                  [items]="wpImages"
+                  bindLabel="slug"
+                  placeholder="Select a Wordpress image"
+                  bindValue="source_url"
+                  formControlName="picture"
+                  [(ngModel)]="group_event.picture"
+                  [searchable]="true"
+                  (change)="update()"
+                  style="text-align: center; height: 30px"
+                >
+                  <ng-template ng-option-tmp let-item="item" let-index="index">
+                    <div class="row">
+                      <div class="col-12">
+                        <b>{{ item.slug }}</b>
+                      </div>
+                      <div class="col-12">
+                        <img width="50%" [src]="item.source_url" />
+                      </div>
+                    </div>
+                  </ng-template>
+                </ng-select>
+              </div> -->
+
+              <div class="col-12 col-md-4" [hidden]="true">
+                <div class="custom-file mb-4">
+                  <input
+                    #input_file
+                    accept="image/*"
+                    type="file"
+                    class="custom-file-input"
+                    id="customFile"
+                  />
+                  <label class="custom-file-label" for="customFile"
+                    >Choose file</label
+                  >
+                </div>
+              </div>
+
+              <div
+                *ngIf="
+                  help_request &&
+                  !group_event?.design_request?.idDesignRequestEvent
+                "
+                class="col-12"
+              >
+                <label class="text-secondary">
+                  Please select the designs you require.
+                </label>
+                <div class="flex-wrap is-flex justify-content-around mb-2">
+                  <button
+                    *ngFor="let type of design_request_types"
+                    class="btn btn-sm btn-day btn-type my-1"
+                    [ngClass]="{
+                      active: isActiveItem(type.name, 'types')
+                    }"
+                    (click)="toggleItem(type.name, 'types')"
+                  >
+                    {{ type.name }}
+                  </button>
+                </div>
+              </div>
+
+              <div
+                *ngIf="
+                  help_request &&
+                  group_event?.design_request?.idDesignRequestEvent
+                "
+                class="col-12"
+              >
+                <small class="text-secondary">
+                  You already have a design request for this event.
+                </small>
+                <div class="text-center">
+                  <button
+                    class="btn btn-sm btn-citric"
+                    (click)="goToDesignRequest()"
+                  >
+                    {{ group_event?.design_request?.title }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="col-12 col-md-12">
+            <label>Button Text</label>
+            <div class="input-group mb-3">
+              <input
+                class="form-control"
+                formControlName="button_text"
+                placeholder="Write the text of your form button."
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-12">
+            <label>Button Color</label>
+            <div class="input-group mb-3">
+              <input
+                class="form-control"
+                type="color"
+                matInput
+                formControlName="button_color"
+                placeholder="Pick the color of your button. (Please notice that the text will be white)"
+              />
+            </div>
+          </div>
+        </div>
+        <!-- <div
+          class="tab-pane fade"
+          id="nav-preview"
+          role="tabpanel"
+          aria-labelledby="nav-preview-tab"
+        >
+          Preview
+        </div> -->
+      </div>
+    </div>
+    <div class="col-12 text-center mt-3">
+      <button
+        [disabled]="serverBusy"
+        type="button"
+        (click)="submitV2()"
+        class="btn btn-sm btn-success"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+  <div class="row" [hidden]="!is_loading">
+    <div class="col-12">
+      <ng-template [ngIf]="is_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <button #click_to_glitch (click)="checkClick()" type="button" hidden></button>
+</div>

@@ -1,0 +1,64 @@
+<h4 class="text-citric">
+  See what you need to do to complete: <i> {{ step?.descripcion }} </i>
+
+  <span *ngIf="step?.cumplido">
+    <br />
+    <br />
+    <button class="btn btn-sm btn-outline-success">
+      You already complete this step.
+    </button>
+  </span>
+</h4>
+
+<hr />
+
+<h5 class="text-muted">
+  <li>
+    {{ step?.full_description || "Not Provided" }}
+  </li>
+</h5>
+
+<br />
+<hr />
+
+<div class="col-12">
+  <h5>
+    Need more help? Here are some extra resources:
+  </h5>
+
+  <li *ngFor="let file of step?.files">
+    <a [href]="getUrl(file.url)" target="_blank">
+      {{ file.name }}
+    </a>
+  </li>
+
+  <h6 *ngIf="step?.files.length === 0">
+    <li class="text-muted">
+      Ask to your organization admin to add help files.
+    </li>
+  </h6>
+</div>
+
+<hr />
+
+<div *ngIf="step?.frame_video">
+  <h5 class="text-muted">
+    Still need help? Check out this video to get more help:
+  </h5>
+  <div
+    style="background-color: gainsboro;"
+    class="videoWrapper text-center"
+    data-href="https://www.facebook.com/watch/?v=10155278547321729"
+    data-width="auto"
+    data-show-captions="false"
+    [innerHTML]="step?.frame_video"
+  ></div>
+</div>
+
+<div *ngIf="!step?.frame_video">
+  <h4 class="text-center">
+    <i>
+      There is not any help video.
+    </i>
+  </h4>
+</div>

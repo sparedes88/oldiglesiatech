@@ -1,0 +1,187 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      Notes | group: <i>{{ group?.title }} </i>
+    </h4>
+    <div *ngIf="show_dismiss" class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+
+    <div class="col-12 row">
+      <div class="col-3 offset-9">
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success mt-3 mb-3"
+          (click)="activateForm()"
+          [disabled]="show_editable"
+        >
+          Add Note
+        </button>
+        <!-- <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+          (click)="print()"
+          [disabled]="show_editable || notes.length === 0"
+        >
+          Print
+        </button> -->
+      </div>
+      <div *ngIf="show_editable" class="col-12 p-0">
+        <form
+          #note_form_1="ngForm"
+          [formGroup]="noteForm"
+          style="width: 100%;"
+          class="row"
+        >
+          <div class="col-12">
+            <div class="form-group">
+              <label for="estimated">Notes about this group.</label>
+              <textarea
+                class="form-control"
+                placeholder="Place here any not you want."
+                type="text"
+                formControlName="note"
+              ></textarea>
+            </div>
+          </div>
+        </form>
+
+        <hr />
+
+        <span
+          style="display: block; text-align: right; width: 100%;"
+          class="mb-2"
+        >
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            class="btn btn-sm btn-muted"
+            (click)="deactivateForm()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            [disabled]="noteForm.invalid && !getPermissions()"
+            (click)="addNote(noteForm)"
+            class="btn btn-sm btn-success"
+          >
+            Save
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px;">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem;"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div [hidden]="show_loading" class="col-12 p-0" style="min-height: 500px;">
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="noteStatusForm"
+        style="width: 100%;"
+      >
+        <div formArrayName="statuses" class="col-12 p-0">
+          <div
+            class="row"
+            *ngFor="let note of notes; let i = index"
+            [formGroupName]="i"
+          >
+            <div class="col-12" *ngIf="!note.status">
+              <div class="no-records-found mb-2">
+                Note #{{ note.idGroupNote }} - {{ note.note }} by
+                {{ note.user_deleted_by }} at
+                {{ note.deleted_at | date: "MMM. dd yyyy" }}
+              </div>
+            </div>
+
+            <div *ngIf="note.status" class="col-10 col-md-11">
+              <div *ngIf="!getPermissions()" class="form-group">
+                <div class="form-group">
+                  <label for="estimated" style="width: 100%;">
+                    Note by {{ note.user_created_by }} at
+                    {{ note.created_at | date: "MMM. dd yyyy" }}
+
+                    <span
+                      *ngIf="note.updated_at"
+                      class="text-muted float-right"
+                    >
+                      Last updated by {{ note.user_updated_by }} as
+                      {{ note.updated_at | date: "MMM. dd yyyy" }}
+                    </span>
+                  </label>
+                  <input
+                    class="form-control"
+                    placeholder="Note."
+                    type="text"
+                    formControlName="note"
+                    required
+                  />
+                </div>
+
+                <span style="display: block; text-align: right;">
+                  <button
+                    type="button"
+                    *ngIf="
+                      status_on_form.controls[i].get('note').dirty &&
+                      (currentUser.isSuperUser || currentUser.idUserType === 1)
+                    "
+                    class="btn btn-sm btn-muted"
+                    (click)="resetNoteForm(status_on_form.controls[i], note)"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    *ngIf="
+                      status_on_form.controls[i].get('note').dirty &&
+                      (group.is_leader ||
+                        currentUser.isSuperUser ||
+                        currentUser.idUserType === 1)
+                    "
+                    [disabled]="
+                      status_on_form.controls[i].get('note').invalid &&
+                      (currentUser.isSuperUser || currentUser.idUserType === 1)
+                    "
+                    (click)="updateMemberType(status_on_form.controls[i], note)"
+                    class="btn btn-sm btn-success"
+                  >
+                    Save
+                  </button>
+                </span>
+              </div>
+              <div *ngIf="getPermissions()">
+                {{ note.note }}
+              </div>
+            </div>
+            <div *ngIf="note.status" class="col-2 col-md-1 align-self-center">
+              <div class="btn-group">
+                <button
+                  class="btn btn-sm btn-danger fixed-padding"
+                  (click)="deleteNote(note)"
+                  [disabled]="show_editable"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

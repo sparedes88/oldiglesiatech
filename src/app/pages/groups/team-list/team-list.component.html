@@ -1,0 +1,152 @@
+<div class="container" style="min-height: 700px;">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+            {{ totalGroups || 0 }}
+          </span>
+          <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/groups_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <div class="row col-12 mt-2 text-right">
+      <h5 class="text-citric col-8 mb-2 mt-3">
+        * This view only shows Teams.
+      </h5>
+      <div class="btn-group col-2 mb-2 mt-3">
+        <button
+          class="btn btn-tech"
+          (click)="addGroup(groupFormModal, group_form)"
+        >
+          Add group
+        </button>
+      </div>
+      <div class="btn-group col-2 mb-2 mt-3">
+        <button
+          class="btn btn-tech"
+          (click)="addCategory(categoryFormModal, group_category_form)"
+        >
+          Add category
+        </button>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12 mt-2 table-responsive-sm">
+      <table
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        class="table row-border hover mt-4"
+      >
+        <thead>
+          <tr>
+            <th width="100px">Group</th>
+            <th>Title</th>
+            <th>Short Desc.</th>
+            <th>Members</th>
+            <th>Settings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let group of groups">
+            <!-- routerLink="/groups/details/{{ group.idGroup }}" -->
+            <td>
+              <img
+                [src]="fixUrl(group.picture)"
+                [alt]="group.title"
+                class="responsive"
+                onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+              />
+            </td>
+            <td>
+              <b>{{ group.title }}</b>
+            </td>
+            <td>
+              {{ group.short_description }}
+            </td>
+            <td>
+              <li *ngFor="let item of group.members">
+                {{ item.name }}
+              </li>
+              <span *ngIf="group.members.length === 0">
+                <i> This group hasn't members assigned </i>
+              </span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <!-- <button class="btn btn-sm btn-info" disabled>
+                  <i class="fa fa-comments"></i>
+                </button> -->
+                <button
+                  class="btn btn-sm btn-primary"
+                  routerLink="/groups/details/{{ group.idGroup }}"
+                >
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button
+                  class="btn btn-success btn-sm"
+                  (click)="selectedGroup = group; editFormModal.open()"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="deleteGroup(group)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #groupFormModal
+  identifier="groupFormModal"
+  customClass="large-modal"
+>
+  <group-form
+    #group_form
+    (submit)="groupFormModal.close(); getGroups()"
+  ></group-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #editFormModal
+  identifier="editFormModal"
+  (onAnyCloseEvent)="selectedGroup = undefined"
+  customClass="large-modal"
+>
+  <group-form
+    *ngIf="selectedGroup"
+    [group]="selectedGroup"
+    (submit)="updateGroup()"
+  ></group-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #categoryFormModal
+  identifier="formModal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-group-category-form
+    #group_category_form
+    (onDismiss)="onModalDidDismiss(categoryFormModal, $event)"
+  >
+  </app-group-category-form>
+</ngx-smart-modal>

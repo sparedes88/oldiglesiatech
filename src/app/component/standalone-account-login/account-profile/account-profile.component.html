@@ -1,0 +1,1992 @@
+<div class="container page">
+  <!-- Data -->
+  <form [formGroup]="userFormGroup" (submit)="submitUpdate(userFormGroup)">
+    <div class="row mt-3 mb-3">
+      <!-- Profile pic -->
+      <div class="col-xs-12 col-md-3 text-center" #left_panel>
+        <div
+          class="mb-2"
+          [ngStyle]="{
+            width: 'calc(' + left_panel.offsetWidth + 'px - 30px)',
+            height: 'calc(' + left_panel.offsetWidth + 'px - 30px)'
+          }"
+        >
+          <div class="image">
+            <img
+              class="responsive-img rounded-circle"
+              [src]="tempPhoto || photoUrl"
+              alt="avatar"
+            />
+          </div>
+        </div>
+        <ng-container *ngIf="editMode">
+          <div class="form-group">
+            <label for="file">Choose File</label>
+            <input
+              class="form-control"
+              type="file"
+              accept="image/*"
+              id="file"
+              (change)="handleFileInput($event.target.files)"
+            />
+          </div>
+        </ng-container>
+        <!-- <h4 class="mt-4">{{ member?.nombre }} {{ member?.apellido }}</h4>
+        <span
+          *ngIf="member?.idUsuario"
+          class="badge badge-pill badge-{{
+            member?.estatus ? 'success' : 'warning'
+          }}"
+        >
+          {{ member?.estatus ? "Active" : "Inactive" }}
+        </span> -->
+        <div
+          class="nav flex-column nav-pills navbar-light"
+          id="v-pills-tab"
+          role="tablist"
+          aria-orientation="vertical"
+        >
+          <a
+            class="nav-link active text-muted my-1"
+            id="v-pills-home-tab"
+            data-toggle="pill"
+            href="#v-pills-home"
+            role="tab"
+            aria-controls="v-pills-home"
+            aria-selected="true"
+          >
+            Home
+          </a>
+          <a
+            class="nav-link text-muted my-1"
+            id="v-pills-info-tab"
+            data-toggle="pill"
+            href="#v-pills-info"
+            role="tab"
+            aria-controls="v-pills-info"
+            aria-selected="true"
+          >
+            My info
+          </a>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+
+          <a
+            *ngIf="(!loading_summary && summary.categories) || editMode"
+            class="nav-link text-muted my-1"
+            id="v-pills-categories-tab"
+            data-toggle="pill"
+            href="#v-pills-categories"
+            role="tab"
+            aria-controls="v-pills-categories"
+            aria-selected="false"
+          >
+            Categories
+          </a>
+          <a
+            *ngIf="(!loading_summary && summary.processes) || editMode"
+            class="nav-link text-muted my-1"
+            id="v-pills-process-tab"
+            data-toggle="pill"
+            href="#v-pills-process"
+            role="tab"
+            aria-controls="v-pills-process"
+            aria-selected="false"
+          >
+            Process
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.directories"
+            class="nav-link text-muted my-1"
+            id="v-pills-entries-tab"
+            data-toggle="pill"
+            href="#v-pills-entries"
+            role="tab"
+            aria-controls="v-pills-entries"
+            aria-selected="false"
+          >
+            Directories
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.levels"
+            class="nav-link text-muted my-1"
+            id="v-pills-levels-tab"
+            data-toggle="pill"
+            href="#v-pills-levels"
+            role="tab"
+            aria-controls="v-pills-levels"
+            aria-selected="false"
+          >
+            Levels
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.donations"
+            class="nav-link text-muted my-1"
+            id="v-pills-donations-tab"
+            data-toggle="pill"
+            href="#v-pills-donations"
+            role="tab"
+            aria-controls="v-pills-donations"
+            aria-selected="false"
+          >
+            Donations
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.groups"
+            class="nav-link text-muted my-1"
+            id="v-pills-groups-tab"
+            data-toggle="pill"
+            href="#v-pills-groups"
+            role="tab"
+            aria-controls="v-pills-groups"
+            aria-selected="false"
+          >
+            Groups
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.events"
+            class="nav-link text-muted my-1"
+            id="v-pills-events-tab"
+            data-toggle="pill"
+            href="#v-pills-events"
+            role="tab"
+            aria-controls="v-pills-events"
+            aria-selected="false"
+          >
+            Events
+          </a>
+          <a
+            *ngIf="!loading_summary && disciples.length > 0"
+            class="nav-link text-muted my-1"
+            id="v-pills-disciplers-tab"
+            data-toggle="pill"
+            href="#v-pills-disciplers"
+            role="tab"
+            aria-controls="v-pills-disciplers"
+            aria-selected="false"
+          >
+            Disciples
+          </a>
+          <a
+            *ngIf="!loading_summary && commitments.length > 0"
+            class="nav-link text-muted my-1"
+            id="v-pills-commitments-tab"
+            data-toggle="pill"
+            href="#v-pills-commitments"
+            role="tab"
+            aria-controls="v-pills-commitments"
+            aria-selected="false"
+          >
+            Commitments
+          </a>
+        </div>
+
+        <ng-container *ngIf="editMode">
+          <button type="submit" class="btn btn-success">Save</button>
+        </ng-container>
+
+        <ng-container *ngIf="!editMode && generated_qr_code">
+          <div class="row">
+            <!-- <span class="col-8 align-self-center text-right">
+            Scan this QR clicking on it and share it:
+          </span> -->
+            <div class="col-12 text-center">
+              <ngx-qrcode
+                #qr_code
+                (click)="shareQR(qr_code)"
+                style="width: 50px; height: 50px"
+                [qrc-value]="generated_qr_code"
+                [qrc-class]="'qrItemResize-dash'"
+                qrc-errorCorrectionLevel="M"
+              >
+              </ngx-qrcode>
+              <!-- <button (click)="shareQR(qr_code)" class="btn btn-sm btn-citric">
+                Copy QR
+              </button> -->
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <!-- General info -->
+      <div class="col-xs-12 col-md-9">
+        <div class="tab-content" id="v-pills-tabContent" [ngClass]="{'tab-no-scroll' : is_home}">
+          <!-- Home Tab -->
+          <button
+            type="button"
+            class="btn btn-success btn-sm float-right"
+            (click)="toggleEditMode()"
+            [ngClass]="{ 'btn-warning': editMode }"
+          >
+            {{ editMode ? "Cancel" : "Edit" }}
+          </button>
+          <div
+            class="tab-pane fade show active"
+            id="v-pills-home"
+            role="tabpanel"
+            aria-labelledby="v-pills-home-tab"
+          >
+            <div class="row">
+              <div *ngIf="week_events.length > 0" class="col-12 banner mb-4">
+                <h5 class="text-secondary">
+                  <span *ngIf="!edited_fields?.profile_confirm_your_assistance">
+                    {{ organization_setup?.profile_confirm_your_assistance }}
+                  </span>
+                  <div
+                    *ngIf="edited_fields?.profile_confirm_your_assistance"
+                    class="form-group"
+                  >
+                    <input
+                      type="text"
+                      [ngModelOptions]="{ standalone: true }"
+                      [(ngModel)]="
+                        organization_setup.profile_confirm_your_assistance
+                      "
+                      class="form-control"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="
+                        saveOrganizationSetupField(
+                          'profile_confirm_your_assistance'
+                        )
+                      "
+                    >
+                      <i class="fa fa-save text-success"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="
+                        cancelEditField('profile_confirm_your_assistance')
+                      "
+                    >
+                      <i class="fa fa-close text-danger"></i>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    *ngIf="
+                      (currentUser.isSuperUser || member?.idUserType === 1) &&
+                      !edited_fields?.profile_confirm_your_assistance
+                    "
+                    class="btn btn-sm"
+                    (click)="toggleEditField('profile_confirm_your_assistance')"
+                  >
+                    <i class="fa fa-edit text-info"></i>
+                  </button>
+                </h5>
+                <div
+                  *ngIf="memberId"
+                  [id]="'carouselEventProfile_' + memberId"
+                  class="carousel slide"
+                  data-ride="carousel"
+                  data-interval="3000"
+                >
+                  <div class="carousel-inner">
+                    <div
+                      [ngClass]="
+                        i == 0 ? 'carousel-item active' : 'carousel-item'
+                      "
+                      *ngFor="let event; let i = index; of: week_events"
+                    >
+                      <div class="row">
+                        <div class="col-12 col-md-10">
+                          <img
+                            class="d-block w-100"
+                            style="height: 100%"
+                            [src]="getCover(event, true)"
+                            [alt]="iglesia?.Nombre"
+                            onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+                          />
+                        </div>
+                        <div class="col-12 col-md-2">
+                          <div class="form-check ml-3">
+                            <input
+                              [(ngModel)]="event.is_member"
+                              [ngModelOptions]="{ standalone: true }"
+                              class="form-check-input"
+                              type="radio"
+                              id="true"
+                              [value]="true"
+                              (change)="handleEventCheck($event, event)"
+                            />
+                            <label class="form-check-label" for="true">
+                              Yes
+                            </label>
+                          </div>
+                          <div class="form-check ml-3">
+                            <input
+                              [(ngModel)]="event.is_member"
+                              [ngModelOptions]="{ standalone: true }"
+                              class="form-check-input"
+                              type="radio"
+                              id="false"
+                              [value]="false"
+                              (change)="handleEventCheck($event, event)"
+                            />
+                            <label class="form-check-label" for="false">
+                              No
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- <div class="carousel-caption d-none d-md-block"></div> -->
+                    </div>
+                  </div>
+                  <a
+                    *ngIf="week_events?.length > 1"
+                    class="carousel-control-prev"
+                    [href]="'#carouselEventProfile_' + memberId"
+                    role="button"
+                    data-slide="prev"
+                  >
+                    <span
+                      class="carousel-control-prev-icon"
+                      aria-hidden="true"
+                    ></span>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                  <a
+                    *ngIf="week_events?.length > 1"
+                    class="carousel-control-next"
+                    [href]="'#carouselEventProfile_' + memberId"
+                    role="button"
+                    data-slide="next"
+                  >
+                    <span
+                      class="carousel-control-next-icon"
+                      aria-hidden="true"
+                    ></span>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <h5 class="text-secondary" *ngIf="contact_forms.length > 0">
+                  <span *ngIf="!edited_fields?.profile_contact_text">
+                    {{ organization_setup?.profile_contact_text }}
+                  </span>
+                  <div
+                    *ngIf="edited_fields?.profile_contact_text"
+                    class="form-group"
+                  >
+                    <input
+                      type="text"
+                      [ngModelOptions]="{ standalone: true }"
+                      [(ngModel)]="organization_setup.profile_contact_text"
+                      class="form-control"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="
+                        saveOrganizationSetupField('profile_contact_text')
+                      "
+                    >
+                      <i class="fa fa-save text-success"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="cancelEditField('profile_contact_text')"
+                    >
+                      <i class="fa fa-close text-danger"></i>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    *ngIf="
+                      (currentUser.isSuperUser || member?.idUserType === 1) &&
+                      !edited_fields?.profile_contact_text
+                    "
+                    class="btn btn-sm"
+                    (click)="toggleEditField('profile_contact_text')"
+                  >
+                    <i class="fa fa-edit text-info"></i>
+                  </button>
+                </h5>
+                <a
+                  *ngFor="let form of contact_forms"
+                  class="text-muted"
+                  [href]="
+                    '/contact-forms/v2/' +
+                    form.id +
+                    '/view?idOrganization=' +
+                    currentUser?.idIglesia
+                  "
+                  target="_blank"
+                >
+                  <property-box
+                    class="m-0 form-item"
+                    [text]="form.name"
+                    label=""
+                  ></property-box>
+                </a>
+              </div>
+              <div class="col-12 col-md-6">
+                <h5 class="text-secondary" *ngIf="processes.length > 0">
+                  <span *ngIf="!edited_fields?.profile_progress_text">
+                    {{ organization_setup?.profile_progress_text }}
+                  </span>
+                  <div
+                    *ngIf="edited_fields?.profile_progress_text"
+                    class="form-group"
+                  >
+                    <input
+                      type="text"
+                      [ngModelOptions]="{ standalone: true }"
+                      [(ngModel)]="organization_setup.profile_progress_text"
+                      class="form-control"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="
+                        saveOrganizationSetupField('profile_progress_text')
+                      "
+                    >
+                      <i class="fa fa-save text-success"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="cancelEditField('profile_progress_text')"
+                    >
+                      <i class="fa fa-close text-danger"></i>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    *ngIf="
+                      (currentUser.isSuperUser || member?.idUserType === 1) &&
+                      !edited_fields?.profile_progress_text
+                    "
+                    class="btn btn-sm"
+                    (click)="toggleEditField('profile_progress_text')"
+                  >
+                    <i class="fa fa-edit text-info"></i>
+                  </button>
+                </h5>
+                <div class="list-group">
+                  <div class="card mb-2" *ngFor="let item of processes">
+                    <img
+                      #img_tag
+                      class="card-img-top"
+                      [src]="fixProcessUrl(item)"
+                    />
+                    <div class="card-body py-1">
+                      <small class="text-secondary">
+                        Aún te falta el
+                        {{ item.miss_percent | number : "1.0-2" }}% de '{{
+                          item.name
+                        }}'.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                *ngIf="memberId && groups_fa.length > 0"
+                [id]="'carouselGroups_' + memberId"
+                class="carousel slide col-12"
+                data-ride="carousel"
+                data-interval="3000"
+              >
+                <div class="carousel-inner">
+                  <div
+                    [ngClass]="
+                      i == 0 ? 'carousel-item active' : 'carousel-item'
+                    "
+                    *ngFor="let group; let i = index; of: groups_fa"
+                  >
+                    <div class="row">
+                      <div class="col-12">
+                        <!-- <img
+                          class="d-block w-100"
+                          style="height: 100%"
+                          [src]="fixGroupPicture(group, true)"
+                          [alt]="iglesia?.Nombre"
+                          onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+                        /> -->
+                        <div class="card mb-2">
+                          <div class="card-img">
+                            <img
+                              #img_tag
+                              class="card-img-top card-group"
+                              [src]="fixGroupPicture(group)"
+                              onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+                            />
+                          </div>
+                          <div class="card-body py-1 position-relative">
+                            <small class="text-secondary">
+                              {{ group.title }}
+                            </small>
+                            <div class="btn-actions">
+                              <button
+                                *ngIf="group.is_member"
+                                class="btn btn-sm btn-delete"
+                                (click)="removeFromGroup(group)"
+                              >
+                                <i class="fa fa-trash text-danger"></i>
+                              </button>
+                              <button
+                                *ngIf="!group.is_member"
+                                class="btn btn-sm btn-delete"
+                                (click)="sendRequestToJoin(group)"
+                              >
+                                <i class="fa fa-plus text-success"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="carousel-caption d-none d-md-block"></div> -->
+                  </div>
+                </div>
+                <a
+                  *ngIf="groups_fa?.length > 1"
+                  class="carousel-control-prev"
+                  [href]="'#carouselGroups_' + memberId"
+                  role="button"
+                  data-slide="prev"
+                >
+                  <span
+                    class="carousel-control-prev-icon"
+                    aria-hidden="true"
+                  ></span>
+                  <span class="sr-only">Previous</span>
+                </a>
+                <a
+                  *ngIf="groups_fa?.length > 1"
+                  class="carousel-control-next"
+                  [href]="'#carouselGroups_' + memberId"
+                  role="button"
+                  data-slide="next"
+                >
+                  <span
+                    class="carousel-control-next-icon"
+                    aria-hidden="true"
+                  ></span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </div>
+              <!-- <div class="col-12 row scroll-x flex-nowrap mx-0 p-0">
+                <div class="col-8 col-md-6" *ngFor="let group of groups_fa">
+                  <div class="card mb-2">
+                    <div class="card-img">
+                      <img
+                        #img_tag
+                        class="card-img-top card-group"
+                        [src]="fixGroupPicture(group)"
+                        onerror="this.onerror=null; this.src='/assets/img/default-cover-image.jpg'"
+                      />
+                    </div>
+                    <div class="card-body py-1">
+                      <small class="text-secondary">
+                        {{ group.title }}
+                      </small>
+                    </div>
+                    <div class="btn-actions">
+                      <button
+                        *ngIf="group.is_member"
+                        class="btn btn-sm btn-delete"
+                        (click)="removeFromGroup(group)"
+                      >
+                        <i class="fa fa-trash text-danger"></i>
+                      </button>
+                      <button
+                        *ngIf="!group.is_member"
+                        class="btn btn-sm btn-delete"
+                        (click)="sendRequestToJoin(group)"
+                      >
+                        <i class="fa fa-plus text-success"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+              <div class="w-100"></div>
+              <div class="col-12 col-md-6 mt-4" *ngIf="donation_forms.length > 0">
+                <h5 class="text-secondary">
+                  <span *ngIf="!edited_fields?.profile_donation_text">
+                    {{ organization_setup?.profile_donation_text }}
+                  </span>
+                  <div
+                    *ngIf="edited_fields?.profile_donation_text"
+                    class="form-group"
+                  >
+                    <input
+                      type="text"
+                      [ngModelOptions]="{ standalone: true }"
+                      [(ngModel)]="organization_setup.profile_donation_text"
+                      class="form-control"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="
+                        saveOrganizationSetupField('profile_donation_text')
+                      "
+                    >
+                      <i class="fa fa-save text-success"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm"
+                      (click)="cancelEditField('profile_donation_text')"
+                    >
+                      <i class="fa fa-close text-danger"></i>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    *ngIf="
+                      (currentUser.isSuperUser || member?.idUserType === 1) &&
+                      !edited_fields?.profile_donation_text
+                    "
+                    class="btn btn-sm"
+                    (click)="toggleEditField('profile_donation_text')"
+                  >
+                    <i class="fa fa-edit text-info"></i>
+                  </button>
+                </h5>
+                <a
+                  *ngFor="let form of donation_forms"
+                  class="text-muted"
+                  [href]="
+                    '/donations/' +
+                    currentUser.idIglesia +
+                    '/v2/' +
+                    form.id +
+                    '?login=true'
+                  "
+                  target="_blank"
+                >
+                  <property-box
+                    class="m-0 form-item"
+                    [text]="form.name"
+                    label=""
+                  ></property-box>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="v-pills-info"
+            role="tabpanel"
+            aria-labelledby="v-pills-info-tab"
+          >
+            <ng-template [ngIf]="!loadingMember">
+              <div style="display: flex; justify-content: space-between">
+                <h3 class="font-weight-bold text-muted">
+                  Personal Information
+                </h3>
+                <!-- <button
+                type="button"
+                class="btn btn-success btn-sm"
+                (click)="toggleEditMode()"
+                [ngClass]="{ 'btn-warning': editMode }"
+              >
+                {{ editMode ? "Cancel" : "Edit" }}
+              </button> -->
+              </div>
+
+              <div class="property-box-list">
+                <ng-container *ngIf="!editMode">
+                  <property-box
+                    [text]="member?.nombre + ' ' + member?.apellido"
+                    label="Name"
+                  ></property-box>
+
+                  <property-box
+                    *ngIf="member?.fechaNacimiento"
+                    text="{{ member?.fechaNacimiento | date : 'MM-dd-yyyy' }}"
+                    label="Birth date"
+                  ></property-box>
+
+                  <property-box
+                    *ngIf="member?.estadoCivil"
+                    [text]="
+                      (member?.estadoCivil | lowercase) == 'casado' ||
+                      (member?.estadoCivil | lowercase) == 'casada'
+                        ? 'Married'
+                        : 'Single'
+                    "
+                    label="Marital status"
+                  ></property-box>
+
+                  <!-- <property-box [text]="member?.sexo" label="Sex"></property-box> -->
+                  <property-box
+                    *ngIf="member?.sexo"
+                    [text]="
+                      member?.sexo
+                        ? member?.sexo == 'Masculino'
+                          ? 'Male'
+                          : 'Female'
+                        : 'Unset'
+                    "
+                    label="Sex"
+                  ></property-box>
+                </ng-container>
+                <!-- AQUI COMIENZA -->
+                <!-- If edit mode -->
+                <ng-container *ngIf="editMode">
+                  <div class="form-group">
+                    <label for="first_name">
+                      First name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Member's first name"
+                      formControlName="nombre"
+                      [class.is-invalid]="
+                        userFormGroup.get('nombre').touched &&
+                        userFormGroup.get('nombre').invalid
+                      "
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>
+                      Last name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Member's last name"
+                      formControlName="apellido"
+                      [class.is-invalid]="
+                        userFormGroup.get('apellido').touched &&
+                        userFormGroup.get('apellido').invalid
+                      "
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Birthdate</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      placeholder="Member's Birthdate"
+                      formControlName="fechaNacimiento"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Marital status</label>
+                    <select class="form-control" formControlName="estadoCivil">
+                      <option value="Soltero">Single</option>
+                      <option value="Casado">Married</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Sex</label>
+                    <select class="form-control" formControlName="sexo">
+                      <option value="Masculino">Male</option>
+                      <option value="Femenino">Female</option>
+                    </select>
+                  </div>
+
+                  <!-- <div class="form-group">
+                    <label> Password </label>
+                    <input
+                      type="password"
+                      class="form-control"
+                      placeholder="Leave it blank if no change"
+                      formControlName="password"
+                      [class.is-invalid]="
+                        userFormGroup.get('password').touched &&
+                        userFormGroup.get('password').invalid
+                      "
+                    />
+                  </div>
+                  <div>
+                    <span
+                      class="text-danger"
+                      *ngIf="userFormGroup.get('password').invalid"
+                    >
+                      * Please fill this info (Min 6 characters)
+                    </span>
+                  </div> -->
+
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idUserType">
+                      Role <span class="text-danger">*</span>
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_user_type_select
+                      placeholder="Select an user type"
+                      [data]="user_types"
+                      [settings]="selectUserTypeOptions"
+                      formControlName="idUserType"
+                    ></ng-multiselect-dropdown>
+                  </div>
+                </ng-container>
+              </div>
+
+              <hr />
+
+              <h3 class="font-weight-bold text-muted mt-4">
+                Contact Information
+              </h3>
+              <div class="property-box-list">
+                <ng-container *ngIf="!editMode">
+                  <property-box
+                    [text]="member?.email"
+                    label="Email"
+                  ></property-box>
+                  <property-box
+                    [text]="member?.country_code"
+                    [label]="member?.flag || 'Country Code'"
+                    [show_as_icon]="member?.flag ? true : false"
+                  ></property-box>
+                  <property-box
+                    [text]="member?.telefono"
+                    label="Phone"
+                  ></property-box>
+                </ng-container>
+                <!-- Edit mode -->
+                <ng-container *ngIf="editMode">
+                  <div class="form-group">
+                    <label for="estimated">
+                      Country Code <span class="text-danger">*</span>
+                    </label>
+                    <app-custom-select-country
+                      [return_value]="'callingCode'"
+                      formControlName="country_code"
+                      [idOrganization]="member?.idIglesia"
+                      [preselected_country_code]="member?.country_code"
+                    >
+                    </app-custom-select-country>
+                  </div>
+                  <div class="form-group">
+                    <label> Phone <span class="text-danger">*</span> </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Member's phone"
+                      formControlName="telefono"
+                      mask="(000) 000-0000"
+                      [dropSpecialCharacters]="false"
+                      [class.is-invalid]="
+                        userFormGroup.get('telefono').touched &&
+                        userFormGroup.get('telefono').invalid
+                      "
+                    />
+                  </div>
+                </ng-container>
+              </div>
+
+              <hr />
+
+              <h3
+                *ngIf="
+                  editMode ||
+                  (member?.calle ||
+                    member?.ciudad ||
+                    member?.provincia ||
+                    member?.country)
+                "
+                class="font-weight-bold text-muted mt-4"
+              >
+                Address
+              </h3>
+              <div class="property-box-list">
+                <ng-container
+                  *ngIf="
+                    !editMode &&
+                    (member?.calle ||
+                      member?.ciudad ||
+                      member?.provincia ||
+                      member?.country)
+                  "
+                >
+                  <property-box
+                    *ngIf="member?.calle"
+                    [text]="member?.calle"
+                    label="Street"
+                  ></property-box>
+                  <property-box
+                    *ngIf="member?.ciudad"
+                    [text]="member?.ciudad"
+                    label="City"
+                  ></property-box>
+                  <property-box
+                    *ngIf="member?.provincia"
+                    [text]="member?.provincia"
+                    label="State"
+                  ></property-box>
+                  <property-box
+                    *ngIf="member?.country"
+                    [text]="member?.country"
+                    label="Country"
+                  ></property-box>
+                </ng-container>
+                <ng-container *ngIf="editMode">
+                  <div class="form-group">
+                    <label class="col-12">
+                      <span style="pointer-events: none"> Address </span>
+                    </label>
+                    <div class="input-group">
+                      <google-address-component
+                        *ngIf="editMode"
+                        [value]="userFormGroup.get('full_address').value"
+                        placeholder="Please type the location info about this member."
+                        adressType="address"
+                        (setAddress)="getUserAddress(userFormGroup, $event)"
+                      ></google-address-component>
+                    </div>
+                    <span
+                      class="text-danger error-span"
+                      *ngIf="userFormGroup.get('ciudad').invalid"
+                    >
+                      * Please fill this info
+                    </span>
+                  </div>
+                </ng-container>
+              </div>
+
+              <div class="my-3" *ngIf="currentUser.idUserType === 2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger col-12"
+                  (click)="logOut()"
+                >
+                  Log out
+                </button>
+              </div>
+            </ng-template>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-categories"
+            role="tabpanel"
+            aria-labelledby="v-pills-categories-tab"
+          >
+            <h3 class="font-weight-bold text-muted">Categories</h3>
+            <div *ngIf="!editMode" class="badge-group">
+              <span
+                *ngFor="let category of categories"
+                class="badge badge-pill badge-primary"
+              >
+                {{ category.descripcion }}
+              </span>
+              <div
+                class="no-records-found"
+                *ngIf="!categories?.length && !loadingEvents"
+              >
+                No records found.
+              </div>
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-process"
+            role="tabpanel"
+            aria-labelledby="v-pills-process-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Process</h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size':
+                  !member.fixed_proccesses?.length && !loadingEvents
+              }"
+            >
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%; margin-bottom: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+              <div *ngIf="!editMode" class="list-group">
+                <div *ngFor="let item of member.fixed_proccesses">
+                  <div>
+                    {{ item.name }}
+                  </div>
+                  <mat-accordion
+                    *ngFor="let nivel of item.levels; let i = index"
+                  >
+                    <mat-expansion-panel #accordion [expanded]="true">
+                      <mat-expansion-panel-header
+                        (click)="verRequisitos(nivel, accordion)"
+                      >
+                        {{ nivel.descripcion }}
+                        <span
+                          *ngIf="nivel.requisitos?.length > 0"
+                          class="badge badge-pill fixed-badge"
+                          [ngClass]="
+                            nivel.requisitosCumplidos.length !=
+                            nivel.requisitos.length
+                              ? 'badge-primary'
+                              : 'badge-success'
+                          "
+                        >
+                          <span *ngIf="nivel.requisitosCumplidos?.length > 0">
+                            {{ nivel.requisitosCumplidos.length || 0 }}/
+                          </span>
+                          {{ nivel.requisitos.length }}
+                        </span>
+                      </mat-expansion-panel-header>
+                      <div class="list-fixed">
+                        <div
+                          *ngFor="let requisito of nivel.requisitos"
+                          style="cursor: pointer"
+                          (click)="
+                            openModalDetail(
+                              see_step_detail_modal,
+                              see_step_form,
+                              requisito
+                            )
+                          "
+                        >
+                          <div class="row mb-3">
+                            <div class="font-weight-bold col-9">
+                              {{ requisito.descripcion }}
+                            </div>
+                            <mat-slide-toggle
+                              class="col-2"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="true"
+                              [(ngModel)]="requisito.cumplido"
+                              [ngModelOptions]="{ standalone: true }"
+                            >
+                              <!-- {{ requisito.descripcion }} -->
+                            </mat-slide-toggle>
+                          </div>
+                        </div>
+                        <div style="text-align: right">
+                          <button
+                            type="button"
+                            class="btn btn-outline-citric btn-sm"
+                            (click)="
+                              openRequirements(
+                                form_check_modal,
+                                check_requirements_form,
+                                nivel,
+                                i
+                              )
+                            "
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+
+                  <div
+                    class="no-records-found"
+                    *ngIf="!item.levels?.length && !loadingEvents"
+                  >
+                    No levels found.
+                  </div>
+                </div>
+
+                <div
+                  class="no-records-found"
+                  *ngIf="!member.fixed_proccesses?.length && !loadingEvents"
+                >
+                  No records found.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-entries"
+            role="tabpanel"
+            aria-labelledby="v-pills-entries-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">
+              Entries and directories
+            </h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size':
+                  !community_info.directories.length &&
+                  !community_info.entries.length
+              }"
+            >
+              <h6 *ngIf="community_info.directories.length">Directories</h6>
+              <div class="list-group" *ngIf="community_info.directories.length">
+                <li
+                  *ngFor="let event of community_info.directories"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="goToCommunityBox(event)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">{{ event.name }}</div>
+                  </div>
+                </li>
+                <!-- <div
+                  class="no-records-found"
+                  *ngIf="!community_info.directories.length"
+                >
+                  No directories found.
+                </div> -->
+              </div>
+
+              <h6 *ngIf="community_info.entries.length">Entries</h6>
+              <div class="list-group" *ngIf="community_info.entries.length">
+                <li
+                  *ngFor="let event of community_info.entries"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="openEditModalEntry(event)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">
+                      {{ event.business_name }}
+                    </div>
+                  </div>
+                </li>
+                <div
+                  class="no-records-found"
+                  *ngIf="!community_info.entries.length"
+                >
+                  No entries found.
+                </div>
+              </div>
+
+              <div
+                class="list-group"
+                *ngIf="
+                  !community_info.directories.length &&
+                  !community_info.entries.length
+                "
+              >
+                <div class="no-records-found">No info found.</div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-levels"
+            role="tabpanel"
+            aria-labelledby="v-pills-levels-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Member Levels</h3>
+            <div class="badge-group">
+              <span
+                *ngFor="let level of levels"
+                class="badge badge-pill badge-info"
+              >
+                {{ level.descripcion }}
+              </span>
+              <div
+                class="no-records-found"
+                *ngIf="!levels?.length && !loadingEvents"
+              >
+                No records found.
+              </div>
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-donations"
+            role="tabpanel"
+            aria-labelledby="v-pills-donations-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">
+              Donations made&nbsp;<br />
+            </h3>
+            <div
+              class="col-12"
+              [ngClass]="{ 'fixed-scroll-size': !donations?.length }"
+            >
+              <div *ngFor="let iglesia of donations">
+                <h6 class="text-muted mt-3">{{ iglesia.name }}</h6>
+                <ul class="list-group">
+                  <li
+                    *ngFor="let event of iglesia.donations"
+                    class="list-group-item"
+                    (click)="(null)"
+                  >
+                    <p>
+                      <small class="text-citric">
+                        <span style="float: left"
+                          >{{
+                            event.manual_date ||
+                              (event.date | date : "MMM. dd yyyy")
+                          }}
+                          {{ event.manual }}</span
+                        >
+                        <span class="text-citric" style="float: right"
+                          >&nbsp;{{ " $"
+                          }}{{ event.amount || "Not provided" }}</span
+                        >
+                      </small>
+                    </p>
+                  </li>
+                  <li class="list-group-item">
+                    <p>
+                      <span style="float: left">Total:</span>
+                      <span style="float: right"
+                        >${{ iglesia.total || "Not provided" }}</span
+                      >
+                    </p>
+                  </li>
+                  <div class="no-records-found" *ngIf="!donations?.length">
+                    No records found.
+                  </div>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-commitments"
+            role="tabpanel"
+            aria-labelledby="v-pills-commitments-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">
+              Commitments
+              <br />
+              <small>(Only previous and actual records will show) </small>
+            </h3>
+            <div>
+              <ng-template>
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+              <div
+                class="list-group scrollable-y"
+                [ngClass]="{ 'fixed-scroll-size': !commitments.length }"
+              >
+                <li
+                  *ngFor="let commitment of commitments"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                >
+                  <p class="mb-1">
+                    {{ commitment.name }}
+                  </p>
+                  <div class="d-flex w-100 justify-content-between">
+                    <!-- <small class="text-muted">
+                    {{ commitment.accomplished }}
+                  </small> -->
+
+                    <div class="col-8 align-self-center text-left mb-4">
+                      <input
+                        type="checkbox"
+                        [id]="'acceptance_' + commitment.idUserCommitmentRecord"
+                        name="customRadio"
+                        class="custom-control-input"
+                        [checked]="commitment.accomplished"
+                      />
+                      <span class="checkmark"></span>
+                      <label
+                        style="cursor: pointer"
+                        class="custom-control-label"
+                        [for]="
+                          'acceptance_' + commitment.idUserCommitmentRecord
+                        "
+                      >
+                        Accomplished
+                      </label>
+                    </div>
+
+                    <small>
+                      {{ commitment.commitment_date | date : "MMM. dd yyyy" }}
+                    </small>
+                  </div>
+                </li>
+
+                <div class="no-records-found" *ngIf="commitments.length === 0">
+                  No commitments found.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-groups"
+            role="tabpanel"
+            aria-labelledby="v-pills-groups-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Groups</h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size': !groups?.length && !loadingGroups
+              }"
+            >
+              <ng-template [ngIf]="loadingGroups">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%; margin-bottom: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+
+              <div class="list-group">
+                <li
+                  *ngFor="let group of groups"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="goToGroupDetail(group)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">{{ group.title }}</div>
+                    <span>
+                      <span
+                        class="badge badge-pill badge-{{
+                          group.status ? 'success' : 'warning'
+                        }}"
+                      >
+                        {{ group.status ? "Active" : "Inactive" }}
+                      </span>
+                    </span>
+                  </div>
+                  <p class="mb-1">
+                    {{ group.short_description || "Not provided" }}
+                  </p>
+                  <div class="d-flex w-100 justify-content-between">
+                    <small class="text-muted">
+                      {{ group.member_since | date : "MMM. dd yyyy" }}
+                    </small>
+                    <small>{{ group.level_access }}</small>
+                  </div>
+                </li>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="v-pills-events"
+            role="tabpanel"
+            aria-labelledby="v-pills-events-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Next Events</h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size': !events?.length && !loadingGroups
+              }"
+            >
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+
+              <div class="list-group">
+                <li
+                  *ngFor="let event of events"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="goToGroupEventDetail(event.meta)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">
+                      {{ event.meta.name }}
+                    </div>
+                    <!-- <span>
+                    <span
+                      class="badge badge-pill badge-{{
+                        event.status ? 'success' : 'warning'
+                      }}"
+                    >
+                      {{ event.status ? "Active" : "Inactive" }}
+                    </span>
+                  </span> -->
+                  </div>
+                  <p class="mb-1">
+                    {{ event.meta.description || "Not provided" }}
+                  </p>
+                  <div class="d-flex w-100 justify-content-between">
+                    <small class="text-citric">
+                      {{ event.start | date : "MMM. dd yyyy" }}
+                      <span
+                        *ngIf="event.end && checkDate(event.start, event.end)"
+                      >
+                        - {{ event.end | date : "MMM. dd yyyy" }}</span
+                      >
+                      <br />
+                      {{ event.start | date : "hh:mm a" }}
+                      <span *ngIf="event.end">
+                        - {{ event.end | date : "hh:mm a" }}</span
+                      >
+                    </small>
+                  </div>
+                </li>
+                <div
+                  class="no-records-found"
+                  *ngIf="!events?.length && !loadingGroups"
+                >
+                  No records found.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="v-pills-disciplers"
+            role="tabpanel"
+            aria-labelledby="v-pills-disciplers-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">My Disciplers</h3>
+            <!-- Disciples -->
+            <div>
+              <ng-template>
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+              <div
+                class="list-group scrollable-y"
+                [ngClass]="{ 'fixed-scroll-size': !disciples.length }"
+              >
+                <li
+                  *ngFor="let disciple of disciples"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  [routerLink]="[
+                    '/discipler-builder/' + disciple.id + '/notes'
+                  ]"
+                  routerLinkActive="router-link-active"
+                >
+                  <p class="mb-1">
+                    {{ disciple.full_name }}
+                  </p>
+                </li>
+
+                <div class="no-records-found" *ngIf="disciples.length === 0">
+                  No disciples found.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template [ngIf]="loadingMember">
+          <div class="d-flex justify-content-center" style="margin-top: 15%">
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        </ng-template>
+      </div>
+      <!-- Member details -->
+      <div class="col-xs-12 col-md-4">
+        <div class="iglesiaSelector mb-3" *ngIf="iglesias?.length > 1">
+          <h6 class="font-weight-bold text-muted">Organizations</h6>
+          <ng-multiselect-dropdown
+            [placeholder]="'Select an Organization'"
+            [data]="iglesias || []"
+            [settings]="selectOpts"
+            (onSelect)="selectIglesia($event)"
+            [(ngModel)]="selectedIglesia"
+            [ngModelOptions]="{ standalone: true }"
+          >
+          </ng-multiselect-dropdown>
+        </div>
+
+        <!-- <h6 class="font-weight-bold text-muted mt-3">Events</h6>
+      <ng-template [ngIf]="loadingEvents">
+        <div class="d-flex justify-content-center" style="margin-top: 15%;">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+      </ng-template>
+
+      <div class="list-group">
+        <li
+          *ngFor="let event of events"
+          class="list-group-item list-group-item-action flex-column align-items-start"
+        >
+          <div class="d-flex w-100 justify-content-between">
+            <div class="font-weight-bold mb-1">{{ event.titulo }}</div>
+            <span>
+              <span
+                class="badge badge-pill badge-{{
+                  event.estatus ? 'success' : 'warning'
+                }}"
+              >
+                {{ event.estatus ? "Active" : "Inactive" }}
+              </span>
+            </span>
+          </div>
+          <p class="mb-1">
+            {{ event.descripcion }}
+          </p>
+          <div class="d-flex w-100 justify-content-between">
+            <small class="text-muted">
+              {{ event.frecuencia }} - {{ event.hora }}
+            </small>
+            <small>{{ event.nivelAcceso }}</small>
+          </div>
+        </li>
+        <div class="no-records-found" *ngIf="!events?.length && !loadingEvents">
+          No records found.
+        </div>
+      </div> -->
+      </div>
+    </div>
+  </form>
+</div>
+<ngx-smart-modal
+  #form_check_modal
+  identifier="form_edit_modal"
+  [dismissable]="false"
+  [closable]="false"
+>
+  <app-check-requirements
+    #check_requirements_form
+    (onDismiss)="onModalCheckDidDismiss(form_check_modal, $event)"
+  >
+  </app-check-requirements>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #see_step_detail_modal
+  identifier="see_step_detail_modal"
+  customClass="large-modal"
+>
+  <!-- [dismissable]="false"
+  [closable]="false"
+  [escapable]="false" -->
+  <app-see-step-detail
+    #see_step_form
+    (onDismiss)="onModalEditDidDismiss(see_step_detail_modal, undefined)"
+  >
+  </app-see-step-detail>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #entryFormModal
+  identifier="entryFormModal"
+  (onAnyCloseEvent)="entryFormGroup.reset()"
+>
+  <h4>Add community</h4>
+  <form (ngSubmit)="submitEntry(entryFormGroup)" #entryFormGroup="ngForm">
+    <div class="text-center" *ngIf="entryForm.photo">
+      <img [src]="entryForm.photo" alt="" class="img-circle" />
+    </div>
+    <div class="form-group">
+      <label>Profile Photo</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="photo">
+            <i class="fa fa-image"></i>
+          </span>
+        </div>
+        <input
+          type="file"
+          name="photo"
+          class="form-control"
+          accept="image/*"
+          (change)="addPhoto($event.target.files[0])"
+          #photo_input
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="business_name">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Name"
+          name="business_name"
+          required
+          [(ngModel)]="entryForm.business_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact First Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_first_name">
+            <i class="fa fa-user-alt"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Contact First Name"
+          name="contact_first_name"
+          required
+          [(ngModel)]="entryForm.contact_first_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact Last Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_last_name">
+            <i class="fa fa-user-alt"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Contact last Name"
+          name="contact_last_name"
+          required
+          [(ngModel)]="entryForm.contact_last_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Summary*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="business_summary">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="business_summary"
+          name="business_summary"
+          required
+          [(ngModel)]="entryForm.business_summary"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Categories</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="industry">
+            <i class="fa fa-building"></i>
+          </span>
+        </div>
+        <ng-select
+          [items]="categories"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [searchable]="true"
+          placeholder="Select categories"
+          [(ngModel)]="entryForm.industry"
+          [ngModelOptions]="{ standalone: true }"
+          [addTag]="true"
+        >
+        </ng-select>
+      </div>
+    </div>
+
+    <!-- <div class="form-group">
+      <label>Group entry by</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="entry_groups">
+            <i class="fa fa-building"></i>
+          </span>
+        </div>
+        <ng-select
+          bindLabel="name"
+          bindValue="idEntryGroup"
+          [items]="entry_groups"
+          [multiple]="false"
+          [closeOnSelect]="true"
+          [searchable]="true"
+          placeholder="Select a group"
+          [(ngModel)]="entryForm.idEntryGroup"
+          [ngModelOptions]="{ standalone: true }"
+          [addTag]="false"
+        >
+        </ng-select>
+      </div>
+    </div> -->
+
+    <div class="form-group">
+      <label>Phone</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="phone">
+            <i class="fa fa-phone"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Phone"
+          name="phone"
+          [(ngModel)]="entryForm.phone"
+          [dropSpecialCharacters]="false"
+          mask="(000) 000-0000"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact email</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_email">
+            <i class="fa fa-at"></i>
+          </span>
+        </div>
+        <input
+          type="email"
+          class="form-control"
+          placeholder="Contact email"
+          name="contact_email"
+          [(ngModel)]="entryForm.contact_email"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Location</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="locations">
+            <i class="fa fa-map-marker"></i>
+          </span>
+        </div>
+        <google-address-component
+          *ngIf="entryFormModal.isVisible()"
+          (setAddress)="getAddress($event)"
+          adressType="geocode"
+          [value]="entryForm.locations"
+        ></google-address-component>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Radius (miles)</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="radius">
+            <i class="fa fa-circle"></i>
+          </span>
+        </div>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          class="form-control"
+          placeholder="Range radius"
+          name="radius"
+          [(ngModel)]="entryForm.radius"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Website</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="website">
+            <i class="fa fa-address-card"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Website"
+          name="website"
+          [(ngModel)]="entryForm.website"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Instagram</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="instagram">
+            <i class="socicon-instagram"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Instagram"
+          name="instagram"
+          [(ngModel)]="entryForm.instagram"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Twitter</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="twitter">
+            <i class="socicon-twitter"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Twitter"
+          name="twitter"
+          [(ngModel)]="entryForm.twitter"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Facebook</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="facebook">
+            <i class="socicon-facebook"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Facebook"
+          name="facebook"
+          [(ngModel)]="entryForm.facebook"
+        />
+      </div>
+    </div>
+
+    <!-- <div class="form-group">
+      <div class="col-12">
+        <ng-multiselect-dropdown
+          placeholder="Select your users"
+          [data]="available_users"
+          [settings]="selectCatOptions"
+          [(ngModel)]="entryForm.assigned_users"
+          [ngModelOptions]="{standalone: true}"
+        ></ng-multiselect-dropdown>
+      </div>
+      <small class="col-12 text-citric">*Only members unassigned to directory are available.</small>
+    </div> -->
+
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        name="featured"
+        [(ngModel)]="entryForm.featured"
+        id="featuredCheck"
+      />
+      <label class="form-check-label" for="featuredCheck">Featured</label>
+    </div>
+    <div class="form-group">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="entryFormGroup.invalid || saving"
+      >
+        <i class="fa fa-paper-plane"></i>
+        {{ saving ? "Please wait..." : "Save entry" }}
+      </button>
+    </div>
+  </form>
+</ngx-smart-modal>

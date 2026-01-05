@@ -1,0 +1,48 @@
+<form style="width: 100%" [formGroup]="get_started_form">
+  <div
+    class="row justify-content-center align-content-center"
+    style="min-height: 500px"
+  >
+    <div class="col-9 align-self-center">
+      <h2 class="text-citric text-center" *ngIf="!currentUser">
+        {{ 'login.get_started' | translate | uppercase }}
+      </h2>
+      <h6 class="text-citric text-center">
+        <span [innerHTML]="header_message"></span>
+      </h6>
+
+      <div class="input-group mb-2">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            <i
+              class="fa fa-at"
+              [ngClass]="
+                get_started_form.get('login_type').value === 'phone'
+                  ? 'fa-phone-alt'
+                  : 'fa-at'
+              "
+            ></i>
+          </div>
+        </div>
+        <input
+          class="form-control col-12"
+          type="text"
+          formControlName="value_to_verify"
+          required
+          (keyup)="checkType()"
+          (keydown.enter)="validateInputType()"
+        />
+      </div>
+    </div>
+    <div class="col-9 text-center align-self-center">
+      <button
+        class="btn btn-sm btn-citric"
+        type="button"
+        [disabled]="get_started_form.get('value_to_verify').invalid"
+        (click)="validateInputType()"
+      >
+        {{ login_text_button }}
+      </button>
+    </div>
+  </div>
+</form>

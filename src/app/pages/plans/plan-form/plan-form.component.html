@@ -1,0 +1,81 @@
+<div class="row">
+  <div class="col-10"></div>
+  <div class="col-2">
+    <button class="btn btn-sm btn-outline-citric" (click)="close()">
+      Close
+    </button>
+  </div>
+
+  <form
+    style="width: 100%;"
+    #group_form="ngForm"
+    [formGroup]="plan_form"
+    (submit)="submitPlan(plan_form, group_form)"
+  >
+    <ng-template [ngIf]="!show_detail">
+      <div class="d-flex justify-content-center" style="margin: 15%;">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem;"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+
+    <div [hidden]="!show_detail" class="tab-content mb-3">
+      <div class="row">
+        <div class="col-12">
+          <!-- Name -->
+          <div class="form-group">
+            <label>Name <span class="text-danger"> * </span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="nombre"
+              placeholder="Plan name"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-md-12">
+          <!-- Description -->
+          <div class="form-group">
+            <label>Description</label>
+            <textarea
+              class="form-control"
+              formControlName="descripcion"
+            ></textarea>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <!-- Cost -->
+          <div class="form-group">
+            <label>Monthly Cost <span class="text-danger"> * </span></label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="precioMes"
+            />
+          </div>
+        </div>
+        <!-- Initial -->
+        <div class="col-12 col-md-6">
+          <div class="form-group">
+            <label>Initial Payment <span class="text-danger"> * </span> </label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="cuotaInicial"
+            />
+          </div>
+        </div>
+
+        <div class="col-12 mt-2 text-center">
+          <button class="btn btn-sm btn-success">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,93 @@
+<form style="width: 100%" [formGroup]="additional_form">
+  <div
+    class="row justify-content-center align-content-center"
+    style="min-height: 500px"
+  >
+    <div class="row justify-content-center col-9 align-self-center">
+      <h2 class="text-citric text-center">
+        {{ "events.how_many" | translate }}
+      </h2>
+      <h6 class="text-citric text-center"></h6>
+
+      <div class="col-10 text-center">
+        <label floating class="text-muted" class="width-fix">
+          {{ "events.how_many_disclaimer" | translate }}
+        </label>
+      </div>
+      <div
+        class="row col-10 align-items-center justify-content-center center-fix mb-2"
+      >
+        <div class="col-2 p-0 col-md-1 text-center align-self-stretch">
+          <button
+            [disabled]="additional_form.get('guests').value <= 0"
+            ion-button
+            (click)="addQuantity(-1)"
+            class="btn btn-outline-danger circular-button left"
+          >
+            <mat-icon matPrefix>remove</mat-icon>
+          </button>
+        </div>
+        <div class="col-8 p-0 col-md-6 align-self-stretch">
+          <div style="height: 100%" no-lines class="center-fix">
+            <input
+              style="height: 100%"
+              class="col-12 align-center-fixer text-center"
+              formControlName="guests"
+              type="number"
+              readonly
+              required
+            />
+          </div>
+        </div>
+        <div class="col-2 p-0 col-md-1 text-center align-self-stretch">
+          <button
+            (click)="addQuantity(1)"
+            ion-button
+            class="btn btn-outline-success circular-button right"
+          >
+            <mat-icon matPrefix>add</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="col-8 align-self-center text-left mb-4">
+        <input
+          type="checkbox"
+          id="acceptance"
+          name="customRadio"
+          class="custom-control-input"
+          formControlName="covid_quest"
+          [checked]="additional_form.get('covid_quest').value"
+          (click)="toggleAcceptace(additional_form, 'covid_quest')"
+        />
+        <span
+          class="checkmark"
+          (click)="toggleAcceptace(additional_form, 'covid_quest')"
+        ></span>
+        <label
+          style="cursor: pointer"
+          class="custom-control-label"
+          for="acceptance"
+        >
+          {{ "events.have_been_covid" | translate }}
+        </label>
+      </div>
+    </div>
+    <div class="w-100"></div>
+    <div class="col-6 text-center align-self-center">
+      <button
+        class="btn btn-sm btn-citric"
+        type="button"
+        [disabled]="additional_form.invalid"
+        (click)="acceptInvitation()"
+      >
+        {{ "generals.accept" | translate }}
+      </button>
+    </div>
+    <div class="col-6 text-center align-self-center">
+      <button class="btn btn-sm btn-secondary" type="button" [disabled]="true">
+        Events
+      </button>
+    </div>
+  </div>
+</form>

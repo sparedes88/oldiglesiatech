@@ -1,0 +1,145 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8">
+    <form [formGroup]="form_group">
+      <div class="row" *ngIf="record">
+        <div class="col-md-6 mb-3">
+          <label>Record date <span class="text-danger"> * </span></label>
+          <input
+            class="form-control"
+            type="datetime-local"
+            id="datetime"
+            name="datetime"
+            [(ngModel)]="report_date"
+            [ngModelOptions]="{ standalone: true }"
+            format="yyyy-MM-ddThh:mm"
+            required
+          />
+        </div>
+      </div>
+      <div class="row justify-content-center" formArrayName="optional_fields">
+        <div
+          class="col-12"
+          [formGroupName]="i"
+          *ngFor="let control of optional_field_array.controls; let i = index"
+        >
+          <div
+            [ngClass]="{
+              'form-group': control.value.input_type != 4,
+              'form-check': control.value.input_type == 4
+            }"
+          >
+            <label *ngIf="control.value.input_type != 4">
+              {{ control.value.name }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="value"
+              [class.is-invalid]="
+                control.get('value').touched && control.get('value').invalid
+              "
+              *ngIf="
+                control.value.input_type == 1 ||
+                control.value.input_type == 2 ||
+                control.value.input_type == 5 ||
+                control.value.input_type == 6
+              "
+            />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="value"
+              *ngIf="control.value.input_type == 3"
+              [class.is-invalid]="
+                control.get('value').touched && control.get('value').invalid
+              "
+            />
+            <input
+              type="checkbox"
+              class="form-check-input"
+              formControlName="value"
+              *ngIf="control.value.input_type == 4"
+              [class.is-invalid]="
+                control.get('value').touched && control.get('value').invalid
+              "
+            />
+            <small
+              class="text-danger"
+              *ngIf="
+                control.get('value').touched && control.get('value').invalid
+              "
+            >
+              <span *ngIf="control.get('value').hasError('required')">
+                Please fill this field
+              </span>
+              <span
+                *ngIf="
+                  (control.value.input_type == 1 ||
+                    control.value.input_type == 2 ||
+                    control.value.input_type == 5 ||
+                    control.value.input_type == 6) &&
+                  control.value.input_display_type == 1 &&
+                  control.get('value').hasError('pattern') &&
+                  !control.get('value').hasError('required')
+                "
+              >
+                This optional field only accepts integers.
+              </span>
+              <span
+                *ngIf="
+                  (control.value.input_type == 1 ||
+                    control.value.input_type == 2 ||
+                    control.value.input_type == 5 ||
+                    control.value.input_type == 6) &&
+                  control.value.input_display_type == 4 &&
+                  control.get('value').hasError('max') &&
+                  !control.get('value').hasError('required')
+                "
+              >
+                This optional field is set as percent, the max value accepted is
+                100.
+              </span>
+            </small>
+            <label
+              class="form-check-label"
+              *ngIf="control.value.input_type == 4"
+            >
+              {{ control.value.name }}
+            </label>
+          </div>
+        </div>
+
+        <!-- <div class="col-12 text-center">
+          <button
+            [disabled]="busy"
+            class="btn btn-sm btn-success"
+            (click)="submit()"
+          >
+            Save
+          </button>
+        </div> -->
+      </div>
+    </form>
+
+    <hr />
+
+    <span style="display: block; text-align: right; width: 100%" class="mb-2">
+      <button
+        type="button"
+        class="btn btn-sm btn-muted"
+        (click)="deactivateForm()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        [disabled]="busy"
+        (click)="submit()"
+        class="btn btn-sm btn-success"
+      >
+        Save
+      </button>
+    </span>
+  </div>
+</div>

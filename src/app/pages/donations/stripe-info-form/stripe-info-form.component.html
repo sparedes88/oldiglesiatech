@@ -1,0 +1,191 @@
+<div class="row">
+  <div class="col-12 text-right">
+    <button (click)="closeForm()" class="btn btn-sm btn-outline-citric">
+      Close
+    </button>
+  </div>
+</div>
+<form #projectForm="ngForm">
+  <!-- Address line 1 -->
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="form-group mb-0" style="display: flex; flex-direction: column">
+        <label for="public_key"
+          >Stripe's Public API Key:
+          {{
+            this.providedTokens.hasPublicKey &&
+            this.stripe_info.valid_public_key == 0
+              ? "Provided"
+              : ""
+          }}
+          {{
+            !this.providedTokens.hasPublicKey &&
+            this.stripe_info.valid_public_key == 0
+              ? "Not provided"
+              : ""
+          }}
+          {{ this.stripe_info.valid_public_key == 1 ? "Valid" : "" }}
+          {{ this.stripe_info.valid_public_key == 2 ? "Invalid" : "" }}
+          <i
+            *ngIf="
+              this.providedTokens.hasPublicKey &&
+              this.stripe_info.valid_public_key == 0
+            "
+            class="fa fa-check-circle"
+            style="color: dodgerblue"
+          ></i>
+          <i
+            *ngIf="
+              !this.providedTokens.hasPublicKey &&
+              this.stripe_info.valid_public_key == 0
+            "
+            class="fa fa-times-circle"
+            style="color: red"
+          ></i>
+          <i
+            *ngIf="this.stripe_info.valid_public_key == 1"
+            class="fa fa-check-circle"
+            style="color: limegreen"
+          ></i>
+          <i
+            *ngIf="this.stripe_info.valid_public_key == 2"
+            class="fa fa-times-circle"
+            style="color: orange"
+          ></i>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="public_key"
+          [(ngModel)]="stripe_info.public_key"
+          placeholder="pk_live_..."
+          (ngModelChange)="this.stripe_info.valid_public_key = 0"
+          [ngModelOptions]="{ standalone: true }"
+          [readOnly]="is_busy"
+        />
+        <label
+          *ngIf="
+            !stripe_info.public_key.startsWith('pk_live_') &&
+            !this.providedTokens.hasPublicKey
+          "
+          style="color: red"
+        >
+          This not a valid API Key. The key must start with "pk_live_"
+        </label>
+        <label
+          *ngIf="
+            !stripe_info.public_key.startsWith('pk_live_') &&
+            this.providedTokens.hasPublicKey
+          "
+          style="color: red"
+        >
+          If you provide another key, it will replace the existing API key. The
+          key must start with "pk_live_"
+        </label>
+      </div>
+      <!-- <button
+        class="btn btn-primary"
+        [disabled]="
+          stripe_info.public_key.length == 0 ||
+          !stripe_info.public_key.startsWith('pk_live_')
+        "
+        style="width: min-content"
+        (click)="initializeStripe()"
+      >
+        Check
+      </button> -->
+    </div>
+
+    <!-- Project Start Date -->
+    <div class="col-12 col-md-6">
+      <div class="form-group mb-0" style="display: flex; flex-direction: column">
+        <label for="public_key"
+          >Stripe's Public API Key:
+          {{
+            this.providedTokens.hasSecretKey &&
+            this.stripe_info.valid_secret_key == 0
+              ? "Provided"
+              : ""
+          }}
+          {{
+            !this.providedTokens.hasSecretKey &&
+            this.stripe_info.valid_secret_key == 0
+              ? "Not provided"
+              : ""
+          }}
+          {{ this.stripe_info.valid_secret_key == 1 ? "Valid" : "" }}
+          {{ this.stripe_info.valid_secret_key == 2 ? "Invalid" : "" }}
+          <i
+            *ngIf="
+              this.providedTokens.hasPublicKey &&
+              this.stripe_info.valid_secret_key == 0
+            "
+            class="fa fa-check-circle"
+            style="color: dodgerblue"
+          ></i>
+          <i
+            *ngIf="
+              !this.providedTokens.hasSecretKey &&
+              this.stripe_info.valid_secret_key == 0
+            "
+            class="fa fa-times-circle"
+            style="color: red"
+          ></i>
+          <i
+            *ngIf="this.stripe_info.valid_secret_key == 1"
+            class="fa fa-check-circle"
+            style="color: limegreen"
+          ></i>
+          <i
+            *ngIf="this.stripe_info.valid_secret_key == 2"
+            class="fa fa-times-circle"
+            style="color: orange"
+          ></i>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="secret_key"
+          [(ngModel)]="stripe_info.secret_key"
+          placeholder="sk_live_..."
+          [ngModelOptions]="{ standalone: true }"
+          [readOnly]="is_busy"
+        />
+        <label
+          *ngIf="
+            !stripe_info.secret_key.startsWith('sk_live_') &&
+            !this.providedTokens.hasSecretKey
+          "
+          style="color: red"
+        >
+          This not a valid API Key. The key must start with "sk_live_"
+        </label>
+        <label
+          *ngIf="
+            !stripe_info.secret_key.startsWith('sk_live_') &&
+            this.providedTokens.hasSecretKey
+          "
+          style="color: red"
+        >
+          If you provide another key, it will replace the existing API key. The
+          key must start with "sk_live_"
+        </label>
+      </div>
+      <!-- <button
+        class="btn btn-primary"
+        [disabled]="
+          stripe_info.secret_key.length == 0 ||
+          !stripe_info.secret_key.startsWith('sk_live_')
+        "
+        style="width: min-content"
+        (click)="checkSecretKey()"
+      >
+        Check
+      </button> -->
+    </div>
+    <!-- End Row -->
+    <div class="col-12 mt-4"><button [disabled]="is_busy" class="btn btn-sm btn-success" (click)="submit()">
+      Submit
+    </button></div>
+  </div>
+</form>

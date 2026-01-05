@@ -1,0 +1,163 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{
+        commitment?.idUserCommitmentManage
+          ? "Edit Commitment Setting"
+          : "Add Commitment"
+      }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+
+  <form class="col-12" #event_form="ngForm" [formGroup]="eventFormGroup">
+    <div class="row">
+      <!-- Left panel -->
+      <div class="row col-12">
+        <!-- Name -->
+        <div class="col-12 col-md-12">
+          <label>Name*</label>
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Commitment's Name"
+              formControlName="name"
+              required
+              [class.is-invalid]="
+                eventFormGroup.get('name').touched &&
+                eventFormGroup.get('name').invalid
+              "
+            />
+            <div class="input-group-append">
+              <span class="input-group-text">
+                <i class="fas fa-align-left"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-12">
+          <div class="mb-3">
+            <label>Frequency*</label>
+            <select
+              formControlName="idFrequency"
+              class="form-control"
+              required
+              (change)="onSelectFrequency()"
+              [class.is-invalid]="
+                eventFormGroup.get('idFrequency').touched &&
+                eventFormGroup.get('idFrequency').invalid
+              "
+            >
+              <option value="0">-- Select one option --</option>
+              <option *ngFor="let item of frequencies" [value]="item.id">
+                {{ item.name | translate }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <!-- Exact date -->
+
+        <div
+          class="col-md-12 mb-3"
+          *ngIf="selected_frequency && selected_frequency.is_exact_date"
+        >
+          <label>Commitment Date*</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="commitment_date"
+            required
+          />
+          <span class="text-citric error-span">
+            We do not recommend select a date before the actual. However, you can
+            select it if you need to create previous accomplisheds.
+          </span>
+        </div>
+        <!-- Not exact date -->
+        <div
+          class="col-12"
+          *ngIf="selected_frequency && !selected_frequency.is_exact_date"
+        >
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label> Current Week *: </label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="commitment_date"
+                required
+              />
+              <span
+                class="text-citric error-span"
+                *ngIf="eventFormGroup.get('commitment_date').invalid"
+              >
+                Select the day of the first commitment.
+              </span>
+              <span class="text-citric error-span">
+                We do not recommend select a date before the actual. However, you
+                can select it if you need to create previous accomplisheds.
+              </span>
+            </div>
+            <!-- <div class="col-12 col-md-6 mb-3 align-self-center">
+              <b> Select the days and time for each one </b>
+              <button class="btn btn-citric" (click)="addDay()" type="button">
+                Add
+              </button>
+            </div> -->
+
+            <div class="col-12 mb-3">
+              <label> Repeat until *: </label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="repeat_until_date"
+                required
+              />
+              <span
+                class="text-citric error-span"
+                *ngIf="eventFormGroup.get('repeat_until_date').invalid"
+              >
+                Select the finish date of this commitment.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-12 col-md-12">
+          <label>Description</label>
+          <div class="input-group mb-3">
+            <textarea
+              rows="5"
+              class="form-control"
+              formControlName="description"
+              placeholder="Write a description for the commitment"
+            ></textarea>
+            <div class="input-group-append">
+              <span class="input-group-text">
+                <i class="fas fa-align-left"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 mb-4">
+        <div class="col-12 text-center mt-3">
+          <button
+            [disabled]="eventFormGroup.invalid"
+            type="button"
+            (click)="submitLog()"
+            class="btn btn-sm btn-success"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

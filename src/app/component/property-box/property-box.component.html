@@ -1,0 +1,28 @@
+<div class="property-box">
+  <div class="content">
+    <div
+      #textarea
+      (input)="change($event)"
+      role="textarea"
+      class="text"
+      [ngClass]="{ 'not-provided': !text }"
+    >
+      {{ text || (label | titlecase) + " not provided" }}
+    </div>
+    <div class="label text-muted">
+      <span *ngIf="!show_as_icon">
+        {{ label }}
+      </span>
+      <span *ngIf="show_as_icon">
+        <img style="height: 18px;" [src]="label" alt="">
+      </span>
+    </div>
+  </div>
+</div>
+<span
+  class="text-danger"
+  *ngIf="label === 'State' && !text"
+  style="font-size: 12px; margin-top: -10px; display: block;"
+>
+  Please complete State as it is Required.
+</span>

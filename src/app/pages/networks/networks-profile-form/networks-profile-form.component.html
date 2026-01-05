@@ -1,0 +1,154 @@
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<div>
+  <div
+    *ngIf="networks.length > 0"
+    class="row"
+    [hidden]="show_form || loading"
+    cdkDropList
+    cdkDropListOrientation="vertical"
+    class="navbar-nav mr-auto"
+    (cdkDropListDropped)="dropLevel($event)"
+    [ngClass]="{ 'example-list': can_edit, 'flex-row flex-wrap': icon_only }"
+  >
+    <!-- <div
+      [cdkDragDisabled]="
+        !can_edit ||
+        item.idModule == 1 ||
+        item.idModule === -1 ||
+        item.fixed_id === 'my_account'
+      "
+      [cdkDragLockAxis]="'x'"
+      class="example-box"
+      *ngFor="let item of iglesia.header_items"
+      cdkDrag
+      style="display: flex; align-items: center"
+    ></div> -->
+    <div
+      [cdkDragDisabled]="!can_edit"
+      [cdkDragLockAxis]="'y'"
+      cdkDrag
+      class="p-0"
+      [ngClass]="{
+        'example-box': can_edit,
+        col: icon_only,
+        'col-12': !icon_only
+      }"
+      *ngFor="let net of networks"
+    >
+      <!-- (click)="net.event(iglesia[net.id])" -->
+      <div (click)="handleAction(net)" class="row m-0">
+        <!-- <img
+          *ngIf="is_live(net)"
+          class="on-live"
+          style="display: inline-block"
+          src="/assets/img/on_live.gif"
+          alt="Playing actually..."
+        /> -->
+        <div class="col-2 align-self-center">
+          <i
+            *ngIf="!net.is_custom_icon"
+            [ngClass]="net.icon_svg"
+            [ngStyle]="{
+              background: net.background_color,
+              color: net.text_color
+            }"
+            class="bigIcon rounded-circle"
+          ></i>
+          <img
+            class="bigIcon"
+            *ngIf="net.is_custom_icon"
+            [src]="fixUrl(net.icon_path)"
+          />
+        </div>
+        <div class="col-10 align-self-center text-left" *ngIf="!icon_only">
+          <h5 class="m-0">
+            {{ net.custom_name }}
+            <div class="btn-group" *ngIf="can_edit">
+              <button
+                *ngIf="can_edit"
+                class="btn btn-light edit-logo-btn"
+                (click)="
+                  updateNetworkOrganization(net); $event.stopPropagation()
+                "
+              >
+                <i class="fa fa-edit"></i>
+              </button>
+              <button
+                *ngIf="can_edit"
+                class="btn btn-danger edit-logo-btn edit-logo-btn-delete"
+                (click)="
+                  deleteNetworkOrganization(net); $event.stopPropagation()
+                "
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+
+            <div *ngIf="is_live(net)" class="btn-group">
+              <img
+                class="sound-bars"
+                style="display: inline-block"
+                src="/assets/img/on_live.gif"
+                alt="Playing actually..."
+              />
+              <small class="live-text"> LIVE </small>
+            </div>
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="is_edition_mode && !show_form" class="col-12 text-center">
+    <hr />
+    <button (click)="addNewNetwork()" class="btn btn-sm btn-success col-7">
+      <i class="fa fa-plus"> </i>
+    </button>
+  </div>
+  <div *ngIf="is_edition_mode && !show_form" class="col-12 text-center">
+    <hr />
+    <button
+      class="btn btn-sm btn-success"
+      (click)="showCategories(manage_networks_modal)"
+    >
+      Manage categories
+    </button>
+  </div>
+</div>
+
+<app-networks-organization-form
+  [idOrganization]="idOrganization"
+  [hidden]="!show_form"
+  #network_organization_form
+  (on_cancel)="cancelNetworkOrganizationForm()"
+  (make_refresh)="cancelNetworkOrganizationForm(); getNetworks()"
+>
+</app-networks-organization-form>
+
+<ngx-smart-modal
+  #manage_networks_modal
+  identifier="manage_networks_modal"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <ng-template [ngIf]="!show_form">
+    <app-networks-home
+      [display_as_modal]="true"
+      [idOrganization]="idOrganization"
+    >
+      <!-- (make_refresh)="getNetworks(iglesiaId || currentUser.idIglesia)" -->
+    </app-networks-home>
+  </ng-template>
+</ngx-smart-modal>

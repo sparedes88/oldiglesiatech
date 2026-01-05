@@ -1,0 +1,354 @@
+<div class="row" style="padding: 10px">
+  <ng-template [ngIf]="loading_colors">
+    <div
+      class="d-flex justify-content-center col-12"
+      style="margin-top: 10%; margin-bottom: 10%"
+    >
+      <div
+        style="
+          height: 120px;
+          width: 120px;
+          font-size: 15px;
+          border-width: 0.45em;
+        "
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div [hidden]="showing_more" class="col-12 mb-3" *ngIf="view_type === 'list'">
+    <div class="row mx-0">
+      <!--  Both views -->
+      <div *ngIf="settings?.both_views" class="col-12">
+        <div class="row">
+          <div class="col-12 col-lg-8" style="border-right: 1px solid #8f8f8f">
+            <h5 class="text-left">
+              {{ event_template_settings?.use_own_text ? event_template_settings?.events_text_header : (translate?.events || 'Eventos')}}
+
+            </h5>
+            <div class="row">
+              <div
+                class="col-12"
+                *ngFor="let event of events.standalone"
+                [routerLink]="getRouterForEvent(event)"
+              >
+                <div class="card" style="height: calc(100% - 15px)">
+                  <img
+                    class="card-cover-standalone"
+                    [src]="fixUrl(event.picture)"
+                    onError="this.src='assets/img/default-image.jpg'"
+                  />
+                  <div class="card-body">
+                    <h4
+                      [ngStyle]="{
+                        'text-align': style_settings?.home_title_text_align || 'left',
+                        color: style_settings?.home_title_text_color || '#000000',
+                        'font-weight':
+                        style_settings?.home_title_text_bold || 'bolder'
+                      }"
+                    >
+                      {{ event.name }}
+                    </h4>
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="card-sub-title bold">
+                          <span class="text-citric">
+                            {{ event.start_date }}
+                            <span *ngIf="event.end_date && !event.is_same_date">
+                              -
+                              {{ event.end_date }}</span
+                            >
+                            <br />
+                            <span *ngIf="!event.all_day">
+                              {{ event.start_time }}
+                              <span *ngIf="event.end_time">
+                                - {{ event.end_time }}</span
+                              >
+                            </span>
+                          </span>
+                        </div>
+                        <div class="card-title medium-text">
+                          {{ event.description }}
+                        </div>
+                      </div>
+                      <div class="col-xs-12 col-md-6"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-4">
+            <h5 class="text-left">
+              {{ event_template_settings?.use_own_text ? event_template_settings?.our_meetings_text : ( translate?.our_meetings || 'Nuestras Reuniones')}}
+            </h5>
+            <div class="row">
+              <div
+                class="col-12"
+                *ngFor="let event of events.periodic"
+                [routerLink]="getRouterForEvent(event)"
+              >
+                <div class="card" style="height: calc(100% - 15px)">
+                  <img
+                    class="card-cover"
+                    [src]="fixUrl(event.picture)"
+                    onError="this.src='assets/img/default-image.jpg'"
+                  />
+                  <div class="card-body">
+                    <h4
+                      [ngStyle]="{
+                        'text-align': style_settings?.home_title_text_align || 'left',
+                        color: style_settings?.home_title_text_color || '#000000',
+                        'font-weight':
+                        style_settings?.home_title_text_bold || 'bolder'
+                      }"
+                    >
+                      {{ event.name }}
+                    </h4>
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="card-sub-title bold">
+                          <span class="text-citric">
+                            {{ event.start_date }}
+                            <span *ngIf="event.end_date && !event.is_same_date">
+                              -
+                              {{ event.end_date }}</span
+                            >
+                            <br />
+                            <span *ngIf="!event.all_day">
+                              {{ event.start_time }}
+                              <span *ngIf="event.end_time">
+                                - {{ event.end_time }}</span
+                              >
+                            </span>
+                          </span>
+                        </div>
+                        <div class="card-title medium-text">
+                          {{ event.description }}
+                        </div>
+                      </div>
+                      <div class="col-xs-12 col-md-6"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div *ngIf="!loading_more" class="row justify-content-center">
+              <div class="col-5">
+                <button class="btn btn-citric btn-small" (click)="loadMore()">
+                  {{ (event_template_settings?.view_more_text ? event_template_settings?.view_more_text : (translate?.view_more || 'VER MAS')) | uppercase}}
+                </button>
+              </div>
+            </div>
+            <ng-template [ngIf]="loading_more">
+              <div
+                class="d-flex justify-content-center col-12"
+                style="margin-top: 10%; margin-bottom: 10%"
+              >
+                <div
+                  style="
+                    height: 60px;
+                    width: 60px;
+                    font-size: 15px;
+                    border-width: 0.45em;
+                  "
+                  class="spinner-border text-citric"
+                  role="status"
+                ></div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!--  -->
+      <div
+        *ngIf="settings?.only_standalone || settings?.only_recurrents"
+        class="col-12"
+      >
+        <h2 class="text-left">
+          {{ event_template_settings?.use_own_text ? event_template_settings?.events_text_header : (translate?.events || 'Eventos')}}
+        </h2>
+        <div class="row">
+          <div
+            *ngIf="most_recent"
+            class="col-12"
+            [routerLink]="getRouterForEvent(most_recent)"
+          >
+            <div class="card" style="height: calc(100% - 15px)">
+              <img
+                class="card-cover card-cover-most-recent"
+                [src]="fixUrl(most_recent.picture)"
+                onError="this.src='assets/img/default-image.jpg'"
+              />
+              <div class="card-body">
+                <h4>{{ most_recent.name }}</h4>
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card-sub-title bold">
+                      <span class="text-citric">
+                        {{ most_recent.start_date }}
+                        <span
+                          *ngIf="
+                            most_recent.end_date && !most_recent.is_same_date
+                          "
+                        >
+                          - {{ most_recent.end_date }}</span
+                        >
+                        <br />
+                        {{ most_recent.start_time }}
+                        <span *ngIf="most_recent.end_time">
+                          - {{ most_recent.end_time }}</span
+                        >
+                      </span>
+                    </div>
+                    <div class="card-title medium-text">
+                      {{ most_recent.description }}
+                    </div>
+                  </div>
+                  <div class="col-xs-12 col-md-6"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="col-12 col-md-6 col-lg-4"
+            *ngFor="let event of events.custom"
+            [routerLink]="getRouterForEvent(event)"
+          >
+            <div class="card" style="height: calc(100% - 15px)">
+              <img
+                class="card-cover"
+                [src]="fixUrl(event.picture)"
+                onError="this.src='assets/img/default-image.jpg'"
+              />
+              <div class="card-body">
+                <h4
+                  [ngStyle]="{
+                    'text-align': style_settings?.home_title_text_align || 'left',
+                    color: style_settings?.home_title_text_color || '#000000',
+                    'font-weight':
+                    style_settings?.home_title_text_bold || 'bolder'
+                  }"
+                >
+                  {{ event.name }}
+                </h4>
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card-sub-title bold">
+                      <span class="text-citric">
+                        {{ event.start_date }}
+                        <span *ngIf="event.end_date && !event.is_same_date">
+                          -
+                          {{ event.end_date }}</span
+                        >
+                        <br />
+                        <span *ngIf="!event.all_day">
+                          {{ event.start_time }}
+                          <span *ngIf="event.end_time">
+                            - {{ event.end_time }}</span
+                          >
+                        </span>
+                      </span>
+                    </div>
+                    <div class="card-title medium-text">
+                      {{ event.description }}
+                    </div>
+                  </div>
+                  <div class="col-xs-12 col-md-6"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div *ngIf="!loading_more" class="row justify-content-center">
+              <div class="col-5">
+                <button class="btn btn-citric btn-small" (click)="loadMore()">
+                  {{ (event_template_settings?.view_more_text ? event_template_settings?.view_more_text : (translate?.view_more || 'VER MAS')) | uppercase }}
+                </button>
+              </div>
+            </div>
+            <ng-template [ngIf]="loading_more">
+              <div
+                class="d-flex justify-content-center col-12"
+                style="margin-top: 10%; margin-bottom: 10%"
+              >
+                <div
+                  style="
+                    height: 60px;
+                    width: 60px;
+                    font-size: 15px;
+                    border-width: 0.45em;
+                  "
+                  class="spinner-border text-citric"
+                  role="status"
+                ></div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div
+        class="col-12 col-md-6 col-lg-4"
+        *ngFor="let event of events"
+        [routerLink]="getRouterForEvent(event.meta)"
+      >
+        <div class="card" style="height: calc(100% - 15px)">
+          <img
+            class="card-cover"
+            [src]="fixUrl(event.meta.picture)"
+            onError="this.src='assets/img/default-image.jpg'"
+          />
+          <div class="card-body">
+            <h4>{{ event.title }}</h4>
+            <div class="row">
+              <div class="col-12">
+                <div class="card-sub-title bold">
+                  <span class="text-citric">
+                    {{ event.meta.start_date }}
+                    <span
+                      *ngIf="event.meta.end_date && !event.meta.is_same_date"
+                    >
+                      -
+                      {{ event.meta.end_date }}</span
+                    >
+                    <br />
+                    {{ event.meta.start_time }}
+                    <span *ngIf="event.meta.end_time">
+                      - {{ event.meta.end_time }}</span
+                    >
+                  </span>
+                </div>
+                <div class="card-title medium-text">
+                  {{ event.meta.description }}
+                </div>
+              </div>
+              <div class="col-xs-12 col-md-6"></div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+    </div>
+  </div>
+
+  <app-event-calendar
+    *ngIf="showing_more"
+    class="col-12"
+    [hidden]="false"
+    [show_options]="false"
+    [idOrganization]="idOrganization"
+    [show_view_type]="false"
+    [view_type]="'list'"
+    [event_template_settings]="event_template_settings"
+    [filter_dates]="filter_dates"
+    [set_range]="true"
+    (go_back)="showing_more = false"
+    [style_settings]="style_settings"
+  >
+  </app-event-calendar>
+</div>

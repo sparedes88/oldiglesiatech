@@ -1,0 +1,135 @@
+<form [formGroup]="levelFormGroup" (submit)="submitForm(levelFormGroup)">
+  <div class="row">
+    <div class="col-xs-12 col-md-12">
+      <div class="form-group">
+        <label for="descripcion">Description*</label>
+        <input
+          type="text"
+          class="form-control"
+          id="descripcion"
+          placeholder="Description"
+          formControlName="descripcion"
+          required
+        />
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <div class="mb-3">
+        <div class="font-weight-bold">Status</div>
+        <mat-slide-toggle color="primary" formControlName="estatus">
+          Active/Inactive
+        </mat-slide-toggle>
+      </div>
+    </div>
+    <div
+      class="col-xs-12 col-md-12"
+      style="display: flex; justify-content: space-between;"
+    >
+      <h5>Requirements</h5>
+      <button
+        type="button"
+        class="btn btn-success btn-sm"
+        (click)="addRequirement()"
+      >
+        Add requirement
+      </button>
+    </div>
+    <div
+      formArrayName="requisitos"
+      class="col-xs-12 col-md-12"
+      *ngFor="
+        let requirement of levelFormGroup.get('requisitos')['controls'];
+        let i = index
+      "
+    >
+      <div [formGroupName]="i">
+        <hr *ngIf="i > 0" />
+        <div class="form-group">
+          <label for="descripcion">Description*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="descripcion"
+            placeholder="Description"
+            formControlName="descripcion"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="full_description">Full Description* </label>
+          <textarea
+            type="text"
+            class="form-control"
+            id="full_description"
+            placeholder="Please give a detail description to complete this step."
+            formControlName="full_description"
+            required
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="frame_video">Frame Video </label>
+          <textarea
+            type="text"
+            class="form-control"
+            id="frame_video"
+            placeholder="Please paste here your embed code."
+            formControlName="frame_video"
+          ></textarea>
+        </div>
+
+        <li *ngFor="let file of requirement.get('files_json').value">
+          <a [href]="getUrl(file.url)" target="_blank">
+            {{ file.name }}
+          </a>
+        </li>
+
+        <div class="row">
+          <div class="col-4 text-center">
+            <button
+              type="button"
+              class="btn btn-sm btn-success"
+              *ngIf="i > 0 || levelFormGroup.value.idNivel"
+              (click)="uploadFiles(input_file, requirement)"
+            >
+              Add Files
+            </button>
+
+            <div class="col-12 col-md-4" [hidden]="true">
+              <div class="custom-file mb-4">
+                <input
+                  #input_file
+                  type="file"
+                  class="custom-file-input"
+                  id="customFile"
+                  multiple
+                />
+                <label class="custom-file-label" for="customFile"
+                  >Choose file</label
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-4 offset-3 text-center">
+            <button
+              type="button"
+              class="btn btn-sm btn-danger"
+              *ngIf="i > 0 || levelFormGroup.value.idNivel"
+              (click)="deleteRequirement(i)"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12 mt-3 text-center">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="levelFormGroup.invalid"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+</form>

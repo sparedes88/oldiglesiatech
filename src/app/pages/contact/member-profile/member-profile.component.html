@@ -1,0 +1,1997 @@
+<div class="container page">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a routerLink="/home">Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/contact">Contacts</a>
+      </li>
+      <li class="breadcrumb-item active">
+        {{ member?.nombre }} {{ member?.apellido }}
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Data -->
+  <form [formGroup]="userFormGroup" (submit)="submitUpdate(userFormGroup)">
+    <div class="row">
+      <!-- Profile pic -->
+      <div class="col-xs-12 col-md-3 text-center" #left_panel>
+        <div
+          class="mb-2"
+          [ngStyle]="{
+            width: 'calc(' + left_panel.offsetWidth + 'px - 30px)',
+            height: 'calc(' + left_panel.offsetWidth + 'px - 30px)'
+          }"
+        >
+          <div class="image">
+            <img
+              class="responsive-img rounded-circle"
+              [src]="tempPhoto || photoUrl"
+              alt="avatar"
+            />
+          </div>
+        </div>
+        <ng-container *ngIf="editMode">
+          <div class="form-group">
+            <label for="file">Choose File</label>
+            <input
+              class="form-control"
+              type="file"
+              accept="image/*"
+              id="file"
+              (change)="handleFileInput($event.target.files)"
+            />
+          </div>
+        </ng-container>
+
+        <!-- <h4 class="mt-4">{{ member?.nombre }} {{ member?.apellido }}</h4> -->
+        <!-- <span
+          *ngIf="member?.idUsuario"
+          class="badge badge-pill badge-{{
+            member?.estatus ? 'success' : 'warning'
+          }}"
+        >
+          {{ member?.estatus ? "Active" : "Inactive" }}
+        </span> -->
+        <div
+          class="nav flex-column nav-pills navbar-light"
+          id="v-pills-tab"
+          role="tablist"
+          aria-orientation="vertical"
+        >
+          <a
+            class="nav-link active text-muted my-1"
+            id="v-pills-home-tab"
+            data-toggle="pill"
+            href="#v-pills-home"
+            role="tab"
+            aria-controls="v-pills-home"
+            aria-selected="true"
+          >
+            My info
+          </a>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+          <app-skeleton
+            class="my-1"
+            *ngIf="loading_summary"
+            [show_body]="false"
+            [show_footer]="false"
+            [show_button]="true"
+          ></app-skeleton>
+
+          <a
+            *ngIf="(!loading_summary && summary.categories) || editMode"
+            class="nav-link text-muted my-1"
+            id="v-pills-categories-tab"
+            data-toggle="pill"
+            href="#v-pills-categories"
+            role="tab"
+            aria-controls="v-pills-categories"
+            aria-selected="false"
+          >
+            Categories
+          </a>
+          <a
+            *ngIf="(!loading_summary && summary.processes) || editMode"
+            class="nav-link text-muted my-1"
+            id="v-pills-process-tab"
+            data-toggle="pill"
+            href="#v-pills-process"
+            role="tab"
+            aria-controls="v-pills-process"
+            aria-selected="false"
+          >
+            Process
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.directories"
+            class="nav-link text-muted my-1"
+            id="v-pills-entries-tab"
+            data-toggle="pill"
+            href="#v-pills-entries"
+            role="tab"
+            aria-controls="v-pills-entries"
+            aria-selected="false"
+          >
+            Directories
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.levels"
+            class="nav-link text-muted my-1"
+            id="v-pills-levels-tab"
+            data-toggle="pill"
+            href="#v-pills-levels"
+            role="tab"
+            aria-controls="v-pills-levels"
+            aria-selected="false"
+          >
+            Levels
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.donations"
+            class="nav-link text-muted my-1"
+            id="v-pills-donations-tab"
+            data-toggle="pill"
+            href="#v-pills-donations"
+            role="tab"
+            aria-controls="v-pills-donations"
+            aria-selected="false"
+          >
+            Donations
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.groups"
+            class="nav-link text-muted my-1"
+            id="v-pills-groups-tab"
+            data-toggle="pill"
+            href="#v-pills-groups"
+            role="tab"
+            aria-controls="v-pills-groups"
+            aria-selected="false"
+          >
+            Groups
+          </a>
+          <a
+            *ngIf="!loading_summary && summary.events"
+            class="nav-link text-muted my-1"
+            id="v-pills-events-tab"
+            data-toggle="pill"
+            href="#v-pills-events"
+            role="tab"
+            aria-controls="v-pills-events"
+            aria-selected="false"
+          >
+            Events
+          </a>
+          <a
+            *ngIf="currentUser.idUserType === 1 || currentUser.isSuperUser"
+            class="nav-link text-muted my-1"
+            id="v-pills-commitments-tab"
+            data-toggle="pill"
+            href="#v-pills-commitments"
+            role="tab"
+            aria-controls="v-pills-commitments"
+            aria-selected="false"
+          >
+            Commitments
+          </a>
+          <a
+            *ngIf="currentUser.idUserType === 1 || currentUser.isSuperUser"
+            class="nav-link text-muted my-1"
+            id="v-pills-notes-tab"
+            data-toggle="pill"
+            href="#v-pills-notes"
+            role="tab"
+            aria-controls="v-pills-notes"
+            aria-selected="false"
+          >
+            Notes
+          </a>
+          <a
+            *ngIf="!loading_summary && editMode"
+            class="nav-link text-muted my-1"
+            id="v-pills-password-tab"
+            data-toggle="pill"
+            href="#v-pills-password"
+            role="tab"
+            aria-controls="v-pills-password"
+            aria-selected="false"
+          >
+            Password
+          </a>
+        </div>
+
+        <ng-container *ngIf="!editMode">
+          <div class="row">
+            <!-- <span class="col-8 align-self-center text-right">
+            Scan this QR clicking on it and share it:
+          </span> -->
+            <div class="col-12 text-center">
+              <ngx-qrcode
+                #qr_code
+                (click)="shareQR(qr_code)"
+                style="width: 50px; height: 50px"
+                [qrc-value]="generated_qr_code"
+                [qrc-class]="'qrItemResize-dash'"
+                qrc-errorCorrectionLevel="M"
+              >
+              </ngx-qrcode>
+              <!-- <button (click)="shareQR(qr_code)" class="btn btn-sm btn-citric">
+                Copy QR
+              </button> -->
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode">
+          <button type="submit" class="btn btn-success">Save</button>
+        </ng-container>
+      </div>
+
+      <div class="col-md-9">
+        <div class="tab-content" id="v-pills-tabContent">
+          <!-- Home Tab -->
+          <button
+            type="button"
+            class="btn btn-success btn-sm float-right"
+            (click)="toggleEditMode()"
+            [ngClass]="{ 'btn-warning': editMode }"
+          >
+            {{ editMode ? "Cancel" : "Edit" }}
+          </button>
+          <div
+            class="tab-pane fade show active"
+            id="v-pills-home"
+            role="tabpanel"
+            aria-labelledby="v-pills-home-tab"
+          >
+            <ng-template [ngIf]="!loadingMember">
+              <div style="display: flex; justify-content: space-between">
+                <h3 class="font-weight-bold text-muted">
+                  Personal Information
+                </h3>
+                <!-- <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="toggleEditMode()"
+                  [ngClass]="{ 'btn-warning': editMode }"
+                >
+                  {{ editMode ? "Cancel" : "Edit" }}
+                </button> -->
+              </div>
+
+              <div class="property-box-list">
+                <ng-container *ngIf="!editMode">
+                  <property-box
+                    [text]="member?.nombre + ' ' + member?.apellido"
+                    label="Name"
+                  ></property-box>
+
+                  <property-box
+                    *ngIf="member?.fechaNacimiento"
+                    text="{{ member?.fechaNacimiento | date : 'MM-dd-yyyy' }}"
+                    label="Birth date"
+                  ></property-box>
+
+                  <property-box
+                    *ngIf="member?.estadoCivil"
+                    [text]="
+                      (member?.estadoCivil | lowercase) == 'casado' ||
+                      (member?.estadoCivil | lowercase) == 'casada'
+                        ? 'Married'
+                        : 'Single'
+                    "
+                    label="Marital status"
+                  ></property-box>
+
+                  <!-- <property-box [text]="member?.sexo" label="Sex"></property-box> -->
+                  <property-box
+                    *ngIf="member?.sexo"
+                    [text]="
+                      member?.sexo
+                        ? member?.sexo == 'Masculino'
+                          ? 'Male'
+                          : 'Female'
+                        : 'Unset'
+                    "
+                    label="Sex"
+                  ></property-box>
+                </ng-container>
+                <!-- AQUI COMIENZA -->
+                <!-- If edit mode -->
+                <ng-container *ngIf="editMode">
+                  <div class="form-group">
+                    <label for="first_name">
+                      First name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Member's first name"
+                      formControlName="nombre"
+                      [class.is-invalid]="
+                        userFormGroup.get('nombre').touched &&
+                        userFormGroup.get('nombre').invalid
+                      "
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>
+                      Last name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Member's last name"
+                      formControlName="apellido"
+                      [class.is-invalid]="
+                        userFormGroup.get('apellido').touched &&
+                        userFormGroup.get('apellido').invalid
+                      "
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Birthdate</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      placeholder="Member's Birthdate"
+                      formControlName="fechaNacimiento"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Marital status</label>
+                    <select class="form-control" formControlName="estadoCivil">
+                      <option value="Soltero">Single</option>
+                      <option value="Casado">Married</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Sex</label>
+                    <select class="form-control" formControlName="sexo">
+                      <option value="Masculino">Male</option>
+                      <option value="Femenino">Female</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <span
+                      class="text-danger"
+                      *ngIf="userFormGroup.get('password').invalid"
+                    >
+                      * Please fill this info (Min 6 characters)
+                    </span>
+                  </div>
+
+                  <div
+                    class="form-group"
+                    style="display: flex; flex-direction: column"
+                  >
+                    <label for="idUserType">
+                      Role <span class="text-danger">*</span>
+                    </label>
+                    <ng-multiselect-dropdown
+                      #multi_user_type_select
+                      placeholder="Select an user type"
+                      [data]="user_types"
+                      [settings]="selectUserTypeOptions"
+                      formControlName="idUserType"
+                    ></ng-multiselect-dropdown>
+                  </div>
+                </ng-container>
+              </div>
+
+              <hr />
+
+              <h3 class="font-weight-bold text-muted mt-4">
+                Contact Information
+              </h3>
+              <div class="property-box-list">
+                <ng-container *ngIf="!editMode">
+                  <property-box
+                    [text]="member?.email"
+                    label="Email"
+                  ></property-box>
+                  <property-box
+                    [text]="member?.country_code"
+                    [label]="member?.flag || 'Country Code'"
+                    [show_as_icon]="member?.flag ? true : false"
+                  ></property-box>
+                  <property-box
+                    [text]="member?.telefono"
+                    label="Phone"
+                  ></property-box>
+                </ng-container>
+                <!-- Edit mode -->
+                <ng-container *ngIf="editMode">
+                  <div class="form-group">
+                    <label for="estimated">
+                      Country Code <span class="text-danger">*</span>
+                    </label>
+                    <app-custom-select-country
+                      [return_value]="'callingCode'"
+                      formControlName="country_code"
+                      [idOrganization]="member?.idIglesia"
+                      [preselected_country_code]="member?.country_code"
+                    >
+                    </app-custom-select-country>
+                  </div>
+                  <div class="form-group">
+                    <label> Phone <span class="text-danger">*</span> </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Member's phone"
+                      formControlName="telefono"
+                      mask="(000) 000-0000"
+                      [dropSpecialCharacters]="false"
+                      [class.is-invalid]="
+                        userFormGroup.get('telefono').touched &&
+                        userFormGroup.get('telefono').invalid
+                      "
+                    />
+                  </div>
+                </ng-container>
+              </div>
+
+              <hr />
+
+              <h3
+                *ngIf="
+                  !editMode &&
+                  (member?.calle ||
+                    member?.ciudad ||
+                    member?.provincia ||
+                    member?.country)
+                "
+                class="font-weight-bold text-muted mt-4"
+              >
+                Address
+              </h3>
+              <div class="property-box-list">
+                <ng-container
+                  *ngIf="
+                    !editMode &&
+                    (member?.calle ||
+                      member?.ciudad ||
+                      member?.provincia ||
+                      member?.country)
+                  "
+                >
+                  <property-box
+                    *ngIf="member?.calle"
+                    [text]="member?.calle"
+                    label="Street"
+                  ></property-box>
+                  <property-box
+                    *ngIf="member?.ciudad"
+                    [text]="member?.ciudad"
+                    label="City"
+                  ></property-box>
+                  <property-box
+                    *ngIf="member?.provincia"
+                    [text]="member?.provincia"
+                    label="State"
+                  ></property-box>
+                  <property-box
+                    *ngIf="member?.country"
+                    [text]="member?.country"
+                    label="Country"
+                  ></property-box>
+                </ng-container>
+              </div>
+
+              <ng-container *ngIf="editMode">
+                <div class="form-group">
+                  <label class="col-12">
+                    <span style="pointer-events: none"> Address </span>
+                  </label>
+                  <div class="input-group">
+                    <google-address-component
+                      *ngIf="init_map"
+                      [value]="userFormGroup.get('location').value"
+                      placeholder="Please type the location info about this member."
+                      adressType="address"
+                      (setAddress)="getAddress($event)"
+                    ></google-address-component>
+                  </div>
+                  <span
+                    class="text-danger error-span"
+                    *ngIf="userFormGroup.get('ciudad').invalid"
+                  >
+                    * Please fill this info
+                  </span>
+                </div>
+              </ng-container>
+            </ng-template>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-categories"
+            role="tabpanel"
+            aria-labelledby="v-pills-categories-tab"
+          >
+            <h3 class="font-weight-bold text-muted">Categories</h3>
+            <div *ngIf="!editMode" class="badge-group">
+              <span
+                *ngFor="let category of categories"
+                class="badge badge-pill badge-primary"
+              >
+                {{ category.descripcion }}
+              </span>
+              <div
+                class="no-records-found"
+                *ngIf="!categories?.length && !loadingEvents"
+              >
+                No records found.
+              </div>
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+            </div>
+
+            <div *ngIf="editMode" style="display: flex; flex-direction: column">
+              <label>Categories</label>
+              <ng-multiselect-dropdown
+                placeholder="Select categories"
+                [data]="selectableCategories"
+                [settings]="selectCatOptions"
+                formControlName="categorias"
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="v-pills-process"
+            role="tabpanel"
+            aria-labelledby="v-pills-process-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Process</h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size':
+                  !member.fixed_proccesses?.length && !loadingEvents
+              }"
+            >
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%; margin-bottom: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+              <div *ngIf="!editMode" class="list-group">
+                <div *ngFor="let item of member.fixed_proccesses">
+                  <div>
+                    {{ item.name }}
+                  </div>
+                  <mat-accordion
+                    *ngFor="let nivel of item.levels; let i = index"
+                  >
+                    <mat-expansion-panel #accordion [expanded]="true">
+                      <mat-expansion-panel-header
+                        (click)="verRequisitos(nivel, accordion)"
+                      >
+                        {{ nivel.descripcion }}
+                        <span
+                          *ngIf="nivel.requisitos?.length > 0"
+                          class="badge badge-pill fixed-badge"
+                          [ngClass]="
+                            nivel.requisitosCumplidos.length !=
+                            nivel.requisitos.length
+                              ? 'badge-primary'
+                              : 'badge-success'
+                          "
+                        >
+                          <span *ngIf="nivel.requisitosCumplidos?.length > 0">
+                            {{ nivel.requisitosCumplidos.length || 0 }}/
+                          </span>
+                          {{ nivel.requisitos.length }}
+                        </span>
+                      </mat-expansion-panel-header>
+                      <div class="list-fixed">
+                        <div
+                          *ngFor="let requisito of nivel.requisitos"
+                          style="cursor: pointer"
+                          (click)="
+                            openModalDetail(
+                              see_step_detail_modal,
+                              see_step_form,
+                              requisito
+                            )
+                          "
+                        >
+                          <div class="row mb-3">
+                            <div class="font-weight-bold col-9">
+                              {{ requisito.descripcion }}
+                            </div>
+                            <mat-slide-toggle
+                              class="col-2"
+                              labelPosition="before"
+                              color="primary"
+                              [disabled]="true"
+                              [(ngModel)]="requisito.cumplido"
+                              [ngModelOptions]="{ standalone: true }"
+                            >
+                              <!-- {{ requisito.descripcion }} -->
+                            </mat-slide-toggle>
+                          </div>
+                        </div>
+                        <div style="text-align: right">
+                          <button
+                            type="button"
+                            class="btn btn-outline-citric btn-sm"
+                            (click)="
+                              openRequirements(
+                                form_check_modal,
+                                check_requirements_form,
+                                nivel,
+                                i
+                              )
+                            "
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+
+                  <div
+                    class="no-records-found"
+                    *ngIf="!item.levels?.length && !loadingEvents"
+                  >
+                    No levels found.
+                  </div>
+                </div>
+
+                <div
+                  class="no-records-found"
+                  *ngIf="!member.fixed_proccesses?.length && !loadingEvents"
+                >
+                  No records found.
+                </div>
+              </div>
+
+              <div
+                *ngIf="editMode"
+                style="display: flex; flex-direction: column"
+              >
+                <label class="mt-2">User's process</label>
+                <ng-multiselect-dropdown
+                  #process_multiselect
+                  placeholder="Select processes"
+                  [data]="processes"
+                  [settings]="selectLevelOptions"
+                  formControlName="processes"
+                  (onDropDownClose)="getNivelesForProcess($event)"
+                ></ng-multiselect-dropdown>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-entries"
+            role="tabpanel"
+            aria-labelledby="v-pills-entries-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">
+              Entries and directories
+            </h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size':
+                  !community_info.directories.length &&
+                  !community_info.entries.length
+              }"
+            >
+              <h6 *ngIf="community_info.directories.length">Directories</h6>
+              <div class="list-group" *ngIf="community_info.directories.length">
+                <li
+                  *ngFor="let event of community_info.directories"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="goToCommunityBox(event)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">{{ event.name }}</div>
+                  </div>
+                </li>
+                <!-- <div
+                  class="no-records-found"
+                  *ngIf="!community_info.directories.length"
+                >
+                  No directories found.
+                </div> -->
+              </div>
+
+              <h6 *ngIf="community_info.entries.length">Entries</h6>
+              <div class="list-group" *ngIf="community_info.entries.length">
+                <li
+                  *ngFor="let event of community_info.entries"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="openEditModalEntry(event)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">
+                      {{ event.business_name }}
+                    </div>
+                  </div>
+                </li>
+                <div
+                  class="no-records-found"
+                  *ngIf="!community_info.entries.length"
+                >
+                  No entries found.
+                </div>
+              </div>
+
+              <div
+                class="list-group"
+                *ngIf="
+                  !community_info.directories.length &&
+                  !community_info.entries.length
+                "
+              >
+                <div class="no-records-found">No info found.</div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-levels"
+            role="tabpanel"
+            aria-labelledby="v-pills-levels-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Member Levels</h3>
+            <div class="badge-group">
+              <span
+                *ngFor="let level of levels"
+                class="badge badge-pill badge-info"
+              >
+                {{ level.descripcion }}
+              </span>
+              <div
+                class="no-records-found"
+                *ngIf="!levels?.length && !loadingEvents"
+              >
+                No records found.
+              </div>
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-donations"
+            role="tabpanel"
+            aria-labelledby="v-pills-donations-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">
+              Donations made&nbsp;<br />
+            </h3>
+            <div [formGroup]="donation_filter_form" class="row col-12 mx-0">
+              <div class="col-12 col-md-3">
+                <div class="form-group">
+                  <label class="text-secondary"> From </label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="from"
+                  />
+                </div>
+              </div>
+              <div class="col-12 col-md-3">
+                <div class="form-group">
+                  <label class="text-secondary"> To </label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="to"
+                  />
+                </div>
+              </div>
+              <div class="col-12 col-md-3">
+                <div class="form-group">
+                  <label class="text-secondary"> Category </label>
+                  <select class="form-control" formControlName="category">
+                    <option value="">-- None --</option>
+                    <option
+                      *ngFor="let category of donation_categories"
+                      [value]="category.idDonationCategory"
+                    >
+                      {{ category.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12 col-md-3">
+                <!-- <div class="form-group mb-0">
+                  <label class="text-secondary"> Search </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="search"
+                  />
+                </div> -->
+                <div class="text-right my-2">
+                  <button
+                    type="button"
+                    (click)="getDonations()"
+                    class="btn btn-sm btn-success"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="col-12"
+              [ngClass]="{ 'fixed-scroll-size': !donations?.length }"
+            >
+              <div *ngFor="let iglesia of donations">
+                <h6 class="text-muted mt-3">{{ iglesia.name }}</h6>
+                <div class="row mx-0">
+                  <div class="col-6">
+                    <span> Info </span>
+                  </div>
+                  <div class="col-4">
+                    <span> Category </span>
+                  </div>
+                  <div class="col-2 text-right">
+                    <span> Amount </span>
+                  </div>
+                </div>
+                <ul class="list-group">
+                  <li
+                    *ngFor="let event of iglesia.donations; let f = first"
+                    class="list-group-item"
+                  >
+                    <div class="row">
+                      <div class="col-6">
+                        <span>
+                          <small class="text-citric">
+                            {{
+                              event.manual_date ||
+                                (event.date | date : "MMM. dd yyyy")
+                            }}
+                          </small>
+                          <br />
+                          <small class="text-secondary">
+                            {{ event.manual }}
+                          </small>
+                        </span>
+                      </div>
+                      <div class="col-4">
+                        <small>
+                          {{ event.category }}
+                        </small>
+                      </div>
+                      <div class="col-2 text-right">
+                        <small class="text-citric">
+                          {{ (event.amount | currency) || "Not provided" }}
+                        </small>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item">
+                    <p>
+                      <span style="float: left">Total:</span>
+                      <span style="float: right"
+                        >${{ iglesia.total || "Not provided" }}</span
+                      >
+                    </p>
+                  </li>
+                  <div class="no-records-found" *ngIf="!donations?.length">
+                    No records found.
+                  </div>
+                </ul>
+              </div>
+
+              <ul class="list-group px-3">
+                <div class="no-records-found" *ngIf="!donations?.length">
+                  No records found.
+                </div>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-commitments"
+            role="tabpanel"
+            aria-labelledby="v-pills-commitments-tab"
+            *ngIf="currentUser.idUserType === 1 || currentUser.isSuperUser"
+          >
+            <div class="m-0 row">
+              <h3 class="col-9 font-weight-bold text-muted mt-3">
+                Commitments. <br />
+                <small>(Only previous and actual records will show) </small>
+              </h3>
+
+              <div class="col-3 mt-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-success"
+                  (click)="
+                    openUserCommitmentModal(
+                      user_commitment_modal,
+                      user_commitment_form
+                    )
+                  "
+                >
+                  Add
+                </button>
+              </div>
+
+              <ng-template [ngIf]="loadingGroups">
+                <div
+                  class="col-12 d-flex justify-content-center"
+                  style="margin-top: 15%; margin-bottom: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+
+              <div
+                *ngIf="!loadingGroups"
+                class="list-group col-12 p-0"
+                [ngClass]="{ 'fixed-scroll-size': !commitments.length }"
+              >
+                <li
+                  *ngFor="let commitment of commitments"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                >
+                  <p class="mb-1">
+                    {{ commitment.name }}
+                  </p>
+                  <div class="d-flex w-100 justify-content-between">
+                    <!-- <small class="text-muted">
+                    {{ commitment.accomplished }}
+                  </small> -->
+
+                    <div class="col-8 align-self-center text-left mb-4">
+                      <input
+                        type="checkbox"
+                        [id]="'acceptance_' + commitment.idUserCommitmentRecord"
+                        name="customRadio"
+                        class="custom-control-input"
+                        [checked]="commitment.accomplished"
+                        (click)="toggleCommitment(commitment)"
+                      />
+                      <span
+                        class="checkmark"
+                        (click)="toggleCommitment(commitment)"
+                      ></span>
+                      <label
+                        style="cursor: pointer"
+                        class="custom-control-label"
+                        [for]="
+                          'acceptance_' + commitment.idUserCommitmentRecord
+                        "
+                      >
+                        Accomplished
+                      </label>
+                    </div>
+
+                    <small>
+                      {{ commitment.commitment_date | date : "MMM. dd yyyy" }}
+                      <br />
+                      <i
+                        class="fa fa-edit btn btn-sm text-info"
+                        type="button"
+                        (click)="
+                          updateCommitment(
+                            user_commitment_modal,
+                            user_commitment_form,
+                            commitment
+                          )
+                        "
+                      ></i>
+
+                      <i
+                        class="fa fa-trash-alt btn btn-sm text-danger"
+                        type="button"
+                        (click)="deleteCommitment(commitment)"
+                      ></i>
+                    </small>
+                  </div>
+                </li>
+
+                <div class="no-records-found" *ngIf="commitments.length === 0">
+                  No commitments found.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="v-pills-groups"
+            role="tabpanel"
+            aria-labelledby="v-pills-groups-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Groups</h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size': !groups?.length && !loadingGroups
+              }"
+            >
+              <ng-template [ngIf]="loadingGroups">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%; margin-bottom: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+
+              <div class="list-group">
+                <li
+                  *ngFor="let group of groups"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="goToGroupDetail(group)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">{{ group.title }}</div>
+                    <span>
+                      <span
+                        class="badge badge-pill badge-{{
+                          group.status ? 'success' : 'warning'
+                        }}"
+                      >
+                        {{ group.status ? "Active" : "Inactive" }}
+                      </span>
+                    </span>
+                  </div>
+                  <p class="mb-1">
+                    {{ group.short_description || "Not provided" }}
+                  </p>
+                  <div class="d-flex w-100 justify-content-between">
+                    <small class="text-muted">
+                      {{ group.member_since | date : "MMM. dd yyyy" }}
+                    </small>
+                    <small>{{ group.level_access }}</small>
+                  </div>
+                </li>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="v-pills-events"
+            role="tabpanel"
+            aria-labelledby="v-pills-events-tab"
+          >
+            <h3 class="font-weight-bold text-muted mt-3">Next Events</h3>
+            <div
+              class=""
+              [ngClass]="{
+                'fixed-scroll-size': !events?.length && !loadingGroups
+              }"
+            >
+              <ng-template [ngIf]="loadingEvents">
+                <div
+                  class="d-flex justify-content-center"
+                  style="margin-top: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+
+              <div class="list-group">
+                <li
+                  *ngFor="let event of events"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                  (click)="goToGroupEventDetail(event)"
+                >
+                  <div class="d-flex w-100 justify-content-between">
+                    <div class="font-weight-bold mb-1">
+                      {{ event.name }}
+                    </div>
+                    <!-- <span>
+                      <span
+                        class="badge badge-pill badge-{{
+                          event.status ? 'success' : 'warning'
+                        }}"
+                      >
+                        {{ event.status ? "Active" : "Inactive" }}
+                      </span>
+                    </span> -->
+                  </div>
+                  <p class="mb-1">
+                    {{ event.description || "Not provided" }}
+                  </p>
+                  <div class="d-flex w-100 justify-content-between">
+                    <small class="text-citric">
+                      {{ event.start_date | date : "MMM. dd yyyy" }}
+                      <span
+                        *ngIf="
+                          event.end_date &&
+                          checkDate(event.start_date, event.end_date)
+                        "
+                      >
+                        - {{ event.end_date | date : "MMM. dd yyyy" }}</span
+                      >
+                      <br />
+                      {{ event.start_date | date : "hh:mm a" }}
+                      <span *ngIf="event.end_date">
+                        - {{ event.end_date | date : "hh:mm a" }}</span
+                      >
+                    </small>
+                  </div>
+                </li>
+                <div
+                  class="no-records-found"
+                  *ngIf="!events?.length && !loadingGroups"
+                >
+                  No records found.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="v-pills-notes"
+            role="tabpanel"
+            aria-labelledby="v-pills-notes-tab"
+          >
+            <div class="m-0 row">
+              <h3 class="col-9 font-weight-bold text-muted mt-3">
+                Notes about this member.
+              </h3>
+
+              <div class="col-3 mt-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-success"
+                  (click)="openUserLogModal(user_log_modal, user_log_form)"
+                >
+                  Add
+                </button>
+              </div>
+
+              <ng-template [ngIf]="loadingGroups">
+                <div
+                  class="col-12 d-flex justify-content-center"
+                  style="margin-top: 15%; margin-bottom: 15%"
+                >
+                  <div class="spinner-border text-primary" role="status"></div>
+                </div>
+              </ng-template>
+
+              <div *ngIf="!loadingGroups" class="list-group col-12 p-0">
+                <li
+                  *ngFor="let log of logs"
+                  class="list-group-item list-group-item-action flex-column align-items-start"
+                >
+                  <p class="mb-1">
+                    {{ log.note }}
+                  </p>
+                  <div class="d-flex w-100 justify-content-between">
+                    <small class="text-muted">
+                      {{ log.user_created_by }}
+                    </small>
+                    <small>
+                      {{ log.submitted_date | date : "MMM. dd yyyy" }}
+                      <br />
+                      <i
+                        class="fa fa-edit btn btn-sm text-info"
+                        type="button"
+                        (click)="updateLog(user_log_modal, user_log_form, log)"
+                      ></i>
+
+                      <i
+                        class="fa fa-trash-alt btn btn-sm text-danger"
+                        type="button"
+                        (click)="deleteLog(log)"
+                      ></i>
+                    </small>
+                  </div>
+                </li>
+
+                <div class="no-records-found" *ngIf="logs.length === 0">
+                  No notes found.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="tab-pane fade"
+            id="v-pills-password"
+            role="tabpanel"
+            aria-labelledby="v-pills-password-tab"
+          >
+            <div [formGroup]="userFormGroup" class="form-group">
+              <label> Update your password </label>
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Leave it blank if no change"
+                formControlName="password"
+                [class.is-invalid]="
+                  userFormGroup.get('password').touched &&
+                  userFormGroup.get('password').invalid
+                "
+              />
+            </div>
+            <div>
+              <span
+                class="text-danger"
+                *ngIf="userFormGroup.get('password').invalid"
+              >
+                * Please fill this info (Min 6 characters)
+              </span>
+            </div>
+            <ng-container *ngIf="editMode">
+              <button type="button" class="btn btn-success" (click)="updatePassword()">
+                Save
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+      <!-- General info -->
+      <div class="col-xs-12 col-md-5">
+        <ng-template [ngIf]="loadingMember">
+          <div
+            class="d-flex justify-content-center"
+            style="margin-top: 15%; margin-bottom: 15%"
+          >
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        </ng-template>
+
+        <!-- <ng-template [ngIf]="!loadingMember">
+          <div style="display: flex; justify-content: space-between">
+            <h6 class="font-weight-bold text-muted">Personal Information</h6>
+            <button
+              type="button"
+              class="btn btn-success btn-sm"
+              (click)="toggleEditMode()"
+              [ngClass]="{ 'btn-warning': editMode }"
+            >
+              {{ editMode ? "Cancel" : "Edit" }}
+            </button>
+          </div>
+
+          <div class="property-box-list">
+            <ng-container *ngIf="!editMode">
+              <property-box
+                [text]="member?.nombre + ' ' + member?.apellido"
+                label="Name"
+              ></property-box>
+
+              <property-box
+                *ngIf="member?.fechaNacimiento"
+                text="{{ member?.fechaNacimiento | date : 'MM-dd-yyyy' }}"
+                label="Birth date"
+              ></property-box>
+
+              <property-box
+                *ngIf="member?.estadoCivil"
+                [text]="
+                  (member?.estadoCivil | lowercase) == 'casado' ||
+                  (member?.estadoCivil | lowercase) == 'casada'
+                    ? 'Married'
+                    : 'Single'
+                "
+                label="Marital status"
+              ></property-box>
+
+              <property-box
+                *ngIf="member?.sexo"
+                [text]="
+                  member?.sexo
+                    ? member?.sexo == 'Masculino'
+                      ? 'Male'
+                      : 'Female'
+                    : 'Unset'
+                "
+                label="Sex"
+              ></property-box>
+            </ng-container>
+
+            <ng-container *ngIf="editMode">
+              <div class="form-group">
+                <label for="first_name">
+                  First name <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  class="form-control"
+                  placeholder="Member's first name"
+                  formControlName="nombre"
+                  [class.is-invalid]="
+                    userFormGroup.get('nombre').touched &&
+                    userFormGroup.get('nombre').invalid
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label> Last name <span class="text-danger">*</span> </label>
+                <input
+                  type="text"
+                  required
+                  class="form-control"
+                  placeholder="Member's last name"
+                  formControlName="apellido"
+                  [class.is-invalid]="
+                    userFormGroup.get('apellido').touched &&
+                    userFormGroup.get('apellido').invalid
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Birthdate</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  placeholder="Member's Birthdate"
+                  formControlName="fechaNacimiento"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Marital status</label>
+                <select class="form-control" formControlName="estadoCivil">
+                  <option value="Soltero">Single</option>
+                  <option value="Casado">Married</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Sex</label>
+                <select class="form-control" formControlName="sexo">
+                  <option value="Masculino">Male</option>
+                  <option value="Femenino">Female</option>
+                </select>
+              </div>
+            </ng-container>
+          </div>
+
+          <h6 class="font-weight-bold text-muted mt-4">Contact Information</h6>
+          <div class="property-box-list">
+            <ng-container *ngIf="!editMode">
+              <property-box [text]="member?.email" label="Email"></property-box>
+              <property-box
+                [text]="member?.country_code"
+                [label]="member?.flag || 'Country Code'"
+                [show_as_icon]="member?.flag ? true : false"
+              ></property-box>
+              <property-box
+                [text]="member?.telefono"
+                label="Phone"
+              ></property-box>
+            </ng-container>
+
+            <ng-container *ngIf="editMode">
+              <div class="form-group">
+                <label for="estimated">
+                  Country Code <span class="text-danger">*</span>
+                </label>
+                <app-custom-select-country
+                  [return_value]="'callingCode'"
+                  formControlName="country_code"
+                  [idOrganization]="member?.idIglesia"
+                  [preselected_country_code]="member?.country_code"
+                >
+                </app-custom-select-country>
+              </div>
+              <div class="form-group">
+                <label> Phone <span class="text-danger">*</span> </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Member's phone"
+                  formControlName="telefono"
+                  mask="(000) 000-0000"
+                  [dropSpecialCharacters]="false"
+                  [class.is-invalid]="
+                    userFormGroup.get('telefono').touched &&
+                    userFormGroup.get('telefono').invalid
+                  "
+                />
+              </div>
+            </ng-container>
+            <ng-container *ngIf="editMode">
+              <div class="form-group">
+                <label> Password </label>
+                <input
+                  type="password"
+                  class="form-control"
+                  placeholder="Leave it blank if no change"
+                  formControlName="password"
+                  [class.is-invalid]="
+                    userFormGroup.get('password').touched &&
+                    userFormGroup.get('password').invalid
+                  "
+                />
+              </div>
+              <div>
+                <span
+                  class="text-danger"
+                  *ngIf="userFormGroup.get('password').invalid"
+                >
+                  * Please fill this info (Min 6 characters)
+                </span>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="editMode">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label for="idUserType">
+                  Role <span class="text-danger">*</span>
+                </label>
+                <ng-multiselect-dropdown
+                  #multi_user_type_select
+                  placeholder="Select an user type"
+                  [data]="user_types"
+                  [settings]="selectUserTypeOptions"
+                  formControlName="idUserType"
+                ></ng-multiselect-dropdown>
+              </div>
+            </ng-container>
+          </div>
+
+          <h6
+            *ngIf="
+              !editMode &&
+              (member?.calle ||
+                member?.ciudad ||
+                member?.provincia ||
+                member?.country)
+            "
+            class="font-weight-bold text-muted mt-4"
+          >
+            Address
+          </h6>
+          <div class="property-box-list">
+            <ng-container
+              *ngIf="
+                !editMode &&
+                (member?.calle ||
+                  member?.ciudad ||
+                  member?.provincia ||
+                  member?.country)
+              "
+            >
+              <property-box
+                *ngIf="member?.calle"
+                [text]="member?.calle"
+                label="Street"
+              ></property-box>
+              <property-box
+                *ngIf="member?.ciudad"
+                [text]="member?.ciudad"
+                label="City"
+              ></property-box>
+              <property-box
+                *ngIf="member?.provincia"
+                [text]="member?.provincia"
+                label="State"
+              ></property-box>
+              <property-box
+                *ngIf="member?.country"
+                [text]="member?.country"
+                label="Country"
+              ></property-box>
+            </ng-container>
+          </div>
+
+          <ng-container *ngIf="editMode">
+            <div class="form-group">
+              <label class="col-12">
+                <span style="pointer-events: none"> Address </span>
+              </label>
+              <div class="input-group">
+                <google-address-component
+                  *ngIf="init_map"
+                  [value]="userFormGroup.get('location').value"
+                  placeholder="Please type the location info about this member."
+                  adressType="address"
+                  (setAddress)="getAddress($event)"
+                ></google-address-component>
+              </div>
+              <span
+                class="text-danger error-span"
+                *ngIf="userFormGroup.get('ciudad').invalid"
+              >
+                * Please fill this info
+              </span>
+            </div>
+          </ng-container>
+        </ng-template> -->
+
+        <div class="actions mt-4 mb-4">
+          <!-- <ng-container *ngIf="editMode">
+            <button type="submit" class="btn btn-success">Save</button>
+          </ng-container> -->
+          <ng-container *ngIf="!editMode">
+            <button type="button" class="btn btn-link" routerLink="/contact">
+              Return
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<ngx-smart-modal
+  #form_check_modal
+  identifier="form_edit_modal"
+  [dismissable]="false"
+  [closable]="false"
+>
+  <app-check-requirements
+    #check_requirements_form
+    (onDismiss)="onModalCheckDidDismiss(form_check_modal, $event)"
+  >
+  </app-check-requirements>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #user_log_modal
+  identifier="user_log_modal"
+  [dismissable]="false"
+  [closable]="false"
+  [escapable]="false"
+>
+  <app-user-log-form
+    #user_log_form
+    [member]="member"
+    (onDismiss)="onModalEditDidDismiss(user_log_modal, $event)"
+  >
+  </app-user-log-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #user_commitment_modal
+  identifier="user_commitment_modal"
+  [dismissable]="false"
+  [closable]="false"
+  [escapable]="false"
+>
+  <app-user-commitment-form
+    #user_commitment_form
+    [member]="member"
+    (onDismiss)="onModalEditDidDismiss(user_commitment_modal, $event)"
+  >
+  </app-user-commitment-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #see_step_detail_modal
+  identifier="see_step_detail_modal"
+  customClass="large-modal"
+>
+  <!-- [dismissable]="false"
+  [closable]="false"
+  [escapable]="false" -->
+  <app-see-step-detail
+    #see_step_form
+    (onDismiss)="onModalEditDidDismiss(see_step_detail_modal, undefined)"
+  >
+  </app-see-step-detail>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #entryFormModal
+  identifier="entryFormModal"
+  (onAnyCloseEvent)="entryFormGroup.reset()"
+>
+  <h4>Add community</h4>
+  <form (ngSubmit)="submitEntry(entryFormGroup)" #entryFormGroup="ngForm">
+    <div class="text-center" *ngIf="entryForm.photo">
+      <img [src]="entryForm.photo" alt="" class="img-circle" />
+    </div>
+    <div class="form-group">
+      <label>Profile Photo</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="photo">
+            <i class="fa fa-image"></i>
+          </span>
+        </div>
+        <input
+          type="file"
+          name="photo"
+          class="form-control"
+          accept="image/*"
+          (change)="addPhoto($event.target.files[0])"
+          #photo_input
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="business_name">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Name"
+          name="business_name"
+          required
+          [(ngModel)]="entryForm.business_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact First Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_first_name">
+            <i class="fa fa-user-alt"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Contact First Name"
+          name="contact_first_name"
+          required
+          [(ngModel)]="entryForm.contact_first_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact Last Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_last_name">
+            <i class="fa fa-user-alt"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Contact last Name"
+          name="contact_last_name"
+          required
+          [(ngModel)]="entryForm.contact_last_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Summary*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="business_summary">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="business_summary"
+          name="business_summary"
+          required
+          [(ngModel)]="entryForm.business_summary"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Categories</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="industry">
+            <i class="fa fa-building"></i>
+          </span>
+        </div>
+        <ng-select
+          [items]="categories"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [searchable]="true"
+          placeholder="Select categories"
+          [(ngModel)]="entryForm.industry"
+          [ngModelOptions]="{ standalone: true }"
+          [addTag]="true"
+        >
+        </ng-select>
+      </div>
+    </div>
+
+    <!-- <div class="form-group">
+      <label>Group entry by</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="entry_groups">
+            <i class="fa fa-building"></i>
+          </span>
+        </div>
+        <ng-select
+          bindLabel="name"
+          bindValue="idEntryGroup"
+          [items]="entry_groups"
+          [multiple]="false"
+          [closeOnSelect]="true"
+          [searchable]="true"
+          placeholder="Select a group"
+          [(ngModel)]="entryForm.idEntryGroup"
+          [ngModelOptions]="{ standalone: true }"
+          [addTag]="false"
+        >
+        </ng-select>
+      </div>
+    </div> -->
+
+    <div class="form-group">
+      <label>Phone</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="phone">
+            <i class="fa fa-phone"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Phone"
+          name="phone"
+          [(ngModel)]="entryForm.phone"
+          [dropSpecialCharacters]="false"
+          mask="(000) 000-0000"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact email</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_email">
+            <i class="fa fa-at"></i>
+          </span>
+        </div>
+        <input
+          type="email"
+          class="form-control"
+          placeholder="Contact email"
+          name="contact_email"
+          [(ngModel)]="entryForm.contact_email"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Location</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="locations">
+            <i class="fa fa-map-marker"></i>
+          </span>
+        </div>
+        <google-address-component
+          *ngIf="entryFormModal.isVisible()"
+          (setAddress)="getAddressEntry($event)"
+          adressType="geocode"
+          [value]="entryForm.locations"
+        ></google-address-component>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Radius (miles)</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="radius">
+            <i class="fa fa-circle"></i>
+          </span>
+        </div>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          class="form-control"
+          placeholder="Range radius"
+          name="radius"
+          [(ngModel)]="entryForm.radius"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Website</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="website">
+            <i class="fa fa-address-card"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Website"
+          name="website"
+          [(ngModel)]="entryForm.website"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Instagram</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="instagram">
+            <i class="socicon-instagram"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Instagram"
+          name="instagram"
+          [(ngModel)]="entryForm.instagram"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Twitter</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="twitter">
+            <i class="socicon-twitter"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Twitter"
+          name="twitter"
+          [(ngModel)]="entryForm.twitter"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Facebook</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="facebook">
+            <i class="socicon-facebook"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Facebook"
+          name="facebook"
+          [(ngModel)]="entryForm.facebook"
+        />
+      </div>
+    </div>
+
+    <!-- <div class="form-group">
+      <div class="col-12">
+        <ng-multiselect-dropdown
+          placeholder="Select your users"
+          [data]="available_users"
+          [settings]="selectCatOptions"
+          [(ngModel)]="entryForm.assigned_users"
+          [ngModelOptions]="{standalone: true}"
+        ></ng-multiselect-dropdown>
+      </div>
+      <small class="col-12 text-citric">*Only members unassigned to directory are available.</small>
+    </div> -->
+
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        name="featured"
+        [(ngModel)]="entryForm.featured"
+        id="featuredCheck"
+      />
+      <label class="form-check-label" for="featuredCheck">Featured</label>
+    </div>
+    <div class="form-group">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="entryFormGroup.invalid || saving"
+      >
+        <i class="fa fa-paper-plane"></i>
+        {{ saving ? "Please wait..." : "Save entry" }}
+      </button>
+    </div>
+  </form>
+</ngx-smart-modal>

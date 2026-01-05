@@ -1,0 +1,95 @@
+<div class="container">
+  <div class="row">
+    <div class="col-10" *ngIf="display_close_button"></div>
+    <div class="col-2" *ngIf="display_close_button">
+      <button class="btn btn-sm btn-outline-citric" (click)="close()">
+        Close contacts
+      </button>
+    </div>
+    <div class="col-md-12">
+      <div class="row mt-2" [hidden]="show_form">
+        <div
+          [ngClass]="currentUser.isSuperUser ? 'col-10' : 'col-12'"
+          class="mt-2 text-right"
+        >
+          <div class="btn-group col-2 mb-2 mt-3">
+            <button
+              class="btn btn-outline-citric btn-sm"
+              (click)="addContact(contact_form)"
+            >
+              <i class="fa fa-user-plus"></i> Add Contact
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4 mb-5">
+        <div [hidden]="show_form" class="col-md-12 table-responsive-sm">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table table-striped"
+          >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Phones</th>
+                <th>Emails</th>
+                <th>Configurations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let contacto of iglesiaContactos">
+                <td>{{ contacto.nombre }} {{ contacto.apellido }}</td>
+                <td>
+                  {{ contacto.posicion }}
+                </td>
+                <td>
+                  <ul>
+                    <li *ngFor="let tag of contacto.telefonos">
+                      {{ tag.telefono }}
+                    </li>
+                  </ul>
+                </td>
+                <td>
+                  <ul>
+                    <li *ngFor="let tag of contacto.correos">
+                      {{ tag.correo }}
+                    </li>
+                  </ul>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button
+                      class="btn btn-sm btn-warning"
+                      (click)="editContact(contact_form, contacto)"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteContact(contacto)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-12" [hidden]="!show_form">
+          <app-contacts-form
+            (dismiss_form)="dismissContactForm($event)"
+            style="width: 100%;"
+            #contact_form
+          >
+          </app-contacts-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

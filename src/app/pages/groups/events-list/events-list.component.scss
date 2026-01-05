@@ -1,0 +1,37 @@
+.card-img-top-fixed {
+  object-fit: cover;
+  object-position: left center;
+  height: 200px;
+}
+
+.card-fixed-text {
+  height: 200px;
+}
+
+.card {
+  border: none !important;
+}
+
+::ng-deep {
+  .table td {
+    padding: 4px !important;
+    vertical-align: middle !important;
+  }
+}
+
+app-view-event-activities,
+app-view-event-reviews,
+app-view-event-finances,
+app-view-event-attendance {
+  width: 100%;
+}
+
+.active {
+  background: lightgray;
+}
+
+.btn-group{
+  button{
+      border: 1px solid gray;
+  }
+}

@@ -1,0 +1,281 @@
+<div class="container page">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+          {{ totalGroups || 0 }}
+        </span>
+        <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/tickets_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-end">
+    <h3 class="col-12 col-md-3 text-citric">Design Requests</h3>
+    <div class="col-8 col-md-3">
+      <button
+        class="btn btn-outline-citric mt-1 mt-md-0 w-100"
+        (click)="addDesignRequest(design_request_form)"
+      >
+        Add Design Request
+      </button>
+    </div>
+    <div
+      class="col-8 col-md-2"
+      *ngIf="currentUser.isSuperUser && !show_as_user"
+    >
+      <button
+        class="btn btn-outline-citric mt-1 mt-md-0 w-100"
+        routerLink="planning"
+      >
+        View Planning
+      </button>
+    </div>
+
+    <div class="col-8 col-md-3" *ngIf="currentUser.isSuperUser">
+      <button
+        class="btn btn-outline-citric mt-1 mt-md-0 w-100"
+        (click)="getSamsonDesignRequests()"
+      >
+        {{ samsonMode ? "View all" : "View Samson Design Requests" }}
+      </button>
+    </div>
+  </div>
+
+  <hr />
+  <div class="row" *ngIf="!is_loading">
+    <div class="col-12 btn-group">
+      <button
+        (click)="getStatusByParent(1)"
+        class="btn btn-outline-citric"
+        [ngClass]="{ active: parent_id == 1 }"
+      >
+        Design
+      </button>
+      <button
+        (click)="getStatusByParent(2)"
+        class="btn btn-outline-citric"
+        [ngClass]="{ active: parent_id == 2 }"
+      >
+        Development
+      </button>
+    </div>
+  </div>
+  <hr />
+
+  <ng-template [ngIf]="!statuses || statuses.length === 0 || is_loading">
+    <div class="d-flex justify-content-center" style="margin: 15%">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div [hidden]="statuses.length === 0 || is_loading">
+    <div class="row col-12">
+      <br />
+      <div
+        [ngClass]="{
+          active:
+            item.idDesignRequestStatus ===
+            selected_status?.idDesignRequestStatus
+        }"
+        (click)="filterByStatus(item)"
+        class="col-6 col-md-3 text-center clickable"
+        *ngFor="let item of statuses"
+      >
+        <span class="text-citric summary">
+          {{ item.summary }}
+        </span>
+        <br />
+        <span
+          class="status text-center"
+          [ngStyle]="{
+            background: item.color ? '#' + item.color : '#6c757d'
+          }"
+          style="width: 90%; display: inline-block"
+        >
+          {{ item.name }}
+        </span>
+      </div>
+      <br />
+      <br />
+    </div>
+
+    <hr />
+    <div class="scroll-x">
+      <table
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        class="table row-border hover"
+      >
+        <thead>
+          <tr>
+            <th hidden>Priority</th>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Priority</th>
+            <th width="30%" style="width: 120px !important">Desc</th>
+            <th>Organization</th>
+            <th>Status</th>
+            <th>Assigned To</th>
+            <th>Created by</th>
+            <th>Date</th>
+            <th>Deadline</th>
+            <th>Estimated Time</th>
+            <th [hidden]="parent_id == 1">Platform & Module</th>
+            <th>Configurations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let item of designRequests"
+            [ngClass]="{
+              'in-red': item.estimatedTime == 0,
+              'in-green': item.estimatedTime > 0 && item.is_ready
+            }"
+          >
+            <td hidden>
+              {{ item.priority }}
+            </td>
+            <td>
+              {{ item.idDesignRequest }}
+            </td>
+            <td>
+              {{ item.title || "N/A" }}
+            </td>
+            <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'badge-secondary': item.priority == 0,
+                  'badge-info': item.priority > 0 && item.priority < 3,
+                  'badge-warning': item.priority > 2 && item.priority < 5,
+                  'badge-danger': item.priority > 4
+                }"
+              >
+                {{ item.priority }}
+              </span>
+              {{ item.designRequestPriority || "Not assigned" }}
+            </td>
+            <td width="30%" style="width: 120px !important">
+              <div
+                style="width: 180px; display: block; overflow-wrap: break-word"
+                [innerHTML]="
+                  showTrim(item.description | safe: 'text' | attachParse, item)
+                "
+              ></div>
+              <a routerLink="detail/{{ item.idDesignRequest }}" target="_blank">
+                <small class="clickable text-citric"> Read more... </small>
+              </a>
+            </td>
+            <td>
+              {{ item.iglesia }}
+            </td>
+            <td>
+              <span
+                class="status"
+                [ngStyle]="{
+                  background: item.color ? '#' + item.color : '#6c757d'
+                }"
+              >
+                {{ item.designRequestStatus }}
+              </span>
+            </td>
+            <td>
+              {{ item.userAssignedTo }}
+            </td>
+            <td>
+              <div class="strong">{{ item.user }}</div>
+              <div class="green">
+                {{ item.phone }}
+              </div>
+              <div class="green">
+                {{ item.email }}
+              </div>
+            </td>
+            <td>
+              {{ item.createdAt | date: "MMM dd yyyy" }}
+            </td>
+            <td>
+              {{ item.deadline | date: "MMM dd yyyy" }}
+            </td>
+            <td>{{ item.estimatedTime }} Hrs.</td>
+            <td [hidden]="parent_id == 1">
+              <div *ngIf="item.platform">
+                {{ item.platform | titlecase }}
+                <i
+                  class="fa fa-mobile-alt ml-2"
+                  *ngIf="item.platform === 'mobile' || item.platform === 'both'"
+                >
+                </i>
+                <i
+                  class="fa fa-desktop ml-2"
+                  *ngIf="item.platform === 'web' || item.platform === 'both'"
+                ></i>
+              </div>
+
+              <br *ngIf="item.designRequestModule" />
+
+              <span
+                *ngIf="item.designRequestModule"
+                class="badge badge-secondary"
+              >
+                {{ item.designRequestModule | titlecase }}
+              </span>
+            </td>
+            <td class="text-right">
+              <button
+                routerLink="detail/{{ item.idDesignRequest }}"
+                [queryParams]="query_params"
+                class="btn ml-2"
+              >
+                <i class="text-primary fa fa-eye"> </i>
+              </button>
+              <button
+                class="btn ml-2"
+                (click)="openEditModal(item, design_request_form)"
+              >
+                <i class="text-info fa fa-edit"></i>
+              </button>
+              <button class="btn ml-2" (click)="deleteRequest(item)">
+                <i class="text-danger fa fa-trash-alt"></i>
+              </button>
+              <button class="btn ml-2" (click)="copyUrl(item)">
+                <i class="text-secondary fa fa-link"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #design_request_form_modal_3
+  identifier="design_request_form_modal_3"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+  (onOpenFinished)="initDesignRequest(design_request_form)"
+>
+  <app-design-request-form
+    #design_request_form
+    (onDismiss)="onModalDidDismiss($event)"
+  >
+  </app-design-request-form>
+</ngx-smart-modal>

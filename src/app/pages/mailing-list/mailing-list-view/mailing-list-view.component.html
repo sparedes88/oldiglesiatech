@@ -1,0 +1,419 @@
+<div [ngClass]="is_preview ? 'card' : 'container'">
+  <h4 *ngIf="is_preview" class="mb-4 p-2">Preview</h4>
+  <div *ngIf="!submitted && !loading" class="row justify-content-center">
+    <div class="col-12 col-md-10 row">
+      <div
+        [ngClass]="
+          mailing_list?.setup?.display_contact_info ? 'col-6' : 'col-12'
+        "
+      >
+        <div class="row">
+          <div *ngIf="extra_display_settings.logo" class="col-2 col-md-2 align-self-center">
+            <div class="logo-container">
+              <img [src]="getPicture()" />
+            </div>
+          </div>
+          <h1
+            *ngIf="extra_display_settings.name"
+            id="title_setting"
+            class="header-element align-self-center"
+            [ngClass]="
+              mailing_list?.organization?.logo ? 'col-10 col-md-10' : 'col-10'
+            "
+          >
+            {{ mailing_list?.organization?.name }}
+          </h1>
+          <h4 class="col-12">{{ mailing_list?.setup?.header_text }}</h4>
+        </div>
+        <form [formGroup]="form_group">
+          <div formArrayName="inputs">
+            <div
+              *ngFor="let input of inputs_array.controls; let i = index"
+              [formGroupName]="i"
+              class="form-group text-justify"
+            >
+              <label>
+                <span
+                  [ngClass]="{
+                    'text-danger':
+                      (input.value.idMailingListInputType === 4 ||
+                        input.value.idMailingListInputType === 5) &&
+                      (input.get('value').touched ||
+                        input.get('value').dirty) &&
+                      input.get('value').invalid
+                  }"
+                >
+                  {{ input.value.custom_label || input.value.label }}
+                </span>
+              </label>
+              <div *ngIf="input.value.idMailingListInputType == 4">
+                <div
+                  class="form-check"
+                  *ngFor="let option of input.value.options"
+                >
+                  <input
+                    [checked]="option.checked"
+                    class="form-check-input"
+                    type="checkbox"
+                    (change)="setCheckedValues(input, option, $event)"
+                  />
+                  <label class="form-check-label">
+                    {{ option.name }}
+                  </label>
+                </div>
+              </div>
+              <div *ngIf="input.value.idMailingListInputType == 5">
+                <div
+                  class="form-check"
+                  *ngFor="let option of input.value.options; let f = first"
+                >
+                  <input
+                    formControlName="value"
+                    class="form-check-input"
+                    type="radio"
+                    [id]="option.value"
+                    [value]="option.value"
+                  />
+                  <label class="form-check-label" [for]="option.value">
+                    {{ option.name }}
+                  </label>
+                </div>
+              </div>
+              <textarea
+                formControlName="value"
+                class="form-control"
+                [placeholder]="input.value.custom_placeholder || input.value.placeholder || ''"
+                *ngIf="input.value.idMailingListInputType == 2"
+                [class.is-invalid]="
+                  (input.get('value').touched || input.get('value').dirty) &&
+                  input.get('value').invalid
+                "
+              >
+              </textarea>
+              <input
+                formControlName="value"
+                class="form-control"
+                [placeholder]="input.value.custom_placeholder || input.value.placeholder || ''"
+                *ngIf="input.value.idMailingListInputType == 1"
+                type="text"
+                [class.is-invalid]="
+                  (input.get('value').touched || input.get('value').dirty) &&
+                  input.get('value').invalid
+                "
+              />
+              <!-- <div
+                    class="p-0 col-12"
+                    [ngClass]="{ 'col-md-6 px-md-2': !show_as_minimal }"
+                  >
+                    <div class="form-group">
+                      <label for="estimated">
+                        Country Code <span class="text-danger">*</span>
+                      </label>
+                      <app-custom-select-country
+                        [return_value]="'callingCode'"
+                        formControlName="country_code"
+                        [idOrganization]="idIglesia"
+                        [preselected_country_code]="phone.get('country_code').value"
+                      >
+                      </app-custom-select-country>
+                    </div>
+                  </div> -->
+
+              <input
+                formControlName="value"
+                class="form-control mb-1"
+                [placeholder]="input.value.custom_placeholder || input.value.placeholder || '(999) 999-9999'"
+                *ngIf="input.value.idMailingListInputType == 9"
+                type="tel"
+                [dropSpecialCharacters]="false"
+                mask="(000) 000-0000"
+                [class.is-invalid]="
+                  (input.get('value').touched || input.get('value').dirty) &&
+                  input.get('value').invalid
+                "
+              />
+
+              <input
+                formControlName="value"
+                class="form-control"
+                [placeholder]="input.value.custom_placeholder || input.value.placeholder || 'your@email.com'"
+                *ngIf="input.value.idMailingListInputType == 10"
+                type="email"
+                [class.is-invalid]="
+                  (input.get('value').touched || input.get('value').dirty) &&
+                  input.get('value').invalid
+                "
+              />
+              <input
+                formControlName="value"
+                class="form-control"
+                [placeholder]="input.value.custom_placeholder || input.value.placeholder"
+                *ngIf="input.value.idMailingListInputType == 3"
+                type="number"
+                [class.is-invalid]="
+                  (input.get('value').touched || input.get('value').dirty) &&
+                  input.get('value').invalid
+                "
+              />
+              <input
+                formControlName="value"
+                class="form-control"
+                [placeholder]="input.value.custom_placeholder || input.value.placeholder"
+                *ngIf="input.value.idMailingListInputType == 11"
+                type="url"
+                [class.is-invalid]="
+                  (input.get('value').touched || input.get('value').dirty) &&
+                  input.get('value').invalid
+                "
+              />
+
+              <small
+                class="text-danger"
+                *ngIf="
+                  input.value.idMailingListInputType == 11 &&
+                  input.get('value').hasError('invalidUrl')
+                "
+              >
+                Please enter a valid url.
+              </small>
+
+              <small *ngIf="input.value.show_hint">
+                {{ input.value.custom_hint || input.value.hint }}
+              </small>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div *ngIf="mailing_list?.setup?.display_contact_info" class="col-6">
+        <div class="row p-0 w-100">
+          <div
+            *ngIf="!mailing_list?.setup?.hide_address"
+            class="row col-12 align-self-center"
+          >
+            <i
+              [ngStyle]="{
+                color: mailing_list?.setup?.icon_color
+                  ? mailing_list?.setup?.icon_color
+                  : '#ff7f50'
+              }"
+              class="fas fa-map-marker-alt resized-fa-icon col-3 col-md-2 text-center align-self-center p-0"
+            ></i>
+            <div
+              *ngIf="mailing_list && mailing_list.organization"
+              class="col-9 col-md-10 align-self-center p-0"
+            >
+              <h4 class="bold my-0">{{ lang.keys["address"] }}</h4>
+              <span
+                [ngClass]="{
+                  'not-provided': !mailing_list.organization.street
+                }"
+              >
+                {{ mailing_list.organization.street || "-- No street --" }}
+              </span>
+              <span
+                [ngClass]="{ 'not-provided': !mailing_list.organization.city }"
+              >
+                {{ mailing_list.organization.city || "-- No city --" }},
+              </span>
+              <span
+                [ngClass]="{ 'not-provided': !mailing_list.organization.state }"
+              >
+                {{ mailing_list.organization.state || "-- No state --" }}
+              </span>
+              <span
+                [ngClass]="{
+                  'not-provided': !mailing_list.organization.zip_code
+                }"
+              >
+                {{ mailing_list.organization.zip_code || "-- No zip code --" }}
+              </span>
+            </div>
+          </div>
+          <!-- Phones -->
+          <div
+            *ngIf="!mailing_list?.setup?.hide_phones"
+            class="row col-12 align-self-center mt-4"
+          >
+            <i
+              [ngStyle]="{
+                color: mailing_list?.setup?.icon_color
+                  ? mailing_list?.setup?.icon_color
+                  : '#ff7f50'
+              }"
+              class="fas fa-phone-alt resized-fa-icon col-3 col-md-2 text-center align-self-center p-0"
+            ></i>
+            <div class="col-9 col-md-10 align-self-center p-0">
+              <h4 class="bold my-0">{{ lang.keys["contact_phone"] }}</h4>
+              <span
+                *ngIf="contact_info.phones?.length === 0"
+                class="not-provided"
+              >
+                -- {{ lang.keys["no_phones_provided"] || 'No phones provided' }} --
+              </span>
+              <ul class="p-0" style="list-style-type: none">
+                <li
+                  *ngFor="let phone of contact_info.phones"
+                  class="form-group mb-0"
+                >
+                  <a class="text-400 text-dark" [href]="'tel:' + phone.phone">
+                    {{ phone.phone }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- Emails -->
+          <div
+            *ngIf="!mailing_list?.setup?.hide_emails"
+            class="row col-12 align-self-center mt-4"
+          >
+            <i
+              [ngStyle]="{
+                color: mailing_list?.setup?.icon_color
+                  ? mailing_list?.setup?.icon_color
+                  : '#ff7f50'
+              }"
+              class="fas fa-envelope resized-fa-icon col-3 col-md-2 text-center align-self-center p-0"
+            ></i>
+            <div class="col-9 col-md-10 align-self-center p-0">
+              <h4 class="bold my-0">{{ lang.keys["contact_email"] }}</h4>
+              <span
+                *ngIf="contact_info.emails?.length === 0"
+                class="not-provided"
+              >
+                -- {{ lang.keys["no_emails_provided"] || 'No emails provided' }} --
+              </span>
+              <ul class="p-0" style="list-style-type: none">
+                <li
+                  *ngFor="let email of contact_info.emails"
+                  class="form-group mb-0"
+                >
+                  <a class="text-400 text-dark" :href="'mailto:' + email.email">
+                    {{ email.email }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- Sunday Service -->
+          <div
+            *ngIf="
+              mailing_list?.setup?.sunday_service &&
+              !mailing_list?.setup?.hide_sunday_service
+            "
+            class="row col-12 align-self-center mt-4"
+          >
+            <i
+              [ngStyle]="{
+                color: mailing_list?.setup?.icon_color
+                  ? mailing_list?.setup?.icon_color
+                  : '#ff7f50'
+              }"
+              class="fas fa-calendar resized-fa-icon col-3 col-md-2 text-center align-self-center p-0"
+            ></i>
+            <div
+              class="col-9 col-md-10 align-self-center"
+              style="position: relative"
+            >
+              <h4 class="bold my-0">{{ lang.keys["sunday_service"] }}</h4>
+              <span
+                class="fixed-span-sunday"
+                style="
+                  white-space: pre-line;
+                  position: absolute;
+                  display: contents;
+                "
+              >
+                {{ mailing_list?.setup?.sunday_service }}
+              </span>
+            </div>
+          </div>
+          <div
+            class="mt-4 col-12 align-self-center row d-none d-sm-block"
+            *ngIf="
+              mailing_list?.setup?.picture && !mailing_list?.setup?.hide_picture
+            "
+          >
+            <div class="img-container">
+              <img [src]="base_url + mailing_list?.setup?.picture" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 text-center">
+        <button
+          (click)="submit()"
+          [ngStyle]="{
+            'background-color':
+              mailing_list?.setup?.button_settings.button_color,
+            color: mailing_list?.setup?.button_settings.text_color,
+            width: mailing_list?.setup?.button_settings.width + '%',
+            'text-align': mailing_list?.setup?.button_settings.align,
+            'border-radius':
+              mailing_list?.setup?.button_settings.border_radius + 'px'
+          }"
+          class="subscribe-button button is-itech"
+          type="submit"
+        >
+          {{ mailing_list?.setup?.button_settings.text }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="submitted && !loading" class="row justify-content-center">
+    <div class="col-12 col-md-10 row">
+      <div
+        [ngClass]="
+          mailing_list?.setup?.display_contact_info ? 'col-6' : 'col-12'
+        "
+      >
+        <div class="row">
+          <div class="col-2 col-md-2 align-self-center">
+            <div class="logo-container">
+              <img [src]="getPicture()" />
+            </div>
+          </div>
+          <h1
+            id="title_setting"
+            class="header-element align-self-center"
+            [ngClass]="
+              mailing_list?.organization?.logo ? 'col-10 col-md-10' : 'col-10'
+            "
+          >
+            {{ mailing_list?.organization?.name }}
+          </h1>
+        </div>
+
+        <h2 class="header-element bold col-xs-12 text-center mt-4">
+          {{ mailing_list?.setup?.thank_you_message }}
+          <span *ngIf="is_preview">
+            <br />
+            <button class="btn btb-sm btn-citric" (click)="submitted = false">
+              Back
+            </button>
+          </span>
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <ng-template [ngIf]="loading">
+    <div
+      class="d-flex justify-content-center col-12"
+      style="margin-top: 10%; margin-bottom: 10%"
+    >
+      <div
+        style="
+          height: 120px;
+          width: 120px;
+          font-size: 15px;
+          border-width: 0.45em;
+        "
+        class="spinner-border text-citric"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,332 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      Reviews | Event: <i>{{ group_event?.name }} </i>
+    </h4>
+    <div *ngIf="show_dismiss" class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+
+    <div class="col-12 row">
+      <div class="col-3 offset-9">
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success mt-3 mb-3"
+          (click)="activateForm()"
+          [disabled]="show_editable"
+        >
+          Add Review
+        </button>
+        <button
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+          (click)="print()"
+          [disabled]="show_editable || reviews.length === 0"
+        >
+          Print
+        </button>
+      </div>
+      <div *ngIf="show_editable" class="col-12 p-0">
+        <form
+          #review_form="ngForm"
+          [formGroup]="reviewForm"
+          style="width: 100%;"
+          class="row"
+        >
+          <div class="col-8">
+            <div class="form-group">
+              <label for="estimated">Task *</label>
+              <input
+                class="form-control"
+                placeholder="Task description."
+                type="text"
+                formControlName="description"
+                required
+              />
+            </div>
+          </div>
+          <!-- <div class="col-4">
+            <div class="form-group">
+              <label for="estimated">Time* (minutes)</label>
+              <input
+                class="form-control"
+                placeholder="Time (in minutes)."
+                type="text"
+                formControlName="review_duration"
+                required
+              />
+            </div>
+          </div> -->
+
+          <div class="col-4 mb-3">
+            <label>Team: *</label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select a team"
+              [data]="groups"
+              [settings]="selectTeamOptions"
+              (onSelect)="fixIdGroup($event)"
+              (onDeSelect)="
+                reviewForm.patchValue({
+                  idGroupTeam: undefined
+                })
+              "
+            ></ng-multiselect-dropdown>
+            <!-- formControlName="idGroupTeam" -->
+          </div>
+
+          <!-- <div class="col-4">
+            <div class="form-group">
+              <label for="estimated">Resources</label>
+              <input
+                class="form-control"
+                placeholder="Resources to use."
+                type="text"
+                formControlName="resources"
+              />
+            </div>
+          </div> -->
+
+          <!-- <div class="col-4 mb-3">
+            <label>Volunteers: *</label>
+            <ng-multiselect-dropdown
+              #multi_select_users
+              placeholder="Select the volunteers"
+              [data]="users"
+              [settings]="selectUserOptions"
+              (onSelect)="fixUsersValues($event)"
+              (onDeSelect)="fixUsersValues($event)"
+            ></ng-multiselect-dropdown>
+          </div> -->
+
+          <div class="col-12" formArrayName="notes">
+            <div class="row">
+              <div class="col-8">
+                Notes
+              </div>
+              <div class="col-3 text-right">
+                Add note
+              </div>
+              <div class="col-1 mb-3">
+                <button
+                  class="btn btn-sm btn-success fixed-padding"
+                  (click)="addNote()"
+                >
+                  <i class="fa fa-plus"></i>
+                </button>
+              </div>
+            </div>
+            <div
+              class="row"
+              *ngFor="let item of notes_on_form; let i = index"
+              [formGroupName]="i"
+            >
+              <div class="col-11 p-0">
+                <div class="form-group">
+                  <label for="estimated">Note {{ i + 1 }}</label>
+                  <textarea
+                    class="form-control"
+                    placeholder="Notes about this review"
+                    type="text"
+                    formControlName="description"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="col-1 align-self-center">
+                <button
+                  class="btn btn-sm btn-danger fixed-padding"
+                  (click)="deleteNote(i)"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="col-4 align-self-center" *ngIf="!getPermissions()">
+            <button
+              class="btn btn-sm btn-light"
+              (click)="uploadPicture(input_file)"
+            >
+              Attach documents
+            </button>
+          </div> -->
+        </form>
+
+        <hr />
+
+        <span
+          style="display: block; text-align: right; width: 100%;"
+          class="mb-2"
+        >
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            class="btn btn-sm btn-muted"
+            (click)="deactivateForm()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            [disabled]="reviewForm.invalid && !getPermissions()"
+            (click)="addReview(reviewForm)"
+            class="btn btn-sm btn-success"
+          >
+            Save
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem;"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div [hidden]="show_loading" class="col-12 p-0" style="min-height: 500px;">
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="reviewStatusForm"
+        style="width: 100%;"
+      >
+        <div formArrayName="statuses" class="col-12 p-0">
+          <table class="table row-border hover table-striped">
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th *ngIf="!getPermissions()">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let review of reviews; let i = index"
+                [formGroupName]="i"
+              >
+                <td>
+                  {{ review.group_name }}
+                </td>
+                <td>
+                  {{ review.description }}
+                </td>
+                <td>
+                  <div *ngIf="!getPermissions()" class="form-group">
+                    <select
+                      (change)="
+                        checkChange(
+                          status_on_form.controls[i].get(
+                            'idGroupEventReviewStatus'
+                          ),
+                          review
+                        )
+                      "
+                      formControlName="idGroupEventReviewStatus"
+                      class="form-control mb-1"
+                    >
+                      <option
+                        *ngFor="let status of status_list"
+                        [value]="status.idGroupEventReviewStatus"
+                      >
+                        {{ status.name }}
+                      </option>
+                    </select>
+                    <span style="display: block; text-align: right;">
+                      <button
+                        type="button"
+                        *ngIf="
+                          status_on_form.controls[i].get(
+                            'idGroupEventReviewStatus'
+                          ).dirty &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="
+                          resetReviewStatusForm(
+                            status_on_form.controls[i],
+                            review
+                          )
+                        "
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          status_on_form.controls[i].get(
+                            'idGroupEventReviewStatus'
+                          ).dirty &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        [disabled]="
+                          status_on_form.controls[i].get(
+                            'idGroupEventReviewStatus'
+                          ).invalid &&
+                          (group.is_leader ||
+                            currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        (click)="
+                          updateMemberType(status_on_form.controls[i], review)
+                        "
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span>
+                  </div>
+                  <div *ngIf="getPermissions()">
+                    {{ review.review_status }}
+                  </div>
+                </td>
+                <td>
+                  <ol>
+                    <li *ngFor="let note of review.notes">
+                      {{ note.description }}
+                    </li>
+                  </ol>
+                </td>
+                <td *ngIf="!getPermissions()">
+                  <div class="btn-group">
+                    <button
+                      (click)="updateReview(review)"
+                      [disabled]="show_editable"
+                      class="btn btn-sm btn-info fixed-padding"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger fixed-padding"
+                      (click)="deleteReview(review)"
+                      [disabled]="show_editable"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

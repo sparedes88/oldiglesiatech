@@ -1,0 +1,677 @@
+<div class="container page">
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+          {{ totalGroups || 0 }}
+        </span>
+        <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/content_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="row">
+        <div class="col-12 text-right mb-2">
+          <button
+            *ngIf="user?.isSuperUser"
+            class="btn btn-sm btn-secondary mr-2"
+            routerLink="fonts"
+          >
+            Fonts
+          </button>
+          <button class="btn btn-sm btn-citric" routerLink="categories">
+            Categories
+          </button>
+        </div>
+      </div>
+      <ul #myTab class="nav nav-tabs navbar-citric" id="myTab" role="tablist">
+        <li class="nav-item" *ngFor="let item of tabs">
+          <a
+            data-toggle="tab"
+            [ngClass]="tabSelected == item.idTab.toString() ? 'active' : ''"
+            class="nav-link text-citric"
+            id="home-tab"
+            href="#home"
+            role="tab"
+            aria-controls="home"
+            aria-selected="true"
+            (click)="changeTab(item)"
+          >
+            {{ item.tabTitle }}
+          </a>
+        </li>
+      </ul>
+      <div
+        class="fix-border-top"
+        *ngIf="tabToShow && tabToShow.idTab != 6 && tabToShow.idTab != 7"
+      >
+        <!-- <ion-grid padding> -->
+        <div
+          class="row row-divider align-items-center pb-5 pb-md-2"
+          no-margin
+          *ngIf="!editTitle"
+        >
+          <div class="col-12 col-md-4" no-padding>
+            <span ion-text class="fix-font-size"> Tab Title: </span>
+            <h5 ion-text>
+              {{ tabToShow.tabTitle }}
+            </h5>
+          </div>
+          <div class="col-4 col-md-2" no-padding>
+            <button
+              class="fix-button-heigh btn btn-outline-citric"
+              color="citric"
+              (click)="canEditTitle(true)"
+            >
+              Edit Title
+            </button>
+          </div>
+          <div class="col-4 col-md-2" no-padding>
+            <button
+              class="fix-button-heigh btn btn-outline-citric"
+              color="citric"
+              (click)="addArticulo()"
+            >
+              Add Article
+            </button>
+          </div>
+          <div class="col-4 col-md-2" no-padding>
+            <button
+              class="fix-button-heigh btn btn-outline-citric"
+              color="citric"
+              (click)="uploadSelectModal.open()"
+            >
+              Add Cover
+            </button>
+            <br />
+            <span style="font-size: 12px; position: absolute">
+              Recommended size: 1000x428
+            </span>
+            <div class="col-12 col-md-4" [hidden]="true">
+              <div class="custom-file mb-4">
+                <input
+                  #input_file
+                  accept="image/*"
+                  type="file"
+                  class="custom-file-input"
+                  id="customFile"
+                />
+                <label class="custom-file-label" for="customFile"
+                  >Choose file</label
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="row row-divider align-items-center"
+          *ngIf="editTitle"
+          justify-content-center
+          align-items-center
+        >
+          <div class="col-8" no-padding>
+            <!-- <ion-item no-lines>
+            </ion-item> -->
+            <input class="col-11" #title [(ngModel)]="newTitle" />
+          </div>
+          <div class="col-2" no-padding>
+            <button
+              no-margin
+              color="citric"
+              class="fix-button-heigh btn btn-primary"
+              (click)="saveEditTitle(tabToShow)"
+            >
+              Save
+            </button>
+          </div>
+          <div class="col-2" no-padding>
+            <button
+              no-margin
+              class="fix-button-heigh btn btn-danger"
+              (click)="canEditTitle(false)"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <div
+          [formGroup]="background_form"
+          class="row row-divider align-items-center"
+        >
+          <div class="col-8">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+              (click)="uploadPicture(input_file)"
+            >
+              <label stacked color="gray">
+                Background {{ background_settings.background_type }}
+              </label>
+              <input
+                *ngIf="background_settings.background_type === 'picture'"
+                type="text"
+                required
+                class="form-control"
+                readonly
+                placeholder="Click here to select a picture"
+                formControlName="background_picture"
+              />
+
+              <input
+                *ngIf="background_settings.background_type === 'color'"
+                type="color"
+                formControlName="background_picture"
+                class="form-control"
+                style="height: 40px"
+                (change)="savePictureOrColor()"
+              />
+            </div>
+          </div>
+          <div class="col-2 align-self-center">
+            <button class="btn btn-sm btn-success" (click)="toggleType()">
+              Use {{ background_settings.other_type }} instead
+            </button>
+          </div>
+          <div class="col-2 align-self-center">
+            <button class="btn btn-sm btn-success" (click)="addDefaultImage()">
+              Reset to default {{ background_settings.background_type }}
+            </button>
+          </div>
+
+          <div class="col-12 col-md-4" [hidden]="true">
+            <div class="custom-file mb-4">
+              <input
+                #input_file
+                accept="image/*"
+                type="file"
+                class="custom-file-input"
+                id="customFile"
+              />
+              <label class="custom-file-label" for="customFile"
+                >Choose file</label
+              >
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4" no-padding>
+            <span class="fix-font-size"> Template: </span>
+            <h5>
+              {{
+                tabToShow.template
+                  ? tabToShow.template.nombre
+                  : "Not Template Selected"
+              }}
+            </h5>
+          </div>
+          <div class="col-3 col-md-3" no-padding>
+            <button
+              class="fix-button-heigh btn btn-outline-citric"
+              (click)="
+                saveTemplate(
+                  tabToShow.template,
+                  select_template_modal,
+                  select_template_form
+                )
+              "
+            >
+              <span *ngIf="tabToShow.template"> Update </span>
+              <span *ngIf="!tabToShow.template"> Add </span>
+            </button>
+          </div>
+        </div>
+        <!-- </ion-grid> -->
+        <!-- <ion-grid no-padding> -->
+        <div
+          class="row mx-0"
+          [hidden]="
+            tabToShow.template?.require_extra_info ||
+            tabToShow.template?.idTemplate === 16
+          "
+        >
+          <!-- <table class="table row-border hover">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Configurations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let articulo of tabToShow.articulos">
+                <td>
+                  {{ articulo.titulo | titlecase }}
+                </td>
+                <td>
+                  <button
+                    routerLink="article/{{ articulo.idArticulo }}"
+                    class="btn btn-primary ml-2"
+                  >
+                    <i class="fa fa-eye"> </i>
+                  </button>
+                  <button
+                    class="btn btn-info ml-2"
+                    [disabled]="getting_detail"
+                    (click)="openEditModal(articulo)"
+                  >
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn btn-danger ml-2"
+                    (click)="deleteArticulo(articulo)"
+                  >
+                    <i class="fa fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table> -->
+
+          <!-- <drag-article-item
+            [item]="tabToShow"
+            [has_limited_permission]="false"
+            [connectedDropListsIds]="connectedDropListsIds"
+            [sort_mode]="false"
+            (itemDrop)="onDragDropV1($event)"
+            (sortItem)="sortElement($event)"
+            (makeAction)="handleAction($event)"
+            (makeActionContainer)="handleActionContainer($event)"
+          >
+          </drag-article-item> -->
+          <div class="col-8">
+            <div style="border-bottom: 2px solid #dee2e6" class="row m-0">
+              <h5 class="col-6">Title</h5>
+              <h5 class="col-6">Configurations</h5>
+            </div>
+            <div
+              cdkDropList
+              class="drag-list builder-scroll"
+              [cdkDropListConnectedTo]="connectedDropListsIds"
+              [cdkDropListData]="tabToShow"
+              [id]="tabToShow.uId"
+              (cdkDropListDropped)="onDragDropV1($event)"
+            >
+              <!-- (cdkDropListDropped)="dropLevel($event)" -->
+              <ng-container *ngFor="let articulo of tabToShow.articulos">
+                <div
+                  class="drag-box row"
+                  cdkDrag
+                  [id]="articulo.uId"
+                  [cdkDragData]="articulo"
+                  (cdkDropListDropped)="onDragDropV1($event)"
+                >
+                  <div class="col-6">
+                    {{ articulo.orden }}. {{ articulo.titulo }}
+                  </div>
+                  <div class="col-6">
+                    <div class="btn-group">
+                      <button
+                        routerLink="article/{{ articulo.idArticulo }}"
+                        class="btn btn-sm btn-primary ml-2"
+                      >
+                        <i class="fa fa-eye"> </i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-info ml-2"
+                        [disabled]="getting_detail"
+                        (click)="openEditModal(articulo)"
+                      >
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger ml-2"
+                        (click)="deleteArticulo(articulo)"
+                      >
+                        <i class="fa fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- [ngClass]="{ 'item-dropzone': !sort_mode && !has_limited_permission, 'item-reduced': sort_mode || has_limited_permission }" -->
+                <ul
+                  class="item-dropzone parent"
+                  cdkDropList
+                  [id]="articulo.uId"
+                  [cdkDropListConnectedTo]="connectedDropListsIds"
+                  [cdkDropListData]="articulo"
+                  (cdkDropListDropped)="onDragDropV1($event)"
+                >
+                  <li class="drop-li">
+                    <h6 class="my-1">Articles added to {{ articulo.titulo }}</h6>
+
+                    <div
+                      cdkDropList
+                      class="item-dropzone example-list"
+                      [id]="articulo.uId"
+                      [cdkDropListData]="articulo"
+                      [cdkDropListConnectedTo]="connectedDropListsIds"
+                      (cdkDropListDropped)="onDragDropV1($event)"
+                    >
+                      <div
+                        class="example-box"
+                        *ngFor="let subItem of articulo.articulos"
+                        cdkDrag
+                        [id]="subItem.uId"
+                        [cdkDragData]="subItem"
+                      >
+                        <!-- [cdkDragDisabled]="dragDisabled || sort_mode" -->
+                        <div class="item-drag-preview" *cdkDragPreview>
+                          <!-- {{ item.name }} with {{ item.containers.length }} child item(s) -->
+                          Drag this article inside any other you want
+                        </div>
+                        <div class="row mx-0">
+                          <div class="col-10">
+                            {{ subItem.titulo }}
+                            <div class="btn-group float-right">
+                              <button
+                                routerLink="article/{{ subItem.idArticulo }}"
+                                class="btn btn-sm btn-primary ml-2"
+                              >
+                                <i class="fa fa-eye"> </i>
+                              </button>
+                              <button
+                                class="btn btn-sm btn-info"
+                                [disabled]="getting_detail"
+                                (click)="openEditModal(subItem)"
+                              >
+                                <i class="fa fa-edit"></i>
+                              </button>
+                              <button
+                                class="btn btn-sm btn-danger"
+                                (click)="deleteArticulo(subItem)"
+                              >
+                                <i class="fa fa-trash-alt"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-2">
+                            <svg
+                              cdkDragHandle
+                              width="24px"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+                              ></path>
+                              <path d="M0 0h24v24H0z" fill="none"></path>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <list-item
+                    [item]="subItem"
+                    [parentItem]="item"
+                    [has_limited_permission]="has_limited_permission"
+                    [connectedDropListsIds]="allDropListsIds"
+                    (itemDrop)="onDragDrop($event)"
+                    (sortItem)="sortItem.emit($event)"
+                    (makeAction)="makeAction.emit($event)"
+                    (makeActionContainer)="makeActionContainer.emit($event)"
+                    [sort_mode]="sort_mode"
+                  >
+                  </list-item> -->
+                  </li>
+                </ul>
+              </ng-container>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card">
+              <h4 class="text-citric">Preview</h4>
+              <div class="preview-scroll">
+                <app-template-preview
+                  id="preview_template"
+                  [tab]="tabToShow"
+                ></app-template-preview>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div [hidden]="tabToShow.template?.idTemplate !== 16">
+          <h5 class="col-12 text-center text-danger py-2 px-0">
+            To edit this section, please go to
+            <a routerLink="/wordpress"> Wordpress Module </a>
+          </h5>
+        </div>
+        <div [hidden]="!tabToShow.template?.require_extra_info">
+          <h5 class="col-12 text-center text-danger py-2 px-0">
+            Note: This template won't show your articles. But we will keep them.
+            Change the template to edit your articles.
+          </h5>
+        </div>
+      </div>
+
+      <div class="fix-border-top" *ngIf="tabToShow && tabToShow.idTab == 6">
+        <h4 class="font-weight-bold mt-4">Article Manager</h4>
+        <div class="row justify-content-end">
+          <div class="col-4 col-md-2" no-padding>
+            <button
+              class="fix-button-heigh btn btn-outline-citric"
+              color="citric"
+              (click)="addArticuloWithManager()"
+            >
+              Add Article
+            </button>
+          </div>
+          <div class="col-xs-12 col-md-12">
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select
+                class="form-control"
+                [(ngModel)]="selected_category"
+                placeholder="Sex"
+                (change)="filterArticles($event)"
+              >
+                <option
+                  *ngFor="let item of categorias"
+                  [value]="item.idCategoriaArticulo"
+                >
+                  {{ item.nombre }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="col-12"
+            *ngIf="tabToShow?.articulos?.length > 0 && !loading"
+          >
+            <div class="row m-0" *ngFor="let tab of tab_articles_categoties">
+              <h5 class="col-8 text-secondary">
+                Tab: {{ tab.tabTitle || "None" }}
+              </h5>
+              <div class="col-4 text-center text-scondary">
+                <button class="btn btn-sm btn-citric" (click)="resetOrder(tab)">
+                  <i class="fa fa-sort"></i> Unset order
+                </button>
+              </div>
+              <div style="border-bottom: 2px solid #dee2e6" class="row m-0">
+                <h5 class="col-6">Title</h5>
+                <h5 class="col-6">Configurations</h5>
+              </div>
+              <div
+                cdkDropList
+                class="drag-list builder-scroll"
+                (cdkDropListDropped)="
+                  dropLevelGroup($event, tab.temp_articulos)
+                "
+              >
+                <ng-container *ngFor="let articulo of tab.temp_articulos">
+                  <div class="drag-box row" cdkDrag>
+                    <div class="col-6">
+                      {{ articulo.orden }}. {{ articulo.titulo }}
+                      <!-- <span class="text-secondary" *ngIf="articulo.tabTitle">
+                        <small> ({{ articulo.tabTitle }}) </small>
+                      </span> -->
+                      <span class="text-citric" *ngIf="selected_category == 0">
+                        <small> ({{ articulo.categoria | translate }}) </small>
+                      </span>
+                    </div>
+                    <div class="col-6">
+                      <div class="btn-group">
+                        <button
+                          routerLink="article/{{ articulo.idArticulo }}"
+                          class="btn btn-sm btn-primary ml-2"
+                        >
+                          <i class="fa fa-eye"> </i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-info ml-2"
+                          [disabled]="getting_detail"
+                          (click)="openEditModal(articulo)"
+                        >
+                          <i class="fa fa-edit"></i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-danger ml-2"
+                          (click)="deleteArticulo(articulo)"
+                        >
+                          <i class="fa fa-trash-alt"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <h5
+            class="col-12 text-center text-danger py-2 px-0"
+            *ngIf="tabToShow?.articulos?.length === 0 && !loading"
+          >
+            This category hasn't articles yet.
+          </h5>
+
+          <ng-template [ngIf]="loading">
+            <div
+              class="d-flex justify-content-center col-12"
+              style="margin-top: 10%; margin-bottom: 10%"
+            >
+              <div
+                style="
+                  height: 120px;
+                  width: 120px;
+                  font-size: 15px;
+                  border-width: 0.45em;
+                "
+                class="spinner-border text-citric"
+                role="status"
+              ></div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="fix-border-top" *ngIf="tabToShow && tabToShow.idTab == 7">
+        <h4 class="font-weight-bold mt-4">Other App Settings</h4>
+        <div class="row">
+          <div
+            class="col-12 col-md-6 mb-3 text-right"
+            *ngFor="let setting of settings"
+          >
+            <mat-slide-toggle
+              [disabled]="server_busy"
+              style="margin: 10px 0"
+              class="col-2"
+              labelPosition="after"
+              [(ngModel)]="setting.value"
+              [ngModelOptions]="{ standalone: true }"
+              (change)="updateExtraSetting(setting)"
+              color="primary"
+            >
+              {{ setting.descripcion | translate }}
+            </mat-slide-toggle>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="col-xs-12 col-md-3">
+      <h3>Test</h3>
+      <iframe
+        src="https://iglesiatechapp.firebaseapp.com/"
+        style="height:700px;width:400px;"
+      ></iframe>
+    </div> -->
+  </div>
+</div>
+
+<ngx-smart-modal
+  #editArticleContentModal
+  identifier="editArticleContentModal"
+  [dismissable]="false"
+  customClass="large-modal"
+  (onAnyCloseEvent)="selectedArticle = undefined"
+  (onOpenFinished)="loadMediaTypes(article_form_content)"
+>
+  <h4>Edit article</h4>
+  <ng-template [ngIf]="selectedArticle">
+    <article-form
+      #article_form_content
+      [article]="selectedArticle"
+      (submit)="updateTabs(editArticleContentModal)"
+    ></article-form>
+  </ng-template>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #select_template_modal
+  identifier="select_template_modal"
+  [dismissable]="false"
+  [escapable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <!-- (submit)="updateTabs(editArticleContentModal)" -->
+  <app-select-template
+    #select_template_form
+    (dismiss_page)="
+      dismissTemplateModal(select_template_modal, select_template_form)
+    "
+  ></app-select-template>
+</ngx-smart-modal>
+
+<fullscreen-modal
+  [(visible)]="visiblePixieModal"
+  (visibilityChange)="visiblePixieModal = $event"
+>
+  <pixie-editor
+    *ngIf="visiblePixieModal"
+    (onExport)="handlePixieExport($event)"
+  ></pixie-editor>
+</fullscreen-modal>
+
+<ngx-smart-modal #uploadSelectModal identifier="uploadSelectModal">
+  <h4>Change Cover</h4>
+
+  <div class="mt-5 text-center">
+    <button
+      class="btn btn-success mr-2"
+      (click)="addCover(); uploadSelectModal.close()"
+    >
+      Upload photo
+      <i class="fa fa-upload"></i>
+    </button>
+
+    <button
+      class="btn btn-primary"
+      (click)="visiblePixieModal = true; uploadSelectModal.close()"
+    >
+      Create your own design
+      <i class="fa fa-image"></i>
+    </button>
+  </div>
+</ngx-smart-modal>

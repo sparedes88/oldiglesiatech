@@ -1,0 +1,11 @@
+.display_as_number {
+  text-align: right;
+  border: 1px #dee2e6 solid;
+}
+
+::ng-deep {
+  .table td.display_as_number {
+    padding: 0 !important;
+    vertical-align: middle;
+  }
+}

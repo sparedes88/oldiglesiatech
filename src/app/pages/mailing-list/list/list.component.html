@@ -1,0 +1,1821 @@
+<div [hidden]="show_form" class="container">
+  <div class="row mt-2">
+    <div class="col-xs-7 col-md-7">
+      <h2 class="text-citric mt-2">
+        {{ is_v2 ? "Form Builder" : "Visitor Inboxes" }}
+      </h2>
+    </div>
+    <div class="col-xs-5 col-md-5 text-right">
+      <button class="btn btn-success btn-sm mt-1" (click)="createNewForm()">
+        <i class="fa fa-plus"></i>
+        Create {{ is_v2 ? "Form" : "Contact Inbox" }}</button
+      >&nbsp;&nbsp;
+      <button
+        class="btn btn-primary btn-sm mt-1"
+        (click)="showSettings = !showSettings"
+        *ngIf="currentUser.isSuperUser"
+      >
+        <i class="fa fa-cog"></i>&nbsp;
+        <i class="fa fa-caret-down" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+  <div class="row mx-0 mt-2" *ngIf="showSettings">
+    <div class="col-12 col-xs-12 col-md-12">
+      <div
+        class="form-group row"
+        style="
+          background: rgba(187, 214, 255, 0.4);
+          border-radius: 5px;
+          border: solid 1px #dadada;
+          padding: 2px;
+          margin: 2px;
+        "
+      >
+        <div class="input-group input-group-sm mb-3">
+          <div class="input-group-prepend" style="width: 30%">
+            <label
+              class="input-group-text"
+              for="inputGroupSelect01"
+              style="
+                border: 0;
+                background-color: transparent;
+                font-weight: bold;
+              "
+              >Notification language:</label
+            >
+          </div>
+          <select
+            class="custom-select"
+            id="inputGroupSelect01"
+            style="border: 0; border-radius: 20; max-width: 70%"
+            [(ngModel)]="this.settings.lang"
+          >
+            <option value="en">English</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
+
+        <!-- <label for="colFormLabelSm" class="col-sm-5 col-form-label col-form-label-sm mt-1"
+          style="font-weight: bold;">Notification language:</label>
+        <div class="col-sm-7 mt-1">
+          <select id="colFormLabelSm" class="form-control form-control-sm" [(ngModel)]="this.settings.lang">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+          </select>
+        </div> -->
+        <div class="input-group input-group-sm mb-3">
+          <div class="input-group-prepend" style="width: 30%">
+            <label
+              class="input-group-text"
+              for="inputGroupSelect01"
+              style="
+                border: 0;
+                background-color: transparent;
+                font-weight: bold;
+              "
+              >Select your admin:</label
+            >
+          </div>
+          <div class="input-group-area" style="max-width: 70%">
+            <ng-select
+              [items]="this.settings.admins"
+              [multiple]="true"
+              [closeOnSelect]="false"
+              [searchable]="true"
+              bindLabel="full_name"
+              placeholder="Admins"
+              bindValue="id"
+              labelForId="colFormLabelSm"
+              style="
+                text-align: center;
+                height: 100%;
+                max-height: 100%;
+                width: 100%;
+                max-width: 100%;
+              "
+              [(ngModel)]="this.selectedAdmins"
+              [selectableGroup]="true"
+              groupBy="group"
+              (change)="click($event)"
+            >
+            </ng-select>
+          </div>
+        </div>
+        <!-- <div class="col-12">
+          <label for="colFormLabelSm" class="col-form-label col-form-label-sm" style="font-weight: bold;">Select your
+            admin:</label>
+
+          <!-- <div>
+            <ng-select [items]="this.settings.admins" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+              bindLabel="full_name" placeholder="Admins" bindValue="id" labelForId="colFormLabelSm"
+              style="text-align:center; height:100%; max-height: 100%; width:100%; max-width: 100%;"
+              [(ngModel)]="this.selectedAdmins" [selectableGroup]="true" groupBy="group" (change)="click($event)">
+            </ng-select>
+            <!-- <select id="colFormLabelSm" [multiple]="true" [disabled]="true" class="form-control form-control-sm"
+              [(ngModel)]="this.settings.lang">
+              <option value="en">English</option>
+              <option value="es">Español</option>
+            </select>
+          </div>
+        </div> -->
+
+        <div class="col-sm-10 mt-1 text-center">
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="inlineRadioOptions"
+              id="inlineRadio1"
+              [value]="1"
+              [(ngModel)]="this.settings.notification_type"
+            />
+            <label class="form-check-label" for="inlineRadio1">SMS</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="inlineRadioOptions"
+              id="inlineRadio2"
+              [value]="2"
+              [(ngModel)]="this.settings.notification_type"
+            />
+            <label class="form-check-label" for="inlineRadio2">Email</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="inlineRadioOptions"
+              id="inlineRadio3"
+              [value]="3"
+              [(ngModel)]="this.settings.notification_type"
+            />
+            <label class="form-check-label" for="inlineRadio3">Both</label>
+          </div>
+        </div>
+        <div class="col-sm-2 mt-1 text-center">
+          <button class="btn btn-success btn-sm mt-1" (click)="saveSettings()">
+            <i class="fa fa-save"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr />
+  <div class="row mx-0">
+    <div class="col-12 scroll-x">
+      <table
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        class="table row-border hover mt-4"
+      >
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Total Contacts</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let mailingList of mailingLists">
+            <td class="strong">
+              {{ mailingList.id }}
+            </td>
+            <td class="clickable" [routerLink]="mailingList.id">
+              {{ mailingList.name }}
+            </td>
+            <td>
+              <span *ngIf="mailingList.total_contacts">
+                {{ mailingList.total_contacts }}
+              </span>
+              <span *ngIf="!mailingList.total_contacts"> -- </span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-outline-success btn-sm"
+                  [routerLink]="mailingList.id"
+                >
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="openEditForm(mailingList)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  *ngIf="is_v2"
+                  class="btn btn-outline-secondary btn-sm"
+                  (click)="
+                    mailing_list_id = mailingList.id;
+                    mailing_list_link_modal.open()
+                  "
+                >
+                  <i class="fa fa-link"></i>
+                </button>
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="deleteContactInbox(mailingList)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="show_form" class="container">
+  <app-mailing-list-form-v2
+    #mailing_list_form_v2
+    (on_add)="handleAdd($event)"
+  ></app-mailing-list-form-v2>
+</div>
+
+<ngx-smart-modal
+  identifier="mailingListModal"
+  #mailingListModal
+  customClass="large-modal"
+>
+  <div class="row m-0">
+    <div class="col-12 col-md-4">
+      <h4>
+        {{
+          mailignListFormData.get("id")
+            ? "Edit Contact Inbox"
+            : "Create a new Contact Inbox"
+        }}
+      </h4>
+
+      <form
+        class="row m-0"
+        [formGroup]="mailignListFormData"
+        (ngSubmit)="submitMailingList()"
+      >
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fa fa-align-left"></i>
+            </span>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Name"
+            name="name"
+            required
+            formControlName="name"
+            [class.is-invalid]="mailignListFormData.get('name').invalid"
+          />
+        </div>
+        <div formGroupName="setup" class="col-12 row m-0">
+          <h5 class="col-12 text-secondary pl-0">Visuals</h5>
+
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_contact_info"
+                name="display_contact_info_radio"
+                class="custom-control-input"
+                formControlName="display_contact_info"
+                [checked]="
+                  mailignListFormData.get('setup').get('display_contact_info')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_contact_info'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_contact_info'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_contact_info"
+              >
+                Display Contact info
+              </label>
+            </div>
+          </div>
+          <div
+            [hidden]="
+              !mailignListFormData.get('setup').get('display_contact_info')
+                .value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_picture"
+                name="show_picture_radio"
+                class="custom-control-input"
+                formControlName="show_picture"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_picture').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_picture'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_picture'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_picture"
+              >
+                Display Picture
+              </label>
+            </div>
+          </div>
+          <div
+            [hidden]="
+              !mailignListFormData.get('setup').get('display_contact_info')
+                .value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_address"
+                name="show_address_radio"
+                class="custom-control-input"
+                formControlName="show_address"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_address').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_address'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_address'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_address"
+              >
+                Display Address
+              </label>
+            </div>
+          </div>
+          <div
+            [hidden]="
+              !mailignListFormData.get('setup').get('display_contact_info')
+                .value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_phones"
+                name="show_phones_radio"
+                class="custom-control-input"
+                formControlName="show_phones"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_phones').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_phones'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_phones'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_phones"
+              >
+                Display Phones
+              </label>
+            </div>
+          </div>
+          <div
+            [hidden]="
+              !mailignListFormData.get('setup').get('display_contact_info')
+                .value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="hide_emails"
+                name="hide_emails_radio"
+                class="custom-control-input"
+                formControlName="show_emails"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_emails').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_emails'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_emails'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="hide_emails"
+              >
+                Display Emails
+              </label>
+            </div>
+          </div>
+          <div
+            [hidden]="
+              !mailignListFormData.get('setup').get('display_contact_info')
+                .value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_sunday_service"
+                name="show_sunday_service_radio"
+                class="custom-control-input"
+                formControlName="show_sunday_service"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_sunday_service')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_sunday_service'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_sunday_service'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_sunday_service"
+              >
+                Display Sunday Service
+              </label>
+            </div>
+          </div>
+
+          <h5 class="col-12 text-secondary pl-0">Inputs</h5>
+          <div
+            [ngClass]="
+              mailignListFormData.get('setup').get('hide_message_input').value
+                ? 'col-12'
+                : 'col-12  col-md-6'
+            "
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_message_input"
+                name="show_message_input_radio"
+                class="custom-control-input"
+                formControlName="show_message_input"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_message_input')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_message_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_message_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_message_input"
+              >
+                Display Message
+              </label>
+            </div>
+          </div>
+
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_message_input').value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="message_required_input"
+                name="message_required_input_radio"
+                class="custom-control-input"
+                formControlName="message_required_input"
+                [checked]="
+                  mailignListFormData.get('setup').get('message_required_input')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'message_required_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'message_required_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="message_required_input"
+              >
+                Message required
+              </label>
+            </div>
+          </div>
+
+          <div
+            [ngClass]="
+              mailignListFormData.get('setup').get('hide_email_input').value
+                ? 'col-12'
+                : 'col-12  col-md-6'
+            "
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_email_input"
+                name="show_email_input_radio"
+                class="custom-control-input"
+                formControlName="show_email_input"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_email_input').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_email_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_email_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_email_input"
+              >
+                Display Email
+              </label>
+            </div>
+          </div>
+
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_email_input').value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="email_required_input"
+                name="email_required_input_radio"
+                class="custom-control-input"
+                formControlName="email_required_input"
+                [checked]="
+                  mailignListFormData.get('setup').get('email_required_input')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'email_required_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'email_required_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="email_required_input"
+              >
+                Email required
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="first_name_required_input"
+                name="first_name_required_input_radio"
+                class="custom-control-input"
+                formControlName="first_name_required_input"
+                [checked]="
+                  mailignListFormData
+                    .get('setup')
+                    .get('first_name_required_input').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'first_name_required_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'first_name_required_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="first_name_required_input"
+              >
+                First Name Required
+              </label>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="last_name_required_input"
+                name="last_name_required_input_radio"
+                class="custom-control-input"
+                formControlName="last_name_required_input"
+                [checked]="
+                  mailignListFormData
+                    .get('setup')
+                    .get('last_name_required_input').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'last_name_required_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'last_name_required_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="last_name_required_input"
+              >
+                Last Name required
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="phone_required_input"
+                name="phone_required_input_radio"
+                class="custom-control-input"
+                formControlName="phone_required_input"
+                [checked]="
+                  mailignListFormData.get('setup').get('phone_required_input')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'phone_required_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'phone_required_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="phone_required_input"
+              >
+                Phone required
+              </label>
+            </div>
+          </div>
+          <div class="w-100"></div>
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_groups"
+                name="display_groups_radio"
+                class="custom-control-input"
+                formControlName="display_groups"
+                [checked]="
+                  mailignListFormData.get('setup').get('display_groups').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_groups'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_groups'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_groups"
+              >
+                Display Groups?
+              </label>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_events"
+                name="display_events_radio"
+                class="custom-control-input"
+                formControlName="display_events"
+                [checked]="
+                  mailignListFormData.get('setup').get('display_events').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_events'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_events'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_events"
+              >
+                Display Events?
+              </label>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_e_group_question"
+                name="display_e_group_question_radio"
+                class="custom-control-input"
+                formControlName="display_e_group_question"
+                [checked]="
+                  mailignListFormData
+                    .get('setup')
+                    .get('display_e_group_question').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_e_group_question'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_e_group_question'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_e_group_question"
+              >
+                Display 1st Question?
+              </label>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="display_e_team_question"
+                name="display_e_team_question_radio"
+                class="custom-control-input"
+                formControlName="display_e_team_question"
+                [checked]="
+                  mailignListFormData
+                    .get('setup')
+                    .get('display_e_team_question').value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_e_team_question'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'display_e_team_question'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="display_e_team_question"
+              >
+                Display 2nd Question?
+              </label>
+            </div>
+          </div>
+          <h5
+            *ngIf="
+              mailignListFormData.get('setup').get('display_e_group_question')
+                .value ||
+              mailignListFormData.get('setup').get('display_e_team_question')
+                .value
+            "
+            class="col-12 text-secondary"
+          >
+            Additional questions
+          </h5>
+
+          <div class="col-12">
+            <div class="row">
+              <div
+                [hidden]="
+                  !mailignListFormData
+                    .get('setup')
+                    .get('display_e_group_question').value
+                "
+                class="col-12"
+              >
+                <div class="form-group">
+                  <label> 1st Question Text </label>
+                  <input
+                    type="text"
+                    class="form-control mb-1"
+                    placeholder="What is your first question?"
+                    formControlName="question_1_text"
+                    [class.is-invalid]="
+                      mailignListFormData.get('setup').get('question_1_text')
+                        .dirty &&
+                      mailignListFormData.get('setup').get('question_1_text')
+                        .invalid
+                    "
+                  />
+                </div>
+                <div class="row m-0">
+                  <div class="col-12 ml-3">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <input
+                        type="checkbox"
+                        id="question_1_as_check"
+                        name="question_1_as_check_radio"
+                        class="custom-control-input"
+                        formControlName="question_1_as_check"
+                        [checked]="
+                          mailignListFormData
+                            .get('setup')
+                            .get('question_1_as_check').value
+                        "
+                        (click)="
+                          toggleAcceptace(
+                            mailignListFormData.get('setup'),
+                            'question_1_as_check'
+                          )
+                        "
+                      />
+                      <span
+                        class="checkmark"
+                        (click)="
+                          toggleAcceptace(
+                            mailignListFormData.get('setup'),
+                            'question_1_as_check'
+                          )
+                        "
+                      ></span>
+                      <label
+                        style="cursor: pointer"
+                        class="custom-control-label"
+                        for="question_1_as_check"
+                      >
+                        Show as checkbox?
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="col-6 pl-0 form-group">
+                    <label> 1st Answer </label>
+                    <input
+                      type="text"
+                      class="form-control mb-1"
+                      placeholder="What is your 1st option?"
+                      formControlName="question_1_answer_1"
+                      [class.is-invalid]="
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_1_answer_1').dirty &&
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_1_answer_1').invalid
+                      "
+                    />
+                  </div>
+                  <div class="col-6 pl-0 form-group">
+                    <label> 2nd Answer </label>
+                    <input
+                      type="text"
+                      class="form-control mb-1"
+                      placeholder="What is your 2nd option?"
+                      formControlName="question_1_answer_2"
+                      [class.is-invalid]="
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_1_answer_2').dirty &&
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_1_answer_2').invalid
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                [hidden]="
+                  !mailignListFormData
+                    .get('setup')
+                    .get('display_e_team_question').value
+                "
+                class="col-12"
+              >
+                <div class="form-group">
+                  <label> 2nd Question Text </label>
+                  <input
+                    type="text"
+                    class="form-control mb-1"
+                    placeholder="What is your second question?"
+                    formControlName="question_2_text"
+                    [class.is-invalid]="
+                      mailignListFormData.get('setup').get('question_2_text')
+                        .dirty &&
+                      mailignListFormData.get('setup').get('question_2_text')
+                        .invalid
+                    "
+                  />
+                </div>
+                <div class="row m-0">
+                  <div class="col-12 ml-3">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <input
+                        type="checkbox"
+                        id="question_2_as_check"
+                        name="question_2_as_check_radio"
+                        class="custom-control-input"
+                        formControlName="question_2_as_check"
+                        [checked]="
+                          mailignListFormData
+                            .get('setup')
+                            .get('question_2_as_check').value
+                        "
+                        (click)="
+                          toggleAcceptace(
+                            mailignListFormData.get('setup'),
+                            'question_2_as_check'
+                          )
+                        "
+                      />
+                      <span
+                        class="checkmark"
+                        (click)="
+                          toggleAcceptace(
+                            mailignListFormData.get('setup'),
+                            'question_2_as_check'
+                          )
+                        "
+                      ></span>
+                      <label
+                        style="cursor: pointer"
+                        class="custom-control-label"
+                        for="question_2_as_check"
+                      >
+                        Show as checkbox?
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="col-6 pl-0 form-group">
+                    <label> 1st Answer </label>
+                    <input
+                      type="text"
+                      class="form-control mb-1"
+                      placeholder="What is your 1st option?"
+                      formControlName="question_2_answer_1"
+                      [class.is-invalid]="
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_2_answer_1').dirty &&
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_2_answer_1').invalid
+                      "
+                    />
+                  </div>
+                  <div class="col-6 pl-0 form-group">
+                    <label> 2nd Answer </label>
+                    <input
+                      type="text"
+                      class="form-control mb-1"
+                      placeholder="What is your 2nd option?"
+                      formControlName="question_2_answer_2"
+                      [class.is-invalid]="
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_2_answer_2').dirty &&
+                        mailignListFormData
+                          .get('setup')
+                          .get('question_2_answer_2').invalid
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            [ngClass]="
+              mailignListFormData.get('setup').get('hide_custom_input').value
+                ? 'col-12'
+                : 'col-12  col-md-6'
+            "
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="show_custom_input"
+                name="show_custom_input_radio"
+                class="custom-control-input"
+                formControlName="show_custom_input"
+                [checked]="
+                  mailignListFormData.get('setup').get('show_custom_input')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_custom_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'show_custom_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="show_custom_input"
+              >
+                Show Custom Input
+              </label>
+            </div>
+          </div>
+
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_custom_input').value
+            "
+            class="col-12 col-md-6"
+          >
+            <div
+              class="form-group"
+              style="display: flex; flex-direction: column"
+            >
+              <input
+                type="checkbox"
+                id="custom_required_input"
+                name="custom_required_input_radio"
+                class="custom-control-input"
+                formControlName="custom_required_input"
+                [checked]="
+                  mailignListFormData.get('setup').get('custom_required_input')
+                    .value
+                "
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'custom_required_input'
+                  )
+                "
+              />
+              <span
+                class="checkmark"
+                (click)="
+                  toggleAcceptace(
+                    mailignListFormData.get('setup'),
+                    'custom_required_input'
+                  )
+                "
+              ></span>
+              <label
+                style="cursor: pointer"
+                class="custom-control-label"
+                for="custom_required_input"
+              >
+                Custom required
+              </label>
+            </div>
+          </div>
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_custom_input').value
+            "
+            class="col-12"
+          >
+            <div class="form-group">
+              <label class="label"> Display Mode </label>
+              <div class="form-check custom-radio form-check-inline ml-3">
+                <input
+                  formControlName="inline"
+                  class="form-check-input custom-control-input"
+                  type="radio"
+                  id="inlineRadio1"
+                  [value]="true"
+                  [checked]="
+                    mailignListFormData.get('setup').get('inline').value
+                  "
+                />
+                <label
+                  class="form-check-label custom-control-label"
+                  for="inlineRadio1"
+                >
+                  Inline
+                </label>
+              </div>
+              <div class="form-check custom-radio form-check-inline">
+                <input
+                  formControlName="inline"
+                  class="form-check-input custom-control-input"
+                  type="radio"
+                  id="inlineRadio2"
+                  [value]="false"
+                  [checked]="
+                    !mailignListFormData.get('setup').get('inline').value
+                  "
+                />
+                <label
+                  class="form-check-label custom-control-label"
+                  for="inlineRadio2"
+                >
+                  Multiline
+                </label>
+              </div>
+            </div>
+          </div>
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_custom_input').value
+            "
+            class="col-12"
+          >
+            <div class="form-group">
+              <label> Label for custom input </label>
+              <input
+                type="text"
+                required
+                class="form-control mb-1"
+                placeholder="Please type the custom label"
+                formControlName="custom_text"
+                [class.is-invalid]="
+                  mailignListFormData.get('setup').get('custom_text').dirty &&
+                  mailignListFormData.get('setup').get('custom_text').invalid
+                "
+              />
+            </div>
+          </div>
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_custom_input').value
+            "
+            class="col-12"
+          >
+            <div class="form-group">
+              <label> Placeholder for custom input </label>
+              <input
+                type="text"
+                required
+                class="form-control mb-1"
+                placeholder="Please type a placeholder"
+                formControlName="custom_placeholder"
+                [class.is-invalid]="
+                  mailignListFormData.get('setup').get('custom_placeholder')
+                    .dirty &&
+                  mailignListFormData.get('setup').get('custom_placeholder')
+                    .invalid
+                "
+              />
+            </div>
+          </div>
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_custom_input').value ||
+              mailignListFormData.get('setup').get('inline').value
+            "
+            class="col-12"
+          >
+            <div class="form-group">
+              <label> Rows size (max. 15) </label>
+              <input
+                type="number"
+                required
+                class="form-control mb-1"
+                placeholder="Rows size"
+                formControlName="row_size"
+                [class.is-invalid]="
+                  mailignListFormData.get('setup').get('row_size').dirty &&
+                  mailignListFormData.get('setup').get('row_size').invalid
+                "
+              />
+            </div>
+          </div>
+          <div
+            [hidden]="
+              mailignListFormData.get('setup').get('hide_custom_input').value
+            "
+            class="col-12"
+          >
+            <div
+              class="form-group"
+              [hidden]="!mailignListFormData.get('setup').get('inline').value"
+            >
+              <label for="selectLang">Input type</label>
+              <select
+                required
+                class="form-control mb-1"
+                formControlName="custom_type"
+                [class.is-invalid]="
+                  mailignListFormData.get('setup').get('custom_type').dirty &&
+                  mailignListFormData.get('setup').get('custom_type').invalid
+                "
+              >
+                <option value="number">Number</option>
+                <option value="text">Text</option>
+                <option value="email">Email</option>
+                <option value="url">Url</option>
+              </select>
+            </div>
+
+            <div
+              class="form-group"
+              [hidden]="mailignListFormData.get('setup').get('inline').value"
+            >
+              <h6 class="text-danger">
+                The multiline display only supports type 'text'.
+              </h6>
+            </div>
+          </div>
+        </div>
+
+        <h5 class="col-12 text-secondary">Button settings</h5>
+
+        <div formGroupName="setup" class="row">
+          <div formGroupName="button_settings" class="col-12">
+            <div class="row m-0">
+              <div class="col-6 col-md-3">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label>Button color</label>
+                  <input
+                    type="color"
+                    formControlName="button_color"
+                    class="form-control"
+                    style="width: 50px; height: 40px"
+                  />
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label>Text color</label>
+                  <input
+                    type="color"
+                    formControlName="text_color"
+                    class="form-control"
+                    style="width: 50px; height: 40px"
+                  />
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="form-group">
+                  <label> Text </label>
+                  <input
+                    type="text"
+                    class="form-control mb-1"
+                    placeholder="Text button"
+                    formControlName="text"
+                    [class.is-invalid]="
+                      mailignListFormData
+                        .get('setup')
+                        .get('button_settings')
+                        .get('text').dirty &&
+                      mailignListFormData
+                        .get('setup')
+                        .get('button_settings')
+                        .get('text').invalid
+                    "
+                  />
+                </div>
+              </div>
+              <div class="col-6">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label for="button_border_radius_range" color="gray">
+                    Border Radius
+                    {{
+                      mailignListFormData
+                        .get("setup")
+                        .get("button_settings")
+                        .get("border_radius").value
+                    }}%
+                  </label>
+                  <input
+                    type="range"
+                    class="custom-range"
+                    min="1"
+                    max="20"
+                    step="1"
+                    id="button_border_radius_range"
+                    formControlName="border_radius"
+                  />
+                </div>
+              </div>
+              <div class="col-6">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label for="button_width_range" color="gray">
+                    Width
+                    {{
+                      mailignListFormData
+                        .get("setup")
+                        .get("button_settings")
+                        .get("width").value
+                    }}%
+                  </label>
+                  <input
+                    type="range"
+                    class="custom-range"
+                    min="20"
+                    max="100"
+                    step="5"
+                    id="button_width_range"
+                    formControlName="width"
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label for="align_select" color="gray"> Align </label>
+                  <select
+                    class="form-control"
+                    id="align_select"
+                    formControlName="align"
+                  >
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 text-center mt-2">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="mailignListFormData.invalid || saving"
+          >
+            <i class="fa fa-paper-plane"></i>
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-12 col-md-8">
+      <app-preview
+        [idIglesia]="currentUser.idIglesia"
+        [order]="questions"
+        [setup]="mailignListFormData.get('setup').value"
+      ></app-preview>
+      <div class="row">
+        <div class="col-6">
+          <h5 class="col-12 text-secondary pl-0">Other</h5>
+          <div [formGroup]="mailignListFormData.get('setup')" class="row">
+            <div class="col-12">
+              <div class="form-group">
+                <label> Header text </label>
+                <input
+                  type="text"
+                  required
+                  class="form-control mb-1"
+                  placeholder="Please type a header title"
+                  formControlName="header_text"
+                  [class.is-invalid]="
+                    mailignListFormData.get('setup').get('header_text').dirty &&
+                    mailignListFormData.get('setup').get('header_text').invalid
+                  "
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label> Thank you message </label>
+                <input
+                  type="text"
+                  required
+                  class="form-control mb-1"
+                  placeholder="Please type a greetings message"
+                  formControlName="thank_you_message"
+                  [class.is-invalid]="
+                    mailignListFormData.get('setup').get('thank_you_message')
+                      .dirty &&
+                    mailignListFormData.get('setup').get('thank_you_message')
+                      .invalid
+                  "
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label> Message text </label>
+                <input
+                  type="text"
+                  required
+                  class="form-control mb-1"
+                  placeholder="Please type a message label"
+                  formControlName="message_text"
+                  [class.is-invalid]="
+                    mailignListFormData.get('setup').get('message_text')
+                      .dirty &&
+                    mailignListFormData.get('setup').get('message_text').invalid
+                  "
+                />
+              </div>
+            </div>
+            <div class="col-3">
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <label>Icons color</label>
+                <input
+                  type="color"
+                  formControlName="icon_color"
+                  class="form-control"
+                  style="width: 50px; height: 40px"
+                />
+                <!-- (change)="print($event)" -->
+              </div>
+            </div>
+
+            <div class="col-9">
+              <div class="form-group">
+                <label>Picture</label>
+                <input
+                  type="text"
+                  rows="3"
+                  class="form-control mb-1"
+                  placeholder="Add a picture to your mailing list. (optional)"
+                  formControlName="picture"
+                  [readOnly]="true"
+                  [class.is-invalid]="
+                    mailignListFormData.get('setup').get('picture').dirty &&
+                    mailignListFormData.get('setup').get('picture').invalid
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn btn-sm btn-light"
+                (click)="uploadPicture(input_file)"
+              >
+                Upload image
+              </button>
+              <!-- <button
+                class="btn btn-sm btn-light"
+                (click)="visiblePixieModal = true"
+              >
+                Create your own design
+              </button> -->
+            </div>
+
+            <span style="font-size: 12px"> Recommended size: 1000x428 </span>
+            <div class="col-12 col-md-4" [hidden]="true">
+              <div class="custom-file mb-4">
+                <input
+                  #input_file
+                  accept="image/*"
+                  type="file"
+                  class="custom-file-input"
+                  id="customFile"
+                />
+                <label class="custom-file-label" for="customFile"
+                  >Choose file</label
+                >
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="text-citric" for="idOrganization">
+                Sunday Service info
+              </label>
+              <div
+                class="form-group"
+                style="display: flex; flex-direction: column"
+              >
+                <textarea
+                  formControlName="sunday_service"
+                  class="form-control mb-1"
+                  placeholder="Aboout your service..."
+                  type="text"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <h5 class="col-12 text-secondary pl-0">Order</h5>
+          <div
+            cdkDropList
+            class="drag-list builder-scroll"
+            (cdkDropListDropped)="dropLevel($event)"
+          >
+            <ng-container *ngFor="let level of questions">
+              <div class="drag-box" cdkDrag>
+                {{ level.order }}. {{ level.name }}
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<ngx-smart-modal #mailing_list_link_modal identifier="mailing_list_link_modal">
+  <h4>Link</h4>
+  <div class="row justify-content-center">
+    <div class="col-10 text-center">
+      <small class="text-secondary">
+        Scan this QR to visit the Contact Form or share it with someone by
+        clicking on it.
+      </small>
+    </div>
+    <div class="col-8 text-center">
+      <ngx-qrcode
+        #qr_code
+        class="col-2"
+        (click)="shareQR(qr_code)"
+        style="width: 50px; height: 50px"
+        [qrc-value]="iframeCode.direct_link"
+        [qrc-class]="'qrItemResize-dash'"
+        qrc-errorCorrectionLevel="M"
+      >
+      </ngx-qrcode>
+      <button (click)="shareQR(qr_code)" class="btn btn-sm btn-citric">
+        Copy QR
+      </button>
+    </div>
+    <div class="col-12">
+      <h5 class="text-center my-3">Or</h5>
+      <small class="text-secondary mb-2">
+        Copy this url and paste use it on you website
+      </small>
+      <pre
+        class="mb-0"
+        style="background-color: #e2e2e2; padding: 8px; white-space: normal"
+      >
+        <a [href]="iframeCode.direct_link" target="_blank">{{ iframeCode.direct_link }}</a>
+      </pre>
+    </div>
+  </div>
+</ngx-smart-modal>

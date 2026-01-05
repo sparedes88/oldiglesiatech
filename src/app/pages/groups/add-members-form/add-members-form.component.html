@@ -1,0 +1,47 @@
+<div class="header">
+  Add Members
+</div>
+<div class="container page">
+  <form
+    #group_form="ngForm"
+    [formGroup]="formGroup"
+    (submit)="submitMembers(formGroup, group_form)"
+  >
+    <div class="row">
+      <div class="col-12 mb-3">
+        <label>Leaders*</label>
+        <ng-multiselect-dropdown
+          placeholder="Leaders"
+          [data]="users"
+          [settings]="selectLeadersOptions"
+          formControlName="leaders"
+        ></ng-multiselect-dropdown>
+      </div>
+      <div class="col-12 mb-3">
+        <label>Members</label>
+        <ng-multiselect-dropdown
+          placeholder="Members"
+          [data]="users"
+          [settings]="selectLeadersOptions"
+          formControlName="members"
+        ></ng-multiselect-dropdown>
+      </div>
+      <span class="col-12 text-citric mb-4">
+        <b>Note:</b> If you add the members as leader and member. This will be
+        saved as leader.
+      </span>
+    </div>
+
+    <div class="text-center col-12">
+      <div class="form-group">
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="formGroup.invalid"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

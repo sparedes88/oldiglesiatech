@@ -1,0 +1,254 @@
+<div class="row">
+  <div class="col-12 text-right">
+    <button (click)="cancelForm()" class="btn btn-sm btn-outline-citric">
+      Cancel
+    </button>
+  </div>
+
+  <div [formGroup]="network_organization_form" class="col-12 row text-left">
+    <div class="col-12">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="idOrganization"> Network to display </label>
+        <select
+          required
+          formControlName="idNetwork"
+          class="form-control w-100"
+          (change)="fixAsNumber($event.target.value)"
+        >
+          <option [value]="0">-- Select a network</option>
+          <option [value]="net.idNetwork" *ngFor="let net of networks">
+            {{ net.name }}
+          </option>
+        </select>
+      </div>
+      <div
+        class="form-group"
+        *ngIf="network_organization_form.get('idNetwork').value > 0"
+      >
+        <label for="custom_name">
+          <span class="tooltip_">
+            <span *ngIf="selected_network" class="tooltiptext">
+              {{ selected_network.help_text }}
+            </span>
+            {{ selected_network?.label_name || "Select a network first" }}
+            <i
+              *ngIf="selected_network"
+              class="text-secondary fa fa-info-circle"
+            ></i>
+          </span>
+        </label>
+        <input
+          class="form-control"
+          required
+          formControlName="site_link"
+          type="text"
+        />
+      </div>
+      <mat-select-country
+        *ngIf="network_organization_form.get('idNetwork').value == 5"
+        [id]="'country_sel'"
+        #mat_select_country
+        appearance="outline"
+        label=""
+        class="
+          col-4
+          select-country
+          mat-input-element mat-form-field-infix-fixed
+        "
+        [showCallingCode]="true"
+        [value]="selected_country"
+        (onCountrySelected)="onCountrySelected($event, mat_select_country)"
+        [itemsLoadSize]="5"
+      ></mat-select-country>
+
+      <div class="form-group">
+        <label for="custom_name">Network name</label>
+        <input
+          class="form-control"
+          required
+          formControlName="custom_name"
+          type="text"
+        />
+      </div>
+      <div *ngIf="!is_for_ezlink" class="form-group form-check mb-0">
+        <input
+          formControlName="is_for_ezlink"
+          type="checkbox"
+          class="form-check-input"
+          id="is_for_ezlink"
+        />
+        <label class="form-check-label" for="is_for_ezlink">
+          Show in EzLink section?
+        </label>
+      </div>
+      <div class="form-group form-check mb-0">
+        <input
+          formControlName="is_custom_icon"
+          (change)="toggleCustomIcon()"
+          type="checkbox"
+          class="form-check-input"
+          id="is_custom_icon"
+        />
+        <label class="form-check-label" for="is_custom_icon">
+          Use custom icon instead?
+        </label>
+      </div>
+
+      <div
+        *ngIf="
+          network_organization_form.get('idNetwork').value > 0 &&
+          !network_organization_form.get('is_custom_icon').value
+        "
+        class="col-12"
+      >
+        <div class="form-group align-items-center d-inline-block">
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Changes the text color of the network icon.
+              </span>
+              <small> Text color </small>
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+          <input
+            type="color"
+            formControlName="text_color"
+            class="form-control"
+            style="width: 50px; height: 40px"
+          />
+        </div>
+
+        <div class="form-group align-items-center d-inline-block ml-2">
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Changes the background color of the network button.
+              </span>
+              <small> Background </small>
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+          <input
+            type="color"
+            formControlName="background_color"
+            class="form-control"
+            style="width: 50px; height: 40px"
+          />
+        </div>
+        <app-custom-icon-picker
+          class="d-inline-block ml-2"
+          [required]="network_organization_form.get('is_custom_icon').value"
+          [small_label]="true"
+          [label]="'Network icon'"
+          formControlName="icon_svg"
+        ></app-custom-icon-picker>
+      </div>
+
+      <div class="row col-12">
+        <div
+          class="col-9"
+          *ngIf="
+            network_organization_form.get('idNetwork').value > 0 &&
+            network_organization_form.get('is_custom_icon').value
+          "
+        >
+          <img
+            *ngIf="network_organization_form.get('is_custom_icon').value"
+            [src]="
+              fixUrlDesign(network_organization_form.get('icon_temp').value)
+            "
+            style="height: 50px; width: 50px"
+          />
+        </div>
+
+        <div
+          class="col-3"
+          *ngIf="
+            network_organization_form.get('idNetwork').value > 0 &&
+            network_organization_form.get('is_custom_icon').value
+          "
+        >
+          <button
+            type="button"
+            (click)="showActionSheet(2, input_file_reference)"
+            class="btn btn-citric circular-button"
+          >
+            <i class="fa fa-plus"></i>
+          </button>
+          <input
+            [hidden]="true"
+            #input_file_reference
+            accept="image/*"
+            type="file"
+            class="custom-file-input"
+            id="customFile"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <hr
+    *ngIf="network_organization_form.get('idNetwork').value > 0"
+    class="col-10"
+  />
+  <h6
+    *ngIf="network_organization_form.get('idNetwork').value > 0"
+    class="text-secondary col-12"
+  >
+    Link Preview
+  </h6>
+  <div
+    class="col-12 p-0 text-left"
+    *ngIf="network_organization_form.get('idNetwork').value > 0"
+  >
+    <div *ngIf="selected_network" class="row m-0">
+      <div class="col-2 align-self-center">
+        <i
+          *ngIf="!network_organization_form.get('is_custom_icon').value"
+          [ngClass]="network_organization_form.get('icon_svg').value"
+          [ngStyle]="{
+            background: network_organization_form.get('background_color').value,
+            color: network_organization_form.get('text_color').value
+          }"
+          class="bigIcon rounded-circle"
+        ></i>
+        <img
+          *ngIf="network_organization_form.get('is_custom_icon').value"
+          [src]="fixUrlDesign(network_organization_form.get('icon_temp').value)"
+          class="bigIcon"
+        />
+      </div>
+      <div class="col-10 align-self-center text-left">
+        <h5 class="m-0">
+          {{ network_organization_form.get("custom_name").value }}
+        </h5>
+      </div>
+      <div class="col-12 text-left">
+        <small class="text-secondary">
+          Please check your link clicking
+          <a target="_blank" [href]="getLink()"> here. </a>
+        </small>
+        <a target="_blank" [href]="getLink()">
+          <small>
+            {{ getLink() }}
+          </small>
+        </a>
+      </div>
+
+      <div class="col-12 text-center">
+        <hr />
+
+        <button
+          (click)="saveNetworkOrganization()"
+          class="btn btn-sm btn-success"
+        >
+          <!-- [disabled]="network_organization_form.invalid" -->
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

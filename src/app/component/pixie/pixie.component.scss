@@ -1,0 +1,41 @@
+.modal-overlay {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0;
+  align-items: center;
+  justify-content: center;
+  background-color: #00000070;
+  z-index: 99;
+
+  .pix-modal {
+    background-color: white;
+    border-radius: 4px;
+    padding: 24px;
+    box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.75);
+  }
+
+  .templates-modal {
+    min-height: 50vh;
+    max-height: 80vh;
+    min-width: 50vw;
+    max-width: 80vw;
+  }
+  .tab-content {
+    overflow-y: scroll;
+    height: 60vh;
+    overflow-x: hidden;
+  }
+}
+
+::ng-deep {
+  navigation-bar .separator {
+    margin: 0 12px !important;
+  }
+  navigation-bar button.control-button .control-icon {
+    width: 30px !important;
+    height: 30px !important;
+  }
+}

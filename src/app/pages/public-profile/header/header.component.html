@@ -1,0 +1,214 @@
+<div
+  #profile_div
+  class="profile-header"
+  [ngStyle]="{
+    'background-color': headerStyle?.background_color,
+    'flex-wrap': headerStyle?.display_mode == 'double_logo' ? 'wrap' : 'nowrap'
+  }"
+>
+  <ng-container *ngIf="theme == 'theme1' && iglesia?.idIglesia">
+    <div
+      class="logos-container is-flex is-vh-centered"
+      [ngClass]="{
+        'dual-logo container': headerStyle?.display_mode == 'double_logo'
+      }"
+      style="justify-content: space-between;"
+      [ngStyle]="{
+        width: headerStyle?.display_mode == 'double_logo' ? '100%' : ''
+      }"
+    >
+      <img
+        (click)="changeTab(0)"
+        class="logo"
+        [src]="headerStyle?.primary_logo || iglesia?.Logo"
+        [alt]="iglesia?.Nombre"
+        style="cursor: pointer;"
+        [ngStyle]="{ height: headerStyle?.logo_size || '100px' }"
+      />
+      <img
+        *ngIf="headerStyle?.display_mode == 'double_logo'"
+        class="logo secondary-logo"
+        [src]="headerStyle?.secondary_logo"
+        [alt]="iglesia?.Nombre"
+        style="cursor: pointer;"
+      />
+    </div>
+    <div
+      class="is-flex w-100"
+      [ngClass]="{ container: headerStyle?.display_mode == 'double_logo' }"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      "
+    >
+      <!-- Tabs list -->
+      <div
+        class="w-100 tabs-container text-center"
+        [ngClass]="{ 'text-left': headerStyle?.display_mode == 'double_logo' }"
+      >
+        <span
+          *ngFor="let tab of tabs; let i = index"
+          style="position: relative;"
+          class="tab-btn-container"
+        >
+          <!-- <button
+            class="btn tab-btn"
+            [ngClass]="{ active: currentTabIndex == i }"
+            (click)="changeTab(i)"
+            [ngStyle]="{
+              'background-color':
+                currentTabIndex == i ? headerStyle?.primary_color : '',
+              color:
+                currentTabIndex == i
+                  ? headerStyle?.secondary_color
+                  : headerStyle?.inactive_color
+            }"
+          >
+            {{ tab.title }}
+          </button> -->
+          <ul class="sub-pages" *ngIf="tab.sub_pages?.length">
+            <li
+              *ngFor="let subpage of tab.sub_pages; let idx = index"
+              (click)="changeSubPage(idx, i)"
+            >
+              {{ subpage.title }}
+            </li>
+          </ul>
+        </span>
+
+        <!-- Tab actions -->
+        <div
+          class="btn-group"
+          style="background-color: white; border-radius: 6px;"
+          *ngIf="displayMode == 'edit'"
+          style="min-width: 120px;"
+        >
+          <button
+            class="btn btn-outline-success btn-sm"
+            (click)="openTabForm()"
+          >
+            <i class="fa fa-plus"></i>
+            Add tab
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            (click)="openUpdateTabForm()"
+          >
+            <i class="fa fa-list"></i>
+            Change order
+          </button>
+        </div>
+      </div>
+      <!-- Social Links -->
+      <div
+        class="social-links is-flex vh-centered"
+        style="justify-content: flex-end;"
+      >
+        <a
+          class="btn btn-light social-icon"
+          [ngStyle]="{ color: headerStyle?.icon_color }"
+          target="_blank"
+          [href]="socialLinks?.facebook"
+          *ngIf="socialLinks?.facebook"
+        >
+          <i class="socicon-facebook"></i>
+        </a>
+
+        <a
+          class="btn btn-light social-icon"
+          [ngStyle]="{ color: headerStyle?.icon_color }"
+          target="_blank"
+          [href]="socialLinks?.instagram"
+          *ngIf="socialLinks?.instagram"
+        >
+          <i class="socicon-instagram"></i>
+        </a>
+
+        <a
+          class="btn btn-light social-icon"
+          [ngStyle]="{ color: headerStyle?.icon_color }"
+          target="_blank"
+          [href]="socialLinks?.twitter"
+          *ngIf="socialLinks?.twitter"
+        >
+          <i class="socicon-twitter"></i>
+        </a>
+
+        <a
+          class="btn btn-light social-icon"
+          [ngStyle]="{ color: headerStyle?.icon_color }"
+          target="_blank"
+          [href]="socialLinks?.linkedin"
+          *ngIf="socialLinks?.linkedin"
+        >
+          <i class="socicon-linkedin"></i>
+        </a>
+
+        <a
+          class="btn btn-light social-icon"
+          [ngStyle]="{ color: headerStyle?.icon_color }"
+          target="_blank"
+          [href]="socialLinks?.youtube"
+          *ngIf="socialLinks?.youtube"
+        >
+          <i class="socicon-youtube"></i>
+        </a>
+        <a
+          class="btn btn-light social-icon"
+          (click)="toggleLang()"
+          style="min-width: 120px; font-size: medium; cursor: pointer;"
+          [ngStyle]="{
+            color: headerStyle?.inactive_color
+          }"
+        >
+          <img src="/assets/{{ lang }}.png" [alt]="lang" />
+          {{ lang == "en" ? "English" : "Spanish" }}
+        </a>
+
+        <div
+          *ngIf="displayMode == 'edit'"
+          class="btn-group"
+          style="background-color: white; border-radius: 6px; min-width: 250px;"
+        >
+          <button
+            *ngIf="displayMode == 'edit'"
+            class="btn btn-outline-primary btn-sm"
+            (click)="addSocialLinks()"
+          >
+            Social links
+            <div class="fa fa-plus"></div>
+          </button>
+          <button
+            class="btn btn-outline-success btn-sm"
+            (click)="openStyleUpdate()"
+            *ngIf="displayMode == 'edit'"
+          >
+            Style
+            <i class="fa fa-edit"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Burger menu for mobile -->
+    <div class="burger-btn">
+      <button class="btn btn-light" (click)="showSidenav = !showSidenav">
+        <i class="fa fa-bars fa-lg"></i>
+      </button>
+    </div>
+  </ng-container>
+  <div class="mobile-menu" [ngClass]="{'show': showSidenav}">
+    <div>
+      <button class="btn btn-light pull-right" (click)="showSidenav = false">
+        <i class="fa fa-times fa-lg"></i>
+      </button>
+    </div>
+    <!-- Tabs list -->
+    <ul class="tabs-list mt-4">
+      <li *ngFor="let tab of tabs; let i = index" (click)="changeTab(i)">
+        {{ tab.title }}
+      </li>
+    </ul>
+  </div>
+</div>

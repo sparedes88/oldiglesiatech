@@ -1,0 +1,32 @@
+<div class="card-ui" [ngClass]="brand + (selected ? ' selected': '')">
+  <div class="row mx-0 brand-info">
+    <!-- Brand -->
+    <div class="col-4 p-0 brand-logo" [ngClass]="brand"></div>
+  </div>
+  <!-- Number -->
+  <div class="row mx-0">
+    <div class="col-3 p-0">
+      <span class="card-number-point">****</span>
+    </div>
+    <div class="col-3 p-0">
+      <span class="card-number-point">****</span>
+    </div>
+    <div class="col-3 p-0">
+      <span class="card-number-point">****</span>
+    </div>
+    <div class="col-3 p-0">
+      <span class="card-number-point">
+        {{ card_number[0] }}{{ card_number[1] }}{{ card_number[2]
+        }}{{ card_number[3] }}
+      </span>
+    </div>
+  </div>
+  <!--  -->
+  <div class="row mx-0">
+    <div class="offset-7 col-5 text-right pr-1">
+      <span class="card-number-point">
+        {{ fixed_month }}/{{ fixed_year }}
+      </span>
+    </div>
+  </div>
+</div>

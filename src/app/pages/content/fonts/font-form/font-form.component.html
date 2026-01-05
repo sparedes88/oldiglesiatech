@@ -1,0 +1,53 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{ font?.id ? "Editing " + font?.name : "Create Font" }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div #basic_form="ngForm" [formGroup]="font_form" style="width: 100%">
+    <div class="row">
+      <div class="col-12">
+        <div class="form-group">
+          <label for="estimated">
+            Name <span class="text-danger">*</span>
+          </label>
+          <input
+            class="form-control"
+            placeholder="Name"
+            type="text"
+            formControlName="name"
+            required
+          />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-group">
+          <label>Font <span class="text-danger">*</span></label>
+          <input
+            type="file"
+            name="font"
+            formControlName="font"
+            class="form-control"
+            accept=".woff, .woff2, .ttf, .otf"
+            (change)="addFontFile($event.target.files[0])"
+          />
+        </div>
+      </div>
+
+      <div class="w-100"></div>
+
+      <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+        <button
+          [disabled]="serverBusy"
+          (click)="onRegister()"
+          class="btn btn-citric searchButton"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

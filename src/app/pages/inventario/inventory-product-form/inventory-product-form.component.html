@@ -1,0 +1,464 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col">Products |</h4>
+    <div *ngIf="show_dismiss && !show_editable" class="col text-right">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        <i class="fa fa-chevron-left"></i> Back
+      </button>
+    </div>
+
+    <!-- <span *ngIf="show_editable" class="col-12 text-citric text-right">
+      This button is disabled because you are editing a product.
+    </span> -->
+
+    <div class="col-12 row justify-content-end">
+      <div class="col-9 text-right" *ngIf="!show_editable">
+        <button
+          class="btn btn-sm btn-outline-citric mr-2"
+          routerLink="categories"
+        >
+          <!-- (click)="showCategories(inventory_category_form)" -->
+          Categories
+        </button>
+        <button
+          class="btn btn-sm btn-outline-citric mr-2"
+          routerLink="statuses"
+        >
+          <!-- (click)="showStatuses(inventory_status_form)" -->
+          Statuses
+        </button>
+
+        <button
+          *ngIf="!getPermissions() && !show_editable"
+          class="btn btn-sm btn-outline-success mt-3 mb-3"
+          (click)="activateForm()"
+          [disabled]="show_editable"
+        >
+          Add Product
+        </button>
+      </div>
+      <div *ngIf="show_editable" class="col-12 p-0">
+        <form [formGroup]="reviewForm" style="width: 100%" class="row">
+          <div class="col-12 col-md-8">
+            <div class="form-group">
+              <label for="estimated">
+                Name
+                <span class="text-danger"> * </span>
+              </label>
+              <input
+                class="form-control"
+                placeholder="Product Name."
+                type="text"
+                formControlName="name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for=""> Description <small> (Optional) </small></label>
+              <textarea
+                class="form-control"
+                placeholder="Something about this product."
+                type="text"
+                formControlName="description"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4 mb-3">
+            <div class="form-group">
+              <label>
+                Default Category:
+                <span class="text-danger"> * </span>
+              </label>
+              <ng-multiselect-dropdown
+                #multi_select_category
+                placeholder="Select a item category."
+                [data]="categories"
+                [settings]="selectCategoryOptions"
+                (onSelect)="fixIdField('idInventoryProductCategory', $event)"
+                (onDeSelect)="
+                  reviewForm.patchValue({
+                    idInventoryProductCategory: undefined
+                  })
+                "
+              ></ng-multiselect-dropdown>
+            </div>
+
+            <div class="form-group">
+              <label
+                >Default Status: <span class="text-danger"> * </span>
+              </label>
+              <ng-multiselect-dropdown
+                #multi_select_status
+                placeholder="Select a status"
+                [data]="statuses"
+                [settings]="selectStatusOptions"
+                (onSelect)="fixIdField('idInventoryProductStatus', $event)"
+                (onDeSelect)="
+                  reviewForm.patchValue({
+                    idInventoryProductStatus: undefined
+                  })
+                "
+              ></ng-multiselect-dropdown>
+            </div>
+          </div>
+
+          <!-- <div class="col-7">
+            <div class="form-group" (click)="uploadPicture(input_file)">
+              <label for="estimated">
+                Picture url:
+              </label>
+              <input
+                class="form-control"
+                placeholder="Picture url of the image (click to upload)."
+                type="text"
+                formControlName="picture"
+                readonly
+              />
+            </div>
+            <div class="col-12 col-md-4" [hidden]="true">
+              <div class="custom-file mb-4">
+                <input
+                  #input_file
+                  accept="image/*"
+                  type="file"
+                  class="custom-file-input"
+                  id="customFile"
+                />
+                <label class="custom-file-label" for="customFile"
+                  >Choose file</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="col-1 align-self-center">
+            <button
+              class="btn btn-sm btn-light"
+              (click)="uploadPicture(input_file)"
+            >
+              <i class="fa fa-upload"></i>
+            </button>
+          </div> -->
+
+          <div class="col-12" *ngIf="optional_fields.length > 0">
+            <h4 class="text-citric mb-0">Optional fields</h4>
+            <p class="text-secondary text-justify">
+              Please check the optional fields that will apply for this product.
+            </p>
+          </div>
+
+          <div class="row col-12" formArrayName="optional_fields">
+            <div
+              class="col-12"
+              *ngFor="let item of optional_fields.controls; let i = index"
+              [formGroupName]="i"
+            >
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  formControlName="status"
+                  class="form-check-input"
+                />
+                <label class="form-check-label">
+                  {{ item.value.name }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <hr />
+
+        <span
+          style="display: block; text-align: right; width: 100%"
+          class="mb-2"
+        >
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            class="btn btn-sm btn-muted"
+            (click)="deactivateForm()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            [disabled]="reviewForm.invalid && !getPermissions()"
+            (click)="addReview(reviewForm)"
+            class="btn btn-sm btn-success"
+          >
+            Save
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div
+      [hidden]="show_loading || show_editable"
+      class="col-12 p-0"
+      style="min-height: 500px"
+    >
+      <form
+        #member_type_form="ngForm"
+        [formGroup]="reviewStatusForm"
+        style="width: 100%"
+      >
+        <div formArrayName="statuses" class="col-12 p-0">
+          <table class="table row-border hover table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Default Status</th>
+                <th>Default Category</th>
+                <th *ngIf="!getPermissions()">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let review of products; let i = index"
+                [formGroupName]="i"
+              >
+                <td>
+                  {{ review.name }}
+                </td>
+                <td>
+                  <div *ngIf="!getPermissions()" class="form-group">
+                    <select
+                      (change)="
+                        checkChange(
+                          status_on_form.controls[i].get(
+                            'idInventoryProductStatus'
+                          ),
+                          review,
+                          'idInventoryProductStatus'
+                        )
+                      "
+                      formControlName="idInventoryProductStatus"
+                      class="form-control mb-1"
+                    >
+                      <option
+                        *ngFor="let status of statuses"
+                        [value]="status.idInventoryProductStatus"
+                      >
+                        {{ status.name }}
+                      </option>
+                    </select>
+                    <span style="display: block; text-align: right">
+                      <button
+                        type="button"
+                        *ngIf="
+                          status_on_form.controls[i].get(
+                            'idInventoryProductStatus'
+                          ).dirty &&
+                          (currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="
+                          resetReviewStatusForm(
+                            status_on_form.controls[i],
+                            review,
+                            'idInventoryProductStatus'
+                          )
+                        "
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          status_on_form.controls[i].get(
+                            'idInventoryProductStatus'
+                          ).dirty &&
+                          (currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        [disabled]="
+                          status_on_form.controls[i].get(
+                            'idInventoryProductStatus'
+                          ).invalid &&
+                          (currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        (click)="
+                          updateMemberType(
+                            status_on_form.controls[i],
+                            review,
+                            'idInventoryProductStatus',
+                            'Status'
+                          )
+                        "
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span>
+                  </div>
+                  <div *ngIf="getPermissions()">
+                    {{ review.product_status }}
+                  </div>
+                </td>
+                <td>
+                  <div *ngIf="!getPermissions()" class="form-group">
+                    <select
+                      (change)="
+                        checkChange(
+                          status_on_form.controls[i].get(
+                            'idInventoryProductCategory'
+                          ),
+                          review,
+                          'idInventoryProductCategory'
+                        )
+                      "
+                      formControlName="idInventoryProductCategory"
+                      class="form-control mb-1"
+                    >
+                      <option
+                        *ngFor="let category of categories"
+                        [value]="category.idInventoryProductCategory"
+                      >
+                        {{ category.name }}
+                      </option>
+                    </select>
+                    <span style="display: block; text-align: right">
+                      <button
+                        type="button"
+                        *ngIf="
+                          status_on_form.controls[i].get(
+                            'idInventoryProductCategory'
+                          ).dirty &&
+                          (currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="
+                          resetReviewStatusForm(
+                            status_on_form.controls[i],
+                            review,
+                            'idInventoryProductCategory'
+                          )
+                        "
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          status_on_form.controls[i].get(
+                            'idInventoryProductCategory'
+                          ).dirty &&
+                          (currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        [disabled]="
+                          status_on_form.controls[i].get(
+                            'idInventoryProductCategory'
+                          ).invalid &&
+                          (currentUser.isSuperUser ||
+                            currentUser.idUserType === 1)
+                        "
+                        (click)="
+                          updateMemberType(
+                            status_on_form.controls[i],
+                            review,
+                            'idInventoryProductCategory',
+                            'Category'
+                          )
+                        "
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span>
+                  </div>
+                  <div *ngIf="getPermissions()">
+                    {{ review.product_category }}
+                  </div>
+                </td>
+                <td *ngIf="!getPermissions()">
+                  <div class="btn-group">
+                    <button
+                      class="btn btn-secondary ml-2"
+                      data-toggle="modal"
+                      data-target="#exampleModalCenter"
+                      (click)="mostrarQr(review.qr_code)"
+                    >
+                      <i class="fa fa-qrcode"></i>
+                    </button>
+
+                    <button
+                      (click)="updateReview(review)"
+                      [disabled]="show_editable"
+                      class="btn btn-sm btn-info fixed-padding"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger fixed-padding"
+                      (click)="deleteReview(review)"
+                      [disabled]="show_editable"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal QR -->
+
+<div
+  class="modal fade"
+  id="exampleModalCenter"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+  *ngIf="qr_code"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Qr code</h5>
+        </div>
+        <div class="row mt-3">
+          <div class="col-2"></div>
+          <div class="col-7">
+            <qrcode [qrdata]="qr_code" [size]="256" [level]="'Q'"></qrcode>
+          </div>
+          <div class="col-2"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

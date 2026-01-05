@@ -1,0 +1,389 @@
+<div class="container page">
+  <div class="row">
+    <h3 class="col-6 text-citric">Notes</h3>
+    <div class="col-6 text-right">
+      <button
+        *ngIf="currentUser.isSuperUser&&!(this.idProjectTrackingStep)"
+        class="btn btn-outline-citric mr-1"
+        (click)="toogleAll()"
+      >
+        {{ showAllNotes ? "Current church only" : "Show all" }}
+      </button>
+      <button class="btn btn-outline-citric" *ngIf="!this.showAllNotes"  (click)="addObject(note_form)">
+        {{!(this.idProjectTrackingStep) ? 'Add Note' : 'Añadir nota a paso'}}
+      </button>
+    </div>
+    <div class="col-7 mb-2">
+      <ng-select *ngIf="showAllNotes" [items]="adminsInit" bindLabel="complete_name" class="custom" placeholder="Assigned"
+        bindValue="idUser" [searchable]="true" [(ngModel)]="selected_admin[1]" [multiple]="true"
+        (ngModelChange)="null" style="text-align: center; height: auto; width: 100%; "
+        appearance="outline">
+      </ng-select>
+      <ng-select *ngIf="!showAllNotes" [items]="adminsInit" bindLabel="complete_name" class="custom" placeholder="Assigned"
+        bindValue="idUser" [searchable]="true" [(ngModel)]="selected_admin[2]" [multiple]="true"
+        (ngModelChange)="null" style="text-align: center; height: auto; width: 100%; "
+        appearance="outline">
+      </ng-select>
+    </div>
+    <div class="col-5 mb-2">
+      <div class="input-group" style="width: 100%;">
+        <div class="input-group-prepend" style="width: 70%;">
+          <ng-select *ngIf="showAllNotes" [items]="options" bindLabel="label" class="custom" placeholder="Type" bindValue="id"
+            [(ngModel)]="selected_option[1]" (ngModelChange)="null"
+            style="text-align: center; height: auto; width: 100%;"
+            appearance="outline">
+          </ng-select>
+          <ng-select *ngIf="!showAllNotes" [items]="options" bindLabel="label" class="custom" placeholder="Type" bindValue="id"
+            [(ngModel)]="selected_option[2]" (ngModelChange)="null"
+            style="text-align: center; height: auto; width: 100%;"
+            appearance="outline">
+          </ng-select>
+        </div>
+        <div class="input-group-append">
+          <button class="btn btn-primary" *ngIf="showAllNotes"
+          [disabled]="!(selected_option[1]!=undefined&&selected_admin[1].length!=0)" (click)="search()">
+            <i class="fa fa-search"></i>
+          </button>
+          <button class="btn btn-primary" *ngIf="!showAllNotes" (click)="search()">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="col-md-12" [hidden]="showAllNotes">
+      <table
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        style="width: 100%;"
+        class="table row-border hover table-striped"
+      >
+        <thead>
+          <tr>
+            <th [hidden]="true"></th>
+            <th></th>
+            <th width="12%">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let nota of notas">
+            <td [hidden]="true">{{ nota.idNotaIglesia }}</td>
+            <td style="width: 100%; max-width: 100%;">
+              <div class="notaItemContainer">
+                <div class="notaItemDate">
+                  <div class="row">
+                    <!-- <div class="input-group" style="width: 100%; max-width: 100%;">
+                      <div class="input-group-prepend text-center" style="width: 25%; max-width: 25%; padding-left: 5px;">
+                        <span *ngIf="nota.user_created_by">
+                          {{ nota.user_created_by }} <b *ngIf="nota['step'] && !this.idProjectTrackingStep" >{{steps[nota['step']]}}</b>
+                        </span>
+                      </div>
+                      <div class="input-group-prepend" style="width: 50%; max-width: 50%; padding: 5px;">
+                        <div class="input-group" style="width: 100%;">
+                          <div class="input-group-prepend" style="width: 80%;">
+                            <ng-select *ngIf="true" [items]="admins" bindLabel="Nombre" class="custom" placeholder="Assign" bindValue="id"
+                              [searchable]="true" [(ngModel)]="selected_admin"
+                              style="text-align: center; height: 32px; width: 100%; max-height: 32px;">
+                            </ng-select>
+                          </div>
+                          <div class="input-group-append">
+                            <button *ngIf="true" class="btn btn-sm" (click)="null" style="background-color: Transparent;
+                                                background-repeat:no-repeat;
+                                                border: none;
+                                                cursor:pointer;
+                                                overflow: hidden;
+                                                outline:none;">
+                              <i class="fa fa-clock text-citric" aria-hidden="true" style="color: lighten(#e65100, 13%);"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="input-group-append text-center" style="width: 25%; max-width: 25%; padding-left: 5px;">
+                        <table>
+                          <tr>
+                            <span class="notaItemDateSpan">
+                              {{ nota.fechaCreacion | date: "short" }}
+                            </span>
+                          </tr>
+                          <tr>
+                            <span class="notaItemDateSpan">
+                              Pending <i class="fa fa-clock text-citric" aria-hidden="true" style="color: lighten(#e65100, 13%);"></i>
+                            </span>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="col-6 text-left">
+                      <span *ngIf="nota.user_created_by">
+                        {{'By '}}{{ nota.user_created_by }} <b *ngIf="nota['step'] && !this.idProjectTrackingStep" >{{steps[nota['step']]}}</b>
+                      </span>
+                    </div>
+                    <div class="col-6">
+                      <span class="notaItemDateSpan">
+                        {{ nota.fechaCreacion | date: "short" }}
+                      </span>
+                    </div>
+                    <div class="col-12" *ngIf="nota['step']" >
+                      <div class="input-group" style="width: 100%;">
+                        <div class="input-group-prepend" style="width: 70%; padding-right: 5px;">
+                          <ng-select *ngIf="true" [items]="adminsInit" bindLabel="complete_name" class="custom" placeholder="Assign" bindValue="idUser"
+                            [searchable]="true" [(ngModel)]="nota['assigned_user_ids']" [multiple]="true" (ngModelChange)="nota['changed']=true"
+                            style="text-align: center; height: auto; width: 100%;  "
+                            appearance="outline">
+                          </ng-select>
+                        </div>
+                        <div class="input-group-prepend text-right" style="width: 30%;">
+                          <mat-slide-toggle color="primary" style="width: 100%;" labelPosition="before" [(ngModel)]="nota['is_completed']"
+                            [ngModelOptions]="{ standalone: true }" class="pull-right" (ngModelChange)="nota['changed']=true">
+                            {{nota['is_completed'] ? 'Completed' : 'Incomplete'}}
+                            <i class="fa fa-clock text-citric" aria-hidden="true" *ngIf="!nota['is_completed']"></i>
+                            <i class="fa fa-check-circle text-primary" aria-hidden="true" *ngIf="nota['is_completed']"></i>
+                          </mat-slide-toggle>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="col-4 text-right">
+                      <div class="d-flex justify-content-between">
+                        <div>
+                        </div>
+                        <div>
+                          <mat-slide-toggle color="primary" style="width: 100%;" labelPosition="before" [(ngModel)]="nota['is_completed']"
+                            [ngModelOptions]="{ standalone: true }" class="pull-right">
+                            Incomplete
+                          </mat-slide-toggle>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p
+                  ion-text
+                  color="black"
+                  class="notaItemDescripcion"
+                  [innerHtml]="nota.descripcion | keepHtml"
+                ></p>
+              </div>
+            </td>
+            <td>
+              <div class="btn-group">
+                <!-- <a
+                  routerLink="details/{{ nota.idNotaIglesia }}"
+                  class="btn btn-sm btn-primary"
+                >
+                  <i class="fa fa-eye"> </i>
+                </a>
+                <button
+                  class="btn btn-sm btn-info"
+                  (click)="editObject(nota, note_form)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  *ngIf="(this.idProjectTrackingStep)"
+                  class="btn btn-sm btn-danger"
+                  (click)="removeNoteFromTracking(nota.idNoteTrack)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+                <!-- <button class="btn btn-sm btn-danger" (click)="deleteEvent(event)">
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+              <div class="btn-group" *ngIf="nota['changed']" >
+                <button
+                  class="btn btn-sm btn-success"
+                  (click)="updateTrackingNote(nota.idNoteTrack, nota['is_completed'], nota['assigned_user_ids'])"
+                >
+                  <i class="fa fa-save"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div> -->
+
+    <div class="col-md-12">
+      <table
+      datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        style="width: 100%;"
+        class="table row-border hover table-striped"
+      >
+        <thead>
+          <tr>
+            <th [hidden]="true"></th>
+            <th></th>
+            <th width="12%">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let nota of (showAllNotes ? this.allNotes : this.notas)">
+            <td [hidden]="true">{{ nota.idNotaIglesia }}</td>
+            <td style="width: 100%; max-width: 100%;">
+              <div class="notaItemContainer">
+                <div class="notaItemDate">
+                  <div class="row">
+                    <div class="col-6 text-left" *ngIf="nota.nombreIglesia||idProjectTrackingStep">
+                      <span *ngIf="!nota.nombreIglesia">
+                        {{'By '}}{{ nota.user_created_by }}
+                      </span>
+                      <span *ngIf="nota.nombreIglesia">
+                        <b>{{nota.nombreIglesia}}</b>
+                      </span>
+                    </div>
+                    <div class="col-6" *ngIf="nota.nombreIglesia||idProjectTrackingStep">
+                      <span class="notaItemDateSpan">
+                        {{ nota.fechaCreacion | date: "short" }}
+                      </span>
+                    </div>
+                    <!-- <div class="col-6 text-left mb-1">
+                      <span *ngIf="nota.user_created_by">
+                        {{'By '}}{{ nota.user_created_by }}
+                        <!-- <b *ngIf="nota['step'] && !this.idProjectTrackingStep" >{{steps[nota['step']]}}</b>
+                      </span>
+
+                    </div>
+                    <div class="col-6 mb-1">
+                      <ng-select *ngIf="true" [items]="selectable_steps" bindLabel="label" placeholder="Step" bindValue="id"
+                        [searchable]="true" [(ngModel)]="nota['step']" (ngModelChange)="nota['changed']=true"
+                        style="text-align: center; width: 100%; max-width: 100%;" appearance="outline">
+                      </ng-select>
+                    </div> -->
+                    <div class="col-12 mb-1" *ngIf="!this.idProjectTrackingStep" >
+                      <div class="input-group" style="width: 100%;">
+                        <div class="input-group-prepend" style="width: 70%; padding-right: 5px;">
+                          <ng-select *ngIf="true" [items]="selectable_steps" bindLabel="label" placeholder="Step" bindValue="id"
+                            [searchable]="true" [(ngModel)]="nota['step']" (ngModelChange)="nota['changed']=true"
+                            style="text-align: center; width: 100%; max-width: 100%;" appearance="outline">
+                          </ng-select>
+                        </div>
+                        <div class="input-group-prepend text-right" style="width: 30%;text-align: right;">
+                          <span *ngIf="nota.user_created_by&&nota.nombreIglesia" style="text-align: right;">
+                            {{'By '}}{{ nota.user_created_by }}
+                            <!-- <b *ngIf="nota['step'] && !this.idProjectTrackingStep" >{{steps[nota['step']]}}</b> -->
+                          </span>
+                          <span *ngIf="nota.user_created_by&&!nota.nombreIglesia" style="text-align: right;">
+                            {{'By '}}{{ nota.user_created_by }}{{', '}}{{ nota.fechaCreacion | date: "short" }}
+                            <!-- <b *ngIf="nota['step'] && !this.idProjectTrackingStep" >{{steps[nota['step']]}}</b> -->
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12" *ngIf="nota['step']&&nota['is_completed']!=null" >
+                      <div class="input-group" style="width: 100%;">
+                        <div class="input-group-prepend" style="width: 70%; padding-right: 5px;">
+                          <ng-select *ngIf="true" [items]="adminsInit" bindLabel="complete_name" class="custom" placeholder="Assign" bindValue="idUser"
+                            [searchable]="true" [(ngModel)]="nota['assigned_user_ids']" [multiple]="true" (ngModelChange)="nota['changed']=true"
+                            style="text-align: center; height: auto; width: 100%;  "
+                            appearance="outline">
+                          </ng-select>
+                        </div>
+                        <div class="input-group-prepend text-right" style="width: 30%;">
+                          <mat-slide-toggle color="primary" style="width: 100%;" labelPosition="before" [(ngModel)]="nota['is_completed']"
+                            [ngModelOptions]="{ standalone: true }" class="pull-right" (ngModelChange)="nota['changed']=true">
+                            {{nota['is_completed'] ? 'Completed' : 'Incomplete'}}
+                            <i class="fa fa-clock text-citric" aria-hidden="true" *ngIf="!nota['is_completed']"></i>
+                            <i class="fa fa-check-circle text-primary" aria-hidden="true" *ngIf="nota['is_completed']"></i>
+                          </mat-slide-toggle>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p
+                  ion-text
+                  color="black"
+                  class="notaItemDescripcion"
+                  [innerHtml]="nota.descripcion | keepHtml"
+                ></p>
+              </div>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-sm btn-info"
+                  (click)="editObject(nota, note_form)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  *ngIf="(this.idProjectTrackingStep)"
+                  class="btn btn-sm btn-danger"
+                  (click)="removeNoteFromTracking(nota.idNoteTrack)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+              <div class="btn-group" *ngIf="nota['changed']" >
+                <button
+                  class="btn btn-sm btn-success"
+                  (click)="updateTrackingNote(nota.idNoteTrack, nota['is_completed'], nota['assigned_user_ids'], nota)"
+                >
+                  <i class="fa fa-save"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- <div class="row">
+        <div class="col-xs-8 col-md-8">
+          <div class="form-group mt-2" style="max-width: 256px">
+            <input
+              type="search"
+              class="form-control"
+              placeholder="Search notes..."
+              [(ngModel)]="searchValue"
+            />
+          </div>
+        </div>
+        <div class="col-xs-4 col-md-4 text-right">
+          <button
+            class="btn btn-sm btn-outline-citric"
+            (click)="getAllNotes()"
+            style="float: right"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <ul class="note-list mt-2">
+        <li
+          class="note-item"
+          *ngFor="let note of allNotesFiltered"
+          (click)="editObject(note, note_form)"
+        >
+          <div class="icon">
+            <span>
+              {{ getFirstChar(note.nombreIglesia) }}
+            </span>
+          </div>
+          <div class="content">
+            <div class="title-row">
+              <div class="title">{{ note.nombreIglesia }}</div>
+              <div class="time">
+                {{ timeAgo(note.fechaCreacion) }} by {{note.user_created_by}}
+              </div>
+            </div>
+            <div
+              class="div html-content"
+              [innerHTML]="note.descripcion | keepHtml"
+            ></div>
+          </div>
+        </li>
+      </ul> -->
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #formModal
+  [identifier]="(this.idProjectTrackingStep)? 'formModal'+this.idProjectTrackingStep: 'formModal'"
+  [dismissable]="false" [closable]="false" customClass="large-modal">
+  <app-note-form
+    #note_form
+    (onDismiss)="onModalDidDismiss($event)">
+  </app-note-form>
+</ngx-smart-modal>

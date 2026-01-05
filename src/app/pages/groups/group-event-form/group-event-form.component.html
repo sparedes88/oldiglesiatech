@@ -1,0 +1,643 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{
+        group_event.idGroupEvent
+          ? "Edit Event #" + group_event.name
+          : "Add Event Standalone"
+      }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+
+  <form class="col-12" #event_form="ngForm" [formGroup]="eventFormGroup">
+    <button
+      #click_to_glitch
+      (click)="checkClick()"
+      type="button"
+      hidden
+    ></button>
+    <div class="row">
+      <!-- Left panel -->
+      <div class="row col-7">
+        <!-- Name -->
+        <div class="col-12 col-md-12">
+          <label>Title*</label>
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Event's Name"
+              formControlName="name"
+              required
+              [class.is-invalid]="
+                eventFormGroup.get('name').touched &&
+                eventFormGroup.get('name').invalid
+              "
+            />
+            <div class="input-group-append">
+              <span class="input-group-text">
+                <i class="fas fa-align-left"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div *ngIf="show_groups_dropdown" class="col-12 col-md-12">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idGroup"> Group* </label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select a group"
+              [data]="groups"
+              [settings]="selectOptions"
+              formControlName="idGroup"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div> -->
+
+        <!-- Exact date -->
+        <div
+          class="col-12 row"
+          *ngIf="selected_frequency && selected_frequency.is_exact_date"
+        >
+          <div class="col-12">
+            <div class="custom-control custom-switch">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                formControlName="event_as_range"
+                id="customCheck1"
+                (change)="printChange($event)"
+              />
+              <label class="custom-control-label" for="customCheck1">
+                This is a multi-day event
+              </label>
+            </div>
+          </div>
+          <!-- Only 1 day Event -->
+          <div
+            *ngIf="!eventFormGroup.get('event_as_range').value"
+            class="row col-12"
+          >
+            <div class="col-md-12 mb-3">
+              <label>Event Date*</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="event_date"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>From*</label>
+              <input
+                type="time"
+                class="form-control"
+                formControlName="event_time_start"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>To*</label>
+              <input
+                type="time"
+                class="form-control"
+                formControlName="event_time_end"
+                required
+              />
+            </div>
+          </div>
+          <!-- Multi day Event -->
+          <div
+            *ngIf="eventFormGroup.get('event_as_range').value"
+            class="row col-12"
+          >
+            <div class="col-md-6 mb-3">
+              <label>Event Start*</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="event_date_start"
+                [max]="eventFormGroup.get('event_date_end').value"
+                (change)="eventFormGroup.get('event_date_end').enable()"
+                (keydown)="checkKey($event)"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Time*</label>
+              <input
+                type="time"
+                class="form-control"
+                formControlName="event_time_start"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Event End*</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="event_date_end"
+                [min]="eventFormGroup.get('event_date_start').value"
+                (keydown)="checkKey($event)"
+                required
+              />
+              {{ eventFormGroup.get("event_date_end").valid }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Time*</label>
+              <input
+                type="time"
+                class="form-control"
+                formControlName="event_time_end"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-12 col-md-12">
+          <label>Description</label>
+          <div class="input-group mb-3">
+            <textarea
+              rows="5"
+              class="form-control"
+              formControlName="description"
+              placeholder="Write a description for the new event"
+            ></textarea>
+            <div class="input-group-append">
+              <span class="input-group-text">
+                <i class="fas fa-align-left"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          [ngClass]="{
+            'col-12': eventFormGroup.get('all_day').value,
+            'col-md-6': !eventFormGroup.get('all_day').value
+          }"
+          class="col-md-6 mb-3"
+        >
+          <label>Event Start*</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="event_date_start"
+            [max]="eventFormGroup.get('event_date_end').value"
+            (change)="eventFormGroup.get('event_date_end').enable()"
+            (keydown)="checkKey($event)"
+            required
+          />
+        </div>
+        <div [hidden]="eventFormGroup.get('all_day').value" class="col-md-6 mb-3">
+          <label>Time*</label>
+          <input
+            type="time"
+            class="form-control"
+            formControlName="event_time_start"
+            [class.is-invalid]="eventFormGroup.get('event_time_start').touched && eventFormGroup.get('event_time_start').invalid"
+          />
+        </div>
+        <div
+          [ngClass]="{
+            'col-12': eventFormGroup.get('all_day').value,
+            'col-md-6': !eventFormGroup.get('all_day').value
+          }"
+          class="mb-3"
+        >
+          <label>Event End*</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="event_date_end"
+            [min]="eventFormGroup.get('event_date_start').value"
+            (keydown)="checkKey($event)"
+            required
+          />
+          <!-- {{ eventFormGroup.get("event_date_end").valid }} -->
+        </div>
+        <div [hidden]="eventFormGroup.get('all_day').value" class="col-md-6 mb-3">
+          <label>Time*</label>
+          <input
+            type="time"
+            class="form-control"
+            formControlName="event_time_end"
+            [class.is-invalid]="eventFormGroup.get('event_time_end').touched && eventFormGroup.get('event_time_end').invalid"
+
+          />
+        </div>
+
+        <div class="col-12">
+          <div class="custom-control custom-switch">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              formControlName="all_day"
+              id="all_day"
+              (change)="handleAllDay()"
+            />
+            <label class="custom-control-label" for="all_day">
+              This event is all day
+            </label>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <!-- <div class="col-12 col-md-12">
+          <label>Capacity</label>
+          <div class="input-group mb-3">
+            <input
+              rows="5"
+              class="form-control"
+              formControlName="capacity"
+              placeholder="How many people do you expect?"
+              type="number"
+            />
+          </div>
+        </div> -->
+        <!-- <div class="col-12 col-md-12">
+          <label>Transmission/Video url</label>
+          <div class="input-group mb-3">
+            <textarea
+              rows="5"
+              class="form-control"
+              formControlName="live_event_url"
+              placeholder="Paste here your transmission url (including http://)"
+            ></textarea>
+          </div>
+        </div> -->
+
+        <div class="col-12 col-md-12">
+          <label class="col-12">
+            <span style="pointer-events: none"> Location </span>
+            <div class="text-center float-right">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="same_address_as_church"
+                  id="defaultCheck2"
+                  (change)="setOrganizationAddress()"
+                />
+                <label class="form-check-label" for="defaultCheck2">
+                  <span class="tooltip_">
+                    <span class="tooltiptext">
+                      Check this option to use the same address that your
+                      organization.
+                    </span>
+                    Same address as organization?
+                    <i class="text-secondary fa fa-info-circle"></i>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </label>
+          <div class="input-group mb-3">
+            <google-address-component
+              #address_component
+              [readonly]="eventFormGroup.value.same_address_as_church"
+              #address_component
+              *ngIf="init_map"
+              [value]="group_event.location"
+              placeholder="Please type the location info about this event."
+              adressType="address"
+              (setAddress)="getAddress($event)"
+            ></google-address-component>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-4 mb-4">
+        <div class="card">
+          <div class="row card-body">
+            <img
+              [src]="fixUrl(group_event.picture)"
+              [alt]="group_event.name"
+              class="group-picture mb-1"
+              (click)="uploadPicture(input_file)"
+            />
+            <span class="col-12" style="font-size: 12px">
+              Recommended size: 1000x428
+            </span>
+            <div class="col-12 text-center">
+              <button
+                type="button"
+                class="btn btn-sm btn-citric"
+                (click)="uploadPicture(input_file)"
+              >
+                Upload image
+              </button>
+            </div>
+            <!-- <div class="col-12 text-center">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [value]="help_request"
+                  [(ngModel)]="help_request"
+                  [ngModelOptions]="{ standalone: true }"
+                  id="defaultCheck1"
+                  (change)="initOrResetForm($event)"
+                />
+                <label class="form-check-label" for="defaultCheck1">
+                  Need Help with Design? Click here!
+                </label>
+              </div>
+            </div> -->
+            <div class="col-12 text-center">
+              <ng-select
+                *ngIf="wpImages.length != 0"
+                [items]="wpImages"
+                bindLabel="slug"
+                placeholder="Select a Wordpress image"
+                bindValue="source_url"
+                formControlName="picture"
+                [(ngModel)]="group_event.picture"
+                [searchable]="true"
+                (change)="update()"
+                style="text-align: center; height: 30px"
+              >
+                <ng-template ng-option-tmp let-item="item" let-index="index">
+                  <div class="row">
+                    <div class="col-12">
+                      <b>{{ item.slug }}</b>
+                    </div>
+                    <div class="col-12">
+                      <img width="50%" [src]="item.source_url" />
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-select>
+            </div>
+
+            <div class="col-12 col-md-4" [hidden]="true">
+              <div class="custom-file mb-4">
+                <input
+                  #input_file
+                  accept="image/*"
+                  type="file"
+                  class="custom-file-input"
+                  id="customFile"
+                />
+                <label class="custom-file-label" for="customFile"
+                  >Choose file</label
+                >
+              </div>
+            </div>
+
+            <div
+              [formGroup]="designRequestForm"
+              *ngIf="
+                help_request &&
+                !group_event?.design_request?.idDesignRequestEvent
+              "
+              class="col-12"
+            >
+              <div class="col-12 col-md-12">
+                <label>Special Text*</label>
+                <div class="input-group mb-3">
+                  <textarea
+                    type="text"
+                    class="form-control"
+                    placeholder="Special phrase or bible quote"
+                    formControlName="special_text"
+                    [class.is-invalid]="
+                      designRequestForm.get('special_text').touched &&
+                      designRequestForm.get('special_text').invalid
+                    "
+                  ></textarea>
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-bible"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-12">
+                <label>Speaker or special guest</label>
+                <div class="input-group mb-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Speaker or special guest name"
+                    formControlName="speaker"
+                    [class.is-invalid]="
+                      designRequestForm.get('speaker').touched &&
+                      designRequestForm.get('speaker').invalid
+                    "
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-microphone"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-12">
+                <label>Color guide</label>
+                <div class="input-group mb-3">
+                  <textarea
+                    type="text"
+                    class="form-control"
+                    placeholder="Specify which colors we should use."
+                    formControlName="specifiedColors"
+                    [class.is-invalid]="
+                      designRequestForm.get('specifiedColors').touched &&
+                      designRequestForm.get('specifiedColors').invalid
+                    "
+                  ></textarea>
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-palette"></i>
+                    </span>
+                  </div>
+                  <small
+                    *ngIf="designRequestForm.get('specifiedColors').value"
+                    class="col-12 text-right text-secondary"
+                    >{{
+                      designRequestForm.get("specifiedColors").value.length
+                    }}/1000</small
+                  >
+                </div>
+              </div>
+              <div class="col-12 col-md-12">
+                <label
+                  >Size guide (height x width)
+                  <span class="text-danger"> * </span></label
+                >
+                <div class="input-group mb-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Size guide (height x width)"
+                    formControlName="size_guide"
+                    [class.is-invalid]="
+                      designRequestForm.get('size_guide').touched &&
+                      designRequestForm.get('size_guide').invalid
+                    "
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-expand"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row align-items-center">
+                <div class="col-9">
+                  <h4 class="text-muted">Reference images</h4>
+                </div>
+                <div class="col-3">
+                  <button
+                    type="button"
+                    (click)="showActionSheet(2, input_file_reference)"
+                    class="btn btn-citric circular-button"
+                  >
+                    <mat-icon matPrefix>add</mat-icon>
+                  </button>
+                  <input
+                    [hidden]="true"
+                    #input_file_reference
+                    multiple
+                    type="file"
+                    class="custom-file-input"
+                    id="customFile"
+                  />
+                </div>
+              </div>
+              <div
+                class="col-12 scrollmenu"
+                style="min-width: 1px; min-height: 120px"
+              >
+                <div
+                  class="slide-image"
+                  *ngFor="let image of referenceImages.controls; let i = index"
+                >
+                  <img
+                    [src]="fixUrlDesign(image.value)"
+                    style="height: 120px"
+                  />
+                  <button
+                    class="btn btn-danger front-element"
+                    (click)="removeImage(referenceImages, i)"
+                  >
+                    x
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              [formGroup]="designRequestForm"
+              *ngIf="
+                help_request &&
+                group_event?.design_request?.idDesignRequestEvent
+              "
+              class="col-12"
+            >
+              <small class="text-secondary">
+                You already have a design request for this event.
+              </small>
+              <div class="text-center">
+                <button
+                  class="btn btn-sm btn-citric"
+                  (click)="goToDesignRequest()"
+                >
+                  {{ group_event?.design_request?.title }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12"></div>
+
+        <!-- Description -->
+        <!-- <div class="col-12 col-md-12">
+          <label>Button Text</label>
+          <div class="input-group mb-3">
+            <input
+              class="form-control"
+              formControlName="button_text"
+              placeholder="Write the text of your form button."
+            />
+          </div>
+        </div> -->
+
+        <!-- <div class="col-12 col-md-12">
+          <label>Button Color</label>
+          <div class="input-group mb-3">
+            <input
+              class="form-control"
+              type="color"
+              matInput
+              formControlName="button_color"
+              placeholder="Pick the color of your button. (Please notice that the text will be white)"
+            />
+          </div>
+        </div> -->
+
+        <!-- Cost -->
+        <div class="col-12 col-md-12">
+          <label>Event cost</label>
+          <div class="input-group mb-3">
+            <input
+              class="form-control"
+              formControlName="ticket_cost"
+              placeholder="How much does a ticket for this event cost?"
+              type="number"
+            />
+          </div>
+        </div>
+
+        <div class="col-12 col-md-12">
+          <div class="mb-3">
+            <label>Publish status*</label>
+            <select
+              formControlName="publish_status"
+              class="form-control"
+              required
+              [class.is-invalid]="
+                eventFormGroup.get('publish_status').touched &&
+                eventFormGroup.get('publish_status').invalid
+              "
+            >
+              <option value="0">-- Select one option --</option>
+              <option value="publish">Publish</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-12 text-center mt-3">
+          <button
+            [disabled]="eventFormGroup.invalid || serverBusy"
+            type="button"
+            (click)="submitForm(eventFormGroup)"
+            class="btn btn-sm btn-success"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<fullscreen-modal
+  [(visible)]="visiblePixieModal"
+  (visibilityChange)="visiblePixieModal = $event"
+>
+  <pixie-editor
+    *ngIf="visiblePixieModal"
+    (onExport)="handlePixieExport($event)"
+  ></pixie-editor>
+</fullscreen-modal>

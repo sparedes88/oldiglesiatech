@@ -1,0 +1,163 @@
+<div class="container mt-2">
+  <div class="row">
+    <div class="col-8">
+      <h4 class="text-citric mb-3 mt-2">
+        Community | List
+      </h4>
+    </div>
+    <div class="col-4 text-right">
+      <button
+        class="btn btn-outline-citric btn-sm mt-1"
+        (click)="communityFormModal.open()"
+      >
+        <i class="fa fa-plus"></i>
+        Add Community
+      </button>
+    </div>
+  </div>
+
+  <table
+    datatable
+    [dtOptions]="dtOptions"
+    [dtTrigger]="dtTrigger"
+    class="table row-border hover table-striped"
+  >
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Options</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let community of communities">
+        <td>{{ community.id }}</td>
+        <td>
+          {{ community.name }}
+        </td>
+        <td>
+          {{ community.description }}
+        </td>
+        <td>
+          {{ community.category }}
+        </td>
+        <td style="text-align: right;">
+          <div class="btn-group text-right">
+            <a
+              class="btn btn-sm btn-primary"
+              routerLink="/community-box/details/{{ community.id }}"
+            >
+              <i class="fa fa-eye"></i>
+            </a>
+            <button class="btn btn-sm btn-info" (click)="openEdit(community)">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="deleteCommunity(community)"
+            >
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ngx-smart-modal
+  #communityFormModal
+  identifier="communityFormModal"
+  (onAnyCloseEvent)="communityFormGroup.reset()"
+>
+  <h4>Add community</h4>
+  <form
+    (ngSubmit)="submitCommunity(communityFormGroup)"
+    #communityFormGroup="ngForm"
+  >
+    <div class="form-group">
+      <label>Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="name">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Community name"
+          name="name"
+          required
+          [(ngModel)]="communityForm.name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="description">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Community description"
+          name="description"
+          [(ngModel)]="communityForm.description"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Category</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="category">
+            <i class="fa fa-list-alt"></i>
+          </span>
+        </div>
+        <select
+          name="category"
+          required
+          class="form-control"
+          [(ngModel)]="communityForm.category"
+        >
+          <option *ngFor="let category of categories" [value]="category.name">
+            {{ category.name }}
+          </option>
+        </select>
+        <div class="input-group-append" *ngIf="currentUser.isSuperUser">
+          <button
+            type="button"
+            class="input-group-btn btn btn-success"
+            (click)="categoriesModal.open()"
+          >
+            <i class="fa fa-plus"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="communityFormGroup.invalid || saving"
+      >
+        <i class="fa fa-paper-plane"></i>
+        {{ saving ? "Please wait..." : "Save community" }}
+      </button>
+    </div>
+  </form>
+</ngx-smart-modal>
+
+<ngx-smart-modal identifier="categoriesModal" #categoriesModal>
+  <h4>Categories</h4>
+  <community-categories (onChange)="getCategories()"></community-categories>
+</ngx-smart-modal>

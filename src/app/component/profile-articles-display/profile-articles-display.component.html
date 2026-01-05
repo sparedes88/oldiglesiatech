@@ -1,0 +1,110 @@
+<!-- Detail View -->
+<!-- <ng-template [ngIf]="!loading && view_mode === 'detail'">
+  <h5 class="font-weight-bold text-dark">
+    {{ category.nombre | translate }}
+  </h5>
+  <p class="text-secondary text-justify">
+    {{ category.descripcion }}
+  </p>
+</ng-template> -->
+<ng-template [ngIf]="wait_style">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<div
+  [hidden]="wait_style"
+  id="scroll-x"
+  class="scroll-x row mx-0"
+  *ngIf="categories.length > 1"
+>
+  <div (click)="scroll(-100)" id="scroll-left" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-left"></i>
+  </div>
+  <div (click)="scroll(100)" id="scroll-right" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-right"></i>
+  </div>
+  <div
+    class="col-6 col-sm-4 col-md-3 my-4"
+    [routerLink]="[actual_page + '/' + category.idCategoriaArticulo]"
+    *ngFor="let category of categories"
+    (click)="setCategory(category)"
+    [ngClass]="{
+      clickable: view_mode !== 'edition',
+      active:
+        selected_category?.idCategoriaArticulo === category.idCategoriaArticulo
+    }"
+  >
+    <div
+      (mouseover)="category.is_hover = true"
+      (mouseleave)="category.is_hover = false"
+      style="height: 100%; align-items: center"
+      class="roundedDiv mb-3 shadow row mx-0"
+      [ngStyle]="{
+        'background-color':
+          selected_category?.idCategoriaArticulo ===
+          category.idCategoriaArticulo
+            ? category.active_background_color || '#e4e4e4'
+            : category.is_hover
+            ? category.hover_background_color || '#dddddd'
+            : category.background_color || '#ffffff',
+        color: category.font_color || '#000000',
+        'font-style': category.font_style || 'unset',
+        'font-size': category.font_size || '14px',
+        'font-weight': category.font_weight || 'normal',
+        'text-align': category.text_align || 'center'
+      }"
+    >
+      <div class="col-12">
+        {{ category.nombre }}
+      </div>
+      <div class="col-12" *ngIf="!loading && view_mode === 'edition'">
+        <span class="red" *ngIf="category.articles_count === 0">
+          This category doesn't have articles.
+        </span>
+        <span *ngIf="category.articles_count !== 0">
+          {{ category.articles_count }} articles to show.
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="is_main_page && show_category_name">
+  <h3
+    [ngStyle]="{
+      'text-align': grid_info_settings?.home_title_text_align || 'left',
+      color: grid_info_settings?.home_title_text_color || '#000000',
+      'font-weight': grid_info_settings?.home_title_text_bold || 'bolder'
+    }"
+  >
+    {{ selected_category.nombre }}
+  </h3>
+</div>
+
+<app-articles-per-category
+  class="articles-per-category"
+  #articles_per_category
+  [is_main_page]="is_main_page"
+  [load_all]="load_all"
+  [grid_info_settings]="grid_info_settings"
+  [category]="selected_category"
+  (dismiss_category)="selected_category = undefined"
+  [view_mode]="view_mode"
+  [show_action_buttons]="show_action_buttons"
+  [idOrganization]="idOrganization"
+  [left_section_is_hide]="left_section_is_hide"
+  (onAddArticle)="addArticle($event)"
+  (onEditArticle)="editArticle($event)"
+  (onOpenArticle)="openArticle($event)"
+  [direct_redirection]="direct_redirection"
+>
+</app-articles-per-category>

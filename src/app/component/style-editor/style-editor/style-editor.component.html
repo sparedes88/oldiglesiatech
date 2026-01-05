@@ -1,0 +1,738 @@
+<form
+  *ngIf="type === 'general' || type === 'articles'"
+  style="width: 100%"
+  #basicForm="ngForm"
+  [formGroup]="general_style_form"
+  class="row mt-4"
+>
+  <div class="btn-group col-12">
+    <button
+      (click)="view_options.menu_option = 'view'"
+      class="btn btn-sm col-6"
+      [ngClass]="{
+        active: view_options.menu_option === 'view'
+      }"
+    >
+      View
+    </button>
+    <button
+      (click)="view_options.menu_option = 'text'"
+      class="btn btn-sm col-6"
+      [ngClass]="{
+        active: view_options.menu_option === 'text'
+      }"
+    >
+      Text
+    </button>
+    <button
+      (click)="view_options.menu_option = 'buttons'"
+      class="btn btn-sm col-6"
+      [ngClass]="{
+        active: view_options.menu_option === 'buttons'
+      }"
+    >
+      Buttons
+    </button>
+  </div>
+
+  <h5 class="col-12 text-muted">General Settings</h5>
+  <div class="ws-100"></div>
+  <div class="col-12">
+    <div class="form-group" style="display: flex; flex-direction: column">
+      <label
+        for="
+    "
+      ></label>
+      <select required formControlName="col_size" class="form-control w-100">
+        <option value="12">1 per row</option>
+        <option value="6">2 per row</option>
+        <option value="4">3 per row</option>
+        <option value="3">4 per row</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-left: 44px" class="col-12" *ngIf="type === 'articles'">
+    <div class="form-group" style="display: flex; flex-direction: column">
+      <input
+        type="checkbox"
+        id="load_all"
+        name="load_all_radio"
+        class="custom-control-input"
+        formControlName="load_all"
+        [checked]="general_style_form.get('load_all').value"
+        (click)="toggleAcceptace(general_style_form, 'load_all')"
+      />
+      <span
+        class="checkmark"
+        (click)="toggleAcceptace(general_style_form, 'load_all')"
+      ></span>
+      <label
+        style="cursor: pointer"
+        class="custom-control-label"
+        for="load_all"
+      >
+        Load all at once?
+      </label>
+    </div>
+  </div>
+  <div class="col-12 mt-2 m-0 row">
+    <div style="margin-left: 28px !important" class="col-6 col-sm-3 col-md-2">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <input
+          type="checkbox"
+          id="display_description"
+          name="display_description_radio"
+          class="custom-control-input"
+          formControlName="display_description"
+          [checked]="general_style_form.get('display_description').value"
+          (click)="toggleAcceptace(general_style_form, 'display_description')"
+        />
+        <span
+          class="checkmark"
+          (click)="toggleAcceptace(general_style_form, 'display_description')"
+        ></span>
+        <label
+          style="cursor: pointer"
+          class="custom-control-label"
+          for="display_description"
+        >
+          Display description?
+        </label>
+      </div>
+    </div>
+    <div style="margin-left: 28px !important" class="col-2">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <input
+          type="checkbox"
+          id="display_more_button"
+          name="display_more_button_radio"
+          class="custom-control-input"
+          formControlName="display_more_button"
+          [checked]="general_style_form.get('display_more_button').value"
+          (click)="toggleAcceptace(general_style_form, 'display_more_button')"
+        />
+        <span
+          class="checkmark"
+          (click)="toggleAcceptace(general_style_form, 'display_more_button')"
+        ></span>
+        <label
+          style="cursor: pointer"
+          class="custom-control-label"
+          for="display_more_button"
+        >
+          Display more button?
+        </label>
+      </div>
+    </div>
+    <div style="margin-left: 28px !important" class="col-2">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <input
+          type="checkbox"
+          id="display_article_titles"
+          name="display_article_titles_radio"
+          class="custom-control-input"
+          formControlName="display_article_titles"
+          [checked]="general_style_form.get('display_article_titles').value"
+          (click)="
+            toggleAcceptace(general_style_form, 'display_article_titles')
+          "
+        />
+        <span
+          class="checkmark"
+          (click)="
+            toggleAcceptace(general_style_form, 'display_article_titles')
+          "
+        ></span>
+        <label
+          style="cursor: pointer"
+          class="custom-control-label"
+          for="display_article_titles"
+        >
+          Show articles title?
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="col-12 mt-2 m-0 row"
+    [hidden]="view_options.menu_option !== 'text'"
+  >
+    <h5 [hidden]="!show_articles_title" class="col-12 text-muted">
+      Title Settings
+    </h5>
+    <div [hidden]="!show_articles_title" class="ws-100"></div>
+    <div [hidden]="!show_articles_title" class="col-1">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label>Color</label>
+        <input
+          type="color"
+          formControlName="title_text_color"
+          class="form-control"
+          style="width: 50px; height: 40px"
+        />
+      </div>
+    </div>
+
+    <div [hidden]="!show_articles_title" class="col-5">
+      <div class="form-group">
+        <label for="title_text_align" color="gray"> Align </label>
+        <select
+          class="form-control"
+          id="title_text_align"
+          formControlName="title_text_align"
+        >
+          <option value="left">Left</option>
+          <option value="center">Center</option>
+          <option value="right">Right</option>
+          <option value="justify">Justify</option>
+        </select>
+      </div>
+    </div>
+
+    <div [hidden]="!show_articles_title" class="col-5">
+      <div class="form-group">
+        <label for="title_text_bold" color="gray"> Bold </label>
+        <select
+          class="form-control"
+          id="title_text_bold"
+          formControlName="title_text_bold"
+        >
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="300">300</option>
+          <option value="400">400</option>
+          <option value="500">500</option>
+          <option value="600">600</option>
+          <option value="700">700</option>
+          <option value="800">800</option>
+          <option value="900">900</option>
+          <option value="bold">Bold</option>
+          <option value="bolder">Bolder</option>
+          <option value="lighter">Lighter</option>
+          <option value="normal">Normal</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ws-100" [hidden]="!show_display_description"></div>
+    <h5 class="col-12 text-muted" [hidden]="!show_display_description">
+      Text Settings
+    </h5>
+    <div class="ws-100" [hidden]="!show_display_description"></div>
+
+    <div class="col-3" [hidden]="!show_display_description">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label>Description Text Color</label>
+        <input
+          type="color"
+          formControlName="description_text_color"
+          class="form-control"
+          style="width: 50px; height: 40px"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="col-12 mt-2 m-0 row"
+    [hidden]="view_options.menu_option !== 'buttons'"
+  >
+    <h5 class="col-12 text-muted">Square Settings</h5>
+    <div class="ws-100"></div>
+    <div class="col-6">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="button_border_radius_range" color="gray">
+          Button Border Radius
+          {{ general_style_form.get("button_border_radius").value }}%
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="0"
+          max="50"
+          step="1"
+          id="button_border_radius_range"
+          formControlName="button_border_radius"
+        />
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="button_spacing_range" color="gray">
+          Button Spacing
+          {{ general_style_form.get("button_spacing").value }}
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="0"
+          max="20"
+          step="0.25"
+          id="button_spacing_range"
+          formControlName="button_spacing"
+        />
+      </div>
+    </div>
+
+    <div class="ws-100"></div>
+    <h5 class="col-12 text-muted">Shadow Settings</h5>
+    <div class="ws-100"></div>
+    <div class="col-1">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label>Color</label>
+        <input
+          type="color"
+          formControlName="shadow_color"
+          class="form-control"
+          style="width: 50px; height: 40px"
+        />
+      </div>
+    </div>
+
+    <div class="col-5">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="shadow_spread_range" color="gray">
+          Spread
+          {{ general_style_form.get("shadow_spread").value }}
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="0"
+          max="1"
+          step="0.05"
+          id="shadow_spread_range"
+          formControlName="shadow_spread"
+        />
+      </div>
+    </div>
+
+    <div class="col-5">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="shadow_blur_range" color="gray">
+          Blur
+          {{ general_style_form.get("shadow_blur").value }}
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="0"
+          max="3"
+          step="0.05"
+          id="shadow_blur_range"
+          formControlName="shadow_blur"
+        />
+      </div>
+    </div>
+    <div class="ws-100" [hidden]="!show_display_more_button"></div>
+    <h5 class="col-12 text-muted" [hidden]="!show_display_more_button">
+      Button Settings
+    </h5>
+    <div class="ws-100" [hidden]="!show_display_more_button"></div>
+    <div class="col-3" [hidden]="!show_display_more_button">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label>Button Text Color</label>
+        <input
+          type="color"
+          formControlName="button_more_color"
+          class="form-control"
+          style="width: 50px; height: 40px"
+        />
+      </div>
+    </div>
+  </div>
+</form>
+
+<form
+  *ngIf="type === 'groups'"
+  style="width: 100%"
+  #basicForm="ngForm"
+  [formGroup]="group_style_form"
+  class="row mt-4"
+>
+  <div class="col-12">
+    <div class="row">
+      <div class="col-12">
+        <h5 class="m-0 text-left text-muted">Group Type Style Settings</h5>
+        <small>
+          These style options are only available for groups module.
+        </small>
+      </div>
+      <div class="col-12">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label> Select a language </label>
+          <select
+            required
+            class="hide-control form-control"
+            (change)="checkActualViewSetting(group_style_form)"
+            formControlName="language"
+          >
+            <option value="" selected disabled>-- Select an option</option>
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-12 align-self-start">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label> View mode </label>
+          <select
+            formControlName="idGroupViewMode"
+            class="form-control"
+            (change)="checkActualViewSetting(group_style_form)"
+          >
+            <option value="1">Group type</option>
+            <option value="2">Category</option>
+            <option value="3">Both</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-12 align-self-center">
+        <div
+          class="form-group"
+          style="display: flex; flex-direction: column"
+          *ngIf="
+            group_style_form.get('idGroupViewMode').value == 1 ||
+            group_style_form.get('idGroupViewMode').value == 3
+          "
+        >
+          <label class="hide-control col-12" for="idOrganization">
+            Group types to show
+          </label>
+          <select
+            required
+            class="hide-control form-control"
+            formControlName="idGroupType"
+            (ngModelChange)="checkNewGroupTypeValue(group_style_form, $event)"
+          >
+            <option value="" selected disabled>-- Select an option</option>
+            <option
+              *ngFor="let category of group_types"
+              [value]="category.idGroupType"
+            >
+              {{ category.name | translate }}
+            </option>
+          </select>
+        </div>
+        <div
+          class="form-group"
+          style="display: flex; flex-direction: column"
+          *ngIf="
+            group_style_form.get('idGroupViewMode').value == 2 ||
+            group_style_form.get('idGroupViewMode').value == 3
+          "
+        >
+          <label class="hide-control col-12" for="idOrganization">
+            Categories to show
+          </label>
+          <select
+            required
+            class="hide-control form-control"
+            formControlName="idGroupCategory"
+          >
+            <option value="" selected disabled>-- Select an option</option>
+            <option
+              *ngFor="let category of get_available_categories()"
+              [value]="category.idGroupCategory"
+            >
+              {{ category.name | translate }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-12 align-self-start">
+        <div class="form-group">
+          <label class="hide-control" for="idOrganization">
+            Items per row
+          </label>
+          <select
+            required
+            class="form-control w-100"
+            formControlName="items_per_row"
+          >
+            <option value="12">1 per row</option>
+            <option value="6">2 per row</option>
+            <option value="4">3 per row</option>
+            <!-- <option value="3">4 per row</option> -->
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="form-group form-check">
+        <input
+          formControlName="show_shadow"
+          type="checkbox"
+          class="form-check-input"
+          id="shadow_check"
+        />
+        <label class="form-check-label" for="shadow_check">
+          Show shadow box?
+        </label>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="form-group form-check">
+        <input
+          formControlName="display_header"
+          type="checkbox"
+          class="form-check-input"
+          id="activeCheck"
+        />
+        <label class="form-check-label" for="activeCheck">
+          Display Header?
+        </label>
+      </div>
+    </div>
+    <div
+      class="row"
+      *ngIf="extended && group_style_form.get('display_header').value"
+    >
+      <div class="col-12">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label class="hide-control col-12" for="idOrganization">
+            Title
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="title_text"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="group_style_form.value.display_header"
+      class="col-12 header-div"
+      [ngStyle]="{
+        backgroundImage:
+          'linear-gradient(' +
+          group_style_form.value.degrees +
+          'deg, ' +
+          group_style_form.value.main_color +
+          ' ' +
+          group_style_form.value.main_percent +
+          '%, ' +
+          group_style_form.value.second_color +
+          ' ' +
+          group_style_form.value.second_percent +
+          '%)',
+        color: group_style_form.value.text_color
+      }"
+    >
+      <h1
+        class="text-center"
+        [ngStyle]="{ color: group_style_form.value.text_color }"
+        style="
+          font-family: 'Poppins', Helvetica, Arial, Lucida, sans-serif;
+          font-size: 40px;
+        "
+      >
+        <!-- <span *ngIf="!group_style_form.value.idGroupType">{{ lang.keys["groups"] }} </span>
+    <span *ngIf="group_style_form.value.idGroupType"> {{ page_title }} </span> -->
+        <!-- {{ group_style_form.value.name }} -->
+
+        {{
+          extended
+            ? group_style_form.get("title_text")?.value || "Sample text"
+            : "Sample text"
+        }}
+      </h1>
+    </div>
+
+    <div class="col-12 row" *ngIf="group_style_form.value.display_header">
+      <h5 class="col-12 text-muted">Header Settings</h5>
+      <div class="ws-100"></div>
+      <div class="col-2 col-md-1">
+        <div
+          class="form-group align-items-center"
+          style="display: flex; flex-direction: column"
+        >
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext"> Text Color </span>
+              <small> Text </small>
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+          <input
+            type="color"
+            formControlName="text_color"
+            class="form-control"
+            style="width: 50px; height: 40px"
+          />
+          <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+        </div>
+      </div>
+      <div class="col-10 col-md-3 align-self-center">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label for="degrees_radius" color="gray">
+            Degrees
+            {{ group_style_form.value.degrees }}°
+          </label>
+          <input
+            type="range"
+            class="custom-range"
+            min="0"
+            max="360"
+            step="1"
+            id="degrees_radius"
+            formControlName="degrees"
+          />
+        </div>
+      </div>
+      <div class="col-2 col-md-1">
+        <div
+          class="form-group align-items-center"
+          style="display: flex; flex-direction: column"
+        >
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Main Color: The left-side color in the header (this will be the
+                color of the spinner, too).
+              </span>
+              <small> Main </small>
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+          <input
+            type="color"
+            formControlName="main_color"
+            class="form-control"
+            style="width: 50px; height: 40px"
+          />
+          <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+        </div>
+      </div>
+      <div class="col-10 col-md-3 align-self-center">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label for="main_color_percent_radius_range" color="gray">
+            Main Color Gradient
+            {{ group_style_form.value.main_percent }}%
+          </label>
+          <input
+            type="range"
+            class="custom-range"
+            min="0"
+            max="100"
+            step="1"
+            id="main_color_percent_radius_range"
+            formControlName="main_percent"
+          />
+        </div>
+      </div>
+      <div class="col-2 col-md-1">
+        <div
+          class="form-group align-items-center"
+          style="display: flex; flex-direction: column"
+        >
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Second Color: The right-side color in the header.
+              </span>
+              <small> Second </small>
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+          <input
+            type="color"
+            formControlName="second_color"
+            class="form-control"
+            style="width: 50px; height: 40px"
+          />
+          <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+        </div>
+      </div>
+      <div class="col-10 col-md-3 align-self-center">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label for="second_color_percent_radius_range" color="gray">
+            Second Color Gradient
+            {{ group_style_form.value.second_percent }}%
+          </label>
+          <input
+            type="range"
+            class="custom-range"
+            min="0"
+            max="100"
+            step="1"
+            id="second_color_percent_radius_range"
+            formControlName="second_percent"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Events -->
+<form
+  *ngIf="type === 'events'"
+  style="width: 100%"
+  #basicForm="ngForm"
+  [formGroup]="events_style_form"
+  class="row mt-4"
+>
+  <div class="col-12">
+    <div class="row">
+      <div class="col-12">
+        <h5 class="m-0 text-left text-muted">Event Template Settings</h5>
+        <small>
+          These style options are only available for events module.
+        </small>
+      </div>
+      <div class="col-12">
+        <div class="form-group form-check">
+          <input
+            formControlName="use_own_text"
+            type="checkbox"
+            class="form-check-input"
+            id="use_own_text"
+          />
+          <label class="form-check-label" for="use_own_text">
+            Use own text?
+          </label>
+        </div>
+      </div>
+
+      <div class="col-12" *ngIf="events_style_form.get('use_own_text').value">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label class="hide-control col-12" for="idOrganization">
+            Events text
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="events_text_header"
+          />
+        </div>
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label class="hide-control col-12" for="idOrganization">
+            Our meetings text
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="our_meetings_text"
+          />
+        </div>
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label class="hide-control col-12" for="idOrganization">
+            View More text <small>(This will be shown in uppercase)</small>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="view_more_text"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

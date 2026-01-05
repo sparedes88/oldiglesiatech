@@ -1,0 +1,545 @@
+<!-- Loading -->
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border"
+      role="status"
+      [ngStyle]="{
+        color: grid_info_settings?.title_text_color || '#e65100'
+      }"
+    ></div>
+  </div>
+</ng-template>
+
+<!-- Detail Views -->
+<ng-template
+  [ngIf]="
+    !loading && category && articulos.length !== 0 && view_mode !== 'edition'
+  "
+>
+  <div class="row justify-content-center fw-fixer">
+    <div
+      class="col-12 col-md-11 text-right mb-4"
+      *ngIf="can_edit && show_action_buttons"
+    >
+      <button
+        type="button"
+        class="btn btn-success btn-sm"
+        (click)="addArticle()"
+      >
+        Add Article
+      </button>
+    </div>
+    <div class="col-12 col-md-11 fw-fixer">
+      <div
+        [id]="'carousel_' + category.idCategoriaArticulo"
+        class="carousel slide"
+        data-ride="carousel"
+        *ngIf="category.view_as == 'carousel' && is_main_page"
+      >
+        <div class="carousel-inner">
+          <div
+            [ngClass]="index == 0 ? 'carousel-item active' : 'carousel-item'"
+            *ngFor="let row; let index = index; of: rows"
+          >
+            <div class="row">
+              <a
+                role="link"
+                class="col-12 clickable mb-3"
+                [ngClass]="
+                  'col-md-' +
+                  (is_main_page
+                    ? category.col_size
+                      ? category.col_size
+                      : grid_info_settings?.main_col_size
+                    : grid_info_settings?.col_size)
+                "
+                *ngFor="let article; let index = index; of: row.articulos"
+                style="display: flex"
+                (click)="goToPage($event, article)"
+              >
+                <!-- [routerLink]="[getRouterLink(article)]" -->
+                <button
+                  *ngIf="can_edit && show_action_buttons"
+                  style="z-index: 1000"
+                  class="btn btn-light edit-logo-btn"
+                  (click)="$event.stopPropagation(); updateArticle(article)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  *ngIf="can_edit && show_action_buttons"
+                  class="btn btn-danger edit-logo-btn edit-logo-btn-delete"
+                  (click)="deleteArticle(article); $event.stopPropagation()"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+                <div
+                  class="card"
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    overflow: hidden;
+                    align-self: baseline;
+                  "
+                  [ngStyle]="{
+                    'box-shadow':
+                      '0 0 ' +
+                      grid_info_settings?.shadow_blur +
+                      'em ' +
+                      grid_info_settings?.shadow_spread +
+                      'em ' +
+                      grid_info_settings?.shadow_color,
+                    'border-radius': fixed_border_radius + '%',
+                    width: grid_info_settings?.button_spacing
+                      ? 100 - grid_info_settings?.button_spacing * 2 + '%'
+                      : '100%',
+                    'margin-top': grid_info_settings?.button_spacing + '%',
+                    'margin-left': grid_info_settings?.button_spacing + '%'
+                  }"
+                >
+                  <!-- [ngStyle]="{
+                  background: '#ffffff url(' + fixUrl(article.slider_v2) + ')'
+                }" -->
+                  <img
+                    [src]="fixUrl(article.slider_v2, true)"
+                    class="card-image-container card-image"
+                    [ngClass]="{
+                      'standalone-height':
+                        (is_main_page
+                          ? category.col_size
+                            ? category.col_size
+                            : grid_info_settings?.main_col_size
+                          : grid_info_settings?.col_size) === '12',
+                      main: is_main_page,
+                      'main-fw': left_section_is_hide,
+                      sub: !is_main_page,
+                      hx2: article.height_zoom === 2
+                    }"
+                  />
+                  <img
+                    [id]="article.idArticulo"
+                    #img_cover
+                    hidden
+                    [src]="fixUrl(article.slider_v2, true)"
+                    alt=""
+                  />
+                  <div
+                    class="card-body"
+                    *ngIf="
+                      grid_info_settings?.display_article_titles ||
+                      grid_info_settings?.display_description ||
+                      grid_info_settings?.display_more_button
+                    "
+                    style="width: 100%"
+                  >
+                    <div
+                      class="card-title title-style"
+                      *ngIf="grid_info_settings?.display_article_titles"
+                      [ngStyle]="{
+                        'text-align':
+                          grid_info_settings?.title_text_align || 'left'
+                      }"
+                    >
+                      <span
+                        [ngStyle]="{
+                          color:
+                            grid_info_settings?.title_text_color || '#000000',
+                          'font-weight':
+                            grid_info_settings?.title_text_bold || 'bolder'
+                        }"
+                      >
+                        {{ article.titulo }}
+                      </span>
+                    </div>
+                    <p
+                      *ngIf="grid_info_settings?.display_description"
+                      [ngStyle]="{
+                        color:
+                          grid_info_settings?.description_text_color || '#666'
+                      }"
+                      class="short_description text-left"
+                    >
+                      <!-- {{
+                    article.summary ? article.summary : "No description provided"
+                  }} -->
+                      <span
+                        class="inner-span"
+                        [innerHTML]="article.summary_content"
+                      >
+                      </span>
+                    </p>
+                    <p
+                      *ngIf="grid_info_settings?.display_more_button"
+                      style="text-align: left"
+                      class="show_more_p"
+                    >
+                      <span
+                        [ngStyle]="{
+                          color:
+                            grid_info_settings?.button_more_color || '#e65100'
+                        }"
+                        ion-text
+                      >
+                        {{
+                          (article.show_more_text
+                            ? article.show_more_text
+                            : "More"
+                          ) | uppercase
+                        }}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="carousel-caption d-none d-md-block"></div>
+          </div>
+        </div>
+        <a
+          *ngIf="category.view_as == 'carousel' && category.articles_count > 1"
+          class="carousel-control-prev"
+          [href]="'#carousel_' + category.idCategoriaArticulo"
+          role="button"
+          data-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true">
+            <i class="fa fa-chevron-left"></i>
+          </span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a
+          *ngIf="category.view_as == 'carousel' && category.articles_count > 1"
+          class="carousel-control-next"
+          [href]="'#carousel_' + category.idCategoriaArticulo"
+          role="button"
+          data-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true">
+            <i class="fa fa-chevron-right"></i>
+          </span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+      <div
+        class="row fw-fixer"
+        *ngIf="category.view_as == 'load_more' || !is_main_page"
+      >
+        <a
+          role="link"
+          class="col-12 clickable mb-3"
+          [ngClass]="
+            'col-md-' +
+            (is_main_page
+              ? category.col_size
+                ? category.col_size
+                : grid_info_settings?.main_col_size
+              : grid_info_settings?.col_size)
+          "
+          *ngFor="let article; let index = index; of: articulos"
+          style="display: flex"
+          (click)="goToPage($event, article)"
+        >
+          <!-- [routerLink]="[getRouterLink(article)]" -->
+          <button
+            *ngIf="can_edit && show_action_buttons"
+            style="z-index: 1000"
+            class="btn btn-light edit-logo-btn"
+            (click)="$event.stopPropagation(); updateArticle(article)"
+          >
+            <i class="fa fa-edit"></i>
+          </button>
+          <button
+            *ngIf="can_edit && show_action_buttons"
+            class="btn btn-danger edit-logo-btn edit-logo-btn-delete"
+            (click)="deleteArticle(article); $event.stopPropagation()"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+          <div
+            class="card"
+            style="
+              display: flex;
+              flex-wrap: wrap;
+              overflow: hidden;
+              align-self: baseline;
+            "
+            [ngStyle]="{
+              'box-shadow':
+                '0 0 ' +
+                grid_info_settings?.shadow_blur +
+                'em ' +
+                grid_info_settings?.shadow_spread +
+                'em ' +
+                grid_info_settings?.shadow_color,
+              'border-radius': fixed_border_radius + '%',
+              width: grid_info_settings?.button_spacing
+                ? 100 - grid_info_settings?.button_spacing * 2 + '%'
+                : '100%',
+              'margin-top': grid_info_settings?.button_spacing + '%',
+              'margin-left': grid_info_settings?.button_spacing + '%'
+            }"
+          >
+            <img
+              class="card-image-container card-image"
+              [ngStyle]="{
+                background: '#ffffff url(' + fixUrl(article.slider_v2) + ')'
+              }"
+              [ngClass]="{
+                'standalone-height':
+                  (is_main_page
+                    ? category.col_size
+                      ? category.col_size
+                      : grid_info_settings?.main_col_size
+                    : grid_info_settings?.col_size) === '12',
+                main: is_main_page,
+                'main-fw': left_section_is_hide,
+                sub: !is_main_page,
+                hx2: article.height_zoom === 2
+              }"
+            />
+            <img
+              [id]="article.idArticulo"
+              #img_cover
+              hidden
+              [src]="fixUrl(article.slider_v2, true)"
+              alt=""
+            />
+            <div
+              class="card-body"
+              *ngIf="
+                grid_info_settings?.display_article_titles ||
+                grid_info_settings?.display_description ||
+                grid_info_settings?.display_more_button
+              "
+              style="width: 100%"
+            >
+              <div
+                class="card-title title-style"
+                *ngIf="grid_info_settings?.display_article_titles"
+                [ngStyle]="{
+                  'text-align': grid_info_settings?.title_text_align || 'left'
+                }"
+              >
+                <span
+                  [ngStyle]="{
+                    color: grid_info_settings?.title_text_color || '#000000',
+                    'font-weight':
+                      grid_info_settings?.title_text_bold || 'bolder'
+                  }"
+                >
+                  {{ article.titulo }}
+                </span>
+              </div>
+              <p
+                *ngIf="grid_info_settings?.display_description"
+                [ngStyle]="{
+                  color: grid_info_settings?.description_text_color || '#666'
+                }"
+                class="short_description text-left"
+              >
+                <!-- {{
+                  article.summary ? article.summary : "No description provided"
+                }} -->
+                <span class="inner-span" [innerHTML]="article.summary_content">
+                </span>
+              </p>
+              <p
+                *ngIf="grid_info_settings?.display_more_button"
+                style="text-align: left"
+                class="show_more_p"
+              >
+                <span
+                  [ngStyle]="{
+                    color: grid_info_settings?.button_more_color || '#e65100'
+                  }"
+                  ion-text
+                >
+                  {{
+                    (article.show_more_text ? article.show_more_text : "More")
+                      | uppercase
+                  }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div *ngIf="loading_more" class="col-12 text-center">
+      <div
+        class="d-flex justify-content-center col-12"
+        style="margin-top: 10%; margin-bottom: 10%"
+      >
+        <div
+          style="
+            height: 120px;
+            width: 120px;
+            font-size: 15px;
+            border-width: 0.45em;
+          "
+          class="spinner-border"
+          [ngStyle]="{
+            color: grid_info_settings?.title_text_color || '#e65100'
+          }"
+          role="status"
+        ></div>
+      </div>
+    </div>
+    <div
+      class="col-12 col-md-11 text-center"
+      *ngIf="hasMoreItems() && is_main_page && category.view_as == 'load_more'"
+    >
+      <h5
+        (click)="loadMoreItems()"
+        [ngStyle]="{
+          color: grid_info_settings?.title_text_color || '#000000'
+        }"
+      >
+        Load more...
+      </h5>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template
+  [ngIf]="
+    !loading && category && articulos.length === 0 && view_mode !== 'edition'
+  "
+>
+  <div class="row justify-content-center">
+    <div
+      class="col-12 col-md-11 text-right mb-4"
+      *ngIf="can_edit && show_action_buttons"
+    >
+      <button
+        type="button"
+        class="btn btn-success btn-sm"
+        (click)="addArticle()"
+      >
+        Add Article
+      </button>
+    </div>
+    <h5 class="col-12 col-md-11 font-weight-bold text-dark mt-5">
+      <span class="red" *ngIf="category.articles_count === 0">
+        This category doesn't have articles.
+      </span>
+    </h5>
+  </div>
+</ng-template>
+
+<!-- Edition View -->
+<ng-template [ngIf]="!loading && view_mode === 'edition'">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-11">
+      <div class="row">
+        <div
+          *ngFor="let col of col_generated"
+          class="col-12 clickable mb-3"
+          [ngClass]="
+            'col-md-' +
+            (is_main_page
+              ? category.col_size
+                ? category.col_size
+                : grid_info_settings?.main_col_size
+              : grid_info_settings?.col_size)
+          "
+          style="display: flex"
+        >
+          <div
+            class="card"
+            style="display: flex; flex-wrap: wrap; overflow: hidden"
+            [ngStyle]="{
+              'box-shadow':
+                '0 0 ' +
+                grid_info_settings?.shadow_blur +
+                'em ' +
+                grid_info_settings?.shadow_spread +
+                'em ' +
+                grid_info_settings?.shadow_color,
+              'border-radius': fixed_border_radius + '%',
+              width: grid_info_settings?.button_spacing
+                ? 100 - grid_info_settings?.button_spacing * 2 + '%'
+                : '100%',
+              'margin-top': grid_info_settings?.button_spacing + '%',
+              'margin-left': grid_info_settings?.button_spacing + '%'
+            }"
+          >
+            <img
+              class="card-image-container card-image"
+              [ngStyle]="{
+                background: '#ffffff url(' + fixUrl('') + ')'
+              }"
+              [ngClass]="{
+                'standalone-height':
+                  (is_main_page
+                    ? category.col_size
+                      ? category.col_size
+                      : grid_info_settings?.main_col_size
+                    : grid_info_settings?.col_size) === '12',
+                main: is_main_page,
+                'main-fw': left_section_is_hide,
+                sub: !is_main_page
+              }"
+            />
+            <div
+              class="card-body"
+              *ngIf="
+                grid_info_settings?.display_article_titles ||
+                grid_info_settings?.display_description ||
+                grid_info_settings?.display_more_button
+              "
+              style="width: 100%"
+            >
+              <div
+                class="card-title title-style"
+                *ngIf="grid_info_settings?.display_article_titles"
+                [ngStyle]="{
+                  'text-align': grid_info_settings?.title_text_align || 'left'
+                }"
+              >
+                <span
+                  [ngStyle]="{
+                    color: grid_info_settings?.title_text_color || '#000000',
+                    'font-weight':
+                      grid_info_settings?.title_text_bold || 'bolder'
+                  }"
+                >
+                  Sample Title
+                </span>
+              </div>
+              <p
+                *ngIf="grid_info_settings?.display_description"
+                [ngStyle]="{
+                  color: grid_info_settings?.description_text_color || '#666'
+                }"
+                class="short_description"
+              >
+                Sample Description
+              </p>
+              <p
+                *ngIf="grid_info_settings?.display_more_button"
+                style="text-align: left"
+                class="show_more_p"
+              >
+                <span
+                  [ngStyle]="{
+                    color: grid_info_settings?.button_more_color || '#e65100'
+                  }"
+                  ion-text
+                >
+                  {{ "More" | uppercase }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

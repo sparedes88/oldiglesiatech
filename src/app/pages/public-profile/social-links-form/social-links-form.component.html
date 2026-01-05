@@ -1,0 +1,58 @@
+<form (ngSubmit)="onSubmitForm(socialForm)" #socialForm="ngForm">
+  <div class="form-group">
+    <label>Facebook</label>
+    <input
+      type="url"
+      placeholder="Profile url"
+      class="form-control"
+      name="facebook"
+      [(ngModel)]="socialLinksForm.facebook"
+    />
+  </div>
+  <div class="form-group">
+    <label>Twitter</label>
+    <input
+      type="url"
+      placeholder="Profile url"
+      class="form-control"
+      name="twitter"
+      [(ngModel)]="socialLinksForm.twitter"
+    />
+  </div>
+  <div class="form-group">
+    <label>Intagram</label>
+    <input
+      type="url"
+      placeholder="Profile url"
+      class="form-control"
+      name="instagram"
+      [(ngModel)]="socialLinksForm.instagram"
+    />
+  </div>
+  <div class="form-group">
+    <label>LinkedIn</label>
+    <input
+      type="url"
+      placeholder="Profile url"
+      class="form-control"
+      name="linkedin"
+      [(ngModel)]="socialLinksForm.linkedin"
+    />
+  </div>
+  <div class="form-group">
+    <label>YouTube</label>
+    <input
+      type="url"
+      placeholder="Profile url"
+      class="form-control"
+      name="youtube"
+      [(ngModel)]="socialLinksForm.youtube"
+    />
+  </div>
+  <div class="form-group">
+    <button type="submit" class="btn btn-success">
+      Save
+      <i class="fa fa-paper-plane"></i>
+    </button>
+  </div>
+</form>

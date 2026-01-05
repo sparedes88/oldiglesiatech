@@ -1,0 +1,233 @@
+<canvas id="image_canvas" hidden #canvas></canvas>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row"></div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/contactos_banner_new.png"
+        />
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <ng-template [ngIf]="loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+
+      <div class="row" *ngIf="show_form">
+        <div class="col-12" [formGroup]="api_form">
+          <div class="form-group">
+            <label>
+              <span class="text-secondary"> API Key </span>
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              formControlName="breeze_api_key"
+              type="text"
+              class="form-control"
+              placeholder="Visit https://{your_subdomain}.breezechms.com/account/api to get your API Key."
+              [class.is-invalid]="
+                api_form.get('breeze_api_key').touched &&
+                api_form.get('breeze_api_key').invalid
+              "
+            />
+          </div>
+          <div class="form-group">
+            <label>
+              <span class="text-secondary"> Subdomain </span>
+              <span class="text-danger mr-2">*</span>
+
+              <span class="tooltip_">
+                <span class="tooltiptext">
+                  <img
+                    src="/assets/img/breeze-subdomain-help.png"
+                    alt=""
+                    id="breeze-help"
+                  />
+                </span>
+                <i class="fa fa-info-circle text-secondary"></i>
+              </span>
+            </label>
+            <input
+              formControlName="breeze_sub_domain"
+              type="text"
+              class="form-control"
+              placeholder="Paste here your subdomain breeze..."
+              [class.is-invalid]="
+                api_form.get('breeze_sub_domain').touched &&
+                api_form.get('breeze_sub_domain').invalid
+              "
+            />
+          </div>
+          <div class="text-right">
+            <button (click)="saveSetup()" class="btn btn-sm btn-success">
+              <i class="fa fa-save"></i> Save
+            </button>
+            <button
+              (click)="closeForm()"
+              class="btn btn-sm btn-outline-danger ml-2"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div [hidden]="loading || show_form" class="row mt-4 mb-5">
+        <div class="col-12 text-right">
+          <button (click)="show_form = true" class="btn btn-sm btn-secondary">
+            <i class="fa fa-gear"></i> Edit my API
+          </button>
+        </div>
+        <div class="col-xs-4 col-md-6 self-align-center"></div>
+        <!-- <div class="col-xs-10 col-md-6 self-align-center">
+          <mat-form-field
+            appearance="outline"
+            class="no-padding"
+            style="width: 100%"
+          >
+            <mat-label>Filter:</mat-label>
+            <input
+              type="text"
+              matInput
+              autofocus
+              (input)="onFilterTextBoxChanged($event)"
+            />
+          </mat-form-field>
+        </div> -->
+        <div class="col-md-12 table-responsive-sm">
+          <ejs-grid
+            #grid
+            [dataSource]="contacts"
+            height="315px"
+            allowSorting="true"
+            allowFiltering="true"
+            [filterSettings]="filterOptions"
+            allowPaging="true"
+            [pageSettings]="pageSettings"
+            [toolbar]="toolbar"
+            (toolbarClick)="toolbarClick($event)"
+            (queryCellInfo)="queryCellInfo($event)"
+            (pdfQueryCellInfo)="pdfQueryCellInfo($event)"
+            (excelQueryCellInfo)="excelQueryCellInfo($event)"
+            allowPdfExport="true"
+            [allowExcelExport]="true"
+            [showColumnMenu]="true"
+            [showColumnChooser]="true"
+            (columnMenuOpen)="onColumnMenuClick($event)"
+            (columnMenuClick)="onColumnMenuClick($event)"
+            (dataBound)="dataBound()"
+            (pdfExportComplete)="pdfExportComplete()"
+            (excelExportComplete)="pdfExportComplete()"
+          >
+            <e-columns>
+              <e-column
+                [visible]="false"
+                (click)="onChange($event)"
+                field="idUsuario"
+                headerText="ID"
+                type="string"
+              >
+              </e-column>
+              <e-column headerText="Profile">
+                <ng-template #template let-data>
+                  <div class="text-center">
+                    <div class="image">
+                      <img
+                        class="responsive-img rounded-circle"
+                        [src]="getPhoto(data.img, data.gender)"
+                        alt="avatar"
+                        onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'"
+                      />
+                    </div>
+                  </div>
+                </ng-template>
+              </e-column>
+              <e-column field="full_name" headerText="Name">
+                <ng-template #template let-data>
+                  {{ data.name.first }} {{ data.name.last }}
+                </ng-template>
+              </e-column>
+              <e-column field="phone" headerText="Phone">
+                <ng-template #template let-data>
+                  <a
+                    *ngFor="let phone of data.phones"
+                    [href]="'tel:' + phone.number"
+                  >
+                    {{ phone.number }}
+                  </a>
+                </ng-template>
+              </e-column>
+              <e-column field="email" headerText="Email">
+                <ng-template #template let-data>
+                  <a [href]="'mailto:' + data.email.address">
+                    {{ data.email.address }}
+                  </a>
+                </ng-template>
+              </e-column>
+
+              <e-column
+                field="fechaNacimiento"
+                headerText="birthday"
+                type="date"
+                format="MMM. dd, yyyy"
+              >
+              </e-column>
+
+              <!-- <e-column field="categories" headerText="Categories">
+                <ng-template #filterTemplate let-data>
+                  <ejs-dropdownlist
+                    id="dropdown"
+                    [(ngModel)]="data.name"
+                    [enabled]="data.column.allowFiltering"
+                    (change)="onChange($event)"
+                    [dataSource]="dropdata"
+                    [fields]="fields"
+                    [popupHeight]="height"
+                  ></ejs-dropdownlist>
+                </ng-template>
+                <ng-template #template let-data>
+                  <div style="white-space: normal">
+                    <span
+                      *ngFor="let category of data.categories"
+                      class="badge badge-pill badge-secondary"
+                    >
+                      {{ category.name }}
+                    </span>
+                    <span *ngIf="data.categories?.length === 0">
+                      <i> Not categories assigned </i>
+                    </span>
+                  </div>
+                </ng-template>
+              </e-column> -->
+              <e-column field="configurations" headerText="Configurations">
+                <ng-template #template let-data>
+                  <div class="btn-group">
+                    <button
+                      *ngIf="!data.fields.synchronized"
+                      class="btn btn-sm"
+                      (click)="syncUserWithIglesiaTech(data)"
+                      [disabled]="processing"
+                    >
+                      <i class="fa fa-sync text-success mr-2"></i>Sync with Iglesia
+                      Tech
+                    </button>
+                  </div>
+                </ng-template>
+              </e-column>
+            </e-columns>
+          </ejs-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

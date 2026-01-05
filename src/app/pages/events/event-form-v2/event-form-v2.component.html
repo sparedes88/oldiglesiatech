@@ -1,0 +1,105 @@
+<p>event-form-v2 works!</p>
+
+<div class="container page">
+  <div class="row">
+    <div class="col-12 col-md-3">
+      <!-- Menu -->
+      <div
+        class="nav flex-md-column nav-pills"
+        id="v-pills-tab"
+        role="tablist"
+        aria-orientation="vertical"
+      >
+        <button
+          class="btn nav-link active"
+          id="v-pills-basic-tab"
+          data-toggle="pill"
+          href="#v-pills-basic"
+          role="tab"
+          aria-controls="v-pills-basic"
+          aria-selected="true"
+        >
+          Información básica
+        </button>
+        <button
+          class="btn nav-link"
+          id="v-pills-details-tab"
+          data-toggle="pill"
+          href="#v-pills-details"
+          role="tab"
+          aria-controls="v-pills-details"
+          aria-selected="false"
+          [disabled]="!details_ready"
+        >
+          Detalles
+        </button>
+        <button
+          class="btn nav-link"
+          id="v-pills-register-tab"
+          data-toggle="pill"
+          href="#v-pills-register"
+          role="tab"
+          aria-controls="v-pills-register"
+          aria-selected="false"
+          [disabled]="!register_ready"
+        >
+          Registro
+        </button>
+        <button
+          class="btn nav-link"
+          id="v-pills-publish-tab"
+          data-toggle="pill"
+          href="#v-pills-publish"
+          role="tab"
+          aria-controls="v-pills-publish"
+          aria-selected="false"
+          [disabled]="!publish_ready"
+        >
+          Publicar
+        </button>
+      </div>
+    </div>
+    <div class="col-12 col-md-9">
+      <div class="card">
+        <div class="card-body">
+          <div class="tab-content" id="v-pills-tabContent">
+            <div
+              class="tab-pane fade show active"
+              id="v-pills-basic"
+              role="tabpanel"
+              aria-labelledby="v-pills-basic-tab"
+            >
+              <app-step1-basic-information
+                [form]="step_1"
+              ></app-step1-basic-information>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="v-pills-details"
+              role="tabpanel"
+              aria-labelledby="v-pills-details-tab"
+            >
+              <app-step2-details [form]="step_2"></app-step2-details>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="v-pills-register"
+              role="tabpanel"
+              aria-labelledby="v-pills-register-tab"
+            >
+              <app-step3-register [form]="step_3"></app-step3-register>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="v-pills-publish"
+              role="tabpanel"
+              aria-labelledby="v-pills-publish-tab"
+            >
+              <app-step4-publish [form]="step_4"></app-step4-publish>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

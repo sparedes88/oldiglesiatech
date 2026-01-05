@@ -1,0 +1,1934 @@
+<div
+  class="row header align-items-center"
+  [ngClass]="currentUser.idTipoServicio === 1 ? 'bg-citric' : 'navbar-business'"
+  (drop)="onDrop($event)"
+  (dragover)="onDrop($event)"
+>
+  <div class="col-2 text-center">
+    <img
+      class="group-picture"
+      [src]="fixUrl(group.picture)"
+      [alt]="group.title"
+    />
+  </div>
+  <div class="col-8">
+    <h4 class="text-light">
+      {{ group.title }}
+    </h4>
+    <p>
+      <span class="text-muted bg-light category-span">
+        {{ group.levelAccess }}
+      </span>
+      <br />
+      <span *ngFor="let cat of group.categories; let i = index">
+        <span class="text-light category-span" (click)="goToCategory()">
+          {{ cat.name }}{{ i === group.categories.length - 1 ? "." : ", " }}
+        </span>
+      </span>
+    </p>
+  </div>
+  <div *ngIf="group.is_leader || currentUser.isSuperUser" class="col-2">
+    <button class="btn btn-light" (click)="openUpdateGroup(editFormModal)">
+      Update
+    </button>
+  </div>
+</div>
+
+<div dropzone="false" class="row" style="margin-right: unset">
+  <!-- Side menu. -->
+  <div class="col-3 col-md-3">
+    <div class="menu-container">
+      <div
+        class="nav flex-column nav-pills navbar-light bg-light"
+        id="v-pills-tab"
+        role="tablist"
+        aria-orientation="vertical"
+      >
+        <a
+          class="nav-link active text-muted padding-fixed"
+          id="v-pills-home-tab"
+          data-toggle="pill"
+          href="#v-pills-home"
+          role="tab"
+          aria-controls="v-pills-home"
+          aria-selected="true"
+          (click)="this.page = 1"
+        >
+          Home
+        </a>
+        <a
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-members-tab"
+          data-toggle="pill"
+          href="#v-pills-members"
+          role="tab"
+          aria-controls="v-pills-members"
+          aria-selected="false"
+        >
+          Members
+          <span class="text-citric" id="members-count">
+            {{ members.length }}
+            <span *ngIf="group?.requests_count > 0">
+              ({{ group?.requests_count }})
+            </span>
+          </span>
+        </a>
+        <a
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-events-tab"
+          data-toggle="pill"
+          href="#v-pills-events"
+          role="tab"
+          aria-controls="v-pills-events"
+          aria-selected="false"
+          (click)="this.page = 1"
+        >
+          {{ displayEventSubmodule() }}
+        </a>
+        <!-- <a
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-chat-tab"
+          data-toggle="pill"
+          href="#v-pills-chat"
+          role="tab"
+          aria-controls="v-pills-chat"
+          aria-selected="false"
+          data-target="#v-pills-chat"
+          [ngClass]="{ disabled: checkChatPermissions() }"
+        >
+          {{ messages_loaded ? "Chat" : "Loading chat" }}
+          <span class="text-citric" id="members-count">
+            {{
+              this.currentChannel?.lastConsumedMessageIndex -
+                this.currentChannel?.lastConsumedMessageIndex
+            }}</span
+          >
+        </a> -->
+        <a
+          *ngIf="currentUser.isSuperUser || currentUser.idUserType === 1"
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-notes-tab"
+          data-toggle="pill"
+          href="#v-pills-notes"
+          role="tab"
+          aria-controls="v-pills-notes"
+          aria-selected="false"
+          data-target="#v-pills-notes"
+        >
+          Notes
+        </a>
+        <a
+          *ngIf="currentUser.isSuperUser"
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-documents-tab"
+          data-toggle="pill"
+          href="#v-pills-documents"
+          role="tab"
+          aria-controls="v-pills-documents"
+          aria-selected="false"
+        >
+          Documents
+        </a>
+        <a
+          *ngIf="currentUser.isSuperUser || currentUser.idUserType === 1"
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-reports-tab"
+          data-toggle="pill"
+          href="#v-pills-reports"
+          role="tab"
+          aria-controls="v-pills-reports"
+          aria-selected="false"
+        >
+          Reports
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Containers -->
+  <div class="col-12 col-md-9" [hidden]="show_detail">
+    <ng-template [ngIf]="!show_detail">
+      <div class="d-flex justify-content-center" style="margin: 140px">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="col-12 col-md-9" [hidden]="!show_detail">
+    <div class="tab-content" id="v-pills-tabContent">
+      <!-- Home Tab -->
+      <div
+        class="tab-pane fade show active"
+        id="v-pills-home"
+        role="tabpanel"
+        aria-labelledby="v-pills-home-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-6 mb-3">
+            General Info
+            <div class="card">
+              <form #group_form="ngForm" [formGroup]="formGroup">
+                <div class="row card-body">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Name* </label>
+                      <input
+                        type="text"
+                        required
+                        class="form-control mb-1"
+                        placeholder="Enter your name's group."
+                        [readonly]="getPermissions()"
+                        formControlName="title"
+                        [class.is-invalid]="
+                          formGroup.get('title').dirty &&
+                          formGroup.get('title').invalid
+                        "
+                      />
+                      <span style="display: block; text-align: right">
+                        <button
+                          type="button"
+                          *ngIf="
+                            formGroup.get('title').dirty &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formGroup, 'title')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            formGroup.get('title').dirty &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          [disabled]="
+                            formGroup.get('title').invalid &&
+                            (group.is_leader || currentUser.isSuperUser)
+                          "
+                          (click)="updateValue(formGroup, 'title')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Short description</label>
+                      <textarea
+                        type="text"
+                        required
+                        class="form-control mb-1"
+                        placeholder="Enter a short description."
+                        formControlName="short_description"
+                        [readonly]="getPermissions()"
+                        [class.is-invalid]="
+                          formGroup.get('short_description').dirty &&
+                          formGroup.get('short_description').invalid
+                        "
+                      ></textarea>
+                      <span style="display: block; text-align: right">
+                        <button
+                          type="button"
+                          *ngIf="
+                            formGroup.get('short_description').dirty &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formGroup, 'short_description')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            formGroup.get('short_description').dirty &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          [disabled]="
+                            formGroup.get('short_description').invalid &&
+                            (group.is_leader || currentUser.isSuperUser)
+                          "
+                          (click)="updateValue(formGroup, 'short_description')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Long description</label>
+                      <textarea
+                        type="text"
+                        required
+                        class="form-control mb-1"
+                        placeholder="Enter a long description."
+                        formControlName="long_description"
+                        [readonly]="getPermissions()"
+                        [class.is-invalid]="
+                          formGroup.get('long_description').dirty &&
+                          formGroup.get('long_description').invalid
+                        "
+                      ></textarea>
+                      <span style="display: block; text-align: right">
+                        <button
+                          type="button"
+                          *ngIf="
+                            formGroup.get('long_description').dirty &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formGroup, 'long_description')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            formGroup.get('long_description').dirty &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          [disabled]="
+                            formGroup.get('long_description').invalid &&
+                            (group.is_leader || currentUser.isSuperUser)
+                          "
+                          (click)="updateValue(formGroup, 'long_description')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        formControlName="is_external"
+                        id="defaultCheck2"
+                        (ngModelChange)="setValidatorForExternal()"
+                      />
+                      <label>
+                        <span class="tooltip_">
+                          <span class="tooltiptext">
+                            This will open your own register link in a new
+                            tab.</span
+                          >
+                          Join using an external method
+                          <i class="text-secondary fa fa-info-circle"></i>
+                        </span>
+                      </label>
+                    </div>
+
+                    <div
+                      class="form-group"
+                      *ngIf="formGroup.get('is_external').value"
+                    >
+                      <label>Group register link</label>
+                      <input
+                        type="url"
+                        class="form-control"
+                        formControlName="external_url"
+                        [class.is-invalid]="
+                          formGroup.get('external_url').touched &&
+                          formGroup.get('external_url').invalid
+                        "
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <span style="display: block; text-align: right">
+                        <button
+                          type="button"
+                          *ngIf="
+                            (formGroup.get('is_external').dirty ||
+                              formGroup.get('external_url').dirty) &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formGroup, 'external_url')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            (formGroup.get('is_external').dirty ||
+                              formGroup.get('external_url').dirty) &&
+                            (group.is_leader ||
+                              currentUser.isSuperUser ||
+                              currentUser.idUserType === 1)
+                          "
+                          [disabled]="
+                            formGroup.get('external_url').invalid &&
+                            (group.is_leader || currentUser.isSuperUser)
+                          "
+                          (click)="updateValue(formGroup, 'external_url')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="col-6 mb-3">
+            <div class="card">
+              <div class="row card-body">
+                <img
+                  [src]="fixUrl(group.picture)"
+                  [alt]="group.title"
+                  class="group-picture mb-1"
+                  (click)="uploadPicture(input_file)"
+                />
+                <div class="col-12" *ngIf="!getPermissions()">
+                  <button
+                    class="btn btn-sm btn-light"
+                    (click)="uploadPicture(input_file)"
+                  >
+                    Upload image
+                  </button>
+                  <button
+                    class="btn btn-sm btn-light"
+                    (click)="visiblePixieModal = true"
+                  >
+                    Create your own design
+                  </button>
+                  <div style="padding: 10px">
+                    <ng-select
+                      *ngIf="wpImages.length != 0"
+                      [items]="wpImages"
+                      bindLabel="slug"
+                      placeholder="Select a Wordpress image"
+                      bindValue="source_url"
+                      [searchable]="true"
+                      [(ngModel)]="group.picture"
+                      style="text-align: center; height: 30px"
+                    >
+                      <ng-template
+                        ng-option-tmp
+                        let-item="item"
+                        let-index="index"
+                      >
+                        <div class="row">
+                          <div class="col-12">
+                            <b>{{ item.slug }}</b>
+                          </div>
+                          <div class="col-12">
+                            <img height="100" [src]="item.source_url" />
+                          </div>
+                        </div>
+                      </ng-template>
+                    </ng-select>
+                  </div>
+                </div>
+                <span style="font-size: 12px" *ngIf="!getPermissions()">
+                  Recommended size: 1000x428
+                </span>
+                <div class="col-12 col-md-4" [hidden]="true">
+                  <div class="custom-file mb-4">
+                    <input
+                      #input_file
+                      accept="image/*"
+                      type="file"
+                      class="custom-file-input"
+                      id="customFile"
+                    />
+                    <label class="custom-file-label" for="customFile"
+                      >Choose file</label
+                    >
+                  </div>
+                </div>
+                <div class="col-12 text-center">
+                  <small class="text-secondary">
+                    Share this QR with someone by clicking on it or ask to scan
+                    it using the app to join to the group.
+                  </small>
+
+                  <ngx-qrcode
+                    #qr_code
+                    (click)="shareQR(qr_code)"
+                    style="width: 50px; height: 50px"
+                    [qrc-value]="iframeCode.event_link"
+                    [qrc-class]="'qrItemResize-dash'"
+                    qrc-errorCorrectionLevel="M"
+                  >
+                  </ngx-qrcode>
+                  <button
+                    (click)="shareQR(qr_code)"
+                    class="btn btn-sm btn-citric"
+                  >
+                    Copy QR
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            Location Info
+            <div class="card">
+              <form #group_form="ngForm" [formGroup]="formGroup">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label>City</label>
+                        <input
+                          type="text"
+                          required
+                          class="form-control mb-1"
+                          placeholder="Enter your city's group."
+                          formControlName="city"
+                          [readonly]="getPermissions()"
+                          [class.is-invalid]="
+                            formGroup.get('city').dirty &&
+                            formGroup.get('city').invalid
+                          "
+                        />
+                        <span style="display: block; text-align: right">
+                          <button
+                            *ngIf="
+                              formGroup.get('city').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            class="btn btn-sm btn-muted"
+                            (click)="resetForm(formGroup, 'city')"
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            *ngIf="
+                              formGroup.get('city').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            [disabled]="
+                              formGroup.get('city').invalid &&
+                              (group.is_leader || currentUser.isSuperUser)
+                            "
+                            (click)="updateValue(formGroup, 'city')"
+                            class="btn btn-sm btn-success"
+                          >
+                            Save
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label>Zip</label>
+                        <input
+                          type="text"
+                          required
+                          class="form-control mb-1"
+                          placeholder="Enter your zip code (optional)."
+                          formControlName="zip_code"
+                          [readonly]="getPermissions()"
+                          [class.is-invalid]="
+                            formGroup.get('zip_code').dirty &&
+                            formGroup.get('zip_code').invalid
+                          "
+                        />
+                        <span style="display: block; text-align: right">
+                          <button
+                            *ngIf="
+                              formGroup.get('zip_code').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            class="btn btn-sm btn-muted"
+                            (click)="resetForm(formGroup, 'zip_code')"
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            *ngIf="
+                              formGroup.get('zip_code').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            [disabled]="
+                              formGroup.get('zip_code').invalid &&
+                              (group.is_leader || currentUser.isSuperUser)
+                            "
+                            (click)="updateValue(formGroup, 'zip_code')"
+                            class="btn btn-sm btn-success"
+                          >
+                            Save
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label>Street</label>
+                        <input
+                          type="text"
+                          required
+                          class="form-control mb-1"
+                          placeholder="Enter your street (optional)."
+                          formControlName="street"
+                          [readonly]="getPermissions()"
+                          [class.is-invalid]="
+                            formGroup.get('street').dirty &&
+                            formGroup.get('street').invalid
+                          "
+                        />
+                        <span style="display: block; text-align: right">
+                          <button
+                            *ngIf="
+                              formGroup.get('street').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            class="btn btn-sm btn-muted"
+                            (click)="resetForm(formGroup, 'street')"
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            *ngIf="
+                              formGroup.get('street').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            [disabled]="
+                              formGroup.get('street').invalid &&
+                              (group.is_leader || currentUser.isSuperUser)
+                            "
+                            (click)="updateValue(formGroup, 'street')"
+                            class="btn btn-sm btn-success"
+                          >
+                            Save
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label>State</label>
+                        <input
+                          type="text"
+                          required
+                          class="form-control mb-1"
+                          placeholder="Enter your state's group. (optional)"
+                          formControlName="state"
+                          [readonly]="getPermissions()"
+                          [class.is-invalid]="
+                            formGroup.get('state').dirty &&
+                            formGroup.get('state').invalid
+                          "
+                        />
+                        <span style="display: block; text-align: right">
+                          <button
+                            type="button"
+                            *ngIf="
+                              formGroup.get('state').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            class="btn btn-sm btn-muted"
+                            (click)="resetForm(formGroup, 'state')"
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            type="button"
+                            *ngIf="
+                              formGroup.get('state').dirty &&
+                              (group.is_leader ||
+                                currentUser.isSuperUser ||
+                                currentUser.idUserType === 1)
+                            "
+                            [disabled]="
+                              formGroup.get('state').invalid &&
+                              (group.is_leader || currentUser.isSuperUser)
+                            "
+                            (click)="updateValue(formGroup, 'state')"
+                            class="btn btn-sm btn-success"
+                          >
+                            Save
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members Tab -->
+      <div
+        class="tab-pane fade"
+        id="v-pills-members"
+        role="tabpanel"
+        aria-labelledby="v-pills-members-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-2 offset-6 text-right">
+            <button
+              *ngIf="!getPermissions()"
+              class="btn btn-sm btn-outline-success"
+              (click)="printMembers()"
+              [disabled]="members.length === 0"
+            >
+              Print
+            </button>
+          </div>
+          <div class="col-2">
+            <button
+              class="btn btn-sm btn-outline-success"
+              *ngIf="!getPermissions()"
+              (click)="openModalAddMembers(add_members_modal, add_members_form)"
+            >
+              Add Member
+            </button>
+          </div>
+          <div class="col-2">
+            <button
+              class="btn btn-sm btn-outline-success"
+              *ngIf="!getPermissions()"
+              (click)="openModalCreateMember(form_simple_add, simple_add)"
+            >
+              Create Member
+            </button>
+          </div>
+          <div class="col-12 mb-3">
+            Members
+            <div class="card">
+              <div class="row justify-content-center card-body">
+                <div class="btn-group col-5">
+                  <button
+                    (click)="settings_obj.menu_option = 'members'"
+                    class="btn btn-sm col-6"
+                    [ngClass]="{
+                      active: settings_obj.menu_option === 'members'
+                    }"
+                  >
+                    Members ({{ members.length }})
+                  </button>
+                  <button
+                    (click)="settings_obj.menu_option = 'requests'"
+                    class="btn btn-sm col-6"
+                    [ngClass]="{
+                      active: settings_obj.menu_option === 'requests'
+                    }"
+                  >
+                    Requests
+                    <span *ngIf="group?.requests_count > 0">
+                      ({{ group?.requests_count }})
+                    </span>
+                  </button>
+                </div>
+                <div class="ws-100"></div>
+                <div
+                  class="col-12 mt-2 m-0 row"
+                  [hidden]="settings_obj.menu_option !== 'members'"
+                >
+                  <form
+                    #member_type_form="ngForm"
+                    [formGroup]="membertTypeForm"
+                    style="width: 100%"
+                  >
+                    <div formArrayName="members" class="col-12">
+                      <table
+                        datatable
+                        [dtOptions]="dtOptions"
+                        [dtTrigger]="dtTrigger"
+                        class="table row-border hover table-striped"
+                      >
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th style="min-width: 110px">Role</th>
+                            <th *ngIf="!getPermissions()">Email</th>
+                            <th>Member Since</th>
+                            <th *ngIf="!getPermissions()">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            *ngFor="let member of members; let i = index"
+                            [formGroupName]="i"
+                          >
+                            <td>
+                              <div class="wrapper">
+                                <img
+                                  class="image--cover"
+                                  [src]="
+                                    member.picture
+                                      ? fixUrl(member.picture)
+                                      : '/assets/img/img_avatar.png'
+                                  "
+                                  onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'"
+                                />
+                              </div>
+                            </td>
+                            <td>
+                              <span class="text-citric">
+                                {{ member.name }} {{ member.lastName }}
+                              </span>
+                            </td>
+                            <td>
+                              <div *ngIf="!getPermissions()" class="form-group">
+                                <select
+                                  (change)="
+                                    checkChange(
+                                      members_on_form.controls[i].get(
+                                        'is_leader'
+                                      ),
+                                      member
+                                    )
+                                  "
+                                  formControlName="is_leader"
+                                  class="form-control mb-1"
+                                >
+                                  <option [value]="true">Leader</option>
+                                  <option [value]="false">Member</option>
+                                </select>
+                                <span style="display: block; text-align: right">
+                                  <button
+                                    type="button"
+                                    *ngIf="
+                                      members_on_form.controls[i]?.get(
+                                        'is_leader'
+                                      ).dirty &&
+                                      (group.is_leader ||
+                                        currentUser.isSuperUser ||
+                                        currentUser.idUserType === 1)
+                                    "
+                                    class="btn btn-sm btn-muted"
+                                    (click)="
+                                      resetMemberForm(
+                                        members_on_form.controls[i],
+                                        member
+                                      )
+                                    "
+                                  >
+                                    Cancel
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    *ngIf="
+                                      members_on_form.controls[i].get(
+                                        'is_leader'
+                                      ).dirty &&
+                                      (group.is_leader ||
+                                        currentUser.isSuperUser ||
+                                        currentUser.idUserType === 1)
+                                    "
+                                    [disabled]="
+                                      members_on_form.controls[i].get(
+                                        'is_leader'
+                                      ).invalid &&
+                                      (group.is_leader ||
+                                        currentUser.isSuperUser ||
+                                        currentUser.idUserType === 1)
+                                    "
+                                    (click)="
+                                      updateMemberType(
+                                        members_on_form.controls[i],
+                                        member
+                                      )
+                                    "
+                                    class="btn btn-sm btn-success"
+                                  >
+                                    Save
+                                  </button>
+                                </span>
+                              </div>
+                              <div *ngIf="getPermissions()">
+                                {{ member.is_leader ? "Leader" : "Member" }}
+                              </div>
+                            </td>
+                            <td *ngIf="!getPermissions()">
+                              {{ member.email }}
+                            </td>
+                            <td>
+                              {{
+                                (member.member_since | date : "MMM. dd yyyy") ||
+                                  "N/A"
+                              }}
+                            </td>
+                            <td *ngIf="!getPermissions()">
+                              <div class="btn-group">
+                                <button
+                                  class="btn btn-sm btn-info"
+                                  (click)="
+                                    editMember(
+                                      formEditMemberModal,
+                                      edit_member_form,
+                                      member
+                                    )
+                                  "
+                                >
+                                  <i class="fa fa-edit"></i>
+                                </button>
+
+                                <button
+                                  class="btn btn-sm btn-danger"
+                                  (click)="deleteMember(member)"
+                                >
+                                  <i class="fa fa-trash-alt"></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </form>
+                </div>
+                <div
+                  class="col-12 mt-2 m-0 row"
+                  [hidden]="settings_obj.menu_option !== 'requests'"
+                >
+                  <table class="table row-border hover table-striped col-12">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th style="min-width: 110px">Status</th>
+                        <th *ngIf="!getPermissions()">Email</th>
+                        <th>Member Since</th>
+                        <th *ngIf="!getPermissions()">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let member of requests; let i = index">
+                        <td>
+                          <div class="wrapper">
+                            <img
+                              class="image--cover"
+                              [src]="
+                                member.picture
+                                  ? fixUrl(member.picture)
+                                  : '/assets/img/img_avatar.png'
+                              "
+                              onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'"
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <span class="text-citric">
+                            {{ member.name }} {{ member.lastName }}
+                          </span>
+                        </td>
+                        <td>
+                          <div *ngIf="!getPermissions()" class="form-group">
+                            {{ member.internal_status_name | titlecase }}
+                            <!-- <select
+                            (change)="
+                              checkChange(
+                                members_on_form.controls[i].get(
+                                  'is_leader'
+                                ),
+                                member
+                              )
+                            "
+                            formControlName="is_leader"
+                            class="form-control mb-1"
+                          >
+                            <option [value]="true">Leader</option>
+                            <option [value]="false">Member</option>
+                          </select> -->
+                            <!-- <span style="display: block; text-align: right">
+                              <button
+                                type="button"
+                                *ngIf="
+                                  members_on_form.controls[i]?.get('is_leader')
+                                    .dirty &&
+                                  (group.is_leader ||
+                                    currentUser.isSuperUser ||
+                                    currentUser.idUserType === 1)
+                                "
+                                class="btn btn-sm btn-muted"
+                                (click)="
+                                  resetMemberForm(
+                                    members_on_form.controls[i],
+                                    member
+                                  )
+                                "
+                              >
+                                Cancel
+                              </button>
+
+                              <button
+                                type="button"
+                                *ngIf="
+                                  members_on_form.controls[i].get('is_leader')
+                                    .dirty &&
+                                  (group.is_leader ||
+                                    currentUser.isSuperUser ||
+                                    currentUser.idUserType === 1)
+                                "
+                                [disabled]="
+                                  members_on_form.controls[i].get('is_leader')
+                                    .invalid &&
+                                  (group.is_leader ||
+                                    currentUser.isSuperUser ||
+                                    currentUser.idUserType === 1)
+                                "
+                                (click)="
+                                  updateMemberType(
+                                    members_on_form.controls[i],
+                                    member
+                                  )
+                                "
+                                class="btn btn-sm btn-success"
+                              >
+                                Save
+                              </button>
+                            </span> -->
+                          </div>
+                          <div *ngIf="getPermissions()">
+                            {{ member.is_leader ? "Leader" : "Member" }}
+                          </div>
+                        </td>
+                        <td *ngIf="!getPermissions()">
+                          {{ member.email }}
+                        </td>
+                        <td>
+                          {{
+                            (member.created_at | date : "MMM. dd yyyy") || "N/A"
+                          }}
+                        </td>
+                        <td *ngIf="!getPermissions()">
+                          <div
+                            class="btn-group"
+                            *ngIf="member.internal_status_id === 1"
+                          >
+                            <button
+                              [disabled]="member.wait"
+                              class="btn btn-sm btn-success"
+                              (click)="manageRequest(member, true)"
+                              [ngClass]="{ 'is-loading': member.wait_accept }"
+                            >
+                              <span class="tooltip_">
+                                <span class="tooltiptext"> Accept </span>
+                                <i class="fa fa-check"> </i>
+                              </span>
+                            </button>
+
+                            <button
+                              class="btn btn-sm btn-danger ml-2"
+                              [disabled]="member.wait"
+                              (click)="manageRequest(member, false)"
+                              [ngClass]="{ 'is-loading': member.wait_decline }"
+                            >
+                              <span class="tooltip_">
+                                <span class="tooltiptext"> Decline </span>
+                                <i class="fas fa-ban"> </i>
+                              </span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events Tab -->
+      <div
+        class="tab-pane fade"
+        id="v-pills-events"
+        role="tabpanel"
+        aria-labelledby="v-pills-events-tab"
+      >
+        <div class="col-12" [hidden]="!show_detail_loading">
+          <ng-template [ngIf]="show_detail_loading">
+            <div class="d-flex justify-content-center" style="margin: 140px">
+              <div
+                class="spinner-border text-citric"
+                style="width: 6rem; height: 6rem"
+                role="status"
+              ></div>
+            </div>
+          </ng-template>
+        </div>
+
+        <app-event-calendar
+          *ngIf="!selectedEvent && !show_detail_loading"
+          [hidden]="selectedEvent || show_detail_loading"
+          [filter_dates]="filter_dates"
+          [show_add_button]="true"
+          [idGroup]="group?.idGroup"
+          [idOrganization]="currentUser.idIglesia"
+          [events]="raw_events"
+          (add_event)="openModalAddEvent(group_event_modal, group_event_form)"
+          (update_event)="
+            openModalUpdateEvent(group_event_modal, group_event_form, $event)
+          "
+          (view_activities)="viewActivities($event, view_event_activities_form)"
+          (view_reviews)="viewReviews($event, view_event_reviews_form)"
+          (view_finances)="viewFinance($event, view_event_finances_form)"
+          (view_attendances)="
+            viewAttendance($event, view_event_attendances_form)
+          "
+          (make_refresh)="getGroup()"
+        >
+        </app-event-calendar>
+        <app-view-event-activities
+          [hidden]="!selectedEvent || hide_activities"
+          #view_event_activities_form
+          (onDismiss)="closeViews()"
+        >
+        </app-view-event-activities>
+        <app-view-event-reviews
+          [hidden]="!selectedEvent || hide_reviews"
+          #view_event_reviews_form
+          (onDismiss)="closeViews()"
+        >
+        </app-view-event-reviews>
+
+        <app-view-event-finances
+          [hidden]="!selectedEvent || hide_finances"
+          #view_event_finances_form
+          (onDismiss)="closeViews()"
+        >
+        </app-view-event-finances>
+
+        <app-view-event-attendance
+          [hidden]="!selectedEvent || hide_attendance"
+          #view_event_attendances_form
+          (onDismiss)="closeViews($event)"
+        >
+        </app-view-event-attendance>
+        <!--
+        <div [hidden]="selectedEvent || show_detail_loading" class="row" style="padding: 10px;">
+          <div class="col-9 row">
+            <div class="col-6 mb-3">
+              <label>
+                Range start:
+              </label>
+              <input type="date" class="form-control" [(ngModel)]="filter_dates.start_date" />
+            </div>
+            <div class="col-6 mb-3">
+              <label>
+                End:
+              </label>
+              <input type="date" class="form-control" [(ngModel)]="filter_dates.end_date" (change)="fixDate($event)" />
+              <span class="text-citric" id="members-count">
+                We'll select the last day of month.
+              </span>
+            </div>
+          </div>
+          <div class="col-3 align-self-center">
+            <button *ngIf="!getPermissions()" class="btn btn-sm btn-outline-success"
+              (click)="openModalAddEvent(group_event_modal, group_event_form)">
+              New Event
+            </button>
+            <button *ngIf="!getPermissions()" class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+              (click)="printEventsPdf()" [disabled]="events.length === 0">
+              Print
+            </button>
+          </div>
+          <div class="col-12 mb-3">
+            Events
+            <div class="card">
+              <div class="row card-body">
+                <!-- Calendar 1 ->
+                <div class="col-12 col-md-6">
+                  <div class="row text-center bg-citric">
+                    <div class="col-1 align-items-center">
+                      <div class="btn btn-link btn-color-fixed" mwlCalendarPreviousView [view]="view"
+                        [(viewDate)]="viewDate" (viewDateChange)="closeOpenMonthViewDay(-1)">
+                        <i class="fa fa-chevron-circle-left"> </i>
+                      </div>
+                      <!-- <div
+                          class="btn btn-outline-secondary"
+                          mwlCalendarToday
+                          [(viewDate)]="viewDate"
+                        >
+                          Today
+                        </div> -->
+        <!-- <div
+                          class="btn btn-citric"
+                          mwlCalendarNextView
+                          [view]="view"
+                          [(viewDate)]="viewDate"
+                          (viewDateChange)="closeOpenMonthViewDay()"
+                        >
+                          Next
+                        </div> ->
+                    </div>
+                    <div class="col-10 text-center align-self-center">
+                      <span class="text-light">
+                        {{ viewDate | calendarDate: view + "ViewTitle":"en" }}
+                      </span>
+                    </div>
+                    <!-- <div class="col-md-4">
+                      <div class="btn-group">
+                        <div
+                          class="btn btn-citric"
+                          (click)="setView(CalendarView.Month)"
+                          [class.active]="view === CalendarView.Month"
+                        >
+                          Month
+                        </div>
+                        <div
+                          class="btn btn-citric"
+                          (click)="setView(CalendarView.Week)"
+                          [class.active]="view === CalendarView.Week"
+                        >
+                          Week
+                        </div>
+                        <div
+                          class="btn btn-citric"
+                          (click)="setView(CalendarView.Day)"
+                          [class.active]="view === CalendarView.Day"
+                        >
+                          Day
+                        </div>
+                      </div>
+                    </div> ->
+                  </div>
+                  <div [ngSwitch]="view">
+                    <ng-template #header>
+                      <mwl-calendar-month-view-header [days]="weekDays">
+                      </mwl-calendar-month-view-header>
+                    </ng-template>
+                    <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events"
+                      [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)"
+                      (eventClicked)="handleEvent('Clicked', $event.event)"
+                      (eventTimesChanged)="eventTimesChanged($event)" [headerTemplate]="header">
+                    </mwl-calendar-month-view>
+                    <!-- <mwl-calendar-week-view
+                      *ngSwitchCase="CalendarView.Week"
+                      [viewDate]="viewDate"
+                      [events]="events"
+                      [refresh]="refresh"
+                      (eventClicked)="handleEvent('Clicked', $event.event)"
+                      (eventTimesChanged)="eventTimesChanged($event)"
+                    >
+                    </mwl-calendar-week-view>
+                    <mwl-calendar-day-view
+                      *ngSwitchCase="CalendarView.Day"
+                      [viewDate]="viewDate"
+                      [events]="events"
+                      [refresh]="refresh"
+                      (eventClicked)="handleEvent('Clicked', $event.event)"
+                      (eventTimesChanged)="eventTimesChanged($event)"
+                    >
+                    </mwl-calendar-day-view> ->
+                  </div>
+                </div>
+
+                <!-- Calendar 2 ->
+                <div class="col-12 col-md-6">
+                  <div class="row text-center bg-citric">
+                    <div class="col-10 offset-1 text-center align-self-center">
+                      <span class="text-light">
+                        {{
+                        viewDateNext | calendarDate: view + "ViewTitle":"en"
+                        }}
+                      </span>
+                    </div>
+                    <div class="col-1 align-items-center">
+                      <div class="btn btn-link btn-color-fixed" mwlCalendarNextView [view]="view"
+                        [(viewDate)]="viewDateNext" (viewDateChange)="closeOpenMonthViewDay(1)">
+                        <i class="fa fa-chevron-circle-right"> </i>
+                      </div>
+                    </div>
+                  </div>
+                  <div [ngSwitch]="view">
+                    <!-- <ng-template #header>
+                      <mwl-calendar-month-view-header [days]="weekDays">
+                      </mwl-calendar-month-view-header>
+                    </ng-template> ->
+                    <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDateNext"
+                      [events]="events" [refresh]="refresh" [activeDayIsOpen]="activeSecondDayIsOpen"
+                      (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent('Clicked', $event.event)"
+                      (eventTimesChanged)="eventTimesChanged($event)">
+                      <!-- [headerTemplate]="header" ->
+                    </mwl-calendar-month-view>
+                  </div>
+                </div>
+                <div class="w-100 mb-2">
+                  <hr />
+                </div>
+
+                <div class="col-12 management-tags-panel">
+                  <div class="row">
+                    <div class="col-6 col-md-4 row mb-1" [ngClass]="{
+                        filtered:
+                          event.color.primary === tag_filtered?.color.primary
+                      }" *ngFor="let event of events_clear" (click)="filterByTagColor(event)">
+                      <span class="tag-color align-self-center" [ngStyle]="{ background: event.color.primary }"></span>
+                      <span class="col-10 align-self-center text-muted">
+                        {{ event.title }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="w-100 mb-2">
+                  <hr />
+                </div>
+
+                <div class="col-12">
+                  <table class="table row-border hover table-striped">
+                    <thead>
+                      <tr>
+                        <th [hidden]="true"></th>
+                        <th style="
+                            min-width: 40px !important;
+                            max-width: 40px !important;
+                          "></th>
+                        <th style="min-width: 180px !important;">
+                          Date & Time
+                        </th>
+                        <th>Event</th>
+                        <th>Description</th>
+                        <th>Attendances</th>
+                        <th>Capacity</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let event of events; let i = index" [id]="'event_' + event.id.toString()"
+                        class="event_to_clear">
+                        <td [hidden]="true">
+                          {{ event.id }}
+                        </td>
+                        <td class="text-center" style="
+                            padding: 0.75rem 0 !important;
+                            max-width: 70px !important;
+                            vertical-align: middle;
+                          ">
+                          <span class="tag-color" [ngStyle]="{ background: event.color.primary }"
+                            (click)="filterByTagColor(event)"></span>
+                          <!-- {{ event.color.primary }} ->
+                        </td>
+                        <td class="fixed">
+                          <span class="text-citric">
+                            {{ event.start | date: "MMM. dd yyyy" }}
+                            <span *ngIf="
+                                event.end && checkDate(event.start, event.end)
+                              ">
+                              - {{ event.end | date: "MMM. dd yyyy" }}</span>
+                            <br />
+                            {{ event.start | date: "hh:mm a" }}
+                            <span *ngIf="event.end">
+                              - {{ event.end | date: "hh:mm a" }}</span>
+                          </span>
+                        </td>
+                        <td class="fixed">
+                          {{ event.title }}
+                        </td>
+                        <td class="fixed">
+                          {{ event.meta.description }}
+                        </td>
+                        <td class="text-center fixed">
+                          {{ event.meta.attendances_count }} /
+                          {{ event.meta.attendances_total }}
+                        </td>
+                        <td class="text-center fixed">
+                          {{ event.meta.capacity }}
+                        </td>
+                        <td class="fixed">
+                          <div class="btn-group">
+                            <button [routerLink]="getRouterForEvent(event.meta)" class="btn btn-sm btn-primary">
+                              <i class="far fa-eye"></i>
+                            </button>
+
+                            <button class="btn btn-sm btn-info" (click)="
+                                openModalUpdateEvent(
+                                  group_event_modal,
+                                  group_event_form,
+                                  event
+                                )
+                              " *ngIf="!getPermissions()">
+                              <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" (click)="deleteEvent(event)"
+                              *ngIf="!getPermissions()">
+                              <i class="fa fa-trash-alt"></i>
+                            </button>
+
+                            <!-- </div>
+
+                          <div class="btn-group"> ->
+                            <button (click)="
+                                viewActivities(
+                                  event,
+                                  view_event_activities_form
+                                )
+                              " class="btn btn-sm btn-success">
+                              <i class="fa fa-calendar-day"></i>
+                            </button>
+
+                            <button (click)="
+                                viewReviews(event, view_event_reviews_form)
+                              " class="btn btn-sm btn-success">
+                              <i class="fa fa-star-half-alt"></i>
+                            </button>
+
+                            <button (click)="
+                                viewFinance(event, view_event_finances_form)
+                              " class="btn btn-sm btn-success">
+                              <i class="fa fa-dollar-sign"></i>
+                            </button>
+
+                            <button (click)="
+                                viewAttendance(
+                                  event,
+                                  view_event_attendances_form
+                                )
+                              " class="btn btn-sm btn-success">
+                              <i class="fa fa-user-check"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        -->
+      </div>
+
+      <!-- Chat Tab -->
+      <div
+        hidden
+        class="tab-pane fade"
+        id="v-pills-chat"
+        role="tabpanel"
+        aria-labelledby="v-pills-chat-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-12 mb-3 row" style="height: 560px">
+            <!-- Other chat-->
+            <div class="content">
+              <div class="card-header msg_head">
+                <div class="d-flex bd-highlight">
+                  <div class="img_cont">
+                    <img
+                      [src]="fixUrl(group.picture)"
+                      class="rounded-circle user_img"
+                    />
+                    <span class="online_icon"></span>
+                  </div>
+                  <div class="user_info">
+                    <span>
+                      {{ group.title }}
+                    </span>
+                    <p>
+                      {{ this.currentChannel?.lastMessage?.index + 1 }} Messages
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="contact-profile">
+                      <img [src]="fixUrl(group.picture)" alt="" />
+                      <p>
+                        {{ group.title }}
+                        <br />
+                      </p>
+                    </div> -->
+              <!--<div
+                #messages
+                id="messages"
+                class="messages"
+                (dragover)="onDragOver($event)"
+                (drop)="onDropSuccess($event)"
+                dropzone="true"
+              >-->
+              <div
+                #chatDisplay
+                id="chatDisplay"
+                class="messages"
+                style="z-index: 98"
+                (dragover)="onDragOver($event)"
+                dropzone="true"
+              >
+                <ul>
+                  <li
+                    *ngFor="let message; let msg_index = index; of: messages"
+                    [ngClass]="{
+                      sent: message.author === currentUsername,
+                      replies: message.author !== currentUsername
+                    }"
+                  >
+                    <img
+                      *ngIf="message.author !== currentUsername"
+                      class="profile-picture"
+                      [src]="
+                        getAuthorInfo(message.author).photo_url
+                          ? getAuthorInfo(message.author).photo_url
+                          : 'assets/img/img_avatar.png'
+                      "
+                      onerror="this.onerror=null; this.src='/assets/img/img_avatar.png'"
+                    />
+                    <p
+                      *ngIf="
+                        message.type !== 'media' &&
+                        !isValidHttpUrl(message.body)
+                      "
+                    >
+                      <b>{{
+                        message.author != messages[msg_index - 1]?.author &&
+                        message.author !== currentUsername
+                          ? message.author.split(" <")[0]
+                          : ""
+                      }}</b>
+                      <br
+                        *ngIf="
+                          message.author != messages[msg_index - 1]?.author &&
+                          message.author !== currentUsername
+                        "
+                      />
+                      {{ message.body }}
+                    </p>
+                    <p
+                      *ngIf="
+                        message.type !== 'media' && isValidHttpUrl(message.body)
+                      "
+                    >
+                      <a [href]="message.body" target="_blank">{{
+                        message.body
+                      }}</a>
+                    </p>
+                    <p *ngIf="message.type === 'media'">
+                      <a
+                        *ngIf="(msg_media[msg_index]?.type).startsWith('image')"
+                        [href]="msg_media[msg_index]?.value"
+                        target="_blank"
+                      >
+                        <img [src]="msg_media[msg_index]?.value" width="100" />
+                      </a>
+                      <audio
+                        *ngIf="(msg_media[msg_index]?.type).startsWith('audio')"
+                        style="max-width: 100%"
+                        [src]="msg_media[msg_index]?.value"
+                        class="my-audio-player"
+                        controls
+                      ></audio>
+                      <a
+                        *ngIf="
+                          !(msg_media[msg_index]?.type).startsWith('image') &&
+                          !(msg_media[msg_index]?.type).startsWith('audio')
+                        "
+                        [href]="msg_media[msg_index]?.value"
+                        target="_blank"
+                      >
+                        {{ msg_media[msg_index]?.name }} ({{
+                          msg_media[msg_index]?.size
+                        }}MB)
+                      </a>
+                    </p>
+                    <span
+                      [ngClass]="{
+                        msg_time_send: message.author !== currentUsername,
+                        msg_time: message.author === currentUsername
+                      }"
+                    >
+                      {{ message.dateUpdated | date : "MMM/dd h:mm a" }}
+                      <i
+                        *ngIf="
+                          this.lastMessageConsumed == true &&
+                          msg_index == this.messages.length - 1 &&
+                          message.author == currentUsername
+                        "
+                        class="fa fa-eye"
+                      ></i>
+                      <i
+                        *ngIf="
+                          this.lastMessageConsumed == false &&
+                          msg_index == this.messages.length - 1 &&
+                          message.author == currentUsername
+                        "
+                        class="fa fa-check-circle"
+                      ></i>
+                    </span>
+                    <!--<div
+                      class="attach-on-chat-wrapper"
+                      *ngIf="message.has_attachments && message.status"
+                    >
+                      <div
+                        (click)="openFile(item)"
+                        class="attach-on-chat-container"
+                        *ngFor="let item of message.attachments"
+                      >
+                        <img
+                          [src]="fixUrl(item)"
+                          onerror="this.onerror=null; this.src='assets/img/default-image.jpg'"
+                          [alt]="printDateMessage(message)"
+                        />
+                      </div>
+                    </div>-->
+                  </li>
+                </ul>
+              </div>
+              <!--<div
+                class="message-input"
+                (dragover)="onDragOver($event)"
+                (drop)="onDropSuccess($event)"
+              >-->
+              <div class="message-input">
+                <!--<div *ngIf="message.has_attachments">
+                  <div class="scrolling-wrapper">
+                    <div
+                      *ngFor="let item of message.attachments; let i = index"
+                      class="chat-attach-container"
+                    >
+                      <div style="position: relative;">
+                        <img class="chat-attach" [src]="fixUrl(item)" alt="" />
+                        <button
+                          class="btn delete-attach-button"
+                          (click)="deleteAttach(item, i)"
+                        >
+                          x
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>-->
+                <div *ngIf="membersTyping.length">
+                  <span class="form-text text-muted font-italic"
+                    >{{ whosTyping() }} is typing...</span
+                  >
+                </div>
+                <div
+                  style="
+                    max-height: 50px;
+                    z-index: 1;
+                    background-color: #ff7529 !important;
+                    border-radius: calc(1.25rem - 1px) calc(1.25rem - 1px) 0 0;
+                  "
+                >
+                  <table class="menu">
+                    <tr>
+                      <td style="margin-right: auto; margin-left: 0px">
+                        <button
+                          class="btn btn-sm btn-danger float-right"
+                          color="danger"
+                          (click)="removeFile()"
+                          size="small"
+                          *ngIf="this.file"
+                        >
+                          {{ this.file.name }} ({{
+                            (this.file.size / 1024 / 1024)
+                              .toString()
+                              .substring(0, 4)
+                          }}MB)
+                          <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                      </td>
+                      <td style="margin-right: auto; margin-left: 0px">
+                        <button
+                          class="btn btn-sm btn-light float-right"
+                          *ngIf="!recording"
+                          color="danger"
+                          (click)="startRecording()"
+                          size="small"
+                        >
+                          Record audio
+                          <i class="fa fa-microphone"></i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-success float-right"
+                          *ngIf="recording"
+                          color="danger"
+                          (click)="stopRecording()"
+                          size="small"
+                        >
+                          <i class="fa fa-stop" aria-hidden="true"></i>
+                          {{ minutes(recordingCounter) }}
+                        </button>
+                      </td>
+                      <td style="vertical-align: middle">
+                        <table style="border-collapse: collapse" class="menu">
+                          <tr>
+                            <td>
+                              <label
+                                for="upload"
+                                class="btn btn-sm btn-light float-right"
+                                style="margin-top: 8px"
+                              >
+                                <input
+                                  style="display: none"
+                                  #formInputFile
+                                  (change)="loadImageFromDevice($event)"
+                                  type="file"
+                                  class="custom-file-input"
+                                  id="upload"
+                                />
+                                <i class="fa fa-paperclip"></i>
+                              </label>
+                            </td>
+                            <td>
+                              <button
+                                (click)="sendLike()"
+                                class="btn btn-sm btn-light float-right"
+                              >
+                                <i class="fa fa-thumbs-up"></i>
+                              </button>
+                            </td>
+                            <td>
+                              <button
+                                (click)="toggled = !toggled"
+                                class="btn btn-sm btn-light float-right"
+                              >
+                                <i
+                                  [(emojiPickerIf)]="toggled"
+                                  [emojiPickerDirection]="
+                                    'bottom' || 'top' || 'left' || 'right'
+                                  "
+                                  (emojiPickerSelect)="handleSelection($event)"
+                                  >😄</i
+                                >
+                              </button>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="wrap">
+                  <div id="chatContainer">
+                    <form
+                      (submit)="!toggled ? sendMessage('form') : null"
+                      autocomplete="off"
+                      name="chatForm"
+                      id="chatForm"
+                    >
+                      <div class="input-group">
+                        <textarea
+                          type="text"
+                          id="chatMessage"
+                          name="chatMessage"
+                          #chatElement
+                          autocapitalize="sentences"
+                          class="form-control"
+                          (paste)="consolelog($event)"
+                          [(ngModel)]="chatMessage"
+                          style="resize: none"
+                          (ngModelChange)="capitalize()"
+                          (keypress)="sendMessage($event)"
+                          autofocus
+                        >
+                        </textarea>
+                        <span class="input-group-append">
+                          <button class="btn btn-secondary" type="submit">
+                            <i class="fa fa-arrow-right"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Tab -->
+      <div
+        class="tab-pane fade"
+        id="v-pills-notes"
+        role="tabpanel"
+        aria-labelledby="v-pills-notes-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-12 mb-3">
+            Notes
+            <div class="card">
+              <div class="row card-body">
+                <app-view-group-notes
+                  [show_dismiss]="false"
+                  #view_group_notes
+                  (onDismiss)="closeViews()"
+                  style="width: 100%"
+                >
+                </app-view-group-notes>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Tab -->
+      <div
+        class="tab-pane fade"
+        id="v-pills-documents"
+        role="tabpanel"
+        aria-labelledby="v-pills-documents-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-12 mb-3">
+            Documents
+            <div class="card">
+              <div class="row card-body">
+                <app-view-group-documents
+                  [show_dismiss]="false"
+                  #view_group_documents
+                  (onDismiss)="closeViews()"
+                  style="width: 100%"
+                >
+                </app-view-group-documents>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reports Tab -->
+      <div
+        class="tab-pane fade"
+        id="v-pills-reports"
+        role="tabpanel"
+        aria-labelledby="v-pills-documents-tab"
+      >
+        <div class="row" style="padding: 10px">
+          <div class="col-12 mb-3">
+            Reports
+            <div class="card">
+              <div class="row card-body">
+                <app-groups-report-builder
+                  [idGroup]="groupId"
+                  [origin]="'/groups/details/' + groupId"
+                ></app-groups-report-builder>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #editFormModal
+  identifier="editFormModal"
+  (onAnyCloseEvent)="selectedGroup = undefined"
+  customClass="large-modal"
+>
+  <group-form
+    *ngIf="selectedGroup"
+    [group]="selectedGroup"
+    (submit)="updateGroup(editFormModal, $event)"
+  ></group-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal #add_members_modal identifier="add_members_modal">
+  <!-- customClass="large-modal" -->
+  <!-- *ngIf="selectedGroup"
+[group]="selectedGroup" -->
+  <app-add-members-form
+    #add_members_form
+    (submit)="addMembers(add_members_modal, $event)"
+  ></app-add-members-form>
+</ngx-smart-modal>
+
+<!-- Add Events -->
+<ngx-smart-modal
+  #group_event_modal
+  identifier="group_event_modal"
+  customClass="full-screen-modal"
+  [dismissable]="false"
+  [closable]="false"
+  (onAnyCloseEventFinished)="resetEventForm(group_event_form)"
+>
+  <app-group-event-form
+    #group_event_form
+    (submit)="reloadEvents(group_event_modal, $event)"
+  ></app-group-event-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #form_simple_add
+  identifier="form_simple_add"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-simple-member-form
+    #simple_add
+    (onDismiss)="onModalEditDidDismiss(form_simple_add, $event)"
+  >
+  </app-simple-member-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #formEditMemberModal
+  identifier="formEditMemberModal"
+  customClass="large-modal"
+  (onAnyCloseEvent)="selectedContact = undefined"
+>
+  <h4>Edit contact | {{ selectedContact?.nombre }}</h4>
+  <member-form
+    #edit_member_form
+    [member]="selectedContact"
+    (onSubmit)="onModalEditMemberDidDismiss(formEditMemberModal, $event)"
+  ></member-form>
+</ngx-smart-modal>
+
+<fullscreen-modal
+  [(visible)]="visiblePixieModal"
+  (visibilityChange)="visiblePixieModal = $event"
+>
+  <pixie-editor
+    *ngIf="visiblePixieModal"
+    (onExport)="handlePixieExport($event)"
+  ></pixie-editor>
+</fullscreen-modal>

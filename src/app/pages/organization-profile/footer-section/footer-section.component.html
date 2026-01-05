@@ -1,0 +1,361 @@
+<nav
+  style="min-height: 70px"
+  [ngStyle]="{
+    'background-color': style_settings.background_color,
+    color: style_settings.text_color
+  }"
+  *ngIf="loading"
+></nav>
+<nav
+  *ngIf="!loading"
+  style="min-height: 70px"
+  [ngStyle]="{
+    'background-color': style_settings.background_color,
+    color: style_settings.text_color
+  }"
+  [ngClass]="{ navbar: footer_form.get('id').value == 1 }"
+>
+  <div
+    [ngClass]="{ 'col-12': footer_form.get('id').value == 1 }"
+    class="row mx-0 justify-content-end"
+    *ngIf="can_edit"
+  >
+    <div class="col-12 col-md-5 align-self-center">
+      <div class="form-group" [formGroup]="footer_form">
+        <label> Footer style </label>
+
+        <select formControlName="id" class="form-control">
+          <option [value]="footer.id" *ngFor="let footer of footers">
+            {{ footer.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-2 align-self-center mt-3">
+      <button class="btn btn-sm btn-success" (click)="saveFooter()">
+        Save
+      </button>
+    </div>
+  </div>
+  <!-- Style 1 -->
+  <a
+    class="navbar-brand"
+    [routerLink]="'/organization-profile/main/' + idOrganization + '/inicio'"
+    onclick="return false;"
+    *ngIf="footer_form.get('id').value == 1"
+  >
+    <img
+      [src]="fixUrl(organization?.Logo)"
+      [alt]="organization?.Nombre"
+      class="logo"
+      onerror="this.onerror=null; this.src='/assets/img/logoColor.png'"
+    />
+  </a>
+  <!-- Style 2 -->
+  <div class="row mx-0 py-4" *ngIf="footer_form.get('id').value == 2">
+    <div class="col-12 col-md-4 align-self-center">
+      <ng-container *ngTemplateOutlet="organization_logo"></ng-container>
+      <ng-container *ngTemplateOutlet="contact_info"></ng-container>
+    </div>
+    <div class="col-12 col-md-4 align-self-center">
+      <ng-container *ngTemplateOutlet="profile_tabs_template"></ng-container>
+    </div>
+    <div class="col-12 col-md-4 align-self-center">
+      <ng-container *ngTemplateOutlet="networks_template"></ng-container>
+      <ng-container *ngTemplateOutlet="store_networks_template"></ng-container>
+    </div>
+  </div>
+
+  <!-- Style 3 -->
+  <div class="row mx-0 py-4" *ngIf="footer_form.get('id').value == 3">
+    <div class="col-12 col-md-4 align-self-center">
+      <ng-container *ngTemplateOutlet="profile_tabs_template"></ng-container>
+    </div>
+    <div class="col-12 col-md-4 align-self-center">
+      <ng-container *ngTemplateOutlet="organization_logo"></ng-container>
+      <ng-container *ngTemplateOutlet="networks_template"></ng-container>
+    </div>
+    <div class="col-12 col-md-4 align-self-center">
+      <div class="row mx-0 justify-content-center align-content-start">
+        <div
+          [ngClass]="{
+            'col-8':
+              footer_form.get('id').value == 2 ||
+              footer_form.get('id').value == 3
+          }"
+        >
+          <div class="text-center">
+            <h5 [ngStyle]="{ color: style_settings.text_color }">
+              <i> Escríbenos y Visítanos </i>
+            </h5>
+          </div>
+          <ng-container *ngTemplateOutlet="contact_info"></ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style 4 -->
+  <div
+    class="row mx-0 py-3 justify-content-center"
+    *ngIf="footer_form.get('id').value == 4"
+  >
+    <div class="col-12 col-md-5 align-self-center">
+      <ng-container *ngTemplateOutlet="organization_logo"></ng-container>
+      <ng-container *ngTemplateOutlet="networks_template"></ng-container>
+    </div>
+    <div class="col-12 col-md-10 align-self-center tabs-horizontal">
+      <ng-container *ngTemplateOutlet="profile_tabs_template"></ng-container>
+    </div>
+  </div>
+</nav>
+
+<ng-template #contact_info>
+  <div class="row m-0 p-0" *ngFor="let phone of phones; let last = last">
+    <div class="col-1 align-self-center">
+      <i
+        class="fa fa-phone-alt"
+        [ngStyle]="{
+          'font-size': phones.length > 1 ? '24px' : '24px',
+          color: style_settings.active_text_color
+        }"
+        aria-hidden="true"
+      ></i>
+    </div>
+    <div class="col">
+      <span
+        [ngStyle]="{
+          color: style_settings.active_text_color
+        }"
+        *ngIf="phones.length > 1"
+      >
+        {{ phone.name }}
+        <br />
+      </span>
+      <a
+        [ngStyle]="{ color: style_settings.text_color }"
+        [href]="'tel:' + phone.country_code + phone.phone"
+      >
+        <small>
+          {{ phone.country_code + " " + phone.phone }}
+        </small>
+      </a>
+    </div>
+    <div *ngIf="!last" class="w-100"></div>
+    <div *ngIf="!last" class="col-6 text-center">
+      <hr
+        [ngStyle]="{
+          'border-color': style_settings.active_text_color
+        }"
+        class="my-1"
+      />
+    </div>
+  </div>
+
+  <div *ngIf="phones.length > 0 && emails.length > 0" class="row mx-0">
+    <div class="col-8 text-center">
+      <hr
+        [ngStyle]="{
+          'border-color': style_settings.active_text_color
+        }"
+        class="my-1"
+      />
+    </div>
+  </div>
+
+  <div class="row m-0 p-0" *ngFor="let email of emails; let last = last">
+    <div class="col-1 align-self-center">
+      <i
+        class="fa fa-envelope"
+        [ngStyle]="{
+          'font-size': emails.length > 1 ? '24px' : '24px',
+          color: style_settings.active_text_color
+        }"
+        aria-hidden="true"
+      ></i>
+    </div>
+    <div class="col">
+      <span
+        [ngStyle]="{
+          color: style_settings.active_text_color
+        }"
+        *ngIf="emails.length > 1"
+      >
+        {{ email.name }}
+        <br />
+      </span>
+      <a
+        [ngStyle]="{ color: style_settings.text_color }"
+        [href]="'mailto:' + email.email"
+        target="_blank"
+      >
+        <small>
+          {{ email.email }}
+        </small>
+      </a>
+    </div>
+    <div *ngIf="!last" class="w-100"></div>
+    <div *ngIf="!last" class="col-6 text-center">
+      <hr
+        [ngStyle]="{
+          'border-color': style_settings.active_text_color
+        }"
+        class="my-1"
+      />
+    </div>
+  </div>
+  <div
+    *ngIf="emails.length > 0 || (phones.length > 0 && emails.length == 0)"
+    class="row mx-0"
+  >
+    <div class="col-8 text-center">
+      <hr
+        [ngStyle]="{
+          'border-color': style_settings.active_text_color
+        }"
+        class="my-1"
+      />
+    </div>
+  </div>
+  <div
+    class="row m-0 p-0"
+    *ngFor="let address of addresses_items; let last = last"
+  >
+    <div class="col-1 align-self-center">
+      <i
+        class="fa fa-map-marker"
+        [ngStyle]="{
+          'font-size': '24px',
+          color: style_settings.active_text_color
+        }"
+        aria-hidden="true"
+      ></i>
+    </div>
+    <div class="col">
+      <span
+        [ngStyle]="{
+          color: style_settings.active_text_color
+        }"
+        *ngIf="addresses.length > 1"
+      >
+        {{ address.name }}
+        <br />
+      </span>
+      <small *ngIf="!address.url">
+        {{ address.full_address }}
+      </small>
+      <a
+        *ngIf="address.url"
+        [href]="address.url"
+        target="_blank"
+        [ngStyle]="{ color: style_settings.text_color }"
+      >
+        <small class="p-as-h5">
+          {{ address.full_address }}
+        </small>
+      </a>
+    </div>
+    <div *ngIf="!last" class="w-100"></div>
+    <div *ngIf="!last" class="col-6 text-center">
+      <hr
+        [ngStyle]="{
+          'border-color': style_settings.active_text_color
+        }"
+        class="my-1"
+      />
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #networks_template>
+  <div class="row mx-0 flex-wrap justify-content-center">
+    <div class="col-2 align-self-center" *ngFor="let net of non_store_networks">
+      <!-- (click)="net.event(iglesia[net.id])" -->
+      <div (click)="handleAction(net)" class="row m-0">
+        <!-- <img
+        *ngIf="is_live(net)"
+        class="on-live"
+        style="display: inline-block"
+        src="/assets/img/on_live.gif"
+        alt="Playing actually..."
+      /> -->
+        <div class="">
+          <i
+            *ngIf="!net.is_custom_icon"
+            [ngClass]="net.icon_svg"
+            [ngStyle]="{
+              background: style_settings.active_color,
+              color: style_settings.active_text_color
+            }"
+            class="bigIcon rounded-circle"
+          ></i>
+          <img
+            class="bigIcon"
+            *ngIf="net.is_custom_icon"
+            [src]="fixUrl(net.icon_path)"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #store_networks_template>
+  <div
+    class="row mx-0 justify-content-center"
+    *ngIf="store_networks.length > 0"
+  >
+    <div class="col-12 text-center">
+      <h5 [ngStyle]="{ color: style_settings.text_color }">
+        <i> Descarga nuestra app </i>
+      </h5>
+    </div>
+    <div class="col-6" *ngFor="let network of store_networks">
+      <div (click)="handleAction(network)">
+        <img
+          *ngIf="network.idNetwork == 9"
+          class="store-logos"
+          src="/assets/img/google-play-badge.png"
+        />
+        <img
+          *ngIf="network.idNetwork == 10"
+          class="store-logos"
+          src="/assets/img/apple_transparent.png"
+        />
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #profile_tabs_template>
+  <div class="row mx-0 justify-content-center align-content-start">
+    <div
+      [ngClass]="{
+        'col-8':
+          footer_form.get('id').value == 2 || footer_form.get('id').value == 3
+      }"
+      class="text-left"
+      *ngFor="let item of profile_tabs_items"
+      [hidden]="!((item.is_visible && shouldShow(item)) || can_edit)"
+    >
+      <div
+        class="nav-item dropdown"
+        style="display: inline-block; text-align: left"
+      >
+        <a
+          *ngIf="(item.is_visible && shouldShow(item)) || can_edit"
+          class="nav-link dropbtn py-1"
+          (click)="handleTabClick(item)"
+        >
+          {{ item.name }}
+        </a>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #organization_logo>
+  <div class="img-container" *ngIf="organization">
+    <img [src]="fixUrl(organization?.Logo, true)" [alt]="organization.Nombre" />
+  </div>
+</ng-template>

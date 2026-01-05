@@ -1,0 +1,9 @@
+<div class="fullscreen-modal-container" [hidden]="!visible">
+  <div class="text-right">
+    <button mat-flat-button color="red" (click)="visible = false">
+      Close editor
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <ng-content></ng-content>
+</div>

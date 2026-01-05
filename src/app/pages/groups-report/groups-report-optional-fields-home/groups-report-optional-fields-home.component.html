@@ -1,0 +1,113 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">Viewing Optional Fields |</h4>
+    <div *ngIf="!show_editable" class="col-1">
+      <button
+        class="btn btn-outline-citric"
+        [routerLink]="'/groups/reports/' + idGroupReport + '/detail'"
+      >
+        X
+      </button>
+    </div>
+
+    <div class="col-12 row">
+      <div class="col-3 offset-9">
+        <button
+          *ngIf="!getPermissions() && !show_editable"
+          class="btn btn-sm btn-outline-success mt-3 mb-3 mr-2"
+          (click)="activateForm()"
+          [disabled]="show_editable"
+        >
+          Add Optional field
+        </button>
+
+        <button
+          *ngIf="!show_editable"
+          class="btn btn-sm btn-citric"
+          routerLink="/groups/reports/optional_field_categories"
+          [queryParams]="{
+            origin: '/groups/reports/' + idGroupReport + '/optional_fields'
+          }"
+        >
+          Categories
+        </button>
+      </div>
+      <div *ngIf="show_editable" class="col-12 p-0">
+        <app-groups-report-optional-fields-form
+          #groups_report_optional_fields_form
+          [idGroupReport]="idGroupReport"
+          (onDismiss)="deactivateForm($event)"
+        ></app-groups-report-optional-fields-form>
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="category"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div
+      [hidden]="show_loading || show_editable"
+      class="col-12 p-0"
+      style="min-height: 500px"
+    >
+      <table class="table row-border hover table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th *ngIf="!getPermissions()">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let optional_field of optional_fields; let i = index">
+            <td>
+              {{ optional_field.name }}
+            </td>
+            <td>
+              {{ optional_field.description }}
+            </td>
+            <td>
+              {{ optional_field.input_type_name }}
+              <span *ngIf="optional_field.input_display_type_name">
+                <small class="text-secondary">
+                  ({{ optional_field.input_display_type_name }})
+                </small>
+              </span>
+            </td>
+            <td>
+              {{ optional_field.category_name }}
+            </td>
+            <td *ngIf="!getPermissions()">
+              <div class="btn-group">
+                <button
+                  (click)="updateOptionalField(optional_field)"
+                  [disabled]="show_editable"
+                  class="btn btn-sm fixed-padding"
+                >
+                  <i class="fa fa-edit text-info"></i>
+                </button>
+                <button
+                  class="btn btn-sm fixed-padding"
+                  (click)="deleteOptionalField(optional_field)"
+                  [disabled]="show_editable"
+                >
+                  <i class="fa fa-trash-alt text-danger"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

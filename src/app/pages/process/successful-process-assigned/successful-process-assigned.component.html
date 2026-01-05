@@ -1,0 +1,32 @@
+<!-- Already assigned -->
+<div class="px-5">
+  <div class="row justify-content-center">
+    <h2 class="col-9 text-citric text-center">
+      {{'process.wen_step_welcome_disclaimer' | translate | replace : "user_name"
+      : currentUser.nombre:"user_last_name" : currentUser.apellido}}
+    </h2>
+    <h4 class="col-9 text-citric text-center">
+      <span class="text-secondary">
+        <br />
+        {{'process.congrats_disclaimer' | translate | replace: "name" : process_info?.step_name}}
+        <p class="text-secondary">{{'process.confirm_the_info' | translate }}</p>
+        <h6>
+          {{'process.belongs_to_part_1' | translate}}
+          <span class="text-citric">{{process_info.level_name}}</span
+          >{{'process.belongs_to_part_2' | translate}}
+          <span class="text-citric">{{process_info.process_name}}</span>.
+        </h6>
+      </span>
+    </h4>
+  </div>
+  <div class="row card-body is-vh-centered">
+    <div class="col-8 text-center">
+      <button
+        class="btn btn-sm btn-citric"
+        (click)="handleRedirectByRole(currentUser)"
+      >
+        {{'generals.my_profile' | translate}}
+      </button>
+    </div>
+  </div>
+</div>

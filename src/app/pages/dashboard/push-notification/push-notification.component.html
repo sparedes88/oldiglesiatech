@@ -1,0 +1,82 @@
+<div class="container page">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <h4 class="col-11" style="color: white;">Make Push Notification</h4>
+          <div class="col-1">
+            <button class="btn btn-outline-citric btn-sm" (click)="dismiss()">
+              X
+            </button>
+          </div>
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/push_notification_banner_new.png"
+        />
+      </div>
+    </div>
+
+    <div style="width: 100%;" class="row mt-3">
+      <div class="col-9 col-md-8">
+        <div class="row col-12 justify-content-center">
+          <div class="col-12">
+            <div class="form-group">
+              <label for="name">Title (optional)</label>
+              <input
+                class="form-control"
+                [(ngModel)]="message.title"
+                type="text"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="row col-12 justify-content-center">
+          <div class="col-12">
+            <div class="form-group">
+              <label for="name">Body:*</label>
+              <textarea
+                class="form-control"
+                name="body"
+                cols="30"
+                rows="10"
+                [(ngModel)]="message.body"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 offset-3 text-center">
+          <button class="btn btn-citric" (click)="submit()">
+            Send Notification
+          </button>
+        </div>
+      </div>
+
+      <div class="col-3 col-md-4 card">
+        <h5 class="mt-2 text-citric">
+          Lastest notifications
+        </h5>
+        <div class="card mt-2" *ngFor="let item of array; let i = index">
+          <div class="card-header">
+            <div style="width: 100%;" class="row">
+              <span class="col-12" [ngClass]="!item.title ? 'italic' : ''">
+                {{ item.title || "Sent it without title" }}
+              </span>
+              <span class="col-6 text-muted notification-info">
+                {{ item.created_at | date: "MMM. dd yyyy hh:mm a" }}
+              </span>
+              <span class="col-6 text-muted notification-info">
+                {{ item.created_by_user }}
+              </span>
+            </div>
+          </div>
+          <div class="card-body">
+            {{ item.body }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

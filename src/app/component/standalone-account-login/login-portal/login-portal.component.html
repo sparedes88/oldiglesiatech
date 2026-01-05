@@ -1,0 +1,119 @@
+<form style="width: 100%" [formGroup]="login_form">
+  <div class="col-12" [hidden]="!show_detail_loading">
+    <ng-template [ngIf]="show_detail_loading">
+      <div class="d-flex justify-content-center" style="margin: 140px">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+  </div>
+
+  <div
+    [hidden]="show_detail_loading"
+    class="row justify-content-center align-content-center"
+    style="min-height: 500px"
+  >
+    <div class="col-12 text-right">
+      <button
+        class="btn btn-sm btn-outline-citric mx-5"
+        (click)="cancel_login.emit()"
+        type="button"
+      >
+        {{ close_button_text }}
+      </button>
+    </div>
+    <div class="col-9 align-self-center">
+      <h2 class="text-citric text-center">
+        {{ "login.login_portal" | translate | uppercase }}
+      </h2>
+      <h3 class="text-citric text-center">
+        {{ "login.please_login" | translate }}
+      </h3>
+    </div>
+    <div class="col-8">
+      <div
+        *ngIf="
+          full_form.get('get_started_form').get('login_type').value === 'email'
+        "
+        class="form-group"
+      >
+        <label>Email * </label>
+        <input
+          type="text"
+          required
+          class="form-control mb-1"
+          [placeholder]="
+            'general.type_your_info_name'
+              | translate
+              | replace: 'name':'Miembro_Correo'
+          "
+          formControlName="usuario"
+          readonly
+          [class.is-invalid]="
+            login_form.get('usuario').dirty && login_form.get('usuario').invalid
+          "
+        />
+      </div>
+
+      <div
+        *ngIf="
+          full_form.get('get_started_form').get('login_type').value === 'phone'
+        "
+        class="form-group"
+      >
+        <label>{{ "Miembro_Telefono" | translate }} * </label>
+        <input
+          class="form-control"
+          placeholder="(999) 999-9999."
+          type="tel"
+          formControlName="usuario"
+          readonly
+        />
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="form-group">
+        <label>{{ "Miembro_Password" | translate }} * </label>
+        <input
+          type="password"
+          required
+          class="form-control mb-1"
+          [placeholder]="
+            'general.type_your_info_name'
+              | translate
+              | replace: 'name':'Login_Password'
+          "
+          formControlName="password"
+          [class.is-invalid]="
+            login_form.get('password').dirty &&
+            login_form.get('password').invalid
+          "
+        />
+      </div>
+    </div>
+    <div class="w-100"></div>
+    <div class="col-6 text-center align-self-center">
+      <button
+        class="btn btn-sm btn-citric"
+        type="submit"
+        [disabled]="login_form.invalid"
+        (click)="makeLogin(login_form)"
+      >
+        {{ "Login_Button" | translate }}
+      </button>
+    </div>
+    <div class="col-6 text-center align-self-center">
+      <button
+        class="btn btn-sm btn-medium"
+        type="button"
+        [disabled]="login_form.get('usuario').invalid"
+        (click)="resetPassword(login_form)"
+      >
+      {{'login.forgot_my_password' | translate}}
+      </button>
+    </div>
+  </div>
+</form>

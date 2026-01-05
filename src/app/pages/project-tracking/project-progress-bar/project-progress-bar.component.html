@@ -1,0 +1,12 @@
+<div class="progress">
+  <div
+    class="progress-bar progress-bar-striped"
+    [ngClass]="progressClass"
+    role="progressbar"
+    [ngStyle]="{ width: currentProgress + '%' }"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
+    <b>Progress {{ currentProgress }}%</b>
+  </div>
+</div>

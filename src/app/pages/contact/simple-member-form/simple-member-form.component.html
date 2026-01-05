@@ -1,0 +1,369 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{ user?.idUser ? "Editing " + user?.email : "Create User" }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div #basic_form="ngForm" [formGroup]="basicInfoForm" style="width: 100%">
+    <div class="row">
+      <div [hidden]="user?.idUser" class="col-9 col-md-6">
+        <div class="form-group">
+          <label floating class="text-muted" class="width-fix">
+            Email: <span class="text-danger">*</span>
+            <span
+              class="text-danger"
+              *ngIf="basicInfoForm.get('email').invalid"
+            >
+              * Please fill this with a valid email.
+            </span>
+            <span
+              class="text-danger"
+              *ngIf="!userAvailable && !errorChecking && isChecked"
+            >
+              * This user is already in use.
+            </span>
+            <span class="text-danger" *ngIf="!userAvailable && errorChecking">
+              * Couldn't check availability in this moment. Try again.
+            </span>
+            <span
+              class="text-success"
+              *ngIf="
+                basicInfoForm.get('email').valid &&
+                userAvailable &&
+                !errorChecking
+              "
+            >
+              User available.
+            </span>
+            <span class="text-muted" *ngIf="loading">
+              Checking availability...
+            </span>
+          </label>
+          <input
+            class="form-control col-12"
+            type="email"
+            formControlName="email"
+            (keyup)="startTimeout($event)"
+            (keydown)="clearTimeout($event)"
+            required
+            [readonly]="loading"
+          />
+        </div>
+        <div>
+          <button
+            (click)="showLoading(); checkUser()"
+            class="btn btn-sm btn-outline-citric float-right"
+          >
+            Check user
+          </button>
+          <button
+            *ngIf="display_re_add"
+            (click)="reAddUser()"
+            class="btn btn-sm btn-outline-success float-right mr-2"
+          >
+            Re add user
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="select_manual_organization" class="col-3 col-md-6">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label for="idOrganization">
+            Organization to link <span class="text-danger">*</span>
+          </label>
+          <ng-multiselect-dropdown
+            #multi_select
+            placeholder="Select an organization"
+            [data]="iglesias"
+            [settings]="selectOptions"
+            formControlName="idIglesia"
+          ></ng-multiselect-dropdown>
+        </div>
+      </div>
+      <div *ngIf="select_manual_organization" class="col-3 col-md-6">
+        <div class="form-group" style="display: flex; flex-direction: column">
+          <label for="idUserType">
+            Role <span class="text-danger">*</span>
+          </label>
+          <ng-multiselect-dropdown
+            #multi_user_type_select
+            placeholder="Select an user type"
+            [data]="user_types"
+            [settings]="selectUserTypeOptions"
+            formControlName="idUserType"
+          ></ng-multiselect-dropdown>
+        </div>
+      </div>
+
+      <div
+        class="col-9 col-md-6 text-right align-self-center"
+        *ngIf="select_manual_organization"
+      >
+        <button
+          class="btn btn-sm btn-success"
+          type="button"
+          [disabled]="
+            basicInfoForm.get('idIglesia').value.length === 0 ||
+            basicInfoForm.get('idUserType').value.length === 0
+          "
+          (click)="linkUserToOrganization()"
+        >
+          Submit
+        </button>
+      </div>
+
+      <div
+        class="row col-12"
+        [hidden]="
+          basicInfoForm.get('email').invalid ||
+          (basicInfoForm.get('email').valid && !userAvailable) ||
+          errorChecking
+        "
+      >
+        <div class="col-4">
+          <div class="form-group">
+            <label for="estimated">
+              First Name <span class="text-danger">*</span>
+            </label>
+            <input
+              class="form-control"
+              placeholder="User name."
+              type="text"
+              formControlName="nombre"
+              required
+              [class.is-invalid]="
+                basicInfoForm.get('nombre').touched &&
+                basicInfoForm.get('nombre').invalid
+              "
+            />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="form-group">
+            <label for="estimated">
+              Lastname <span class="text-danger">*</span>
+            </label>
+            <input
+              class="form-control"
+              placeholder="User last name."
+              type="text"
+              formControlName="apellido"
+              required
+              [class.is-invalid]="
+                basicInfoForm.get('apellido').touched &&
+                basicInfoForm.get('apellido').invalid
+              "
+            />
+          </div>
+        </div>
+
+        <div class="row col-4 align-items-center">
+          <div [hidden]="!show_super_user_fields" class="col-12 col-md-12">
+            <div class="from-group">
+              <label class="text-muted"> Is Super User? </label>
+              <ng-toggle
+                class="form-control"
+                onColor="success"
+                onText="Yes"
+                offclass="text-danger"
+                offText="No"
+                formControlName="isSuperUser"
+              >
+              </ng-toggle>
+            </div>
+          </div>
+        </div>
+
+        <div [hidden]="!user?.idUser" class="row col-4 align-items-center">
+          <div class="col-12 col-md-12">
+            <div class="from-group">
+              <label class="text-muted"> Reset Pass? </label>
+              <ng-toggle
+                class="form-control"
+                onColor="success"
+                onText="Yes"
+                offclass="text-danger"
+                offText="No"
+                formControlName="reset_password"
+                (valueChange)="printEvent($event)"
+              >
+              </ng-toggle>
+            </div>
+          </div>
+        </div>
+
+        <div
+          [hidden]="
+            user?.idUser &&
+            user?.idUser &&
+            !basicInfoForm.get('reset_password').value
+          "
+          class="col-4"
+        >
+          <div class="form-group">
+            <label for="estimated">
+              Password <span class="text-danger">*</span>
+            </label>
+            <input
+              class="form-control"
+              placeholder="Type your pass."
+              type="password"
+              formControlName="password"
+              required
+              [class.is-invalid]="
+                basicInfoForm.get('password').touched &&
+                basicInfoForm.get('password').invalid
+              "
+            />
+          </div>
+          <div>
+            <span
+              class="text-danger"
+              *ngIf="basicInfoForm.get('password').invalid"
+            >
+              * Please fill this info (Min 6 characters)
+            </span>
+          </div>
+          <br />
+        </div>
+
+        <div [hidden]="user?.idUser" class="col-4">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization">
+              Organization <span class="text-danger">*</span>
+            </label>
+            <ng-multiselect-dropdown
+              #multi_select
+              placeholder="Select an organization"
+              [data]="iglesias"
+              [settings]="selectOptions"
+              formControlName="idIglesia"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div [hidden]="user?.idUser" class="row col-4 align-items-center">
+          <div class="col-12 col-md-12">
+            <div class="from-group">
+              <label class="text-muted"> New Member? </label>
+              <ng-toggle
+                class="form-control"
+                onColor="success"
+                onText="Yes"
+                offclass="text-danger"
+                offText="No"
+                formControlName="isNewUser"
+                innerState="false"
+              >
+              </ng-toggle>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="user?.idUser" class="w-100"></div>
+
+        <div class="col-4 align-items-center">
+          <div class="form-group">
+            <label for="estimated">
+              Country Code <span class="text-danger">*</span>
+            </label>
+            <app-custom-select-country
+              #custom_select_country
+              [return_value]="'callingCode'"
+              formControlName="country_code"
+              [idOrganization]="currentUser?.idIglesia"
+              [preselected_country_code]="user?.country_code"
+              [class.is-invalid]="basicInfoForm.get('country_code').invalid"
+            >
+            </app-custom-select-country>
+          </div>
+        </div>
+        <div class="col-4 align-items-center">
+          <div class="form-group">
+            <label for="estimated">
+              Cell Phone <span class="text-danger">*</span>
+            </label>
+            <input
+              class="form-control"
+              placeholder="(999) 999-9999."
+              type="tel"
+              formControlName="telefono"
+              [dropSpecialCharacters]="false"
+              mask="(000) 000-0000"
+              [class.is-invalid]="
+                basicInfoForm.get('telefono').touched &&
+                basicInfoForm.get('telefono').invalid
+              "
+            />
+          </div>
+        </div>
+
+        <div class="col-4" [hidden]="user?.idUser">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idUserType">
+              Role <span class="text-danger">*</span>
+            </label>
+            <ng-multiselect-dropdown
+              #multi_user_type_select
+              placeholder="Select an user type"
+              [data]="user_types"
+              [settings]="selectUserTypeOptions"
+              formControlName="idUserType"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div class="w-100"></div>
+        <!-- <div class="col-4">
+          <div class="form-group">
+            <label for="estimated">Repeat Password</label>
+            <input
+              class="form-control"
+              placeholder="User last name."
+              type="text"
+              formControlName="apellido"
+              required
+            />
+          </div>
+        </div> -->
+        <h6 class="col-12 text-citric">Location Info (optional)</h6>
+
+        <div class="col-xs-12 col-md-6 mb-4">
+          <label class="col-12">
+            <span style="pointer-events: none"> Address </span>
+          </label>
+          <div class="input-group">
+            <google-address-component
+              *ngIf="init_map"
+              [value]="basicInfoForm.get('location').value"
+              placeholder="Please type the location info about this member."
+              adressType="address"
+              (setAddress)="getAddress($event)"
+            ></google-address-component>
+          </div>
+          <span
+            class="text-danger error-span"
+            *ngIf="basicInfoForm.get('ciudad').invalid"
+          >
+            * Please fill this info
+          </span>
+        </div>
+
+        <div class="w-100"></div>
+
+        <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+          <button
+            [disabled]="serverBusy"
+            (click)="onRegister()"
+            class="btn btn-citric searchButton"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

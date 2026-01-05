@@ -1,0 +1,24 @@
+.card-fixed-text.row {
+  div,
+  h4 {
+    margin-top: 30px;
+  }
+}
+
+.card-header,
+.card-body {
+  padding: 3px !important;
+}
+
+.col-3.col-md-4.card {
+  max-height: 426px;
+  overflow: scroll;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.notification-info {
+  font-size: 11px;
+}

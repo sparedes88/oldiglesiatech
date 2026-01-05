@@ -1,0 +1,99 @@
+<h2 class="mb-5 mb-md-0">
+  Group Reports Builder
+  <div class="float-right" *ngIf="!hide_header && !show_editable">
+    <button class="btn btn-sm btn-citric mr-2" (click)="activateForm()">
+      <i class="fa fa-plus"></i> Create report
+    </button>
+  </div>
+</h2>
+<hr />
+
+<div *ngIf="show_editable && show_detail">
+  <app-groups-report-builder-form
+    #groups_report_form
+    [idGroup]="group_id"
+    [organization]="organization"
+    (on_dismiss)="deactivateForm($event)"
+  ></app-groups-report-builder-form>
+</div>
+
+<ng-template [ngIf]="!show_detail">
+  <div class="d-flex justify-content-center" style="margin: 140px">
+    <div
+      class="spinner-border text-citric"
+      style="width: 6rem; height: 6rem"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<table
+  *ngIf="!show_editable && show_detail"
+  class="table row-border hover table-striped col-12"
+>
+  <thead>
+    <tr>
+      <th>Report Name</th>
+      <th>Date</th>
+      <th>Composed by</th>
+      <th style="max-width: 320px; width: 320px">
+        Belongs to group<small>(s)</small>
+      </th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let report of reports; let i = index">
+      <td>
+        {{ report.name }}
+      </td>
+      <td>
+        {{ report.report_date }}
+      </td>
+      <td>
+        {{ report.composed_by_name }}
+      </td>
+      <td>
+        <span class="text-secondary">
+          {{ report.groups_belongs_to_name }}
+        </span>
+      </td>
+      <td>
+        <!-- <button class="btn btn-sm" (click)="editReport(report)">
+          <i class="fa fa-edit text-warning"> </i>
+        </button> -->
+        <button
+          class="btn btn-sm"
+          [routerLink]="'/groups/reports/' + report.id + '/detail'"
+          [queryParams]="{ origin: origin }"
+        >
+          <i class="fa fa-eye text-info"> </i>
+        </button>
+        <button
+          [disabled]="busy"
+          class="btn btn-sm"
+          (click)="toggleAsTemplate(report)"
+        >
+          <i
+            [ngClass]="{
+              'text-success': report.is_template,
+              'text-secondary': !report.is_template
+            }"
+            class="fa fa-globe"
+          >
+          </i>
+        </button>
+        <button class="btn btn-sm" (click)="makeACopy(report)">
+          <i class="text-secondary fa fa-copy"> </i>
+        </button>
+        <br />
+        <button class="btn btn-sm" (click)="editRecord(report)">
+          <i class="fa fa-edit text-info"></i>
+        </button>
+        <button class="btn btn-sm" (click)="deleteRecord(report)">
+          <i class="fa fa-trash-alt text-danger"></i>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

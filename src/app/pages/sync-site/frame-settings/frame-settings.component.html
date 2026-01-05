@@ -1,0 +1,625 @@
+<div class="container page">
+  <div class="row">
+    <!-- <div class="col-12">
+      <h2>
+        <span class="text-secondary"> Settings </span>|
+        {{ organization?.Nombre }}
+      </h2>
+    </div> -->
+    <hr />
+    <div class="col-12">
+      <h2>Frame settings</h2>
+
+      <div class="col-12" [formGroup]="options_form">
+        <h5>Select a module:</h5>
+        <div class="form-check" *ngFor="let module of modules">
+          <input
+            formControlName="module"
+            (change)="setOptions($event)"
+            class="form-check-input"
+            type="radio"
+            [id]="module.id"
+            [value]="module.id"
+            checked
+          />
+          <label class="form-check-label" [for]="module.id">
+            {{ module.name }}
+          </label>
+        </div>
+        <div class="mt-2" *ngIf="options_form.get('module').value">
+          <h6 class="mb-0">Which embed option you want to use?</h6>
+          <div class="form-check ml-3" *ngFor="let option of options">
+            <input
+              formControlName="option"
+              (change)="setInstructions($event)"
+              class="form-check-input"
+              type="radio"
+              [id]="option.value"
+              [value]="option.value"
+              checked
+            />
+            <label class="form-check-label" [for]="option.value">
+              {{ option.name }}
+              <small class="text-secondary">
+                (Ready {{ option.percent }}%)</small
+              >
+            </label>
+          </div>
+
+          <div
+            class="form-check ml-3 mt-2"
+            *ngIf="selected_module?.support_full_width"
+          >
+            <input
+              [(ngModel)]="is_full_width"
+              [ngModelOptions]="{ standalone: true }"
+              class="form-check-input"
+              type="checkbox"
+              id="is_full_width"
+              [checked]="is_full_width"
+            />
+            <label class="form-check-label" for="is_full_width">
+              Embed with full width?
+            </label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-md-6" *ngIf="selected_option?.has_form">
+            <div
+              *ngIf="
+                options_form.get('module').value == 'articles' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-md-6 col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select a category </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="id"
+                  >
+                    <!-- [(ngModel)]="id"
+                    [ngModelOptions]="{}" -->
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option
+                      *ngFor="let category of categories"
+                      [value]="category.idCategoriaArticulo"
+                    >
+                      {{ category.nombre | translate }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <style-editor
+                [type]="'articles'"
+                [(ngModel)]="styles"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="printValue($event)"
+              ></style-editor>
+            </div>
+
+            <div
+              *ngIf="
+                options_form.get('module').value == 'media' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-md-6 col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+                <div class="form-group">
+                  <div class="form-check">
+                    <input
+                      formControlName="type"
+                      (change)="onPrintEvent($event)"
+                      class="form-check-input"
+                      type="radio"
+                      id="tab"
+                      value="tab"
+                      checked
+                    />
+                    <label class="form-check-label" for="tab">
+                      Select a tab
+                    </label>
+                  </div>
+                  <small class="text-secondary"> Or </small>
+                  <div class="form-check">
+                    <input
+                      formControlName="type"
+                      (change)="onPrintEvent($event)"
+                      class="form-check-input"
+                      type="radio"
+                      id="playlist"
+                      value="playlist"
+                    />
+                    <label class="form-check-label" for="playlist">
+                      Select playlist
+                    </label>
+                  </div>
+                </div>
+                <div
+                  *ngIf="options_form.get('type').value === 'tab'"
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select a tab </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="tab_id"
+                    (change)="getPlaylistsInTab()"
+                  >
+                    <!-- [(ngModel)]="id"
+                  [ngModelOptions]="{}" -->
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option *ngFor="let tab of media_tabs" [value]="tab.id">
+                      {{ tab.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div
+                  *ngIf="
+                    options_form.get('type').value === 'playlist' ||
+                    (options_form.get('type').value === 'tab' &&
+                      options_form.get('tab_id').value)
+                  "
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select a playlist </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="id"
+                    (change)="setSortType()"
+                  >
+                    <!-- [(ngModel)]="id"
+                    [ngModelOptions]="{}" -->
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option
+                      *ngFor="let playlist of playlists"
+                      [value]="playlist.idPlaylist"
+                    >
+                      {{ playlist.name }}
+                    </option>
+                  </select>
+                </div>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                  *ngIf="options_form.get('type').value === 'playlist'"
+                >
+                  <label class="hide-control" for="idOrganization">
+                    Sort type
+                  </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="sort_type"
+                  >
+                    <option value="date_asc">First created first</option>
+                    <option value="date_desc">Last created first</option>
+                    <option value="alpha_asc">Alphabetical</option>
+                    <option value="alpha_desc">Reverse alphabetical</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                options_form.get('module').value == 'forms' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-md-6 col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select a form </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="id"
+                    (change)="printValue()"
+                  >
+                    <!-- [(ngModel)]="id"
+                    [ngModelOptions]="{}" -->
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option
+                      *ngFor="let contact_inbox of contact_inboxes"
+                      [value]="contact_inbox.id"
+                    >
+                      {{ contact_inbox.name }}
+                    </option>
+                  </select>
+                </div>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select a language </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    (change)="printValue()"
+                    [(ngModel)]="selected_language"
+                    [ngModelOptions]="{ standalone: true }"
+                  >
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option value="es">Español</option>
+                    <option value="en">English</option>
+                  </select>
+                </div>
+                <div class="form-check ml-3">
+                  <input
+                    [(ngModel)]="contact_inbox_options.logo"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-check-input"
+                    type="checkbox"
+                    id="display_organization_logo"
+                    [checked]="contact_inbox_options.logo"
+                  />
+                  <label
+                    class="form-check-label"
+                    for="display_organization_logo"
+                  >
+                    Display organization's logo?
+                  </label>
+                </div>
+                <div class="form-check ml-3">
+                  <input
+                    [(ngModel)]="contact_inbox_options.name"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-check-input"
+                    type="checkbox"
+                    id="display_organization_name"
+                    [checked]="contact_inbox_options.name"
+                  />
+                  <label
+                    class="form-check-label"
+                    for="display_organization_name"
+                  >
+                    Display organization's name?
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                options_form.get('module').value == 'galleries' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-md-6 col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> View mode </label>
+                  <select
+                    [(ngModel)]="styles.idGalleryViewMode"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control"
+                    (change)="checkActualViewSetting()"
+                  >
+                    <option value="1">Gallery</option>
+                    <option value="2">Album</option>
+                  </select>
+                </div>
+
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label>
+                    <span *ngIf="styles?.idGalleryViewMode == 1">
+                      Select a gallery
+                    </span>
+                    <span *ngIf="styles?.idGalleryViewMode == 2">
+                      Select an album
+                    </span>
+                  </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="id"
+                    (change)="printValue()"
+                  >
+                    <!-- [(ngModel)]="id"
+                    [ngModelOptions]="{}" -->
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option
+                      *ngFor="let element of galleries_or_albums"
+                      [value]="element.id"
+                    >
+                      {{ element.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="
+                options_form.get('module').value == 'directories' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-md-6 col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select a directory </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="id"
+                    (change)="printValue()"
+                  >
+                    <!-- [(ngModel)]="id"
+                    [ngModelOptions]="{}" -->
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option
+                      *ngFor="let directory of directories"
+                      [value]="directory.id"
+                    >
+                      {{ directory.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-check ml-3">
+                  <input
+                    [(ngModel)]="directory_options.v2"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-check-input"
+                    type="checkbox"
+                    id="networks_icon_only"
+                    [checked]="directory_options.v2"
+                  />
+                  <label class="form-check-label" for="networks_icon_only">
+                    Use new style?
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                options_form.get('module').value == 'networks' &&
+                selected_option?.has_form
+              "
+            >
+              <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+              <div class="form-check ml-3">
+                <input
+                  [(ngModel)]="networks_options.icon_only"
+                  [ngModelOptions]="{ standalone: true }"
+                  class="form-check-input"
+                  type="checkbox"
+                  id="networks_icon_only"
+                  [checked]="networks_options.icon_only"
+                />
+                <label class="form-check-label" for="networks_icon_only">
+                  View elements in row?
+                </label>
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                options_form.get('module').value == 'groups' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+              </div>
+              <style-editor
+                [type]="'groups'"
+                [idOrganization]="current_user?.idIglesia"
+                [(ngModel)]="group_style"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="printValue($event)"
+                [extended]="true"
+              ></style-editor>
+            </div>
+            <div
+              *ngIf="
+                options_form.get('module').value == 'events' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+              </div>
+              <style-editor
+                [type]="'events'"
+                [idOrganization]="current_user?.idIglesia"
+                [(ngModel)]="events_style"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="printValue($event)"
+                [extended]="true"
+              ></style-editor>
+            </div>
+
+            <div
+              *ngIf="
+                options_form.get('module').value == 'containers' &&
+                selected_option?.has_form
+              "
+            >
+              <div class="col-md-6 col-12 align-self-start p-0">
+                <h4 class="text-secondary mb-0 mt-3">Customize your frame</h4>
+                <div
+                  class="form-group"
+                  style="display: flex; flex-direction: column"
+                >
+                  <label> Select the text you want to show </label>
+                  <select
+                    required
+                    class="hide-control form-control"
+                    formControlName="id"
+                  >
+                    <!-- [(ngModel)]="id"
+                    [ngModelOptions]="{}" -->
+                    <option value="" selected disabled>
+                      -- Select an option
+                    </option>
+                    <option
+                      *ngFor="let section of sections"
+                      [value]="section.id"
+                    >
+                      {{ section.title | translate }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                options_form.get('module').value == 'colors' &&
+                selected_option?.has_form
+              "
+            >
+              <div *ngFor="let color of colors; let l = last" class="row mx-0">
+                <div class="col-12 col-md-4">
+                  <label>
+                    <small class="text-secondary">
+                      {{ color.label }}
+                    </small>
+                  </label>
+                  <input
+                    class="form-control"
+                    type="color"
+                    [value]="color.hex"
+                    (click)="copyValue(color.hex)"
+                  />
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="form-group mb-0">
+                    <label>Hex</label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      readonly
+                      [value]="color.hex"
+                      (click)="copyValue(color.hex)"
+                    />
+                  </div>
+                </div>
+                <div class="col-6 col-md-5">
+                  <div class="form-group mb-0">
+                    <label>RGB</label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      readonly
+                      [value]="color.rgb"
+                      (click)="copyValue(color.rgb)"
+                    />
+                  </div>
+                </div>
+                <small *ngIf="l">
+                  Click on the color you need to copy the value.
+                </small>
+              </div>
+            </div>
+          </div>
+          <div
+            [ngClass]="selected_option?.has_form ? 'col-12 col-md-6' : 'col-12'"
+          >
+            <div class="ml-3" *ngIf="options_form.get('option').value">
+              <div
+                [ngClass]="instruction.classes"
+                *ngFor="let instruction of instructions; let i = index"
+              >
+                <ol [start]="i + 1" *ngIf="instruction.type == 'explanation' || instruction.type == 'selectable'">
+                  <li>
+                    <p>
+                      {{ instruction.text }}
+                    </p>
+                  </li>
+                </ol>
+                <img
+                  *ngIf="instruction.type == 'image'"
+                  [src]="instruction.text"
+                />
+                <pre
+                  *ngIf="instruction.type == 'code'"
+                ><button [disabled]="!instruction.validation()" *ngIf="instruction.can_copy" class="btn btn-sm btn-copy float-right" (click)="copyCode(instruction)"><i class="fa fa-copy"> </i></button>{{
+                  instruction.text
+                }}<span *ngIf="instruction.method">{{ instruction.method(instruction.params()) }}</span>
+              </pre>
+                <div class="row mx-0" *ngIf="instruction.type == 'selectable'">
+                  <div class="col-12 col-md-6 align-self-end">
+                    <div
+                      *ngIf="instruction.option_form"
+                      class="form-group"
+                      [formGroup]="instruction.option_form"
+                    >
+                      <label> Select an item to get its ID.</label>
+                      <select
+                        [formControlName]="instruction.field_id"
+                        class="form-control"
+                      >
+                        <option value="" selected disabled>
+                          -- Select an option --
+                        </option>
+                        <option
+                          *ngFor="let option of instruction.elements()"
+                          [value]="option[instruction.field_id]"
+                        >
+                          {{ option[instruction.field_name] }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6 align-self-end">
+                    <label> Copy this ID to filter.</label>
+                    <pre><button [disabled]="!instruction.value(instruction.value_params())" class="btn btn-sm btn-copy float-right" (click)="copyValue(instruction.value(instruction.value_params()))"><i class="fa fa-copy"> </i></button><span style="top: 8px; position: relative;">{{ instruction.value(instruction.value_params()) }}</span></pre>
+                  </div>
+                </div>
+                <small
+                  class="text-danger"
+                  *ngIf="
+                    instruction.type == 'code' &&
+                    instruction.can_copy &&
+                    !instruction.validation()
+                  "
+                >
+                  * Note: Before copy, please fill all the fields.
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

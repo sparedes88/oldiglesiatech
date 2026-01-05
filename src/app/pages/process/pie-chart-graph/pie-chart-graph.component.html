@@ -1,0 +1,508 @@
+<div class="row">
+  <!-- <div class="col-6 col-md-3">
+    <form [formGroup]="steps_form">
+      <div class="form-group">
+        <label>Process *</label>
+        <select
+          formControlName="idProcess"
+          (change)="loadProcessChart($event.target.value)"
+          class="form-control"
+        >
+          <option
+            *ngFor="let process of processList"
+            [value]="process.idProcess"
+          >
+            {{ process.name }}
+          </option>
+        </select>
+      </div>
+      <div *ngIf="steps_form.get('idProcess').value > 0" class="form-group">
+        <label>Level *</label>
+        <select
+          (change)="loadLevelChart($event.target.value)"
+          formControlName="idLevel"
+          class="form-control"
+        >
+          <option *ngFor="let step of levels" [value]="step.idNivel">
+            {{ step.name }}
+          </option>
+        </select>
+      </div>
+      <div *ngIf="steps_form.get('idLevel').value > 0" class="form-group">
+        <label>Step *</label>
+        <select
+          (change)="loadStepChart($event.target.value)"
+          formControlName="idStep"
+          class="form-control"
+        >
+          <option [value]="0">All</option>
+          <option *ngFor="let step of steps" [value]="step.idRequisito">
+            {{ step.name }}
+          </option>
+        </select>
+      </div>
+    </form>
+  </div> -->
+  <div
+    [formGroup]="steps_form"
+    [ngClass]="{
+      'col-md-12': steps_form.get('idProcess').value == 0
+    }"
+    class="col-6 col-md-4 text-center align-self-end"
+    *ngFor="let chart of charts"
+    #main_form="ngForm"
+  >
+    <ejs-accumulationchart
+      *ngIf="chart.show_graph"
+      (pointClick)="pointClick($event)"
+      #pie
+      [id]="chart.id"
+      width="100%"
+      [height]="steps_form.get('idProcess').value == 0 ? '400px' : '300px'"
+      [legendSettings]="legendSettings"
+      [title]="chart.title"
+      [subTitle]="chart.subtitle || chart.item?.name"
+      [enableAnimation]="enableAnimation"
+      [center]="center"
+      [tooltip]="tooltip"
+      (tooltipRender)="tooltipRender($event, chart)"
+    >
+      <e-accumulation-series-collection>
+        <e-accumulation-series
+          [name]="chart.item?.name"
+          [dataSource]="chart.data"
+          xName="x"
+          yName="y"
+          [startAngle]="startAngle"
+          [endAngle]="endAngle"
+          innerRadius="0%"
+          radius="70%"
+          [explode]="explode"
+          explodeOffset="10%"
+          [dataLabel]="datalabel"
+          [palettes]="chart.palettes"
+        >
+        </e-accumulation-series>
+      </e-accumulation-series-collection>
+    </ejs-accumulationchart>
+    <div *ngIf="chart.form && chart.form?.validation()" class="row mr-0">
+      <div
+        [ngClass]="chart.form.show_update_button() ? 'col-md-10' : 'col-md-12'"
+        class="col-12"
+      >
+        <div class="form-group">
+          <label> {{ chart.form.label }}</label>
+          <select
+            [formControlName]="chart.form.control_name"
+            (change)="chart.form.method($event.target.value)"
+            class="form-control"
+          >
+            <option *ngIf="chart.form.show_default_option" [value]="0">
+              All
+            </option>
+            <option
+              *ngFor="let process of chart.form.array"
+              [value]="process[chart.form.key_id]"
+            >
+              {{ process[chart.form.key_name] }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div
+        *ngIf="chart.form.show_update_button()"
+        class="align-self-center col-12 col-md-2 mt-3"
+      >
+        <button
+          class="btn btn-light edit-btn"
+          (click)="updateItem(chart.form.control_name)"
+        >
+          <i class="fa fa-edit"></i>
+        </button>
+      </div>
+      <div *ngIf="chart.form.validation()" class="col-12 pr-0">
+        <form [formGroup]="chart.add_form" #input_form="ngForm">
+          <div class="input-group input-group-fixed">
+            <input
+              required
+              type="text"
+              class="form-control"
+              [placeholder]="chart.form.placeholder"
+              [formControlName]="chart.form.ng_model_field"
+            />
+            <div class="input-group-append">
+              <button
+                type="button"
+                class="btn btn-success"
+                [disabled]="chart.add_form.invalid"
+                (click)="addItem(chart.form.control_name, chart.add_form)"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div
+      *ngIf="
+        chart.form &&
+        !chart.form?.validation() &&
+        chart.id === 'steps_chart_container' &&
+        steps_form.get('idLevel').value > 0
+      "
+      class="row mr-0"
+    >
+      <h6 class="text-secondary">
+        Please assign at least one member to the process to add steps.
+      </h6>
+    </div>
+  </div>
+
+  <!-- <div class="col-4">
+    <form (ngSubmit)="addItem('process', processForm)" #processForm="ngForm">
+      <div class="input-group">
+        <input
+          required
+          type="text"
+          class="form-control"
+          placeholder="Process Name"
+          [(ngModel)]="processForm.name"
+          name="name"
+        />
+        <div class="input-group-append">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="!processForm.name"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </form>
+  </div> -->
+
+  <!-- <div class="col-4" *ngIf="steps_form.get('idProcess').value > 0">
+    <form (ngSubmit)="addItem('level', levelForm)" #levelForm="ngForm">
+      <div class="input-group">
+        <input
+          required
+          type="text"
+          class="form-control"
+          placeholder="Level Name"
+          [(ngModel)]="levelForm.name"
+          name="name"
+        />
+        <div class="input-group-append">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="!levelForm.name"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </form>
+  </div> -->
+
+  <!-- <div class="col-4" *ngIf="steps_form.get('idLevel').value > 0">
+    <form (ngSubmit)="addItem('step', steepForm)" #steepForm="ngForm">
+      <div class="input-group">
+        <input
+          required
+          type="text"
+          class="form-control"
+          placeholder="Step description"
+          [(ngModel)]="steepForm.description"
+          name="description"
+        />
+        <div class="input-group-append">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="!steepForm.description"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </form>
+  </div> -->
+
+  <div class="col-12 scroll-x p-0">
+    <table
+      *ngIf="selected_process?.idProcess != 0"
+      [ngStyle]="{ width: 320 + user_steps.length * 320 + 'px' }"
+      style="min-width: 100%"
+    >
+      <thead>
+        <tr>
+          <th class="sticky-left" style="min-width: 120px; width: 320px">
+            Unassigned users to process
+          </th>
+          <th
+            *ngIf="selected_level?.idNivel != 0"
+            [ngStyle]="{ width: user_steps.length * 320 + 'px' }"
+            style="min-width: 120px"
+          >
+            Steps
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="sticky-left">
+            <li class="list-group-item">
+              <div>
+                <h4 class="mb-0">{{ selected_process?.name }}</h4>
+                <small class="text-secondary">
+                  Total users in the process:
+                  {{ selected_process?.assigned_to }} /
+                  {{ users_organization_count }}
+                  <br />
+                  <br />
+                  <br />
+                </small>
+              </div>
+              <div class="form-group">
+                <label>Search</label>
+                <input
+                  type="search"
+                  class="form-control"
+                  placeholder="Type contact name"
+                  [(ngModel)]="contactSearchValue"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+              </div>
+            </li>
+            <div
+              style="overflow-y: scroll; height: 600px"
+              *ngIf="steps_form.get('idProcess').value > 0"
+            >
+              <ul class="list-group">
+                <li
+                  class="list-group-item"
+                  *ngFor="let contact of filteredUserProcess"
+                  [hidden]="loadingAllUsers"
+                >
+                  <div class="row" *ngIf="!loadingAllUsers">
+                    <div class="col-xs-10 col-md-10">
+                      {{ contact.name }}
+                    </div>
+                    <div class="col-xs-2 col-md-2 text-right">
+                      <mat-slide-toggle
+                        [(ngModel)]="contact.assigned"
+                        (change)="
+                          toggleAssignUserToProcess(
+                            contact.idUser,
+                            contact.assigned
+                          )
+                        "
+                        color="primary"
+                        [ngModelOptions]="{ standalone: true }"
+                      ></mat-slide-toggle>
+                    </div>
+                  </div>
+                </li>
+                <li *ngIf="loadingAllUsers">
+                  <ng-template [ngIf]="loadingAllUsers">
+                    <div
+                      class="d-flex justify-content-center col-12"
+                      style="margin-top: 10%; margin-bottom: 10%"
+                    >
+                      <div
+                        style="
+                          height: 120px;
+                          width: 120px;
+                          font-size: 15px;
+                          border-width: 0.45em;
+                        "
+                        class="spinner-border text-citric"
+                        role="status"
+                      ></div>
+                    </div>
+                  </ng-template>
+                </li>
+                <li
+                  *ngIf="user_not_in_process.length > 0"
+                  class="list-group-item"
+                >
+                  <div class="row">
+                    <div class="col-xs-10 col-md-10">Assign all users</div>
+                    <div class="col-xs-2 col-md-2 text-right">
+                      <mat-slide-toggle
+                        #toggle
+                        [disabled]="toggle.checked"
+                        (change)="toggleAssignAllUserToProcess($event)"
+                        color="primary"
+                      ></mat-slide-toggle>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  *ngIf="user_not_in_process.length === 0"
+                  class="list-group-item"
+                >
+                  <div class="row">
+                    <div class="col-12">
+                      <h6 class="text-citric">
+                        You've already assign all your users to this process.
+                      </h6>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </td>
+
+          <td *ngIf="selected_level?.idNivel != 0">
+            <li class="list-group-item">
+              <div style="width: 320px">
+                <h4 class="mb-0">
+                  About the level:
+                  <span class="text-secondary">{{ selected_level?.name }}</span>
+                </h4>
+                <small
+                  *ngIf="selected_level && steps_form.get('idLevel').value > 0"
+                  class="text-secondary"
+                >
+                  Total users who took the level:
+                  {{ selected_level?.assigned_to }} ({{
+                    getPercent(selected_level, selected_level?.assigned_to)
+                  }}%) <br />
+                  Complete by: {{ selected_level?.accomplished_by }}/
+                  <span class="text-dark bold">
+                    {{ selected_level?.assigned_to }}
+                  </span>
+                  ({{
+                    getPercent(selected_level, selected_level?.accomplished_by)
+                  }}%) <br />
+                  Incomplete by: {{ selected_level?.unaccomplished_by }}/
+                  <span class="text-dark bold">
+                    {{ selected_level?.assigned_to }}
+                  </span>
+                  ({{
+                    getPercent(
+                      selected_level,
+                      selected_level?.unaccomplished_by
+                    )
+                  }}%) <br />
+                </small>
+              </div>
+              <div style="max-width: 320px" class="form-group">
+                <label>Search</label>
+                <input
+                  type="search"
+                  class="form-control"
+                  placeholder="Type contact name"
+                  [(ngModel)]="contactSearchValueStep"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+              </div>
+            </li>
+            <div style="overflow-y: scroll; height: 600px; margin-right: -15px">
+              <div class="row mx-0">
+                <ul
+                  class="list-group builder-scroll pl-1"
+                  *ngFor="let step of user_steps"
+                  style="width: 319px"
+                >
+                  <div class="row">
+                    <div class="col-7">
+                      <h5>
+                        {{ step.name }}
+                      </h5>
+                      <small class="text-secondary">
+                        Complete by: {{ step.accomplished_by }}/
+                        <span class="text-dark bold">
+                          {{ step.assigned_to }}
+                        </span>
+                        ({{ getPercent(step, step.accomplished_by) }}%) <br />
+                        Incomplete by: {{ step.unaccomplished_by }}/
+                        <span class="text-dark bold">
+                          {{ step.assigned_to }}
+                        </span>
+                        ({{ getPercent(step, step.unaccomplished_by) }}%) <br />
+                      </small>
+                      <br />
+                      <button
+                        (click)="
+                          openLogModal(step, step_log_modal, step_log_component)
+                        "
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        See step logs
+                      </button>
+                    </div>
+                    <div class="col-5">
+                      <!-- (click)="shareQR(qr_code)" -->
+                      <ngx-qrcode
+                        *ngIf="user_steps.length === 1"
+                        #qr_code
+                        class="col-2"
+                        style="width: 50px; height: 50px"
+                        [qrc-value]="generatedQR(step)"
+                        [qrc-class]="'qrItemResize-step'"
+                        qrc-errorCorrectionLevel="M"
+                      >
+                      </ngx-qrcode>
+                    </div>
+                  </div>
+
+                  <li
+                    class="list-group-item"
+                    *ngFor="let contact of filteredUserPerStep(step)"
+                  >
+                    <div class="row">
+                      <div
+                        [routerLink]="'/contact/details/' + contact.idUser"
+                        class="col-10 col-md-8 clickable"
+                      >
+                        {{ contact.name }}
+                        <br *ngIf="contact.groups" />
+                        <small *ngIf="contact.groups"
+                          >({{ contact.groups }})</small
+                        >
+                      </div>
+                      <div class="col-2 col-md-4 text-right">
+                        <mat-slide-toggle
+                          [ngModelOptions]="{ standalone: true }"
+                          [(ngModel)]="contact.cumplido"
+                          (change)="
+                            toggleAccomplishedStepStatus(
+                              contact.idUser,
+                              contact.cumplido,
+                              contact.idRequisito
+                            )
+                          "
+                          color="primary"
+                        ></mat-slide-toggle>
+                      </div>
+                    </div>
+                  </li>
+                  <li
+                    class="list-group-item disabled"
+                    *ngIf="!step.users.length"
+                  >
+                    No contacts assigned
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<ngx-smart-modal
+  #step_log_modal
+  identifier="step_log_modal"
+  customClass="large-modal"
+>
+  <!-- (onAnyCloseEvent)="entryFormGroup.reset()" -->
+  <h4>Step log</h4>
+  <app-step-log #step_log_component> </app-step-log>
+</ngx-smart-modal>

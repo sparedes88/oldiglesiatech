@@ -1,0 +1,65 @@
+<div id="scroll-x" class="scroll-x row mx-0" *ngIf="galleries.length > 1">
+  <div (click)="scroll(-100)" id="scroll-left" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-left"></i>
+  </div>
+  <div (click)="scroll(100)" id="scroll-right" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-right"></i>
+  </div>
+  <!-- {{galleries | json}} -->
+  <div
+    [routerLink]="[actual_page + '/' + gallery.id]"
+    class="col-6 col-sm-4 col-md-3 my-4 button-category"
+    *ngFor="let gallery of galleries"
+    (click)="setGallery(gallery)"
+    [ngClass]="{
+      clickable: view_mode !== 'edition',
+      active: selected_gallery?.id === gallery.id
+    }"
+  >
+    <div
+      style="height: 100%; align-items: center"
+      class="roundedDiv mb-3 shadow row mx-0"
+      (mouseover)="gallery.is_hover = true"
+      (mouseleave)="gallery.is_hover = false"
+      [ngStyle]="{
+        'background-color':
+          selected_gallery?.id === gallery.id
+            ? gallery.active_background_color || '#e4e4e4'
+            : gallery.is_hover
+            ? gallery.hover_background_color || '#dddddd'
+            : gallery.background_color || '#ffffff',
+        color: gallery.font_color || '#000000',
+        'font-style': gallery.font_style || 'unset',
+        'font-size': gallery.font_size || '14px',
+        'font-weight': gallery.font_weight || 'normal',
+        'text-align': gallery.text_align || 'center'
+      }"
+    >
+      <div class="col-12">
+        {{ gallery.name }}
+      </div>
+      <!-- <div class="col-12" *ngIf="!loading && view_mode === 'edition'">
+        <span class="red" *ngIf="gallery.photos.length === 0">
+          This gallery doesn't have photos.
+        </span>
+        <span *ngIf="gallery.photos.length !== 0">
+          {{ gallery.photos.length }} photos to show.
+        </span>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<app-gallery-v2
+  #gallery_embed
+  *ngIf="selected_gallery.idGalleryViewMode == 1"
+  [idGallery]="selected_gallery.idGallery"
+  [style_settings]="style_settings"
+></app-gallery-v2>
+<app-gallery-album-view
+  #gallery_album_embed
+  *ngIf="selected_gallery.idGalleryViewMode == 2"
+  [idGalleryAlbum]="selected_gallery.idGalleryAlbum"
+  [idOrganization]="idOrganization"
+  [style_settings]="style_settings"
+></app-gallery-album-view>

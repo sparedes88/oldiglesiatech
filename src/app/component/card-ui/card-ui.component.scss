@@ -1,0 +1,67 @@
+.selected {
+    box-shadow: 0px 0px 3px 2px rgba(0, 123, 255, 1);
+    -webkit-box-shadow: 0px 0px 3px 2px rgba(0, 123, 255, 1);
+    -moz-box-shadow: 0px 0px 3px 2px rgba(0, 123, 255, 1);
+}
+.card-ui {
+    height: 155px;
+    width: 256px;
+    border-radius: 0.84615em;
+    background: linear-gradient(90deg, #c5c5c5, #f3f3f3);
+    cursor: pointer;
+    &.visa {
+        background: linear-gradient(90deg, #021670, #5168d1);
+    }
+    &.mastercard {
+        background: linear-gradient(90deg, #3a4e64, #5e8aa0);
+    }
+    &.amex {
+        background: linear-gradient(90deg, #73a299, #a8c6b2);
+    }
+    &.discover {
+        background: linear-gradient(90deg, #73a299, #a8c6b2);
+    }
+}
+
+.brand-info {
+    height: 60%;
+    position: relative;
+}
+.brand-logo {
+    max-width: 16.92308em;
+    min-height: 3em;
+    background-repeat: no-repeat;
+    -webkit-background-size: 17.076923076923077em 39.69230769230769em;
+    background-size: 17.076923em 39.69230769230769em;
+    vertical-align: middle;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    &.amex {
+        background-position: -0.07692307692307693em -0.07692307692307693em;
+        background-image: url(/assets/img/card-logos.svg);
+        width: 3.4615384615384617em;
+        height: 3.4615384615384617em;
+    }
+    &.visa {
+        background-position: -0.07692307692307693em -33.446154em;
+        background-image: url(/assets/img/card-logos.svg);
+    }
+    &.mastercard {
+        background-image: url(/assets/img/card-logos.svg);
+        background-position: -0.07692307692307693em -18.846153846153847em;
+    }
+}
+
+.card-number-point {
+    font-family: monospace;
+    letter-spacing: 2px;
+    font-size: 1.30769em;
+    color: #333;
+    background: linear-gradient(180deg, #999 0.1em, #fff 0.7em);
+    -webkit-background-clip: text;
+    transition: color 0.3s ease-in;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 1px black);
+    line-height: 1.3;
+}

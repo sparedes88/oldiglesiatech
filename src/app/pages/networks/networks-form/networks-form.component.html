@@ -1,0 +1,174 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      {{ network?.idNetwork ? "Editing " + network?.name : "Create Network" }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div [formGroup]="network_organization_form" class="col-12 row text-left">
+    <div class="col-12">
+      <div class="form-group">
+        <label for="name">Network name</label>
+        <input
+          class="form-control"
+          required
+          formControlName="name"
+          type="text"
+        />
+      </div>
+      <div class="form-group">
+        <label for="name">Label name</label>
+        <input
+          class="form-control"
+          required
+          formControlName="label_name"
+          type="text"
+        />
+      </div>
+      <div class="form-group">
+        <label for="name"
+          >Base url (leave empty if you want the users paste the full url)
+        </label>
+        <input class="form-control" formControlName="base_url" type="text" />
+      </div>
+      <div class="form-group form-check mb-0">
+        <input
+          formControlName="is_custom_icon"
+          (change)="toggleCustomIcon()"
+          type="checkbox"
+          class="form-check-input"
+          id="is_custom_icon"
+        />
+        <label class="form-check-label" for="is_custom_icon">
+          Use custom icon instead?
+        </label>
+      </div>
+
+      <div
+        *ngIf="!network_organization_form.get('is_custom_icon').value"
+        class="col-12"
+      >
+        <div class="form-group align-items-center d-inline-block">
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Changes the text color of the network icon.
+              </span>
+              <small> Text color </small>
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+          <input
+            type="color"
+            formControlName="text_color"
+            class="form-control"
+            style="width: 50px; height: 40px"
+          />
+        </div>
+
+        <div class="form-group align-items-center d-inline-block ml-2">
+          <label>
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Changes the background color of the network button.
+              </span>
+              <small> Background </small>
+              <i class="text-secondary fa fa-info-circle"></i>
+            </span>
+          </label>
+          <input
+            type="color"
+            formControlName="background_color"
+            class="form-control"
+            style="width: 50px; height: 40px"
+          />
+        </div>
+        <app-custom-icon-picker
+          class="d-inline-block ml-2"
+          [required]="network_organization_form.get('is_custom_icon').value"
+          [small_label]="true"
+          [label]="'Network icon'"
+          formControlName="icon_svg"
+        ></app-custom-icon-picker>
+      </div>
+
+      <div class="row col-12">
+        <div
+          class="col-9"
+          *ngIf="network_organization_form.get('is_custom_icon').value"
+        >
+          <img
+            *ngIf="network_organization_form.get('is_custom_icon').value"
+            [src]="
+              fixUrlDesign(network_organization_form.get('icon_temp').value)
+            "
+            style="height: 50px; width: 50px"
+          />
+        </div>
+
+        <div
+          class="col-3"
+          *ngIf="network_organization_form.get('is_custom_icon').value"
+        >
+          <button
+            type="button"
+            (click)="showActionSheet(2, input_file_reference)"
+            class="btn btn-citric circular-button"
+          >
+            <i class="fa fa-plus"></i>
+          </button>
+          <input
+            [hidden]="true"
+            #input_file_reference
+            accept="image/*"
+            type="file"
+            class="custom-file-input"
+            id="customFile"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Preview -->
+  <hr class="col-10" />
+  <h6 class="text-secondary col-12">Link Preview</h6>
+  <div class="col-12 p-0 text-left">
+    <div class="row m-0">
+      <div class="col-2 align-self-center">
+        <i
+          *ngIf="!network_organization_form.get('is_custom_icon').value"
+          [ngClass]="network_organization_form.get('icon_svg').value"
+          [ngStyle]="{
+            background: network_organization_form.get('background_color').value,
+            color: network_organization_form.get('text_color').value
+          }"
+          class="bigIcon rounded-circle"
+        ></i>
+        <img
+          *ngIf="network_organization_form.get('is_custom_icon').value"
+          [src]="fixUrlDesign(network_organization_form.get('icon_temp').value)"
+          class="bigIcon"
+        />
+      </div>
+      <div class="col-10 align-self-center text-left">
+        <h5 class="m-0">
+          {{ network_organization_form.get("name").value }}
+        </h5>
+      </div>
+
+      <div class="col-12 text-center">
+        <hr />
+
+        <button
+          (click)="saveNetworkOrganization()"
+          class="btn btn-sm btn-success"
+          [disabled]="network_organization_form.invalid || serverBusy"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

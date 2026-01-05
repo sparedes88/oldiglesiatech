@@ -1,0 +1,518 @@
+<div class="container" #container>
+  <div class="row" style="height: 100%; max-height: 100%;">
+    <div class="col-xs-4 col-md-4" #side>
+      <div class="chats-container" style="overflow-y:auto;" [style.max-height]="(maxHeight+150)+'px'">
+        <h3>Chats</h3>
+        <ul class="chat-list" style="height: 100%; max-height: 100%; display:table">
+          <li *ngFor="let channel; let channel_index = index of channels"
+            [ngClass]="currentChannel?.sid === channel?.sid ? 'active' : ''" (click)="enterChannel(channel.sid)">
+            <table style="word-wrap: break-word; table-layout: fixed;">
+              <colgroup>
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 80%;">
+              </colgroup>
+              <tr>
+                <td style="padding: 5px; text-align:left; word-wrap: break-word; width: 50;">
+                  <img [src]="getChannelPhotoURL(channel.uniqueName)" onerror="'assets/img/img_avatar.png'" width="50">
+                </td>
+                <td style="padding: 0px; text-align:left; word-wrap: break-word;">
+                  <div class="grid-container">
+                    <div class="grid-item" #item>
+                      <span [ngStyle]="{'white-space':'nowrap', 'text-overflow':'ellipsis', 'width': (side.offsetWidth*(0.4))+'px',
+                      'display': 'block', 'overflow': 'hidden'}">
+                        <b style="word-wrap:break-word;">
+                          {{ getChannelName(channel.friendlyName, channel.uniqueName) }}
+                        </b>
+                        <span class="badge badge-pill badge-primary" *ngIf="getUnreadMessages(channel)">
+                          {{ getUnreadMessages(channel) }}
+                        </span>
+                      </span>
+                    </div>
+                    <div class="grid-item">
+                      <span style="float: right;">
+                        {{lastMessages[channel_index]?.timestamp | date:(lastMessages[channel_index]?.is_today ?
+                        'shortTime' : 'shortDate')}}
+                      </span>
+                    </div>
+                  </div>
+                  <p *ngIf="this.lastMessages.length==this.channels.length" class="widthHalf">
+                    {{ lastMessages[channel_index]?.author + lastMessages[channel_index]?.cadena }}
+                  </p>
+                  <p *ngIf="this.lastMessages.length!=this.channels.length" class="widthHalf">
+                    Loading...
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </li>
+          <li *ngIf="isConnecting" [ngClass]="currentChannel?.sid === channel?.sid ? 'active' : ''">
+            Loading Chat...
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-xs-8 col-md-8" [style.max-height]="(maxHeight+150)+'px'" #chatBoxMain>
+      <div *ngIf="currentChannel" style="height: 100%;">
+        <div class="card" [style.max-height]="(maxHeight+150)+'px'">
+          <div class="card-header msg_head">
+            <div class="d-flex bd-highlight">
+              <div class="img_cont">
+                <img [src]="getChannelPhotoURL(currentChannel.uniqueName)" onerror="'assets/img/img_avatar.png'"
+                  class="rounded-circle user_img">
+                <span class="online_icon"></span>
+              </div>
+              <div class="user_info">
+                <span>{{ currentChannel ? getChannelName(currentChannel.friendlyName, currentChannel.uniqueName) :
+                  '' }}</span>
+                <p>{{ this.currentChannel?.lastMessage?.index +1}} Messages</p>
+              </div>
+              <div class="video_cam">
+                <span *ngIf="this.currentChannel.createdBy==currentUsername
+                &&!this.currentChannel.uniqueName.includes('ChatGroup-')" (click)="deleteChannel()">
+                  <i class="fa fa-trash"></i>
+                </span>
+                <span *ngIf="true" (click)="leaveChannel()">
+                  Leave
+                </span>
+              </div>
+            </div>
+            <span id="action_menu_btn" (click)="this.toggleMembers=!this.toggleMembers">
+              <i *ngIf="!this.toggleMembers" class="fas fa-ellipsis-v"></i>
+              <i *ngIf="this.toggleMembers" class="fas fa-times"></i>
+            </span>
+            <div *ngIf="this.toggleMembers">
+              <span style="color: white;">{{'Members: '}}</span><b style="color: white;">{{this.members}}</b>
+              <br>
+              <b style="color: white;" *ngIf="this.currentChannel.uniqueName.includes('ChatGroup-')">
+                This chat is linked to a group. To modify any of its info, go to the Groups section.
+              </b>
+            </div>
+            <table style=" color: white;" class="table table-sm table-borderless" *ngIf="this.toggleMembers">
+              <colgroup>
+                <col span="1" style="width: 50%;">
+                <col span="1" style="width: 50%;">
+              </colgroup>
+              <tr
+                *ngIf="this.currentChannel.uniqueName.includes('- Group -')&&!this.currentChannel.uniqueName.includes('ChatGroup-')">
+                <td *ngIf="this.currentChannel.createdBy==currentUsername">
+                  <b style="color: white;">Group name:</b><br>
+                  <input style="text-align:center; height:34px; width: 100%;" type="text" [(ngModel)]="groupName">
+                  <br>
+                  <button style="color: white;" style="margin:5px;" class="btn btn-primary" (click)="changeGroupName()">
+                    Save
+                  </button>
+                </td>
+                <td *ngIf="this.currentChannel.createdBy==currentUsername">
+                  <b style="color: white;">Add persons:</b>
+                  <ng-select [items]="contacts" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                    bindLabel="name" placeholder="Select contact" bindValue="idUsuario"
+                    style="text-align:center; height:30px;width: 100%;" [(ngModel)]="selectedContacts" [selectableGroup]="true"
+                    groupBy="group">
+                  </ng-select>
+                  <button style="color: white;" style="margin:10px;" class="btn btn-primary"
+                    (click)="addPersonsToGroup()">
+                    Add
+                  </button>
+                </td>
+              </tr>
+            </table>
+            <!-- <div class="action_menu" #action_menu>
+              <ul>
+                <li><i class="fas fa-user-circle"></i> View profile</li>
+                <li><i class="fas fa-users"></i> Add to close friends</li>
+                <li><i class="fas fa-plus"></i> Add to group</li>
+                <li><i class="fas fa-ban"></i> Block</li>
+              </ul>
+            </div> -->
+          </div>
+          <div class="card-body msg_card_body" #chatDisplay>
+            <div style="text-align: center;">
+              <button class="btn btn-light" *ngIf="this.currentChannel && messages[0]?.index!=0"
+                (click)="loadData(this.messages[0].index)">
+                Get past messages...
+              </button>
+            </div>
+            <div *ngFor="let message; let msg_index = index of messages">
+              <div [id]="'msg'+message.index" class="message-row"
+                [ngClass]="{ self: message.author == currentUsername }">
+                <div [class]="(message.author!=messages[msg_index-1]?.author && message.author!=messages[msg_index+1]?.author)
+                    ? 'message-bubble' : 'message-bubble2'"
+                  (mouseover)="message.author == currentUsername ? this.msgIndexShowed=msg_index : null"
+                  style="max-width: 80%; display: block;">
+                  <table>
+                    <tr style="padding: 0px; text-align: left;">
+                      <td style="vertical-align:top; padding: 0px; text-align: right;">
+                        <img *ngIf="message.author!=messages[msg_index-1]?.author" [src]="getAuthorInfo(message.author).photo_url ?
+                            getAuthorInfo(message.author).photo_url :
+                            'assets/img/img_avatar.png'" width="50" alt="Avatar" onerror="'assets/img/img_avatar.png'">
+                      </td>
+                      <td style="padding: 0px; text-align: left;">
+                        <span *ngIf="message.author!=messages[msg_index-1]?.author" class="author-name">
+                          {{ message.author.split(' <')[0] }} </span>
+                            &nbsp;
+                            <small class="text-muted">
+                              {{ message.dateUpdated | date: 'MMM/dd h:mm a' }}
+                            </small>
+
+                            <div style="word-wrap: break-word;"
+                              *ngIf="message.type !== 'media' && !isValidHttpUrl(message.body)">
+                              {{ message.body }}
+                            </div>
+                            <div style="word-wrap: break-word;"
+                              *ngIf="message.type !== 'media' && isValidHttpUrl(message.body)">
+                              <a [href]="message.body" target="_blank">{{ message.body }}</a>
+                            </div>
+                            <div style="word-wrap: break-word; width: 100%;" *ngIf="message.type === 'media'">
+                              <a *ngIf="(msg_media[msg_index]?.type).startsWith('image')"
+                                [href]="msg_media[msg_index]?.value" target="_blank">
+                                <img [src]="msg_media[msg_index]?.value" width="100%" style="border-radius: 10%;">
+                              </a>
+                              <audio *ngIf="(msg_media[msg_index]?.type).startsWith('audio')"
+                                [src]="msg_media[msg_index]?.value" class="my-audio-player" controls></audio>
+                              <a *ngIf="!(msg_media[msg_index]?.type).startsWith('image') && !(msg_media[msg_index]?.type).startsWith('audio')"
+                                [href]="msg_media[msg_index]?.value" target="_blank">
+                                {{msg_media[msg_index]?.name}} ({{msg_media[msg_index]?.size}}MB)
+                              </a>
+                            </div>
+
+                      </td>
+                    </tr>
+                    <tr style="padding: 0px; text-align: right;">
+                      <td style="padding: 0px; text-align: right;">
+                      </td>
+                      <td style="padding: 0px; text-align: right;">
+                        <div *ngIf="message.author == currentUsername">
+                          <!-- <span *ngIf="this.displayedMsg[msg_index] && msg_index==this.msgIndexShowed"
+                                style="width: 100%; word-wrap: break-word;">
+                                Seen by{{this.membersSeen.length>0? '
+                                '+this.membersSeen :
+                                ' none'}}
+                              </span> -->
+                          <button *ngIf="message.author == currentUsername && msg_index==this.msgIndexShowed"
+                            title="Info" [ngClass]="{ self: message.author == currentUsername }"
+                            (click)="getMessageConsumptionByIdToggle(msg_index)">
+                            <i class="fa fa-chevron-down"></i>
+                          </button>
+                          <i class="fa fa-check-circle" *ngIf="this.lastMessageConsumed==false
+                          && msg_index==(this.messages.length-1)"></i>
+                          <i class="fa fa-eye" *ngIf="this.lastMessageConsumed==true
+                          && msg_index==(this.messages.length-1)"></i>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div *ngIf="membersTyping.length">
+              <span class="form-text text-muted font-italic">{{ whosTyping() }} is typing...</span>
+            </div>
+            <div class="row m-2" *ngIf="this.file">
+              <div class="col-12">
+                <button class="btn btn-sm btn-danger float-right" color="danger" (click)="removeFile()" size="small">
+                  {{this.file.name}} ({{((this.file.size)/1024/1024).toString().substring(0,4)}}MB)
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="input-group-append">
+                <label for="upload" class="input-group-text attach_btn">
+                  <input style="display:none" #formInputFile (change)="loadImageFromDevice($event)" type="file"
+                    class="custom-file-input" id="upload">
+                  <i class="fa fa-paperclip"></i>
+                </label>
+              </div>
+              <div class="input-group-append" *ngIf="!recording">
+                <span class="input-group-text std_btn" (click)="startRecording()">
+                  <i class="fa fa-microphone"></i>
+                </span>
+              </div>
+              <div class="input-group-append" *ngIf="recording">
+                <span class="input-group-text std_btn" (click)="stopRecording()">
+                  <i class="fa fa-stop" aria-hidden="true"></i>
+                  {{minutes(recordingCounter)}}
+                </span>
+              </div>
+              <textarea name="" class="form-control type_msg" placeholder="Type your message..." type="text"
+                id="chatMessage" name="chatMessage" #chatElement autocapitalize="sentences" class="form-control"
+                (paste)="consolelog($event)" [(ngModel)]="chatMessage" style="resize: none;"
+                (ngModelChange)="capitalize()" (keyup.enter)="sendMessage('keyup')" autofocus>
+              </textarea>
+              <div class="input-group-append">
+                <span class="input-group-text std_btn" (click)="toggled = !toggled">
+                  <i [(emojiPickerIf)]="toggled" [emojiPickerDirection]="'bottom' || 'top' || 'left' || 'right'"
+                    (emojiPickerSelect)="handleSelection($event)">😄</i>
+                </span>
+              </div>
+              <div class="input-group-append">
+                <span class="input-group-text std_btn" (click)="sendLike()">
+                  <i class="fa fa-thumbs-up"></i>
+                </span>
+              </div>
+              <div class="input-group-append">
+                <span class="input-group-text send_btn" type="submit">
+                  <i class="fas fa-location-arrow"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="inner-app-container">
+          <div *ngIf="currentChannel" class="content" [ngStyle]="this.toggleMembers ?
+          toogleStyle(this.currentChannel.createdBy==currentUsername) :
+          toogleStyle1()">
+            <div class="card-header msg_head">
+              <div class="d-flex bd-highlight">
+                <div class="img_cont">
+                  <img [src]="getChannelPhotoURL(currentChannel.uniqueName)" onerror="'assets/img/img_avatar.png'"
+                    class="rounded-circle user_img" />
+                  <span class="online_icon"></span>
+                </div>
+                <div class="user_info">
+                  <table style="table-layout:fixed;">
+                    <tr>
+                      <td style="text-align: left; width: 60%;word-wrap: break-word;">
+                        <span style="color: white; word-wrap: break-word;">
+                          {{ currentChannel ? getChannelName(currentChannel.friendlyName, currentChannel.uniqueName) :
+                          '' }}
+                        </span>
+                      </td>
+                      <td style="text-align: center; width: 15%;">
+                        <button class="btn btn-danger btn-sm" style="margin:5px;" *ngIf="this.currentChannel.createdBy==currentUsername
+                        &&!this.currentChannel.uniqueName.includes('ChatGroup-')" (click)="deleteChannel()">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      </td>
+                      <td style="text-align: center; width: 15%;">
+                        <button class="btn btn-success btn-sm" style="margin:5px;" *ngIf="true"
+                          (click)="leaveChannel()">
+                          Leave
+                        </button>
+                      </td>
+                      <td style="text-align: center; width: 10%;">
+                        <button class="btn btn-light btn-sm" style="margin:5px;"
+                          (click)="this.toggleMembers=!this.toggleMembers" title="Info">
+                          <i class="fa fa-chevron-down"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </table>
+                  <br>
+                  <p style="color: white;">{{ this.currentChannel?.lastMessage?.index +1}} Messages</p>
+                  <div *ngIf="this.toggleMembers">
+                    <span style="color: white;">{{'Members: '}}</span><b style="color: white;">{{this.members}}</b>
+                    <br>
+                    <b style="color: white;" *ngIf="this.currentChannel.uniqueName.includes('ChatGroup-')">
+                      This chat is linked to a group. To modify any of its info, go to the Groups section.
+                    </b>
+                  </div>
+                  <table style=" color: white;" class="table table-sm table-borderless" *ngIf="this.toggleMembers">
+                    <colgroup>
+                      <col span="1" style="width: 50%;">
+                      <col span="1" style="width: 50%;">
+                    </colgroup>
+                    <tr
+                      *ngIf="this.currentChannel.uniqueName.includes('- Group -')&&!this.currentChannel.uniqueName.includes('ChatGroup-')">
+                      <td *ngIf="this.currentChannel.createdBy==currentUsername">
+                        <b style="color: white;">Group name:</b><br>
+                        <input style="text-align:center; height:32px;" type="text" [(ngModel)]="groupName">
+                        <button style="color: white;" style="margin:5px;" class="btn btn-primary"
+                          (click)="changeGroupName()">
+                          Save
+                        </button>
+                      </td>
+                      <td *ngIf="this.currentChannel.createdBy==currentUsername">
+                        <b style="color: white;">Add persons:</b>
+                        <ng-select [items]="contacts" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                          bindLabel="name" placeholder="Select contact" bindValue="idUsuario"
+                          style="text-align:center; height:30px;" [(ngModel)]="selectedContacts"
+                          [selectableGroup]="true" groupBy="group">
+                        </ng-select>
+                        <button style="color: white;" style="margin:10px;" class="btn btn-primary"
+                          (click)="addPersonsToGroup()">
+                          Add
+                        </button>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="area-ig1 pt-3 pl-3" #chatDisplay style="position: relative; z-index: 0;">
+            <div style="height: 160px;" *ngIf="this.toggleMembers">
+
+            </div>
+            <div style="height: 80px;" *ngIf="!this.toggleMembers">
+
+            </div>
+            <div style="text-align: center;">
+              <button class="btn btn-light" *ngIf="this.currentChannel && messages[0]?.index!=0"
+                (click)="loadData(this.messages[0].index)">
+                Get past messages...
+              </button>
+            </div>
+            <div *ngFor="let message; let msg_index = index of messages">
+              <div [id]="'msg'+message.index" class="message-row"
+                [ngClass]="{ self: message.author == currentUsername }">
+                <div [class]="(message.author!=messages[msg_index-1]?.author && message.author!=messages[msg_index+1]?.author)
+                    ? 'message-bubble' : 'message-bubble2'"
+                  (mouseover)="message.author == currentUsername ? this.msgIndexShowed=msg_index : null"
+                  style="max-width: 80%; display: block;">
+                  <table>
+                    <tr style="padding: 0px; text-align: left;">
+                      <td style="vertical-align:top; padding: 0px; text-align: right;">
+                        <img *ngIf="message.author!=messages[msg_index-1]?.author" [src]="getAuthorInfo(message.author).photo_url ?
+                            getAuthorInfo(message.author).photo_url :
+                            'assets/img/img_avatar.png'" width="50" alt="Avatar">
+                      </td>
+                      <td style="padding: 0px; text-align: left;">
+                        <span *ngIf="message.author!=messages[msg_index-1]?.author" class="author-name">
+                          {{ message.author.split(' <')[0] }} </span>
+                            &nbsp;
+                            <small class="text-muted">
+                              {{ message.dateUpdated | date: 'MMM/dd h:mm a' }}
+                            </small>
+
+                            <div style="word-wrap: break-word;"
+                              *ngIf="message.type !== 'media' && !isValidHttpUrl(message.body)">
+                              {{ message.body }}
+                            </div>
+                            <div style="word-wrap: break-word;"
+                              *ngIf="message.type !== 'media' && isValidHttpUrl(message.body)">
+                              <a [href]="message.body" target="_blank">{{ message.body }}</a>
+                            </div>
+                            <div style="word-wrap: break-word; width: 100%;" *ngIf="message.type === 'media'">
+                              <a *ngIf="(msg_media[msg_index]?.type).startsWith('image')"
+                                [href]="msg_media[msg_index]?.value" target="_blank">
+                                <img [src]="msg_media[msg_index]?.value" width="100%" style="border-radius: 10%;">
+                              </a>
+                              <audio *ngIf="(msg_media[msg_index]?.type).startsWith('audio')"
+                                [src]="msg_media[msg_index]?.value" class="my-audio-player" controls></audio>
+                              <a *ngIf="!(msg_media[msg_index]?.type).startsWith('image') && !(msg_media[msg_index]?.type).startsWith('audio')"
+                                [href]="msg_media[msg_index]?.value" target="_blank">
+                                {{msg_media[msg_index]?.name}} ({{msg_media[msg_index]?.size}}MB)
+                              </a>
+                            </div>
+
+                      </td>
+                    </tr>
+                    <tr style="padding: 0px; text-align: right;">
+                      <td style="padding: 0px; text-align: right;">
+                      </td>
+                      <td style="padding: 0px; text-align: right;">
+                        <div *ngIf="message.author == currentUsername">
+                          <!-- <span *ngIf="this.displayedMsg[msg_index] && msg_index==this.msgIndexShowed"
+                                style="width: 100%; word-wrap: break-word;">
+                                Seen by{{this.membersSeen.length>0? '
+                                '+this.membersSeen :
+                                ' none'}}
+                              </span>
+                          <button *ngIf="message.author == currentUsername && msg_index==this.msgIndexShowed"
+                            title="Info" [ngClass]="{ self: message.author == currentUsername }"
+                            (click)="getMessageConsumptionByIdToggle(msg_index)">
+                            <i class="fa fa-chevron-down"></i>
+                          </button>
+                          <i class="fa fa-check-circle" *ngIf="this.lastMessageConsumed==false
+                          && msg_index==(this.messages.length-1)"></i>
+                          <i class="fa fa-eye" *ngIf="this.lastMessageConsumed==true
+                          && msg_index==(this.messages.length-1)"></i>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="area-ig2 pl-1 pr-1" style="position:static; max-height: 150px;" #boxes id="boxes">
+            <div id="chatContainer">
+              <form (submit)=" !toggled ? sendMessage('form') : null" autocomplete="off" name="chatForm" id="chatForm">
+                <div class="input-group">
+                  <textarea type="text" id="chatMessage" name="chatMessage" #chatElement autocapitalize="sentences"
+                    class="form-control" (paste)="consolelog($event)" [(ngModel)]="chatMessage" style="resize: none;"
+                    (ngModelChange)="capitalize()" (keyup.enter)="sendMessage('keyup')" autofocus>
+                  </textarea>
+                  <span class="input-group-append">
+                    <button class="btn btn-secondary" type="submit">
+                      <i class="fa fa-arrow-right"></i>
+                    </button>
+                  </span>
+
+                </div>
+              </form>
+
+              <div *ngIf="membersTyping.length">
+                <span class="form-text text-muted font-italic">{{ whosTyping() }} is typing...</span>
+              </div>
+              <div>
+                <table class="menu">
+                  <tr>
+                    <td style="margin-right: auto;
+                    margin-left: 0px; ">
+                      <button class="btn btn-sm btn-danger float-right" color="danger" (click)="removeFile()"
+                        size="small" *ngIf="this.file">
+                        {{this.file.name}} ({{((this.file.size)/1024/1024).toString().substring(0,4)}}MB)
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                      </button>
+                    </td>
+                    <td style="margin-right: auto;
+                    margin-left: 0px; padding: 10px;">
+                      <button class="btn btn-sm btn-light float-right" *ngIf="!recording" color="danger"
+                        (click)="startRecording()" size="small">
+                        Record audio
+                        <i class="fa fa-microphone"></i>
+                      </button>
+                      <button class="btn btn-sm btn-success float-right" *ngIf="recording" color="danger"
+                        (click)="stopRecording()" size="small">
+                        <i class="fa fa-stop" aria-hidden="true"></i>
+                        {{minutes(recordingCounter)}}
+                      </button>
+                    </td>
+                    <td style="vertical-align:
+                    middle;">
+                      <table style="border-collapse: collapse;" class="menu">
+                        <tr>
+                          <td style="padding: 10px;">
+                            <label for="upload" class="btn btn-sm btn-light float-right" style="margin-top: 8px;">
+                              <input style="display:none" #formInputFile (change)="loadImageFromDevice($event)"
+                                type="file" class="custom-file-input" id="upload">
+                              <i class="fa fa-paperclip"></i>
+                            </label>
+                          </td>
+                          <td style="padding: 10px;">
+                            <button (click)="sendLike()" class="btn btn-sm btn-light float-right">
+                              <i class="fa fa-thumbs-up"></i>
+                            </button>
+                          </td>
+                          <td style="padding: 10px;">
+                            <button (click)="toggled = !toggled" class="btn btn-sm btn-light float-right">
+                              <i [(emojiPickerIf)]="toggled"
+                                [emojiPickerDirection]="'bottom' || 'top' || 'left' || 'right'"
+                                (emojiPickerSelect)="handleSelection($event)">😄</i>
+                            </button>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div> -->
+      </div>
+
+      <div class="no-chat-selected text-center" *ngIf="!currentChannel">
+        <div>
+          <h2 class="text-muted" style="margin-top: 25vh;">
+            Please select a chat
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

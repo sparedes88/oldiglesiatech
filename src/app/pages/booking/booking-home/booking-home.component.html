@@ -1,0 +1,271 @@
+<div class="container page">
+  <div [hidden]="!finish_google" class="row">
+    <div class="col-9 mt-3 pr-0">
+      <div class="row">
+        <h4 class="text-citric col-4">
+          All Bookings |
+        </h4>
+        <div class="col-8 row google-box px-0">
+          <div class="col-12 header py-1">
+            <span *ngIf="user_google">
+              Connected as:
+            </span>
+            <span *ngIf="!user_google">
+              Not connected to any Google Account.
+              <button
+                class="btn btn-sm float-right btn-outline-primary"
+                (click)="signIn()"
+              >
+                Connect with Google.
+              </button>
+            </span>
+          </div>
+          <div class="col-12 py-1" *ngIf="user_google">
+            <img
+              [src]="user_google?.picture"
+              class="google-picture"
+              [alt]="user_google.name"
+            />
+            {{ user_google.name }} ({{ user_google.email }})
+            <div class="col-12">
+              <button
+                class="btn btn-sm float-right btn-danger ml-1"
+                (click)="signOut()"
+              >
+                Log out
+              </button>
+              <button
+                class="btn btn-sm float-right btn-outline-primary"
+                (click)="signIn()"
+              >
+                Change account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-3 align-self-center mt-3" *ngIf="!getPermissions()">
+      <button
+        class="btn btn-sm btn-outline-success"
+        (click)="activateForm()"
+        [disabled]="!user_google"
+      >
+        New Booking
+      </button>
+      <!-- <button
+        class="btn btn-sm btn-outline-success ml-1 mt-3 mb-3"
+        (click)="printEventsPdf()"
+        [disabled]="events.length === 0"
+      >
+        Print
+      </button> -->
+    </div>
+    <div *ngIf="show_editable" class="col-12 p-0">
+      <form
+        #activity_form="ngForm"
+        [formGroup]="bookingForm"
+        style="width: 100%;"
+        class="row"
+      >
+        <div class="col-12">
+          <b>This will create a new Calendar in your Google account.</b>
+          <br />
+          <i>
+            Use an existing calendar?
+            <span
+              class="text-citric"
+              (click)="getCalendars(selectCalendarToSync)"
+            >
+              Click here
+            </span>
+          </i>
+        </div>
+        <div class="col-8">
+          <div class="form-group">
+            <label for="estimated">
+              Name <span class="text-danger"> * </span>
+            </label>
+            <input
+              class="form-control"
+              placeholder="Booking's name."
+              type="text"
+              formControlName="summary"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="col-8">
+          <div class="form-group">
+            <label for="estimated">Notes</label>
+            <textarea
+              class="form-control"
+              placeholder="Description about this booking"
+              type="text"
+              formControlName="description"
+            ></textarea>
+          </div>
+        </div>
+      </form>
+      <span
+        style="display: block; text-align: right; width: 100%;"
+        class="mb-2 col-8"
+      >
+        <button
+          type="button"
+          *ngIf="!getPermissions()"
+          class="btn btn-sm btn-muted"
+          (click)="deactivateForm()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          *ngIf="!getPermissions()"
+          [disabled]="bookingForm.invalid && !getPermissions()"
+          (click)="addBooking(bookingForm)"
+          class="btn btn-sm btn-success"
+        >
+          Save
+        </button>
+      </span>
+    </div>
+
+    <div
+      class="col-9 row booking-item mx-0 p-0 my-3"
+      *ngFor="let booking of bookings"
+    >
+      <div class="col-1 align-self-center"></div>
+      <div class="col-9 py-2 align-self-center">
+        <h4 class="text-citric">
+          {{ booking.summary }}
+        </h4>
+        <h6 class="text-muted" [ngClass]="{ italic: booking.description }">
+          {{ booking.description || "Not description provided..." }}
+        </h6>
+      </div>
+      <div class="col-1 align-self-center"></div>
+      <div class="col-12 row footer-style m-0 py-2">
+        <div class="col-3 text-center">
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary">
+              Sessions
+            </button>
+            <button
+              class="btn btn-sm btn-outline-primary"
+              (click)="shareCalendar(shareReportModal, booking)"
+            >
+              Share
+            </button>
+          </div>
+        </div>
+        <div class="col-3 offset-6 text-center">
+          <div class="btn-group">
+            <button
+              class="btn btn-sm btn-outline-primary"
+              routerLink="/detail/{{ booking.idBookingCalendar }}/{{
+                encodeID(booking.calendar_id)
+              }}/"
+            >
+              Settings
+            </button>
+            <button
+              class="btn btn-sm btn-outline-primary"
+              (click)="openShareEmbed(iframeCodeModal, booking)"
+            >
+              Embed
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div [hidden]="finish_google" class="row">
+    <div class="col-12">
+      <ng-template [ngIf]="!finish_google">
+        <div class="d-flex justify-content-center" style="margin: 140px;">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem;"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+<ngx-smart-modal #iframeCodeModal identifier="iframeCodeModal">
+  <h4>Insert this booking on your page</h4>
+  <pre style="background-color: whitesmoke; padding: 8px;">
+    {{ iframeCode }}
+  </pre>
+
+  <p>
+    Copy this code and paste it on your website
+  </p>
+</ngx-smart-modal>
+
+<ngx-smart-modal #shareReportModal identifier="shareReportModal">
+  <h3 class="text-citric">Share this booking</h3>
+
+  <form
+    [formGroup]="shareForm"
+    (submit)="sendEmail(shareForm, shareReportModal)"
+  >
+    <div class="form-group">
+      <label for="estimated">
+        Email <span class="text-danger"> * </span>
+      </label>
+      <input
+        class="form-control"
+        placeholder="Type the email to share this booking."
+        type="text"
+        formControlName="emails"
+        required
+      />
+    </div>
+
+    <div class="row m-0 justify-content-center">
+      <div class="col-6 text-center">
+        <button class="btn btn-sm btn-success" type="submit">
+          <i class="fa fa-paper-plane"></i>
+          Share my Calendar
+        </button>
+      </div>
+    </div>
+  </form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #selectCalendarToSync
+  identifier="selectCalendarToSync"
+  customClass="sync-modal p-0"
+>
+  <h3 class="text-citric p-3">Select a calendar to sync</h3>
+
+  <div class="row m-0">
+    <div
+      class="col-12 px-1 py-2 list-calendar row m-0"
+      *ngFor="let calendar of calendars"
+      (click)="addBookingWithExistingCalendar(calendar, selectCalendarToSync)"
+    >
+      <span class="col-1 text-center align-self-center">
+        <div
+          class="color-square"
+          [ngStyle]="{ background: calendar.backgroundColor }"
+        ></div>
+      </span>
+      <span class="col-9 text-muted align-self-center">
+        {{ calendar.summary }}
+      </span>
+      <div class="col-2 align-self-center">
+        <button class="btn btn-sm btn-muted">
+          <i class="fa fa-sign-in-alt"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>

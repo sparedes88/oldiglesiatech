@@ -1,0 +1,172 @@
+$b: 1em; // border-width
+$blur: blur(6px);
+$border_size: 6px;
+
+img.photo {
+  cursor: pointer;
+  transition: 0.5s;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+.main-img-container {
+  background: #eaeaea;
+}
+.img-container {
+  // height: calc(200px + 1em + 6px);
+  overflow: hidden;
+  border: $border_size/2 solid white;
+}
+
+.pic_blur {
+  filter: blur(5px) opacity(0.9);
+  border-radius: 10px;
+  position: absolute;
+}
+
+.pic_1 {
+  position: absolute;
+  padding: 16px;
+}
+
+.img-display {
+  position: relative;
+  // margin: 15px;
+  cursor: pointer;
+  transition: 0.5s;
+  transform: scale(1);
+
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
+.bg-img {
+  position: relative;
+  // border: solid $b rgba(#000, 0.03);
+  border-left: solid $b rgba(#000, 0.03);
+  border-right: solid $b rgba(#000, 0.03);
+  border-top: solid $b / 1.777777776 rgba(#000, 0.03);
+  border-bottom: solid $b / 1.777777776 rgba(#000, 0.03);
+  height: 50vmin;
+  // max-width: 13em;
+  width: 100%;
+  max-height: 7em;
+  // background: $url 50%/ cover
+  // 							border-box /* background-origin */
+  // 							padding-box /* background-clip */;
+  font-size: 2em;
+  background-size: cover;
+  box-sizing: border-box;
+  background-position-x: center;
+  background-position-y: center;
+  background-clip: padding-box;
+  background-size: 125%;
+
+  &:before,
+  &:after {
+    position: absolute;
+    z-index: -1; /* put it *behind* parent */
+    /* go outside padding-box by
+		 * a border-width ($b) in every direction */
+    top: -$b * 2;
+    right: -$b * 2;
+    bottom: -$b * 2;
+    left: -$b * 2;
+    border: inherit;
+    border-color: transparent;
+    background: inherit;
+    background-clip: border-box;
+    /* -webkit-prefixed version
+		 * still needed for
+		 * some mobile browsers 💔😭 */
+    -webkit-filter: $blur;
+    filter: $blur;
+    content: "";
+  }
+}
+
+.horizontal-scroll {
+  overflow-x: scroll;
+  flex-wrap: nowrap;
+}
+
+.picsum-img-wrapper {
+  max-height: 750px;
+  img {
+    height: 100%;
+    max-height: 750px;
+    width: 100%;
+    -o-object-position: center;
+    object-position: center;
+    -o-object-fit: contain;
+    object-fit: contain;
+  }
+}
+
+.bg-img-2 {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  background-size: 100%;
+  background-position: center;
+  position: relative;
+  height: 750px;
+  width: auto;
+  max-height: 750px;
+  font-size: 2em;
+  background-size: cover;
+  box-sizing: border-box;
+  background-position-x: center;
+  background-position-y: center;
+  background-clip: padding-box;
+  background-size: 125%;
+
+  &:before,
+  &:after {
+    position: absolute;
+    z-index: -1; /* put it *behind* parent */
+    /* go outside padding-box by
+		 * a border-width ($b) in every direction */
+    top: -$b * 2;
+    right: -$b * 2;
+    bottom: -$b * 2;
+    left: -$b * 2;
+    border: inherit;
+    border-color: transparent;
+    background: inherit;
+    background-clip: border-box;
+    /* -webkit-prefixed version
+		 * still needed for
+		 * some mobile browsers 💔😭 */
+    -webkit-filter: $blur;
+    filter: $blur;
+    content: "";
+  }
+}
+
+@media (min-width: 1400px) and (max-width: 1699px) {
+  // .img-container {
+  //   height: calc(300px + 1.5em + 9px);
+  // }
+  .bg-img {
+    max-height: 10.5em;
+  }
+}
+@media (min-width: 1700px) {
+  // .img-container {
+  //   height: calc(400px + 2em + 12px);
+  // }
+  .bg-img {
+    max-height: 14em;
+  }
+}
+
+.img-tag-test {
+  // height: 250px;
+  // width: 444px;
+  position: relative;
+  top: 20px;
+  overflow: hidden;
+  border: 1px solid red;
+}

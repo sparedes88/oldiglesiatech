@@ -1,0 +1,329 @@
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center"
+    style="margin-top: 15%; margin-bottom: 15%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border"
+      [ngStyle]="{ color: style_settings.main_color }"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<ng-template [ngIf]="!loading">
+  <div class="row">
+    <div
+      *ngIf="style_settings.display_header"
+      class="col-12 header-div"
+      [ngStyle]="{
+        backgroundImage:
+          'linear-gradient(' +
+          style_settings.degrees +
+          'deg, ' +
+          style_settings.main_color +
+          ' ' +
+          style_settings.main_percent +
+          '%, ' +
+          style_settings.second_color +
+          ' ' +
+          style_settings.second_percent +
+          '%)',
+        color: style_settings.text_color
+      }"
+    >
+      <h1
+        class="text-center"
+        [ngStyle]="{ color: style_settings.text_color }"
+        style="
+          font-family: 'Poppins', Helvetica, Arial, Lucida, sans-serif;
+          font-size: 40px;
+        "
+      >
+        <span *ngIf="!title">{{ lang.keys["groups"] }} </span>
+        <span *ngIf="title"> {{ title }} </span>
+      </h1>
+    </div>
+    <div class="col-12">
+      <div class="search-container text-right">
+        <h4></h4>
+        <input
+          type="search"
+          [placeholder]="lang.keys['search'] + ' ' + (page_title | lowercase)"
+          [(ngModel)]="searchValue"
+        />
+      </div>
+      <div class="col-12">
+        <div
+          *ngIf="!selectedElement"
+          class="row justify-content-center section"
+        >
+          <!-- Grid -->
+          <div
+            *ngIf="true"
+            [ngClass]="adjust_col_size"
+            class="row justify-content-center section"
+          >
+            <div
+              [ngClass]="[
+                col_size,
+                !style_settings.show_shadow ? 'no-shadow' : ''
+              ]"
+              *ngFor="let element of filteredElements; let i = index"
+              [id]="'el-' + i"
+              (click)="getSelectedElement(element.idGroup)"
+            >
+              <div
+                class="card element-card"
+                [ngClass]="[!style_settings.show_shadow ? 'no-shadow' : '']"
+              >
+                <div class="card-cover">
+                  <img
+                    [src]="getPicture(element.picture)"
+                    onerror="this.onerror=null; this.src='assets/img/default-image.jpg'"
+                  />
+                </div>
+                <div class="card-body">
+                  <h4
+                    [ngStyle]="{
+                      'text-align':
+                        title_style_settings?.home_title_text_align || 'left',
+                      color:
+                        title_style_settings?.home_title_text_color ||
+                        '#000000',
+                      'font-weight':
+                        title_style_settings?.home_title_text_bold || 'bolder'
+                    }"
+                  >
+                    {{ element.title }}
+                  </h4>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="card-sub-title bold">
+                        {{ getCategoriesList(element.categories) }}
+                      </div>
+                      <div class="card-title medium-text">
+                        {{ element.short_description }}
+                      </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                      <!-- <div class="card-title bold bottom-right">
+                    {{ convertTime(element.event_time) }}
+                  </div> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedElement" class="row justify-content-center">
+          <div class="col-12 col-md-10">
+            <div class="row">
+              <div class="col-12">
+                <div class="details-title">
+                  <button
+                    *ngIf="show_back_button"
+                    class="back-button col-12 col-md-auto mb-0 mb-md-2 d-flex"
+                    (click)="resetSelectedElement()"
+                  >
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Feather-arrows-arrow-left.svg"
+                      alt=""
+                    />
+                  </button>
+                  <h1 class="col-12 col-md">{{ selectedElement.title }}</h1>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <img
+                  [src]="getPicture(selectedElement.picture)"
+                  onerror="this.onerror=null; this.src='assets/img/default-image.jpg'"
+                  class="responsive"
+                />
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="pre-line">
+                          {{ selectedElement.short_description }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr />
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="card-title bold">
+                          {{ lang.keys["location"] }}
+                        </div>
+                        <div>
+                          {{ selectedElement.street }},
+                          {{ selectedElement.zip_code }},
+                          {{ selectedElement.state }},
+                          {{ selectedElement.city }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 text-left" *ngIf="selectedElement.long_description">
+                <h4>{{ lang.keys["about_group"] }}</h4>
+                <p class="pre-line">{{ selectedElement.long_description }}</p>
+              </div>
+            </div>
+          </div>
+          <app-gallery-v2
+            class="col-12"
+            *ngIf="selectedElement?.idGallery"
+            [show_horizontal]="true"
+            [idGallery]="selectedElement?.idGallery"
+          ></app-gallery-v2>
+
+          <div class="col-12 my-2 text-center">
+            <a
+              [href]="getLink(selectedElement)"
+              target="_blank"
+            >
+              <button class="btn btn-secondary">
+                {{ lang.keys["join_me"] || 'Unirme' }}</button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!--
+<div
+class="col-12 col-md-12"
+*ngIf="!selectedElement && mode === 'list'"
+>
+<div class="row">
+  <div
+    *ngIf="display_header"
+    class="col-12 header-div"
+    [ngStyle]="{
+      backgroundImage:
+        'linear-gradient(' +
+        degrees +
+        'deg, ' +
+        main_color +
+        ' ' +
+        main_percent +
+        '%, ' +
+        second_color +
+        ' ' +
+        second_percent +
+        '%)',
+      color: text_color
+    }"
+  >
+    <h1
+      style="
+        font-family: 'Poppins', Helvetica, Arial, Lucida,
+          sans-serif;
+        font-size: 40px;
+      "
+    >
+      <span *ngIf="!group_type_id"> Grupos </span>
+      <span *ngIf="group_type_id">
+        {{ groupIndexes[iglesia.group_type] }}
+      </span>
+    </h1>
+  </div>
+  <div class="col-12">
+    <div class="search-container text-right">
+      <h4></h4>
+      <input
+        type="search"
+        :placeholder="lang.keys['search'] + ' ' + lang.keys['groups'] + '...'"
+        v-model="searchValue"
+      />
+    </div>
+  </div>
+  <div
+    [ngClass]="[!show_shadow ? 'no-shadow' : '']"
+    class="col-12 row justify-content-center section"
+    *ngFor="
+      let element;
+      let index = index;
+      of: iglesia.groups
+        | filter: { idGroupType: iglesia.group_type }
+    "
+    [id]="'el-' + index"
+    (click)="getSelectedElement(element.idGroup)"
+  >
+    <div
+      class="col-10 text-center"
+      style="width: 100%; padding: 2% 0; align-items: center"
+    >
+      <div class="row" style="padding: 2% 0">
+        <div
+          class="col-7"
+          [ngClass]="[
+            index % 2 === 0 ? 'order-1' : 'order-12'
+          ]"
+          [ngStyle]="{
+            'padding-right': index % 2 === 0 ? '2.5%' : '0',
+            'padding-left': index % 2 === 0 ? '0' : '2.5%'
+          }"
+        >
+          <div
+            class="text-container"
+            style="padding-top: 19px !important"
+          >
+            <div
+              [ngClass]="[
+                index % 2 === 0 ? 'text-right' : 'text-left'
+              ]"
+              class="et_pb_text_inner"
+            >
+              <h1 style="font-size: 30px">
+                {{ element.title }}
+              </h1>
+              <p class="medium-text">
+                {{ element.short_description }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          [ngClass]="[
+            index % 2 === 0 ? 'order-12' : 'order-1'
+          ]"
+          class="col-5"
+        >
+          <span
+            class="et_pb_image_wrap"
+            style="
+              display: inline-block;
+              position: relative;
+              max-width: 100%;
+            "
+          >
+            <img
+              loading="lazy"
+              [src]="getPicture(element.picture)"
+              onerror="this.onerror=null; this.src='https://iglesiatech.app/assets/img/default-image.jpg'"
+              class="responsive"
+              alt=""
+              title=""
+              height="auto"
+              width="auto"
+              style="max-width: 100%; height: auto"
+          /></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+  -->

@@ -1,0 +1,465 @@
+<div class="container" style="min-height: 700px">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+            {{ totalGroups || 0 }}
+          </span>
+          <h4 class="col-12 card-title text-center text-citric span-number">Groups</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/groups_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Groups</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-md-12 mt-2 text-right">
+      <!--
+      <h1 class="mt-3 ml-5 md-3">Group</h1>
+
+      <div class="row col-12">
+        <br />
+        <div class="col-6 offset-3 col-md-4 offset-md-4 text-center">
+          <span class="text-citric summary summary">
+            {{ totalGroups }}
+          </span>
+          <br />
+          <span
+            class="status text-center primeroColor ColorPrimero"
+            style="width: 90%;
+            display: inline-block;"
+          >
+            Groups
+          </span>
+        </div>
+        <br />
+        <br />
+      </div>
+      -->
+      <div *ngIf="!show_form" class="btn-group col-2 mb-2 mt-3">
+        <button class="btn btn-tech" (click)="addGroup()">Add group</button>
+      </div>
+      <div *ngIf="!show_form" class="btn-group col-2 mb-2 mt-3">
+        <button class="btn btn-tech" routerLink="categories">
+          <i class="fa fa-th"></i> Categories
+        </button>
+      </div>
+      <div *ngIf="show_form" class="btn-group col-2 mb-2 mt-3">
+        <button class="btn btn-outline-citric" (click)="closeGroup()">
+          Close
+        </button>
+      </div>
+      <!-- <div class="btn-group col-2 mb-2 mt-3">
+        <button
+          class="btn btn-tech"
+          (click)="addCategory(categoryFormModal, group_category_form)"
+        >
+          Add category
+        </button>
+      </div> -->
+    </div>
+    <div
+      [hidden]="show_form"
+      class="col-xs-12 col-md-12 mt-2 table-responsive-sm table-striped"
+    >
+      <table
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        class="table row-border hover mt-4"
+      >
+        <thead>
+          <tr>
+            <th width="100px">Group</th>
+            <th>Title</th>
+            <th>Short Desc.</th>
+            <th>Categories</th>
+            <th>Settings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let group of groups">
+            <!-- routerLink="/groups/details/{{ group.idGroup }}" -->
+            <td>
+              <img
+                [src]="fixUrl(group.picture)"
+                [alt]="group.title"
+                class="responsive"
+                onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+              />
+            </td>
+            <td width="200" class="fixed">
+              <b>{{ group.title }}</b>
+            </td>
+            <td class="fixed" style="max-width: 400px">
+              <span class="pre-line ellipsis">
+                {{ group.short_description }}
+              </span>
+            </td>
+            <td>
+              <li *ngFor="let item of group.categories">
+                {{ item.name }}
+              </li>
+              <span *ngIf="group.categories.length === 0">
+                <i> Not categories assigned </i>
+              </span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <!-- <button class="btn btn-sm btn-info" disabled>
+                  <i class="fa fa-comments"></i>
+                </button> -->
+                <button
+                  class="btn btn-sm btn-primary"
+                  routerLink="/groups/details/{{ group.idGroup }}"
+                >
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button
+                  class="btn btn-success btn-sm"
+                  (click)="editGroup(group)"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-secondary mr-1"
+                  (click)="selected_group_id = group.idGroup; linkModal.open()"
+                >
+                  <i class="fa fa-link"></i>
+                </button>
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="deleteGroup(group)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div [hidden]="show_form" class="col-xs-12">
+      <button class="btn btn-primary mb-2" (click)="iframeCodeModal.open()">
+        Get iframe code
+      </button>
+    </div>
+
+    <group-form
+      style="width: 100%"
+      [hidden]="!show_form"
+      #group_form
+      (submit)="closeAndGetGroups()"
+    ></group-form>
+  </div>
+</div>
+
+<!-- <ngx-smart-modal
+  #groupFormModal
+  identifier="groupFormModal"
+  customClass="full-screen-modal"
+  [escapable]="false"
+  [dismissable]="false"
+>
+</ngx-smart-modal> -->
+
+<!-- <ngx-smart-modal
+  #editFormModal
+  identifier="editFormModal"
+  (onAnyCloseEvent)="selectedGroup = undefined"
+  customClass="full-screen-modal"
+  [escapable]="false"
+  [dismissable]="false"
+>
+  <group-form
+    *ngIf="selectedGroup"
+    [group]="selectedGroup"
+    (submit)="updateGroup()"
+  ></group-form>
+</ngx-smart-modal> -->
+
+<ngx-smart-modal
+  #categoryFormModal
+  identifier="formModal"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-group-category-form
+    #group_category_form
+    (onDismiss)="onModalDidDismiss(categoryFormModal, $event)"
+  >
+  </app-group-category-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  customClass="large-modal"
+  #iframeCodeModal
+  identifier="iframeCodeModal"
+>
+  <h4>Insert groups on your page</h4>
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="form-group mt-1">
+        <label for="selectLang">Select language</label>
+        <select
+          class="form-control"
+          id="selectLang"
+          [(ngModel)]="iframeLang"
+          (change)="updateIframeCode()"
+        >
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+        </select>
+      </div>
+
+      <div class="form-group mt-1">
+        <label for="selectLang">Select View Type</label>
+        <select
+          class="form-control"
+          id="selectLang"
+          [(ngModel)]="header_settings.view_type"
+          (change)="updateIframeCode()"
+        >
+          <option value="grid">Grid (original)</option>
+          <option value="list">List</option>
+        </select>
+      </div>
+
+      <div class="form-group mt-1">
+        <label for="selectLang">Select Group type to display</label>
+        <select
+          class="form-control"
+          id="selectLang"
+          [(ngModel)]="header_settings.group_type_id"
+          (change)="updateIframeCode()"
+        >
+          <option value="1">Ministries</option>
+          <option value="2">Groups</option>
+          <option value="3">Events</option>
+          <option value="4">Teams</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="items_per_row_range" color="gray">
+          Items per row ( {{ header_settings.items_per_row }})
+        </label>
+        <input
+          type="range"
+          class="custom-range"
+          min="1"
+          max="4"
+          step="1"
+          id="items_per_row_range"
+          [(ngModel)]="header_settings.items_per_row"
+        />
+      </div>
+
+      <div class="form-group form-check">
+        <input
+          [(ngModel)]="header_settings.show_shadow"
+          type="checkbox"
+          class="form-check-input"
+          id="shadow_check"
+        />
+        <label class="form-check-label" for="shadow_check">
+          Show shadow box?
+        </label>
+      </div>
+
+      <div class="form-group form-check">
+        <input
+          [(ngModel)]="header_settings.display_header"
+          type="checkbox"
+          class="form-check-input"
+          id="activeCheck"
+        />
+        <label class="form-check-label" for="activeCheck">
+          Display Header?
+        </label>
+      </div>
+
+      <div class="row" [hidden]="!header_settings.display_header">
+        <h5 class="col-12 text-muted">Header Settings</h5>
+        <div class="ws-100"></div>
+        <div class="col-2">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label>Text Color</label>
+            <input
+              type="color"
+              [(ngModel)]="header_settings.text_color"
+              class="form-control"
+              style="width: 50px; height: 40px"
+            />
+            <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+          </div>
+        </div>
+        <div class="col-10">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="degrees_radius" color="gray">
+              Degrees
+              {{ header_settings.degrees }}°
+            </label>
+            <input
+              type="range"
+              class="custom-range"
+              min="0"
+              max="360"
+              step="1"
+              id="degrees_radius"
+              [(ngModel)]="header_settings.degrees"
+            />
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label>Main Color</label>
+            <input
+              type="color"
+              [(ngModel)]="header_settings.main_color"
+              class="form-control"
+              style="width: 50px; height: 40px"
+            />
+            <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+          </div>
+        </div>
+        <div class="col-10">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="main_color_percent_radius_range" color="gray">
+              Main Color Gradient
+              {{ header_settings.main_percent }}%
+            </label>
+            <input
+              type="range"
+              class="custom-range"
+              min="0"
+              max="100"
+              step="1"
+              id="main_color_percent_radius_range"
+              [(ngModel)]="header_settings.main_percent"
+            />
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label>Second Color</label>
+            <input
+              type="color"
+              [(ngModel)]="header_settings.second_color"
+              class="form-control"
+              style="width: 50px; height: 40px"
+            />
+            <!-- [(ngModel)]="communityStyleSettings.button_color" -->
+          </div>
+        </div>
+        <div class="col-10">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="second_color_percent_radius_range" color="gray">
+              Second Color Gradient
+              {{ header_settings.second_percent }}%
+            </label>
+            <input
+              type="range"
+              class="custom-range"
+              min="0"
+              max="100"
+              step="1"
+              id="second_color_percent_radius_range"
+              [(ngModel)]="header_settings.second_percent"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <div
+        class="header-div"
+        [ngStyle]="{
+          background:
+            'linear-gradient(' +
+            header_settings.degrees +
+            'deg, ' +
+            header_settings.main_color +
+            ' ' +
+            header_settings.main_percent +
+            '%, ' +
+            header_settings.second_color +
+            ' ' +
+            header_settings.second_percent +
+            '%)'
+        }"
+      >
+        <h3
+          style="font-size: 40px; font-family: 'Poppins'"
+          class="text-center py-1"
+          [ngStyle]="{ color: header_settings.text_color }"
+          *ngIf="header_settings.display_header"
+        >
+          Sample text
+        </h3>
+      </div>
+
+      <p>Entry Point</p>
+      <pre style="background-color: whitesmoke; padding: 8px">
+    {{ groupEmbedCode.entry_point }}
+  </pre
+      >
+
+      <p>Scripts</p>
+      <pre style="background-color: whitesmoke; padding: 8px">
+    {{ groupEmbedCode.scripts }}
+  </pre
+      >
+      <p>Copy this code and paste it on your website</p>
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<ngx-smart-modal #linkModal identifier="linkModal">
+  <h4>Register Link</h4>
+  <div class="row justify-content-center">
+    <div class="col-10 text-center">
+      <small class="text-secondary">
+        Share this QR with someone by clicking on it or ask to scan it using the
+        app to join to the group.
+      </small>
+    </div>
+    <div class="col-8 text-center">
+      <ngx-qrcode
+        #qr_code
+        class="col-2"
+        (click)="shareQR(qr_code)"
+        style="width: 50px; height: 50px"
+        [qrc-value]="groupEmbedCode.link"
+        [qrc-class]="'qrItemResize-dash'"
+        qrc-errorCorrectionLevel="M"
+      >
+      </ngx-qrcode>
+      <button (click)="shareQR(qr_code)" class="btn btn-sm btn-citric">
+        Copy QR
+      </button>
+    </div>
+    <div class="col-12">
+      <h5 class="text-center my-3">Or</h5>
+      <small class="text-secondary mb-2">
+        Copy this url and paste use it on you website
+      </small>
+      <pre
+        class="mb-0"
+        style="background-color: #e2e2e2; padding: 8px; white-space: normal"
+      >
+        <a [href]="getLink()" target="_blank">{{ getLink() }}</a>
+      </pre>
+    </div>
+  </div>
+</ngx-smart-modal>

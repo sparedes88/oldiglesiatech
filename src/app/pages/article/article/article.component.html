@@ -1,0 +1,189 @@
+<div *ngIf="skip_id_as_param" class="row justify-content-end">
+  <div class="col-4 col-md-2 text-center my-4">
+    <button
+      (click)="dismissArticle()"
+      class="btn btn-sm btn-outline-citric col-11"
+    >
+      Close <i style="font-size: 15px" class="fa fa-times"></i>
+    </button>
+  </div>
+</div>
+<ng-template [ngIf]="loader">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+<div [hidden]="loader" class="article-background-page">
+  <div
+    *ngIf="!articulo?.hide_picture"
+    class="card"
+    [ngStyle]="{
+      'border-radius': (articulo?.header_style.border_radius || 0) + 'px'
+    }"
+  >
+    <div
+      class="rectangle"
+      #rectangle_sizable
+      mwlResizable
+      [enableGhostResize]="true"
+      (resizeEnd)="onResizeEnd($event)"
+      [ngStyle]="{
+        height: title_settings.get('height').value + 'px'
+      }"
+    >
+      <img
+        *ngIf="show_picture"
+        [src]="
+          articulo?.slider
+            ? fixUrl(articulo?.slider)
+            : 'assets/img/default-image.jpg'
+        "
+        onerror="this.onerror=null; this.src='assets/img/default-image.jpg'"
+      />
+
+      <div
+        *ngIf="!show_picture"
+        class="color-header-div"
+        [ngStyle]="{
+          background: background_style,
+          'margin-top': articulo?.header_style?.margin.top + 'px',
+          'margin-bottom': articulo?.header_style?.margin.bottom + 'px',
+          'margin-left': articulo?.header_style?.margin.left + 'px',
+          'margin-right': articulo?.header_style?.margin.right + 'px',
+          'padding-top': articulo?.header_style?.padding.top + 'px',
+          'padding-bottom': articulo?.header_style?.padding.bottom + 'px',
+          'padding-left': articulo?.header_style?.padding.left + 'px',
+          'padding-right': articulo?.header_style?.padding.right + 'px',
+          height: title_settings.get('height').value + 'px'
+        }"
+      ></div>
+      <!-- <div
+        *ngIf="is_preview"
+        class="resize-handle-bottom"
+        mwlResizeHandle
+        [resizeEdges]="{ bottom: true }"
+      ></div> -->
+    </div>
+
+    <div
+      class="flex-header"
+      *ngIf="is_preview && articulo?.header_style?.show_title"
+      [formGroup]="title_settings"
+      [ngStyle]="{
+        'margin-top': articulo?.header_style?.margin.top + 'px',
+        'margin-bottom': articulo?.header_style?.margin.bottom + 'px',
+        'margin-left': articulo?.header_style?.margin.left + 'px',
+        'margin-right': articulo?.header_style?.margin.right + 'px',
+        'padding-top': articulo?.header_style?.padding.top + 'px',
+        'padding-bottom': articulo?.header_style?.padding.bottom + 'px',
+        'padding-left': articulo?.header_style?.padding.left + 'px',
+        'padding-right': articulo?.header_style?.padding.right + 'px',
+        height: title_settings.get('height').value + 'px'
+      }"
+    >
+      <text-editor
+        id="article_text_editor"
+        #article_text_editor
+        [identifier]="'article'"
+        [hide_font_buttons]="true"
+        [height]="'100px'"
+        formControlName="rich_text"
+        class="form-invisible"
+        [ngClass]="
+          'align-self-' +
+          (articulo?.header_style?.title_vertical_position || 'center')
+        "
+        [bubble]="true"
+        custom_class="form-invisible"
+        (change)="setText($event)"
+      ></text-editor>
+    </div>
+
+    <!-- onError="this.src='assets/img/default-image.jpg'" -->
+    <div class="card-text">
+      <div
+        *ngIf="articulo?.show_category"
+        ion-text
+        class="yellow"
+        class="card-subtitle"
+      >
+        <span>
+          <i class="fa fa-star"></i>
+          {{
+            (articulo?.categoria ? articulo?.categoria : "Category") | translate
+          }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container page">
+  <div class="row mb-2" *ngIf="origin === 'profile' && articulo?.idIglesia">
+    <div class="col-4 px-0">
+      <button (click)="backToSearch()" class="btn btn-sm btn-outline-citric">
+        <i class="fa fa-arrow-left"></i> Back
+      </button>
+    </div>
+  </div>
+  <div *ngIf="!articulo?.hide_title" class="row">
+    <div class="col-12">
+      <div ion-text color="black" class="card-title ion-text-wrap">
+        <h2>
+          {{ articulo?.titulo }}
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="articulo?.template">
+    <div
+      *ngIf="
+        (articulo?.template?.idTemplate == 26 &&
+          articulo?.template?.detail_info?.link_module_id == 7) ||
+        articulo?.template?.idTemplate == 21
+        && mailing_list
+      "
+    >
+      <iframe
+        *ngIf="!mailing_list?.is_v2"
+        [hidden]="loader"
+        (load)="finishLoad()"
+        [src]="contactSafeUrl"
+        style="
+          width: 100%;
+          height: 1100px;
+          overflow: hidden;
+          border-radius: 15px;
+        "
+        frameBorder="0"
+      >
+      </iframe>
+      <app-mailing-list-view
+        *ngIf="mailing_list?.is_v2"
+        #mailing_list_embed
+        [idOrganization]="articulo?.idIglesia"
+        [idMailingList]="mailing_list?.id"
+      ></app-mailing-list-view>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-12 p-0">
+      <br />
+      <articulo-media
+        #article_media
+        [id]="'id_' + articuloMedia.idArticuloMedia"
+        *ngFor="let articuloMedia of articulo?.segments"
+        [articuloMedia]="articuloMedia"
+        (close_others)="closeOthers($event)"
+      ></articulo-media>
+    </div>
+  </div>
+</div>

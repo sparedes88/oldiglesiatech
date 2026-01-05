@@ -1,0 +1,77 @@
+<ng-template [ngIf]="idSubmodule === 5">
+  <div class="property-box-list">
+    <ng-container>
+      <div class="row">
+        <app-groups-embed
+          class="col-12"
+          #group_embed_custom
+          [show_back_button]="false"
+          [idOrganization]="idOrganization"
+          [style_settings]="style_settings"
+          [element]="selected_item"
+        ></app-groups-embed>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template [ngIf]="idSubmodule === 6">
+  <div class="property-box-list">
+    <ng-container>
+      <div class="row">
+        <app-profile-galleries-display
+          #detail_category_articles_display
+          *ngIf="item_id && selected_item"
+          class="col-12"
+          [idOrganization]="idOrganization"
+          [view_mode]="'detail'"
+          [galleries]="[selected_item]"
+        >
+        </app-profile-galleries-display>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+<ng-template [ngIf]="idSubmodule === 7">
+  <div class="property-box-list">
+    <ng-container>
+      <div class="row">
+        <app-profile-contact-inbox-display
+          #detail_category_articles_display
+          *ngIf="item_id && selected_item"
+          class="col-12"
+          [idOrganization]="idOrganization"
+          [view_mode]="'detail'"
+          [contact_inboxes]="[selected_item]"
+        >
+        </app-profile-contact-inbox-display>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+<ng-template [ngIf]="idSubmodule === 10">
+  <div class="property-box-list">
+    <ng-container>
+      <div class="row">
+        <app-profile-articles-display
+          #detail_category_articles_display
+          *ngIf="item_id && selected_item"
+          class="col-12"
+          [is_main_page]="false"
+          [grid_info_settings]="grid_info_settings"
+          [idOrganization]="idOrganization"
+          [view_mode]="'detail'"
+          [categories]="[selected_item]"
+          [show_action_buttons]="false"
+        >
+          <!-- (onAddArticle)="
+            addArticle($event, detail_category_articles_display)
+          "
+          (onEditArticle)="
+            editArticle($event, detail_category_articles_display)
+          " -->
+        </app-profile-articles-display>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>

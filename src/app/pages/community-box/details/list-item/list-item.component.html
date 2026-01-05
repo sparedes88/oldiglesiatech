@@ -1,0 +1,212 @@
+<div
+  cdkDropList
+  class="item-dropzone parent"
+  [id]="parentItemId"
+  [cdkDropListData]="parentItem"
+  [cdkDropListConnectedTo]="allDropListsIds"
+  (cdkDropListDropped)="onDragDropAll($event)"
+>
+  <div
+    cdkDrag
+    [id]="item.uId"
+    [cdkDragData]="item"
+    [cdkDragDisabled]="dragDisabled || sort_mode"
+  >
+    <div class="item-drag-preview" *cdkDragPreview>
+      <!-- {{ item.name }} with {{ item.containers.length }} child item(s) -->
+      Drag this group inside any other you want
+    </div>
+    <div [formGroup]="form_element" class="row mx-0">
+      <div class="col-7 align-self-center">
+        <div
+          title="Drag this item with children"
+          class="item-drag-handle"
+          cdkDragHandle
+        >
+          <div
+            [hidden]="item.type !== 'container' && sort_mode"
+            class="form-group align-items-center mb-0"
+          >
+            <label [hidden]="has_limited_permission">
+              <span class="tooltip_">
+                <span class="tooltiptext"> Group name </span>
+                <small> Name </small>
+                <i class="text-secondary fa fa-info-circle"></i>
+              </span>
+            </label>
+            <input [hidden]="has_limited_permission" type="text" formControlName="name" class="form-control" />
+            <span [hidden]="!has_limited_permission">
+              {{ form_element.get('name').value }}
+            </span>
+          </div>
+
+          <div [hidden]="item.type !== 'container' || has_limited_permission" class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              formControlName="show_opened"
+              id="featuredCheck"
+            />
+            <label class="form-check-label" for="featuredCheck"
+              >Show opened?</label
+            >
+          </div>
+
+          <!-- {{ item.name }} -->
+          <!-- <i *ngIf="!dragDisabled && !sort_mode" class="material-icons">
+            drag_indicator
+          </i> -->
+          <svg
+            *ngIf="!dragDisabled && !sort_mode && !has_limited_permission"
+            width="24px"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"
+            ></path>
+            <path d="M0 0h24v24H0z" fill="none"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="col-5 text-right">
+        <div class="btn-group" *ngIf="!has_limited_permission">
+          <button
+            class="btn btn-sm btn-outline-success"
+            *ngIf="form_element.dirty"
+            (click)="updateContainer(item, form_element)"
+          >
+            Save
+          </button>
+          <button
+            class="btn btn-outline-citric btn-sm mr-1"
+            *ngIf="!sort_mode && !has_limited_permission"
+            (click)="triggerAction(item, 'add')"
+          >
+            <i class="fa fa-plus"></i>
+            Add Entry
+          </button>
+          <button
+            *ngIf="
+              sort_mode &&
+              parentItem &&
+              parentItem?.containers.length > 1 &&
+              !is_first(item) &&
+              !has_limited_permission
+            "
+            class="btn btn-sm"
+            (click)="onSortItem(item, 'up')"
+          >
+            <i class="fa fa-arrow-up"></i>
+          </button>
+          <button
+            *ngIf="
+              sort_mode &&
+              parentItem &&
+              parentItem?.containers.length > 1 &&
+              !is_last(item) &&
+              !has_limited_permission
+            "
+            class="btn btn-sm"
+            (click)="onSortItem(item, 'down')"
+          >
+            <i class="fa fa-arrow-down"></i>
+          </button>
+
+          <button
+            (click)="triggerContainerAction(item, form_element, 'add')"
+            class="btn btn-sm btn-success"
+          >
+            <i class="fa fa-plus"></i>
+          </button>
+          <button
+            class="btn btn-sm btn-info"
+            (click)="triggerContainerAction(item, form_element, 'edit')"
+          >
+            <i class="fa fa-edit"></i>
+          </button>
+
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="triggerContainerAction(item, form_element, 'delete')"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ul
+    cdkDropList
+    [ngClass]="{ 'item-dropzone': !sort_mode && !has_limited_permission, 'item-reduced': sort_mode || has_limited_permission }"
+    [id]="item.uId"
+    [cdkDropListConnectedTo]="connectedDropListsIds"
+    [cdkDropListData]="item"
+    (cdkDropListDropped)="onDragDrop($event)"
+  >
+    <li *ngFor="let subItem of item.containers">
+      <list-item
+        [item]="subItem"
+        [parentItem]="item"
+        [has_limited_permission]="has_limited_permission"
+        [connectedDropListsIds]="allDropListsIds"
+        (itemDrop)="onDragDrop($event)"
+        (sortItem)="sortItem.emit($event)"
+        (makeAction)="makeAction.emit($event)"
+        (makeActionContainer)="makeActionContainer.emit($event)"
+        [sort_mode]="sort_mode"
+      >
+      </list-item>
+    </li>
+  </ul>
+
+  <h6
+    *ngIf="item.type === 'container' && item.entries?.length > 0 && !sort_mode"
+  >
+    Entries
+  </h6>
+  <div
+    *ngIf="item.type === 'container' && item.entries?.length > 0 && !sort_mode"
+    cdkDropList
+    class="example-list"
+    [id]="item.uId"
+    [cdkDropListConnectedTo]="connectedDropListsIds"
+    [cdkDropListData]="item"
+    (cdkDropListDropped)="onDragDrop($event)"
+  >
+    <div
+      [cdkDragData]="entry"
+      class="example-box"
+      *ngFor="let entry of item.entries"
+      cdkDrag
+    >
+      {{ entry.business_name }}
+
+      <div class="item-drag-preview" *cdkDragPreview>
+        <!-- {{ item.name }} with {{ item.containers.length }} child item(s) -->
+        Drop this item inside an any drop-zone.
+      </div>
+
+      <div class="btn-group text-right">
+        <button
+          class="btn btn-sm btn-info"
+          (click)="triggerAction(entry, 'edit')"
+        >
+          <i class="fa fa-edit"></i>
+        </button>
+        <button
+          class="btn btn-sm btn-primary"
+          (click)="triggerAction(entry, 'view')"
+        >
+          <i class="fa fa-eye"></i>
+        </button>
+        <button
+          class="btn btn-sm btn-danger"
+          (click)="triggerAction(entry, 'delete')"
+        >
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

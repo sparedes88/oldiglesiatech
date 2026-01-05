@@ -1,0 +1,162 @@
+<form *ngIf="view_type === 'edition'" [formGroup]="form_group">
+  <div class="form-group">
+    <label> Input type </label>
+    <select
+      class="form-control"
+      formControlName="idMailingListInputType"
+      (change)="setSelectedType()"
+    >
+      <option selected disabled value="">-- Select an option</option>
+      <option *ngFor="let input of input_types" [value]="input.id">
+        {{ input.name }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="selected_type" class="row">
+    <div class="col-12">
+      <div class="form-group">
+        <label> Label </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="label"
+          [class.is-invalid]="
+            form_group.get('label').dirty && form_group.get('label').invalid
+          "
+        />
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="form-group">
+        <label> Placeholder </label>
+        <input type="text" class="form-control" formControlName="placeholder" />
+        <small class="form-text text-muted"> (Optional) </small>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          formControlName="should_be_required"
+        />
+        <label class="form-check-label"> Should be required? </label>
+        <small class="form-text text-muted">
+          If you check this option: Your input will be set <i> required </i> as
+          default (you can change this).
+        </small>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          formControlName="show_hint"
+        />
+        <label class="form-check-label"> Show hint? </label>
+        <small class="form-text text-muted">
+          Check this option to show a text to help the people on how to fill the
+          input.
+        </small>
+      </div>
+    </div>
+    <div *ngIf="form_group.get('show_hint').value" class="col-12">
+      <div class="form-group">
+        <label> Hint </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="hint"
+          required
+          [class.is-invalid]="
+            form_group.get('hint').dirty && form_group.get('hint').invalid
+          "
+        />
+      </div>
+    </div>
+    <div
+      formArrayName="options"
+      *ngIf="selected_type.need_options"
+      class="col-12"
+    >
+      <div class="row">
+        <div *ngIf="options_array.length === 0" class="col-12 text-right">
+          <button class="btn btn-sm" (click)="addNewOption()">
+            <i class="fa fa-plus text-success"></i>
+          </button>
+        </div>
+      </div>
+      <div
+        *ngFor="
+          let option of options_array.controls;
+          let i = index;
+          let l = last
+        "
+        class="col-12"
+        [formGroupName]="i"
+      >
+        <div class="row">
+          <div class="col-12">
+            <h5>Option {{ i + 1 }}</h5>
+          </div>
+          <div class="col-4">
+            <div class="form-group">
+              <label> Text/Label </label>
+              <input
+                class="form-control"
+                formControlName="name"
+                type="text"
+                [class.is-invalid]="
+                  option.get('name').dirty && option.get('name').invalid
+                "
+              />
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-group">
+              <label> Value </label>
+              <input
+                class="form-control"
+                formControlName="value"
+                type="text"
+                [class.is-invalid]="
+                  option.get('value').dirty && option.get('value').invalid
+                "
+              />
+            </div>
+          </div>
+          <div class="col-4 text-right">
+            <!-- <button class="btn btn-sm" (click)="editOption(option)">
+              <i class="fa fa-edit text-info"></i>
+            </button> -->
+            <button class="btn btn-sm mr-3" (click)="deleteOption(option, i)">
+              <i class="fa fa-trash text-danger"></i>
+            </button>
+            <button
+              class="btn btn-sm"
+              (click)="addNewOption()"
+              [disabled]="option.invalid"
+              *ngIf="l"
+            >
+              <i class="fa fa-plus text-success"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <span *ngIf="options_array.length === 0" class="text-danger">
+        * This input need at least 1 option.
+      </span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 text-center">
+      <button class="btn btn-sm btn-citric" (click)="submit()">Submit</button>
+    </div>
+  </div>
+</form>
+
+<div *ngIf="view_type === 'view'">TEST</div>

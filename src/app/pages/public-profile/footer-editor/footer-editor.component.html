@@ -1,0 +1,147 @@
+<div class="row">
+  <div class="col-12 text-center">
+    <h4>Footer</h4>
+  </div>
+  <div class="col-12">
+    <div class="btn-group text-right mb-1">
+      <button class="btn btn-outline-success btn-sm" (click)="insertRow()">
+        <i class="fa fa-plus"></i>
+        Add column
+      </button>
+      <button class="btn btn-outline-info btn-sm" (click)="footerModal.open()">
+        <i class="fa fa-edit"></i>
+        Footer style
+      </button>
+      <button
+        class="btn btn-outline-primary btn-sm"
+        (click)="preview = !preview"
+      >
+        <i class="fa fa-eye"></i>
+        {{ preview ? "Edit" : "Preview" }}
+      </button>
+      <button class="btn btn-outline-danger btn-sm" (click)="deleteFooter()">
+        <i class="fa fa-trash"></i>
+        Delete footer
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row footer-editor" *ngIf="!preview">
+  <div
+    class="col-xs-12"
+    [ngClass]="customRowsClasses"
+    *ngFor="let row of footer.rows; let idx = index"
+  >
+    <text-editor
+      [(ngModel)]="row.content"
+      [identifier]="'footer-col-' + idx"
+    ></text-editor>
+    <div class="text-center">
+      <button class="btn btn-outline-danger btn-sm" (click)="removeRow(idx)">
+        <i class="fa fa-trash"></i>
+        Delete column
+      </button>
+    </div>
+  </div>
+</div>
+
+<profile-footer [footer]="footer" *ngIf="preview"></profile-footer>
+
+<ngx-smart-modal identifier="footerModal" #footerModal>
+  <h4>Change footer style</h4>
+  <form (ngSubmit)="footerModal.close()" #styleForm="ngForm">
+    <div class="row">
+      <div class="col-6">
+        <!-- Footer Background color -->
+        <div class="form-group">
+          <label>Footer background color</label>
+          <input
+            type="color"
+            name="background_color"
+            class="form-control"
+            [(ngModel)]="footer.background_color"
+          />
+        </div>
+      </div>
+      <div class="col-6">
+        <!-- Footer font color -->
+        <div class="form-group">
+          <label>Footer text color</label>
+          <input
+            type="color"
+            name="text_color"
+            class="form-control"
+            [(ngModel)]="footer.text_color"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-6">
+        <!-- Footer number of columns -->
+        <img
+          *ngIf="footer.background_image"
+          [src]="footer.background_image"
+          alt=""
+          class="responsive-img"
+        />
+        <button
+          *ngIf="footer.background_image"
+          type="button"
+          class="btn btn-sm btn-danger"
+          (click)="deleteBgPhoto()"
+        >
+          <i class="fa fa-trash"></i>
+        </button>
+        <div class="form-group">
+          <label>Background Image</label>
+          <input
+            type="file"
+            name="text_color"
+            class="form-control"
+            min="1"
+            max="12"
+            (change)="addBgImage($event.target.files[0])"
+          />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group">
+          <label>Background position</label>
+          <select
+            [(ngModel)]="footer.background_position"
+            name="background_position"
+            class="form-control"
+          >
+            <option *ngFor="let position of positions" [value]="position">
+              {{ position }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group">
+          <label>Background size</label>
+          <select
+            [(ngModel)]="footer.background_size"
+            name="background_size"
+            class="form-control"
+          >
+            <option *ngFor="let size of sizes" [value]="size">
+              {{ size }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button class="btn btn-success" [disabled]="styleForm.invalid">
+        Submit
+        <i class="fa fa-paper-plane"></i>
+      </button>
+    </div>
+  </form>
+</ngx-smart-modal>

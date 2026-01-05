@@ -1,0 +1,31 @@
+.bold {
+    font-weight: 700;
+}
+.m-b-spacer-none {
+    margin-bottom: 0;
+}
+.max-w-200 {
+    max-width: 200px !important;
+}
+.ellipsis_3 {
+    display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    /* autoprefixer: off */
+}
+.text-dark {
+    color: #212529 !important;
+}
+.half-here {
+    opacity: 0.5;
+}
+.recent_video_thumbnail {
+    height: auto;
+    width: 100%;
+}
+.ec-border-radius {
+    border-radius: 10px;
+}

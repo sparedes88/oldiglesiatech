@@ -1,0 +1,33 @@
+<a class="card" id="card-link" target="_blank">
+  <div
+    *ngIf="show_img"
+    class="card__body body__img"
+    [ngClass]="{ 'mb-0': !show_body && !show_footer && !show_button }"
+  >
+    <img class="skeleton" alt="" id="cover-img" />
+  </div>
+  <div *ngIf="show_body" class="card__header">
+    <h3 class="card__header header__title" id="card-title">
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+    </h3>
+  </div>
+
+  <div *ngIf="show_body" class="card__body">
+    <div class="card__body body__text" id="card-details">
+      <div class="skeleton skeleton-text skeleton-text__body"></div>
+    </div>
+  </div>
+
+  <div *ngIf="show_footer" class="card__footer" id="card-footer">
+    <div class="skeleton skeleton-text skeleton-footer"></div>
+  </div>
+
+  <div *ngIf="show_button" class="card__button" id="card-button">
+    <div class="skeleton skeleton-text skeleton-button"></div>
+  </div>
+
+  <div *ngIf="show_input" class="card__input" id="card-input">
+    <input disabled class="form-control skeleton skeleton-input mb-0"/>
+  </div>
+</a>

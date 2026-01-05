@@ -1,0 +1,36 @@
+<ng-template [ngIf]="!mailing_list">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="
+        height: 120px;
+        width: 120px;
+        font-size: 15px;
+        border-width: 0.45em;
+      "
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<iframe
+  *ngIf="mailing_list && !mailing_list?.is_v2"
+  [hidden]="loading"
+  (load)="finishLoad()"
+  [src]="contactSafeUrl"
+  style="width: 100%; height: 1100px; overflow: hidden; border-radius: 15px"
+  frameBorder="0"
+>
+</iframe>
+
+<app-mailing-list-view
+  #mailing_list_embed
+  *ngIf="mailing_list && mailing_list?.is_v2"
+  [idOrganization]="idOrganization"
+  [idMailingList]="idMailingList"
+  [extra_display_settings]="extra_display_settings"
+  [language]="language"
+></app-mailing-list-view>

@@ -1,0 +1,33 @@
+.page {
+  padding: 10px;
+}
+.status {
+  padding: 5px;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+}
+
+.summary {
+  display: inline-block;
+  width: 90%;
+  font-weight: 600;
+  font-size: 35px;
+}
+
+
+.card-img-top-fixed {
+  object-fit: cover;
+  object-position: left center;
+  height: 200px;
+}
+
+.card-fixed-text {
+  height: 200px;
+}
+
+.card {
+  border: none !important;
+}

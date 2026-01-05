@@ -1,0 +1,708 @@
+<div class="container">
+  <div [hidden]="loading" class="row mt-2">
+    <div class="col-xs-8 col-md-6">
+      <h2 class="text-citric mt-2">Contact Inbox | {{ mailingList?.name }}</h2>
+      <h6 class="text-muted mb-0">
+        {{ mailingList?.setup?.header_text }}
+      </h6>
+    </div>
+    <div class="col-xs-4 col-md-6 text-right">
+      <button class="btn btn-sm btn-tech" routerLink="categories">
+        <i class="fa fa-th"></i> Categories
+      </button>
+      <button
+        class="btn btn-primary btn-sm ml-2"
+        (click)="mailingListModal.open()"
+      >
+        <i class="fa fa-code"></i>
+        Embed Form
+      </button>
+      <button
+        class="btn btn-primary btn-sm ml-2"
+        (click)="openLinkInBrowser('en')"
+      >
+        <!-- (click)="mailingListLinkModal.open()" -->
+        <i class="fa fa-code"></i>
+        Open Form
+      </button>
+      <button
+        class="btn btn-primary btn-sm ml-2"
+        (click)="openLinkInBrowser('es')"
+      >
+        <!-- (click)="mailingListLinkModal.open()" -->
+        <i class="fa fa-code"></i>
+        Abrir formulario
+      </button>
+    </div>
+
+    <div class="col-12 mt-3 mb-2">
+      <h5 class="mb-0">
+        Level of accomplished: {{ percent | number : "1.0-2" }}%
+      </h5>
+      <small class="text-citric">
+        * The info displayed is according to the filters applied.
+      </small>
+    </div>
+    <div class="col-12">
+      <h5>Accomplished by level</h5>
+    </div>
+    <div class="col-6 col-md-4" *ngFor="let status of statuses">
+      <span class="text-secondary">
+        <b>
+          {{ status.name }}
+        </b>
+      </span>
+      accomplished by: {{ getStatusPercent(status) | number : "1.0-2" }}%
+    </div>
+  </div>
+  <hr />
+
+  <ng-template [ngIf]="loading">
+    <div class="d-flex justify-content-center" style="margin: 15%">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+
+  <div
+    [hidden]="loading"
+    class="row justify-content-end"
+    [formGroup]="contact_filters_form"
+  >
+    <div class="col-12">
+      <h5 class="text-citric">Filter contacts</h5>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="idUserType"> Name </label>
+        <input class="form-control" type="text" formControlName="name" />
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="idUserType"> Status </label>
+        <ng-multiselect-dropdown
+          #multi_user_type_select
+          placeholder="Select an status"
+          [data]="statuses"
+          [settings]="selectStatusOption"
+          formControlName="status"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="idUserType"> Dates (MM-DD, YYYY)</label>
+        <ng-multiselect-dropdown
+          #multi_user_type_select
+          placeholder="Select a date"
+          [data]="mailing_filters.dates"
+          [settings]="selectUserTypeOptions"
+          formControlName="dates"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="idUserType"> Show</label>
+        <select
+          class="form-control"
+          placeholder="Select a date"
+          formControlName="show"
+        >
+          <option value="all">All</option>
+          <option value="complete">Complete</option>
+          <option value="incomplete">Incomplete</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-3" [hidden]="hide_assigned">
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="idUserType"> Assigned to </label>
+        <ng-multiselect-dropdown
+          #multi_user_type_select
+          placeholder="Select an user"
+          [data]="mailing_filters.assigned_to"
+          [settings]="selectUserTypeOptions"
+          formControlName="assigned"
+        ></ng-multiselect-dropdown>
+      </div>
+    </div>
+    <div class="col-12 col-md-10 text-right my-md-3">
+      <button
+        class="btn btn-sm btn-success mr-2"
+        (click)="printReport()"
+        [disabled]="is_downloading"
+        [ngClass]="{ 'is-loading': is_downloading }"
+        style="position: relative"
+      >
+        <i class="fa fa-print"></i>
+        Print
+      </button>
+      <button
+        class="btn btn-sm btn-primary mr-2"
+        (click)="view_columns = !view_columns"
+      >
+        <i class="fa" [ngClass]="view_columns ? 'fa-eye-slash' : 'fa-eye'"></i>
+        {{ view_columns ? "Hide columns" : "Show columns" }}
+      </button>
+    </div>
+    <div class="col-md-2 my-2 my-md-3 text-right text-md-left">
+      <div class="form-group form-check mb-0">
+        <input
+          formControlName="hide_assigned"
+          type="checkbox"
+          class="form-check-input"
+          id="is_visible"
+        />
+        <label class="form-check-label" for="is_visible"> Hide assigned </label>
+      </div>
+      <div class="form-group form-check mb-0">
+        <input
+          formControlName="show_notes"
+          type="checkbox"
+          class="form-check-input"
+          id="show_notes"
+        />
+        <label class="form-check-label" for="is_visible"> Show notes </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- <table>
+    <thead>
+      <tr>
+        <th>Actual Date</th>
+        <th>Format</th>
+        <th>TimeZone</th>
+        <th>Offset</th>
+        <th>Fixed</th>
+        <th>Format</th>
+        <th>Original</th>
+        <th>Format</th>
+        <th>Original F</th>
+        <th>Format</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let test of test_times">
+        <td>{{ test.actual_date }}</td>
+        <td>{{ test.actual_date | date : 'long':test.abbr}}</td>
+        <td>{{ test.timezone }}</td>
+        <td>{{ test.current_utc_offset }}</td>
+        <td>{{ test.time_zone_est }}</td>
+        <td>{{ test.time_zone_est | date: 'long' :test.abbr }}</td>
+        <td>{{ test.actual_date_original }}</td>
+        <td>{{ test.actual_date_original | date: 'long' :test.abbr }}</td>
+        <td>{{ test.original_tz }}</td>
+        <td>{{ test.original_tz | date: 'long' :test.abbr }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <table>
+    <thead>
+      <tr>
+        <th>Actual Date</th>
+        <th>Format</th>
+        <th>TimeZone</th>
+        <th>Offset</th>
+        <th>Fixed</th>
+        <th>Format</th>
+        <th>Original</th>
+        <th>Format</th>
+        <th>Original F</th>
+        <th>Format</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let test of test_times_prod">
+        <td>{{ test.actual_date }}</td>
+        <td>{{ test.actual_date | date : 'long'}}</td>
+        <td>{{ test.timezone }}</td>
+        <td>{{ test.current_utc_offset }}</td>
+        <td>{{ test.time_zone_est }}</td>
+        <td>{{ test.time_zone_est | date: 'long' }}</td>
+        <td>{{ test.actual_date_original }}</td>
+        <td>{{ test.actual_date_original | date: 'long' }}</td>
+        <td>{{ test.original_tz }}</td>
+        <td>{{ test.original_tz | date: 'long' }}</td>
+      </tr>
+    </tbody>
+  </table> -->
+  <div [hidden]="loading" class="col-12 scroll-x p-0 scroll-y">
+    <table
+      [ngStyle]="{ width: get_width }"
+      class="table table-bordered row-border mt-3"
+      [formGroup]="contacts_form"
+    >
+      <thead>
+        <tr>
+          <th width="200px">Full Name</th>
+          <th width="200px">Date</th>
+          <th width="200px" *ngIf="!hide_assigned">Assigned</th>
+          <th width="200px">%</th>
+          <th
+            *ngFor="let category of selected_statuses"
+            width="200px"
+            class="text-center"
+          >
+            <span class="tooltip_">
+              <span class="tooltiptext tooltiptextBottom">
+                {{ category.description }}
+              </span>
+              {{ category.name }}
+            </span>
+          </th>
+
+          <th
+            width="200px"
+            *ngIf="view_columns || !mailingList.setup?.hide_email_input"
+          >
+            Email
+          </th>
+          <th
+            width="200px"
+          >
+            Phone
+          </th>
+          <th
+            width="200px"
+            *ngIf="view_columns || !mailingList.setup?.hide_message_input"
+          >
+            Message
+          </th>
+          <th
+            width="200px"
+            *ngIf="view_columns || mailingList.setup?.display_events"
+          >
+            Events
+          </th>
+          <th
+            width="200px"
+            *ngIf="view_columns || mailingList.setup?.display_groups"
+          >
+            Groups
+          </th>
+          <th
+            width="200px"
+            *ngIf="view_columns || mailingList.setup?.display_e_group_question"
+          >
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Question: '{{ mailingList.setup.question_1_text }}'
+              </span>
+              Question 1
+            </span>
+          </th>
+          <th
+            width="200px"
+            *ngIf="view_columns || mailingList.setup?.display_e_team_question"
+          >
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Question: '{{ mailingList.setup.question_2_text }}'
+              </span>
+              Question 2
+            </span>
+          </th>
+          <th
+            width="200px"
+            *ngIf="view_columns || !mailingList.setup?.hide_custom_input"
+          >
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Question: '{{ mailingList.setup?.custom_text }}'
+              </span>
+              Custom
+              <!-- <br /> -->
+              Question
+            </span>
+          </th>
+
+          <th>Options</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="contacts">
+        <tr
+          class="sticky-tr"
+          *ngFor="let contact of mailing_contacts_filtered; let i = index"
+          [formGroupName]="contact.index"
+        >
+          <td>
+            {{ contact.first_name }}
+            {{ contact.last_name }}
+          </td>
+          <td>
+            <!-- {{ contact.created_at_format }}
+            <br> -->
+            {{
+              contact.new_created_at
+                | date : "MMM. dd yyyy hh:mm aa" : contact.tz_abbr
+            }}
+          </td>
+          <td *ngIf="!hide_assigned">
+            <ng-template [ngIf]="!contact._editable">
+              <div
+                class="clickable"
+                [ngClass]="{ italic: !contact.assigned_to }"
+                (click)="contact._editable = true"
+              >
+                <span>
+                  {{ contact.assigned_to ? contact.assigned_to_user : "Unset" }}
+                </span>
+              </div>
+            </ng-template>
+
+            <ng-template [ngIf]="contact._editable">
+              <ng-multiselect-dropdown
+                placeholder="Select admin"
+                [data]="admins"
+                [settings]="selectAdminOptions"
+                [(ngModel)]="contact.assigned_user"
+                [ngModelOptions]="{ standalone: true }"
+                (onSelect)="updateUserField($event, contact, 'assigned_to')"
+              ></ng-multiselect-dropdown>
+            </ng-template>
+          </td>
+          <td>{{ contact.checked_percent | number : "1.0-2" }}%</td>
+          <td *ngFor="let status of selected_statuses">
+            <div class="col-12 align-self-center text-center mb-4">
+              <input
+                type="checkbox"
+                [id]="
+                  'contact_' +
+                  contact.id +
+                  '_' +
+                  status.idMailingListContactStatus
+                "
+                name="customRadio"
+                [formControlName]="
+                  'status_' + status.idMailingListContactStatus
+                "
+                (change)="setStatus(contact, i, status)"
+              />
+              <label
+                style="cursor: pointer"
+                [for]="
+                  'contact_' +
+                  contact.id +
+                  '_' +
+                  status.idMailingListContactStatus
+                "
+              >
+              </label>
+            </div>
+          </td>
+          <td *ngIf="view_columns || !mailingList.setup?.hide_email_input">
+            {{ contact.email || "--" }}
+          </td>
+          <td
+            width="180px"
+          >
+            {{ contact.country_code + " " + contact.phone || "--" }}
+          </td>
+          <td *ngIf="view_columns || !mailingList.setup?.hide_message_input">
+            {{ contact.message || "--" }}
+          </td>
+          <td *ngIf="view_columns || mailingList.setup?.display_events">
+            <li *ngFor="let event of contact.selected_events">
+              <small>
+                {{ event.name }}
+              </small>
+            </li>
+          </td>
+          <td *ngIf="view_columns || mailingList.setup?.display_groups">
+            <li *ngFor="let group of contact.selected_groups">
+              <small>
+                {{ group.title }}
+              </small>
+            </li>
+          </td>
+          <td
+            *ngIf="view_columns || mailingList.setup?.display_e_group_question"
+          >
+            {{ contact.question_1_answer || "--" }}
+          </td>
+          <td
+            *ngIf="view_columns || mailingList.setup?.display_e_team_question"
+          >
+            {{ contact.question_2_answer || "--" }}
+          </td>
+          <td *ngIf="view_columns || !mailingList.setup?.hide_custom_input">
+            {{ contact.custom_answer || "--" }}
+          </td>
+
+          <td>
+            <div *ngIf="!contact.converted_to_user" class="btn-group">
+              <button
+                class="btn btn-outline-info btn-sm"
+                [routerLink]="'contact/' + contact.id + '/detail'"
+              >
+                <i class="fa fa-eye"></i>
+              </button>
+              <button
+                class="btn btn-outline-warning btn-sm"
+                [routerLink]="'contact/' + contact.id + '/edit'"
+              >
+                <i class="fa fa-pencil"></i>
+              </button>
+              <button
+                class="btn btn-outline-success btn-sm tooltip_"
+                [disabled]="loading_events || loading_groups"
+                (click)="openConvertToContact(contact)"
+              >
+                <span
+                  class="tooltiptext"
+                  *ngIf="loading_events || loading_groups"
+                >
+                  Please wait... Getting groups and events.
+                </span>
+                <span
+                  class="tooltiptext"
+                  *ngIf="!loading_events && !loading_groups"
+                >
+                  This button will help you to create a contact.
+                </span>
+                <i class="fa fa-address-card"> </i>
+              </button>
+              <button
+                class="btn btn-outline-danger btn-sm"
+                (click)="deleteContact(contact)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+              <!-- <button class="btn btn-outline-danger btn-sm">
+              <i class="fa fa-trash"></i>
+            </button> -->
+            </div>
+            <div *ngIf="contact.converted_to_user" class="text-success">
+              Converted to member
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- <table
+      datatable
+      [dtOptions]="dtOptions"
+      [dtTrigger]="dtTrigger"
+      class="table row-border hover mt-4"
+    >
+      <thead>
+        <tr>
+          <th width="180px">Status</th>
+          <th width="40px">Date</th>
+          <th width="90px">Name</th>
+          <th width="120px" *ngIf="!mailingList.setup?.hide_emails">Email</th>
+          <th width="180px" *ngIf="!mailingList.setup?.hide_phones">Phone</th>
+          <th width="140px" *ngIf="!mailingList.setup?.hide_message_input">
+            Message
+          </th>
+          <th width="200px" *ngIf="mailingList.setup?.display_events">
+            Events
+          </th>
+          <th width="200px" *ngIf="mailingList.setup?.display_groups">
+            Groups
+          </th>
+          <th *ngIf="mailingList.setup?.display_e_group_question">
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Question: '{{ mailingList.setup.question_1_text }}'
+              </span>
+              Question 1
+            </span>
+          </th>
+          <th *ngIf="mailingList.setup?.display_e_team_question">
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Question: '{{ mailingList.setup.question_2_text }}'
+              </span>
+              Question 2
+            </span>
+          </th>
+          <th *ngIf="!mailingList.setup?.hide_custom_input">
+            <span class="tooltip_">
+              <span class="tooltiptext">
+                Question: '{{ mailingList.setup?.custom_text }}'
+              </span>
+              Custom
+              <br />
+              Question
+            </span>
+          </th>
+          <th width="250px">Assigned to</th>
+          <th>Options</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let contact of contacts">
+          <td>
+            <ng-multiselect-dropdown
+              placeholder="Select category"
+              [data]="statuses"
+              [settings]="selectCatOptions"
+              [(ngModel)]="contact.category"
+              (onSelect)="contact._edited = true"
+              (onDeSelect)="contact._edited = true"
+            ></ng-multiselect-dropdown>
+
+            <button
+              (click)="updateStatus(contact)"
+              *ngIf="contact._edited"
+              class="btn btn-sm btn-success mt-2 float-right"
+            >
+              Save
+            </button>
+          </td>
+          <td>
+            {{
+              contact.created_at
+                ? (contact.created_at | date: "MMM, dd yyyy HH:mm")
+                : "N/A"
+            }}
+          </td>
+          <td>
+            {{ contact.first_name }}
+            {{ contact.last_name }}
+          </td>
+          <td *ngIf="!mailingList.setup?.hide_emails">
+            {{ contact.email || "--" }}
+          </td>
+          <td *ngIf="!mailingList.setup?.hide_phones" width="180px">
+            {{ contact.country_code + " " + contact.phone || "--" }}
+          </td>
+          <td *ngIf="!mailingList.setup?.hide_message_input">
+            {{ contact.message || "--" }}
+          </td>
+          <td *ngIf="mailingList.setup?.display_events">
+            <li *ngFor="let event of contact.selected_events">
+              <small>
+                {{ event.name }}
+              </small>
+            </li>
+          </td>
+          <td *ngIf="mailingList.setup?.display_groups">
+            <li *ngFor="let group of contact.selected_groups">
+              <small>
+                {{ group.title }}
+              </small>
+            </li>
+          </td>
+          <td *ngIf="mailingList.setup?.display_e_group_question">
+            {{ contact.question_1_answer || "--" }}
+          </td>
+          <td *ngIf="mailingList.setup?.display_e_team_question">
+            {{ contact.question_2_answer || "--" }}
+          </td>
+          <td *ngIf="!mailingList.setup?.hide_custom_input">
+            {{ contact.custom_answer || "--" }}
+          </td>
+          <td>
+            <ng-multiselect-dropdown
+              placeholder="Select admin"
+              [data]="admins"
+              [settings]="selectAdminOptions"
+              [(ngModel)]="contact.assigned_user"
+              (onSelect)="updateUserField($event, contact, 'assigned_to')"
+            ></ng-multiselect-dropdown>
+          </td>
+          <td>
+            <div *ngIf="!contact.converted_to_user" class="btn-group">
+              <button
+                class="btn btn-outline-success btn-sm tooltip_"
+                [disabled]="loading_events || loading_groups"
+                (click)="openConvertToContact(contact)"
+              >
+                <span
+                  class="tooltiptext"
+                  *ngIf="loading_events || loading_groups"
+                >
+                  Please wait... Getting groups and events.
+                </span>
+                <span
+                  class="tooltiptext"
+                  *ngIf="!loading_events && !loading_groups"
+                >
+                  This button will help you to create a contact.
+                </span>
+                <i class="fa fa-address-card"> </i>
+              </button>
+              <button
+                class="btn btn-outline-danger btn-sm"
+                (click)="deleteContact(contact)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+            <div *ngIf="contact.converted_to_user" class="text-success">
+              Converted to member
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table> -->
+  </div>
+</div>
+
+<ngx-smart-modal identifier="mailingListModal" #mailingListModal>
+  <h4>Embed Contact Inbox Form</h4>
+  <p>Entry point</p>
+
+  <div class="form-group mt-1">
+    <label for="selectLang">Select language</label>
+    <select class="form-control" id="selectLang" [(ngModel)]="linkLang">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+    </select>
+  </div>
+
+  <pre
+    style="background-color: #555555; color: white; padding: 8px"
+    [innerText]="embedCode.entry_point"
+  ></pre>
+
+  <p>Scripts</p>
+  <pre
+    style="background-color: #555555; padding: 8px; color: white"
+    [innerText]="embedCode.scripts"
+  ></pre>
+</ngx-smart-modal>
+
+<ngx-smart-modal identifier="mailingListModal" #mailingListLinkModal>
+  <h4>Embed Contact Inbox Form</h4>
+
+  <pre style="background-color: #e2e2e2; padding: 8px">
+    {{ embedCode.direct_link }}
+  </pre>
+
+  <div class="form-group mt-1">
+    <label for="selectLang">Select language</label>
+    <select class="form-control" id="selectLang" [(ngModel)]="linkLang">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+    </select>
+  </div>
+
+  <p>Copy this url and paste use it on you website</p>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  identifier="convert_to_user"
+  #convert_to_user
+  (onAnyCloseEvent)="selected_contact = undefined"
+  customClass="large-modal"
+>
+  <app-convert-to-user
+    *ngIf="selected_contact"
+    #convert_to_user_form
+    [contact]="selected_contact"
+    [mailing_list]="mailingList"
+    [currentUser]="currentUser"
+    (already_finished)="updateUser($event)"
+  ></app-convert-to-user>
+</ngx-smart-modal>

@@ -1,0 +1,161 @@
+<div class="col-12" [hidden]="!hide_preview">
+  <ng-template [ngIf]="hide_preview">
+    <div class="d-flex justify-content-center" style="margin: 140px;">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem;"
+        role="status"
+      ></div>
+    </div>
+  </ng-template>
+</div>
+<div [hidden]="hide_preview" class="container px-0">
+  <div class="row panel">
+    <div *ngIf="booking" class="col-12">
+      <h3 class="text-citric">
+        {{ booking.summary }}
+      </h3>
+      <p class="text-muted">
+        {{ booking.description }}
+      </p>
+    </div>
+    <div class="col-12 text-right mb-1">
+      <div class="btn-group">
+        <button
+          class="btn btn-sm btn-outline-citric"
+          [ngClass]="{ active: view_type === 'weekly' }"
+          (click)="view_type = 'weekly'"
+        >
+          Weekly
+        </button>
+        <button
+          class="btn btn-sm btn-outline-citric"
+          [ngClass]="{ active: view_type !== 'weekly' }"
+          (click)="view_type = 'daily'"
+        >
+          Daily
+        </button>
+      </div>
+    </div>
+    <div class="col-12 col-md-4 align-self-center text-center mb-1">
+      <small> Time Zone <br /> </small>
+      <span class="text-muted time-zone">
+        {{ time_zone.name }}
+      </span>
+    </div>
+    <div class="col-6 col-md-4 align-self-center text-center mb-1">
+      <span class="strong">
+        {{ days[0].date | date: "MMMM yyyy" | uppercase }}
+      </span>
+    </div>
+    <div class="col-6 col-md-4 align-self-center text-center mb-1">
+      <div class="btn-group">
+        <button class="btn btn-sm btn-light">
+          <i class="fa fa-calendar-check"></i>
+        </button>
+        <button class="btn btn-sm btn-light" (click)="addOrLessDays(false)">
+          <
+        </button>
+        <button class="btn btn-sm btn-light" (click)="addOrLessDays(true)">
+          >
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center m-0" *ngIf="view_type === 'weekly'">
+    <div
+      [ngClass]="{ 'column-disabled': checkDayAvailability(day) }"
+      class="col-fixed-7 align-self-end"
+      *ngFor="let day of days; let i = index"
+    >
+      <div
+        class="col-header text-center"
+        [ngClass]="{
+          today: checkIfToday(day.date),
+          'mx-md-2': checkIfToday(day.date),
+          'mx-1': checkIfToday(day.date)
+        }"
+      >
+        <span class="text-muted">
+          <small class="text-citric" *ngIf="checkIfToday(day.date)">
+            Today <br />
+          </small>
+          {{ day.name | translate | slice: "0":"3" }}
+          <h3 class="mb-0">
+            {{ day.date | date: "dd" }}
+          </h3>
+        </span>
+      </div>
+
+      <div class="col-12 px-1 px-md-2">
+        <div
+          *ngFor="let appointment of day.appointments"
+          class="appointment"
+          [ngClass]="{
+            'busy-appointment': !appointment.available,
+            'free-appointment': appointment.available
+          }"
+          (click)="bookAppointment(appointment, day, booking_appointment_modal)"
+        >
+          {{ appointment.start_time_formatted }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center m-0" *ngIf="view_type === 'daily'">
+    <div
+      [ngClass]="{ 'column-disabled': checkDayAvailability(day) }"
+      class="col-8 align-self-end"
+      *ngFor="let day of getActualDay(days); let i = index"
+    >
+      <div
+        class="col-header text-center"
+        [ngClass]="{
+          today: checkIfToday(day.date),
+          'mx-md-2': checkIfToday(day.date),
+          'mx-1': checkIfToday(day.date)
+        }"
+      >
+        <span class="text-muted">
+          <small class="text-citric" *ngIf="checkIfToday(day.date)">
+            Today <br />
+          </small>
+          {{ day.name | translate | slice: "0":"3" }}
+          <h3 class="mb-0">
+            {{ day.date | date: "dd" }}
+          </h3>
+        </span>
+      </div>
+
+      <div class="col-12 px-1 px-md-2">
+        <div
+          *ngFor="let appointment of day.appointments"
+          class="appointment"
+          [ngClass]="{
+            'busy-appointment': !appointment.available,
+            'free-appointment': appointment.available
+          }"
+          (click)="bookAppointment(appointment, day, booking_appointment_modal)"
+        >
+          {{ appointment.start_time_formatted }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #booking_appointment_modal
+  identifier="booking_appointment_modal"
+  [dismissable]="false"
+  [closable]="false"
+>
+  <ng-template [ngIf]="appointment_selected">
+    <app-booking-appointment-form
+      #booking_appointment_form
+      (onDismiss)="dismissAppointment($event, booking_appointment_modal)"
+    >
+    </app-booking-appointment-form>
+  </ng-template>
+</ngx-smart-modal>

@@ -1,0 +1,60 @@
+<div class="mb-2 border-0" [formGroup]="text_editor_form">
+  <div class="form-group form-check mb-2 text-left">
+    <input
+      formControlName="display_label"
+      type="checkbox"
+      class="form-check-input"
+      id="shadow_check"
+    />
+    <label class="form-check-label" for="shadow_check"> Show label? </label>
+  </div>
+
+  <mat-form-field
+    *ngIf="text_editor_form.get('display_label').value"
+    appearance="outline"
+    class="no-padding w-100"
+  >
+    <mat-label
+      [ngClass]="{
+        'text-danger': text_editor_form.get('label').invalid
+      }"
+    >
+      Label
+    </mat-label>
+    <input type="text" formControlName="label" matInput />
+  </mat-form-field>
+
+  <h6
+    class="card-subtitle mb-2"
+    [ngClass]="{
+      'text-danger': text_editor_form.get('description').invalid,
+      'text-dark': text_editor_form.get('description').valid
+    }"
+  >
+    Descripción&nbsp;
+    <i
+      *ngIf="text_editor_form.get('description').invalid"
+      class="fa fa-times"
+      aria-hidden="true"
+    ></i>
+  </h6>
+  <!-- [id]="container.identifier"
+[identifier]="container.identifier" -->
+  <text-editor
+    #disclaimer_settings_editor
+    [hide_font_buttons]="true"
+    [height]="'100%'"
+    formControlName="description"
+    (change)="updateSanitizeContent()"
+  ></text-editor>
+
+  <div class="my-2 text-center">
+    <button
+      [disabled]="submit_loading"
+      (click)="saveSettings()"
+      class="btn btn-success btn-sm"
+    >
+      Save <i class="fa fa-save" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>

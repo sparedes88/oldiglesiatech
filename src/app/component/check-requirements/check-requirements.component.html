@@ -1,0 +1,34 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11"></h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">
+        X
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12" *ngFor="let requisito of requisitos">
+      <div class="row mb-3">
+        <div class="font-weight-bold col-9">
+          {{ requisito.descripcion }}
+        </div>
+        <mat-slide-toggle
+          class="col-2"
+          labelPosition="before"
+          color="primary"
+          [disabled]="inputs_disabled"
+          [(ngModel)]="requisito.cumplido"
+          [ngModelOptions]="{ standalone: true }"
+        >
+          <!-- {{ requisito.descripcion }} -->
+        </mat-slide-toggle>
+      </div>
+    </div>
+    <div class="col-4 offset-4 col-md-2 offset-md-5 text-center">
+      <button (click)="dismiss(true)" class="btn btn-citric searchButton">
+        Submit
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<input
+  [ngClass]="mat_input ? 'mat-input-element' : 'form-control'"
+  type="text"
+  [(ngModel)]="autocompleteInput"
+  #addresstext
+  style="width: 100%"
+  [placeholder]="placeholder"
+  [attr.matInput]="mat_input ? true : null"
+  [readOnly]="readonly"
+/>

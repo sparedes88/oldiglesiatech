@@ -1,0 +1,447 @@
+<div class="row" style="margin-right: unset;">
+  <!-- Side menu. -->
+  <div class="col-2 col-md-2 col-lg-2">
+    <div class="menu-container">
+      <div
+        class="nav flex-column nav-pills navbar-light bg-light"
+        id="v-pills-tab"
+        role="tablist"
+        aria-orientation="vertical"
+      >
+        <a
+          class="nav-link active text-muted padding-fixed"
+          id="v-pills-general-tab"
+          data-toggle="pill"
+          href="#v-pills-general"
+          role="tab"
+          aria-controls="v-pills-general"
+          aria-selected="true"
+        >
+          General Info
+        </a>
+        <a
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-members-tab"
+          data-toggle="pill"
+          href="#v-pills-members"
+          role="tab"
+          aria-controls="v-pills-members"
+          aria-selected="false"
+        >
+          Calendars
+        </a>
+        <a
+          *ngIf="currentUser?.isSuperUser || currentUser?.idUserType === 1"
+          class="nav-link text-muted padding-fixed"
+          id="v-pills-time-settings-tab"
+          data-toggle="pill"
+          href="#v-pills-time-settings"
+          role="tab"
+          aria-controls="v-pills-time-settings"
+          aria-selected="false"
+          data-target="#v-pills-time-settings"
+        >
+          Time Settings
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Containers -->
+  <div class="col-12 col-md-10" [hidden]="show_detail">
+    <ng-template [ngIf]="!show_detail">
+      <div class="d-flex justify-content-center" style="margin: 140px;">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem;"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="col-12 col-md-4" [hidden]="!show_detail">
+    <div class="col-12" style="height: 31px;"></div>
+    <div class="tab-content" id="v-pills-tabContent">
+      <!-- Home Tab -->
+      <div
+        class="tab-pane fade show active"
+        id="v-pills-general"
+        role="tabpanel"
+        aria-labelledby="v-pills-general-tab"
+      >
+        <div class="row" style="padding: 10px;">
+          <div class="col-12 mb-3">
+            General Info
+            <div class="card">
+              <form #group_form="ngForm" [formGroup]="formBooking">
+                <div class="row card-body">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <input
+                        type="text"
+                        required
+                        class="form-control mb-1"
+                        placeholder="Enter your booking's name."
+                        [readonly]="getPermissions()"
+                        formControlName="summary"
+                        [class.is-invalid]="
+                          formBooking.get('summary').dirty &&
+                          formBooking.get('summary').invalid
+                        "
+                      />
+                      <span style="display: block; text-align: right;">
+                        <button
+                          type="button"
+                          *ngIf="
+                            formBooking.get('summary').dirty &&
+                            (currentUser?.isSuperUser ||
+                              currentUser?.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formBooking, 'summary')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            formBooking.get('summary').dirty &&
+                            (currentUser?.isSuperUser ||
+                              currentUser?.idUserType === 1)
+                          "
+                          [disabled]="
+                            formBooking.get('summary').invalid &&
+                            currentUser?.isSuperUser
+                          "
+                          (click)="updateValue(formBooking, 'summary')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Description</label>
+                      <textarea
+                        type="text"
+                        required
+                        class="form-control mb-1"
+                        placeholder="Enter a description for this booking."
+                        formControlName="description"
+                        [readonly]="getPermissions()"
+                        [class.is-invalid]="
+                          formBooking.get('description').dirty &&
+                          formBooking.get('description').invalid
+                        "
+                      ></textarea>
+                      <span style="display: block; text-align: right;">
+                        <button
+                          type="button"
+                          *ngIf="
+                            formBooking.get('description').dirty &&
+                            (currentUser?.isSuperUser ||
+                              currentUser?.idUserType === 1)
+                          "
+                          class="btn btn-sm btn-muted"
+                          (click)="resetForm(formBooking, 'description')"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          *ngIf="
+                            formBooking.get('description').dirty &&
+                            (currentUser?.isSuperUser ||
+                              currentUser?.idUserType === 1)
+                          "
+                          [disabled]="
+                            formBooking.get('description').invalid &&
+                            currentUser?.isSuperUser
+                          "
+                          (click)="updateValue(formBooking, 'description')"
+                          class="btn btn-sm btn-success"
+                        >
+                          Save
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Settings Tab -->
+      <div
+        class="tab-pane fade"
+        id="v-pills-time-settings"
+        role="tabpanel"
+        aria-labelledby="v-pills-time-settings-tab"
+      >
+        <div class="row" style="padding: 10px;">
+          <div class="col-12 mb-3">
+            Availability
+            <div class="card">
+              <form #group_form="ngForm" [formGroup]="formBooking">
+                <div class="row card-body">
+                  <div class="col-12 row ml-0 p-0" formArrayName="days">
+                    <div
+                      class="col-12 row ml-0 pr-0"
+                      *ngFor="let day of booking?.settings?.days; let i = index"
+                      [formGroupName]="i"
+                    >
+                      <div class="col-2 align-self-center">
+                        <input
+                          type="checkbox"
+                          [id]="day.idBookingSettingDay"
+                          name="customRadio"
+                          class="custom-control-input"
+                          formControlName="is_available"
+                          [checked]="day.is_available"
+                          (click)="changeAvailability(day, days_on_form[i])"
+                        />
+                        <span
+                          class="checkmark"
+                          (click)="changeAvailability(day, days_on_form[i])"
+                        ></span>
+                        <label
+                          style="cursor: pointer;"
+                          class="custom-control-label"
+                          [for]="day.idBookingSettingDay"
+                        >
+                          {{ day.name | translate | slice: "0":"3" }}
+                        </label>
+                      </div>
+                      <div class="col-5 pr-0">
+                        <div class="form-group m-0">
+                          <input
+                            type="text"
+                            required
+                            class="form-control mb-1"
+                            placeholder="e.g.08:00"
+                            [readonly]="getPermissions()"
+                            formControlName="time_start"
+                            mask="00:00"
+                            [dropSpecialCharacters]="false"
+                            [class.is-invalid]="
+                              days_on_form[i].get('time_start').dirty &&
+                              days_on_form[i].get('time_start').invalid
+                            "
+                          />
+                        </div>
+                      </div>
+                      <div class="col-5 pr-0">
+                        <div class="form-group m-0">
+                          <input
+                            type="text"
+                            required
+                            class="form-control mb-1"
+                            placeholder="e.g.17:00"
+                            [readonly]="getPermissions()"
+                            formControlName="time_end"
+                            mask="00:00"
+                            [dropSpecialCharacters]="false"
+                            [class.is-invalid]="
+                              days_on_form[i].get('time_end').dirty &&
+                              days_on_form[i].get('time_end').invalid
+                            "
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="col-11" />
+                  <div class="col-12 row ml-0 pr-0" formGroupName="settings">
+                    <div class="col-2 align-self-center">
+                      <input
+                        type="checkbox"
+                        id="has_break"
+                        name="customRadio"
+                        class="custom-control-input"
+                        formControlName="has_break"
+                        [checked]="booking?.settings.has_break"
+                        (click)="
+                          changeBreakSettings(booking?.settings, settings_form)
+                        "
+                      />
+                      <span
+                        class="checkmark"
+                        (click)="
+                          changeBreakSettings(booking?.settings, settings_form)
+                        "
+                      ></span>
+                      <label
+                        style="cursor: pointer;"
+                        class="custom-control-label"
+                        for="has_break"
+                      >
+                        Break
+                      </label>
+                    </div>
+                    <div class="col-5 pr-0">
+                      <div class="form-group m-0">
+                        <input
+                          type="text"
+                          required
+                          class="form-control mb-1"
+                          placeholder="e.g.08:00"
+                          [readonly]="getPermissions()"
+                          formControlName="break_start"
+                          mask="00:00"
+                          [dropSpecialCharacters]="false"
+                          [class.is-invalid]="
+                            settings_form.get('break_start').dirty &&
+                            settings_form.get('break_start').invalid
+                          "
+                        />
+                      </div>
+                    </div>
+                    <div class="col-5 pr-0">
+                      <div class="form-group m-0">
+                        <input
+                          type="text"
+                          required
+                          class="form-control mb-1"
+                          placeholder="e.g.17:00"
+                          [readonly]="getPermissions()"
+                          formControlName="break_end"
+                          mask="00:00"
+                          [dropSpecialCharacters]="false"
+                          [class.is-invalid]="
+                            settings_form.get('break_end').dirty &&
+                            settings_form.get('break_end').invalid
+                          "
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="col-11" />
+
+                  <div class="col-12 mt-2">
+                    <button
+                      class="btn btn-sm btn-success float-right"
+                      [disabled]="formBooking.get('days').invalid"
+                      (click)="saveSettingsDays(formBooking.get('days'))"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="col-12 mb-3">
+            Duration Settings
+            <div class="card">
+              <form #group_form="ngForm" [formGroup]="formBooking">
+                <div class="row card-body" formGroupName="settings">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label>Show availability in increments of</label>
+                      <select
+                        required
+                        class="form-control"
+                        formControlName="idBookingIncrementDuration"
+                        (change)="
+                          changeIncrementDuration(
+                            settings_form,
+                            'idBookingIncrementDuration',
+                            $event
+                          )
+                        "
+                      >
+                        <option
+                          *ngFor="let duration of durations"
+                          [value]="duration.idBookingIncrementDuration"
+                        >
+                          {{ duration.name }}
+                        </option>
+                      </select>
+                    </div>
+                    <span style="display: block; text-align: right;">
+                      <button
+                        type="button"
+                        *ngIf="
+                          settings_form.get('idBookingIncrementDuration')
+                            .dirty &&
+                          (currentUser?.isSuperUser ||
+                            currentUser?.idUserType === 1)
+                        "
+                        class="btn btn-sm btn-muted"
+                        (click)="
+                          resetForm(
+                            settings_form,
+                            'idBookingIncrementDuration',
+                            'settings'
+                          )
+                        "
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        *ngIf="
+                          settings_form.get('idBookingIncrementDuration')
+                            .dirty &&
+                          (currentUser?.isSuperUser ||
+                            currentUser?.idUserType === 1)
+                        "
+                        [disabled]="
+                          settings_form.get('idBookingIncrementDuration')
+                            .invalid && currentUser?.isSuperUser
+                        "
+                        (click)="
+                          updateIncrementDuration(
+                            settings_form,
+                            'idBookingIncrementDuration'
+                          )
+                        "
+                        class="btn btn-sm btn-success"
+                      >
+                        Save
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    *ngIf="show_detail"
+    class="col-12 col-md-6 col-lg-6"
+    style="padding-top: 10px;"
+  >
+    <div class="col-12 text-right">
+      <button class="btn btn-sm btn-outline-citric" routerLink="/booking">
+        Go back
+      </button>
+    </div>
+    <span class="text-citric">
+      Preview
+    </span>
+    <div class="card">
+      <div class="row card-body">
+        <app-booking-preview
+          class="col-12 px-0 px-md-1"
+          #booking_preview
+          [booking]="booking"
+          [form]="formBooking"
+        >
+        </app-booking-preview>
+      </div>
+    </div>
+  </div>
+</div>

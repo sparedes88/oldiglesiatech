@@ -1,0 +1,39 @@
+<div class="container page">
+  <div class="row mx-0">
+    <h4 class="col-11">
+      {{ group_category.idGroupCategory ? "Edit Category" : "Add Category" }}
+    </h4>
+    <div class="col-1">
+      <button class="btn btn-outline-citric" (click)="dismiss()">X</button>
+    </div>
+  </div>
+  <div class="row justify-content-center mx-0">
+    <div class="col-12 col-md-10">
+      <!-- Name -->
+      <div class="form-group">
+        <label>Name *</label>
+        <input class="form-control" [(ngModel)]="group_category.name" />
+      </div>
+    </div>
+    <div class="col-12 col-md-10">
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          class="form-control"
+          [(ngModel)]="group_category.description"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="col-12 text-center">
+      <button
+        [disabled]="serverBusy"
+        (click)="submit(group_category)"
+        class="btn btn-citric searchButton"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+</div>

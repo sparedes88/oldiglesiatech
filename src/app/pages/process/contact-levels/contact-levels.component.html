@@ -1,0 +1,60 @@
+<h4>Contacts in Level: {{ levelName }}</h4>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th width="33.33%">
+        Completed
+      </th>
+      <th width="33.33%">
+        Pending
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngIf="loading">
+      <td colspan="2" class="text-center" align="center">
+        <h4>Loading...</h4>
+      </td>
+    </tr>
+    <tr *ngIf="!loading">
+      <td>
+        <ul class="list-group builder-scroll">
+          <li
+            class="list-group-item"
+            *ngFor="let contact of completedUsers"
+          >
+            <div class="row">
+              <div class="col-xs-10 col-md-10">
+                {{ contact.name }}
+                <br *ngIf="contact.groups">
+                <small *ngIf="contact.groups">({{contact.groups}})</small>
+              </div>
+              <div class="col-xs-2 col-md-2 text-right"></div>
+            </div>
+          </li>
+          <li class="list-group-item disabled" *ngIf="!completedUsers.length">
+            No contact completed
+          </li>
+        </ul>
+      </td>
+      <td>
+        <li class="list-group-item" *ngFor="let contact of pendingUsers">
+          <div class="row">
+            <div class="col-xs-10 col-md-10">
+              {{ contact.name }}
+              <br *ngIf="contact.groups">
+              <small *ngIf="contact.groups">({{contact.groups}})</small>
+            </div>
+            <div class="col-xs-2 col-md-2 text-right">
+              {{ contact.total - contact.total_cumplidos }}
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item disabled" *ngIf="!pendingUsers.length">
+          No contact pending
+        </li>
+      </td>
+    </tr>
+  </tbody>
+</table>

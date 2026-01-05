@@ -1,0 +1,108 @@
+<mat-accordion>
+  <!-- [ngClass]="{
+  'mb-3': last
+}" -->
+  <mat-expansion-panel
+    class="mb-2"
+    #accordion
+    hideToggle
+    [expanded]="item.show_opened"
+  >
+    <!-- (click)="closeOther(accordion)" -->
+    <mat-expansion-panel-header
+      class="custom_panel_header"
+      [ngStyle]="{
+        background: community?.style_settings?.header_background,
+        color: community?.style_settings?.header_text_color,
+        '--be-text': community?.style_settings?.header_text_color
+      }"
+    >
+      <!-- [ngClass]="{
+      active: accordion.expanded,
+      closed: !accordion.expanded
+    }" -->
+      <mat-panel-title
+        [ngStyle]="{
+          color: community?.style_settings?.header_text_color,
+          '--be-text': community?.style_settings?.header_text_color
+        }"
+      >
+        {{ item.name }}
+      </mat-panel-title>
+      <mat-icon>{{ accordion.expanded ? "remove" : "add" }}</mat-icon>
+    </mat-expansion-panel-header>
+    <div *ngIf="item?.picture" class="col-xs-12 mb-4">
+      <img [src]="fixUrl(item?.picture)" alt="" class="responsive-img" />
+    </div>
+
+    <div class="filter-row justify-content-end row mt-2">
+      <div class="col-xs-12 col-md-4 col-lg-3">
+        <div class="form-group">
+          <!-- <div [hidden]="item.type === 'container'" class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="searchBox">
+                <i class="fa fa-search"></i>
+              </span>
+            </div>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search"
+              name="searchBox"
+              required
+              [(ngModel)]="item.searchBoxValue"
+            />
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="item.containers?.length > 0">
+      <app-community-container
+        [hidden]="
+          container.containers.length === 0 && container.entries.length === 0
+        "
+        [item]="container"
+        [community]="community"
+        [searchBoxValue]="searchBoxValue"
+        [iglesia]="iglesia"
+        (open_entry)="open_entry.emit($event)"
+        *ngFor="let container of item.containers"
+      ></app-community-container>
+    </div>
+
+    <div class="row scroll-x">
+      <div
+        *ngFor="let entry of filtered_group_entries(item, accordion) || item.entries"
+        class="list-fixed maximized row m-0 p-0 text-justify clickable py-2"
+        [ngStyle]="{
+          color: community?.style_settings?.entry_text_color
+        }"
+        (click)="openDetailsModal(entry)"
+      >
+        <div *ngIf="community?.column_settings?.show_name" class="col-12 col-md-1 align-self-center">
+          {{ entry.business_name }}
+        </div>
+        <div *ngIf="community?.column_settings?.show_contact" class="col-12 col-md-2 align-self-center">
+          {{ entry.contact_first_name }}
+          {{ entry.contact_last_name }}
+        </div>
+        <div *ngIf="community?.column_settings?.show_phone" class="col-12 col-md-1 align-self-center">
+          <span class="w200">
+            {{ entry.phone | mask: '(999) 999-9999' }}
+          </span>
+        </div>
+        <div *ngIf="community?.column_settings?.show_email" class="col-12 col-md-2 align-self-center">
+          <span class="w200">
+            {{ entry.contact_email }}
+          </span>
+        </div>
+        <div *ngIf="community?.column_settings?.show_address" class="col-12 col-md-6 align-self-center">
+          <span class="w200">
+            {{ entry.locations }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>

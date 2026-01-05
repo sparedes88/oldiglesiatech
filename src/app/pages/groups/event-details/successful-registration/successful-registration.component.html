@@ -1,0 +1,50 @@
+<!-- Already member -->
+<div class="px-5">
+  <div class="row justify-content-center">
+    <h2 class="col-9 text-citric text-center">
+      {{ "events.have_been_registered" | translate }}
+    </h2>
+    <h4 class="col-9 text-citric text-center">
+      <span class="text-secondary">
+        {{ "events.have_been_registered_disclaimer" | translate }}
+        <h5>
+          <span *ngIf="group_event?.confirmation_number">
+            {{ "events.confirmation_number" | translate }}
+            <br />
+            <b>
+              <h2>
+                {{ group_event?.confirmation_number }}
+              </h2>
+            </b>
+          </span>
+          {{ group_event?.name }}
+          {{
+            group_event?.start_date || group_event?.event_date | date: "MMMM dd"
+          }}
+          <br />
+          <br />
+          {{ group_event?.event_time_start }}
+          <br />
+          <br />
+          {{ group_event?.description }}
+          <br />
+          <span *ngIf="group_event?.guests">
+            <br />
+            <b> {{ "events.number_of_seats" | translate }} </b>
+            {{ group_event?.guests }}
+          </span>
+        </h5>
+      </span>
+    </h4>
+  </div>
+  <div class="row card-body is-vh-centered">
+    <div class="col-8 text-center">
+      <button
+        class="btn btn-sm btn-citric"
+        (click)="handleRedirectByRole(currentUser)"
+      >
+      <b> {{ "generals.my_profile" | translate }} </b>
+      </button>
+    </div>
+  </div>
+</div>

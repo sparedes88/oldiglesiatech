@@ -1,0 +1,218 @@
+<div class="row">
+  <div class="col-10"></div>
+  <div class="col-2">
+    <button
+      [hidden]="show_form || show_organization_form || show_contact_home"
+      class="btn btn-sm btn-outline-citric"
+      (click)="close()"
+    >
+      Close
+    </button>
+  </div>
+
+  <form
+    [hidden]="show_form || show_organization_form || show_contact_home"
+    style="width: 100%"
+    #group_form="ngForm"
+    [formGroup]="pipeline_form"
+    (submit)="submitPipeline(pipeline_form, group_form)"
+  >
+    <ng-template [ngIf]="!show_detail">
+      <div class="d-flex justify-content-center" style="margin: 15%">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+
+    <div [hidden]="!show_detail" class="tab-content mb-3">
+      <div class="row">
+        <div class="col-xs-11 col-md-5">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization">
+              Organization <span class="text-danger"> * </span>
+            </label>
+            <ng-multiselect-dropdown
+              (onSelect)="filterContactsByIdIglesia()"
+              (onDeSelect)="filterContactsByIdIglesia()"
+              placeholder="Select Organization"
+              [data]="dropdowns?.iglesias"
+              [settings]="select_iglesias_options"
+              formControlName="idIglesia"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div class="col-xs-1 col-md-1 align-self-center">
+          <button
+            type="button"
+            class="btn btn-citric"
+            (click)="goToAddOrganization(organization_form_1)"
+          >
+            +
+          </button>
+        </div>
+
+        <div class="col-xs-10 col-md-4">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization">
+              Contact <span class="text-danger"> * </span>
+            </label>
+            <ng-multiselect-dropdown
+              #select_contact
+              placeholder="Select Contact"
+              [data]="contactsByIdIglesia"
+              [settings]="select_contacts_options"
+              formControlName="idAgendaContactoIglesia"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div class="col-xs-1 col-md-1 align-self-center">
+          <button
+            [disabled]="pipeline_form.get('idIglesia').invalid"
+            type="button"
+            class="btn btn-citric"
+            (click)="addContact(contact_form)"
+          >
+            +
+          </button>
+        </div>
+        <div class="col-xs-1 col-md-1 align-self-center">
+          <button
+            [disabled]="pipeline_form.get('idIglesia').invalid"
+            type="button"
+            class="btn btn-citric"
+            (click)="viewContacts(contact_form_1)"
+          >
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
+
+        <div class="col-12">
+          <!-- Name -->
+          <div class="form-group">
+            <label>Name <span class="text-danger"> * </span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="nombre"
+              placeholder="Pipeline name"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization"> Tags </label>
+            <ng-multiselect-dropdown
+              placeholder="Select tags"
+              [data]="dropdowns?.tags"
+              [settings]="select_tags_options"
+              formControlName="tags"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group" style="display: flex; flex-direction: column">
+            <label for="idOrganization">
+              Status <span class="text-danger"> * </span>
+            </label>
+            <ng-multiselect-dropdown
+              placeholder="Select Status"
+              [data]="dropdowns?.estadosVenta"
+              [settings]="select_status_options"
+              formControlName="idEstadoClienteVenta"
+            ></ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <!-- Cost -->
+          <div class="form-group">
+            <label>Expectation Cost <span class="text-danger"> * </span></label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="valorExpectativo"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <!-- Description -->
+          <div class="form-group">
+            <label>Description</label>
+            <textarea
+              class="form-control"
+              formControlName="descripcion"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="col-12 mt-2 text-center">
+          <button class="btn btn-sm btn-success">Submit</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="col-12" [hidden]="!show_form">
+    <app-contacts-form
+      (dismiss_form)="dismissContactForm($event)"
+      style="width: 100%"
+      #contact_form
+    >
+    </app-contacts-form>
+  </div>
+  <div class="col-12" [hidden]="!show_contact_home">
+    <app-contacts-home
+      (trigger_close_button)="dismissContactForm($event)"
+      style="width: 100%"
+      #contact_form_1
+      [display_close_button]="true"
+    >
+    </app-contacts-home>
+  </div>
+
+  <div class="col-12" [hidden]="!show_organization_form">
+    <ng-template class="col-12" [ngIf]="show_loader">
+      <div class="d-flex justify-content-center" style="margin: 15%">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+    <div class="tabs-container" [hidden]="show_loader">
+      <button
+        class="btn btn-outline-citric pull-right"
+        (click)="onModalDidDismiss()"
+      >
+        <i class="fa fa-times"></i>
+      </button>
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active">Details</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active">
+          <app-organization-form
+            [show_pipeline]="false"
+            class="p-0 col-12 form-fixed"
+            [hidden]="show_loader"
+            #organization_form_1
+            (onDismiss)="onModalDidDismiss($event)"
+          >
+          </app-organization-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

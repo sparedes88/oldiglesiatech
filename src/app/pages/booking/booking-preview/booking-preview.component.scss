@@ -1,0 +1,62 @@
+@media (max-width: 768px) {
+    .appointment {
+        font-size: 10px !important;
+    }
+}
+
+.col-fixed-7 {
+    flex: 0 0 14.28572857%;
+    max-width: 14.28572857%;
+    // min-height: 700px;
+}
+
+.column-disabled {
+    opacity: 0.4;
+    background: gainsboro;
+    .free-appointment {
+        // opacity: 0.4;
+        pointer-events: none;
+        cursor: unset;
+    }
+    .busy-appointment {
+        opacity: 1;
+        pointer-events: none;
+        cursor: unset;
+    }
+}
+
+.col-header {
+}
+
+.appointment {
+    border: 1px solid #e46e2f;
+    display: block;
+    padding: 10px 0;
+    margin: 5px 0;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+}
+.free-appointment:hover {
+    background: #ffebca;
+    cursor: pointer;
+}
+
+.busy-appointment {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.today {
+    border: 1px solid rgba(230, 81, 0, 0.55);
+    border-radius: 8px;
+    // margin-left: 0.5rem !important;
+    // margin-right: 0.5rem !important;
+}
+
+.time-zone {
+    font-size: 12px;
+    line-height: 5px;
+    display: block;
+    height: 15px;
+}

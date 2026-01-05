@@ -1,0 +1,58 @@
+<div id="scroll-x" class="scroll-x row mx-5" *ngIf="items.length > 1">
+  <div (click)="scroll(-100)" id="scroll-left" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-left"></i>
+  </div>
+  <div (click)="scroll(100)" id="scroll-right" class="scroll-button clickable">
+    <i class="fa fa-chevron-circle-right"></i>
+  </div>
+  <!-- {{items | json}} -->
+  <div
+    [routerLink]="[actual_page + '/item/' + item.id]"
+    class="col-6 col-sm-4 col-md-3 my-4"
+    *ngFor="let item of items"
+    (click)="setItem(item)"
+    [ngClass]="{
+      clickable: view_mode !== 'edition',
+      active: selected_item?.id === item.id
+    }"
+  >
+    <div
+      style="height: 100%; align-items: center"
+      class="roundedDiv mb-3 shadow row mx-0"
+      (mouseover)="item.is_hover = true"
+      (mouseleave)="item.is_hover = false"
+      [ngStyle]="{
+        'background-color':
+          selected_item?.id === item.id
+            ? item.active_background_color || '#e4e4e4'
+            : item.is_hover
+            ? item.hover_background_color || '#dddddd'
+            : item.background_color || '#ffffff',
+        color: item.font_color || '#000000',
+        'font-style': item.font_style || 'unset',
+        'font-size': item.font_size || '14px',
+        'font-weight': item.font_weight || 'normal',
+        'text-align': item.text_align || 'center'
+      }"
+    >
+      <div class="col-12">
+        {{ item.name }}
+      </div>
+      <!-- <div class="col-12" *ngIf="!loading && view_mode === 'edition'">
+        <span class="red" *ngIf="item.photos.length === 0">
+          This item doesn't have photos.
+        </span>
+        <span *ngIf="item.photos.length !== 0">
+          {{ item.photos.length }} photos to show.
+        </span>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<app-donations-v2
+  #item_embed
+  [id]="selected_item.id"
+  [idOrganization]="idOrganization"
+  [hide_headers]="true"
+></app-donations-v2>

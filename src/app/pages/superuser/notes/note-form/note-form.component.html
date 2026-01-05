@@ -1,0 +1,31 @@
+<div class="container page">
+  <input
+    [hidden]="true"
+    #input_file_use
+    multiple
+    type="file"
+    class="custom-file-input"
+    id="customFile"
+  />
+  <div class="row">
+    <h3 class="col-8 col-md-10 text-citric">
+      Add a note.
+    </h3>
+    <div class="col-2 col-md-1">
+      <button class="btn btn-citric" (click)="updateContent()">
+        {{ note.idNotaIglesia ? "Update" : "Add" }}
+      </button>
+    </div>
+    <div class="col-2 col-md-1">
+      <button class="btn btn-outline-danger" (click)="dismiss()">
+        X
+      </button>
+    </div>
+  </div>
+
+  <hr />
+  <div class="col-12" style="min-height: 250px;">
+    <div id="toolbar"></div>
+    <div #editor id="editor"></div>
+  </div>
+</div>

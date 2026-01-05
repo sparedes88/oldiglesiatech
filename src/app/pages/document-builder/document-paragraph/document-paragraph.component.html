@@ -1,0 +1,29 @@
+<h4
+  [ngStyle]="{
+    color: settings.title_color,
+    'font-size': fixed_title_size
+  }"
+>
+  {{ paragraph.title }}
+</h4>
+<p
+  [ngStyle]="{
+    'text-align': settings.text_alignment,
+    'font-size': settings.text_size
+  }"
+  [innerHTML]="paragraph.content | safe: 'html'"
+></p>
+<div #row_div class="row">
+  <div #col_image *ngFor="let picture of paragraph.pictures" [ngClass]="getColWidth()">
+    <img *ngIf="picture.idParagraphImage" class="picture" [src]="base_url + picture.url" alt="" />
+    <img *ngIf="!picture.idParagraphImage" class="picture" [src]="picture.file" alt="" />
+  </div>
+</div>
+<div *ngIf="paragraph.children?.length > 0">
+  <app-document-paragraph
+    *ngFor="let paragraph_ of paragraph.children"
+    [paragraph]="paragraph_"
+    [settings]="settings"
+    [deep_level]="deep_level + 1"
+  ></app-document-paragraph>
+</div>

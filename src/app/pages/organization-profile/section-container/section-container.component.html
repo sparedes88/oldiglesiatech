@@ -1,0 +1,93 @@
+<div class="row">
+  <div
+    class="col-12 m-0"
+    [ngClass]="
+      'col-md-' +
+      container.col_size +
+      ' ' +
+      (container.idContainerType === 1 || container.idContainerType === 2
+        ? 'row'
+        : '') +
+      ' ' +
+      (container.idContainerType === 1 ? 'p-1' : '')
+    "
+    *ngFor="let container of containers"
+  >
+    <app-section-container
+      *ngIf="container.idContainerType === 1"
+      [containers]="container.children"
+      [idOrganization]="idOrganization"
+      [view_mode]="view_mode"
+      [iglesia]="iglesia"
+      (refresh_meetings)="refresh_meetings.emit($event)"
+    >
+    </app-section-container>
+
+    <div
+      *ngIf="container.idContainerType === 2 && container.sections.length > 0"
+      class="subcontainer shadow my-3"
+    >
+      <app-section-item
+        *ngFor="let section of container.sections"
+        [section]="section"
+        [iglesia]="iglesia"
+        [idContainerType]="section.idContainerType"
+      ></app-section-item>
+    </div>
+
+    <app-organization-contact-section
+      class="subcontainer shadow my-3"
+      *ngIf="container.idContainerType === 3"
+      [view_mode]="view_mode"
+      [idOrganization]="idOrganization"
+      [iglesia]="iglesia"
+      (refresh_meetings)="refresh_meetings.emit()"
+    >
+    </app-organization-contact-section>
+
+    <app-networks-profile-form
+      class="subcontainer shadow my-3"
+      *ngIf="container.idContainerType === 4"
+      #networks_profile
+      [idOrganization]="idOrganization"
+      [view_mode]="view_mode"
+    ></app-networks-profile-form>
+
+    <app-profile-events
+      class="subcontainer shadow my-3"
+      *ngIf="container.idContainerType === 5"
+      [idOrganization]="idOrganization"
+      [iglesia]="iglesia"
+    ></app-profile-events>
+
+    <!-- <div
+      class="col-12 p-0 subcontainer my-3 mb-3 shadow"
+      [ngClass]="
+        'col-md-' +
+        subcontainer.col_size +
+        ' ' +
+        (container.idContainerType === 2 ? 'subcontainer' : '')
+      "
+      *ngFor="let subcontainer of container.children"
+    >
+      <app-section-container *ngIf="subcontainer.idContainerType === 2">
+      </app-section-container>
+
+      <app-organization-contact-section
+        *ngIf="subcontainer.idContainerType === 3"
+        [view_mode]="view_mode"
+        [idOrganization]="idOrganization"
+        [iglesia]="iglesia"
+        (refresh_meetings)="refresh_meetings.emit()"
+      >
+      </app-organization-contact-section>
+
+      <app-networks-profile-form
+        *ngIf="subcontainer.idContainerType === 4"
+        #networks_profile
+        [idOrganization]="idOrganization"
+        [view_mode]="view_mode"
+      ></app-networks-profile-form>
+    </div> -->
+  </div>
+</div>

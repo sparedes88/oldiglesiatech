@@ -1,0 +1,13 @@
+
+<!-- [hidden]="show_loader || hide_notes_form" -->
+<div class="col-12" *ngIf="currentUser">
+  <app-organization-contact-info-form
+    *ngFor="let contact of contact_types"
+    [idIglesia]="idOrganization || currentUser?.idIglesia"
+    [contact_type]="contact.id"
+    [name]="contact.name"
+    [description]="contact.description"
+    class="col-4 p-0 form-fixed"
+    #contact_info
+  ></app-organization-contact-info-form>
+</div>

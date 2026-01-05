@@ -1,0 +1,86 @@
+<div class="container" >
+  <div class="row mt-3">
+     <div class="col col-xs-4 col-sm-4 col-md-4 col-lg-4">
+   
+       <div class="example-container">     
+        <div  class="example-list ColorNaranja "> 
+          <div class="col col-xs-4 col-sm-4 col-md-4 col-lg-4 mt-3 ml-5 ">
+           <h4 class="ColorFuente"> Items</h4> 
+          </div>
+        </div> 
+         <div
+           cdkDropList
+           #todoList="cdkDropList"
+           [cdkDropListData]="todo"
+           [cdkDropListConnectedTo]="[doneList]"
+           class="example-list"
+           (cdkDropListDropped)="drop($event)">
+           <div class="example-box" *ngFor="let item of todo" cdkDrag>
+            <li> {{item.title}}  </li></div>
+         </div>
+       </div>
+     </div>
+   <div class="col  col-xs-4 col-sm-4 col-md-4 col-lg-4">
+
+     <div class="example-container">     
+      <div  class="example-list  ColorNaranja"> 
+        <div class="col col-xs-4 col-sm-4 col-md-4 col-lg-4 mt-3 ml-4">
+          <h4 class="ColorFuente">Selected </h4> </div>
+        </div>
+     
+       <div
+         cdkDropList
+         #doneList="cdkDropList"
+         [cdkDropListData]="done"
+         [cdkDropListConnectedTo]="[todoList]"
+         class="example-list"
+         (cdkDropListDropped)="drop($event)">
+         <div class="example-box" *ngFor="let item of done" cdkDrag>
+           <li> {{item.title}}</li> 
+         </div>
+       </div>
+     </div>
+   </div> 
+  </div>
+  <div class="row mt-1">
+    <div class="col">
+      <h3>Filters</h3>
+    </div>
+   
+  </div>
+  <form [formGroup]="filtroFormGroup">
+  <div class="row mt-2">   
+    
+      <div class="col-xs-12 col-md-4">
+        <label>Groups</label>
+        <ng-multiselect-dropdown
+          placeholder="Groups"
+          [data]="groups"
+          [settings]="multiSelectGroups"
+          formControlName="Groups"
+        ></ng-multiselect-dropdown>
+      
+    </div>
+    <div class="col-md-4 mb-3">
+      <label>Categories</label>
+      <ng-multiselect-dropdown
+        placeholder="Categories"
+        [data]="categories"
+        [settings]="selectCatOptions"
+        formControlName="Categories"
+      ></ng-multiselect-dropdown>
+    </div>
+
+    
+  </div>
+</form>
+   <div class="row mt-3">
+    <div class="col  col col col-xs-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+      <button type="button" class="btn btn-primary colorButton" (click)="crearPdf(filtroFormGroup)"> Create PDF </button>
+    </div>
+ 
+  </div>
+
+ </div>
+
+ 

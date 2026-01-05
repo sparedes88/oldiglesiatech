@@ -1,0 +1,325 @@
+<div [ngClass]="{ container: !show_as_minimal }" class="page">
+  <div *ngIf="show_header" class="row">
+    <h4 class="col-12">{{ name }}</h4>
+    <h6 class="col-12">
+      {{ description }}
+    </h6>
+  </div>
+  <!-- <div *ngIf="contact_type === 1" class="row">
+    <h4 class="col-12">Contact Info</h4>
+    <h6 class="col-12">
+      Please notice this info will be shown in the contact inbox embed frame.
+    </h6>
+  </div>
+  <div *ngIf="contact_type === 2" class="row">
+    <h4 class="col-12">Donation Contact</h4>
+    <h6 class="col-12">
+      We're going to add this info on your greeting donation email.
+    </h6>
+  </div> -->
+
+  <form
+    *ngIf="view_mode === 'edition'"
+    style="width: 100%"
+    #group_form="ngForm"
+    [formGroup]="contact_form"
+    (submit)="submitContact(contact_form, group_form)"
+  >
+    <ng-template [ngIf]="!show_detail">
+      <div class="d-flex justify-content-center" style="margin: 15%">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+
+    <div [hidden]="!show_detail" class="tab-content mb-3">
+      <div [ngClass]="{ 'm-0': show_as_minimal }" class="row">
+        <div class="w-100"></div>
+        <div
+          *ngIf="inputs_to_show.includes('phones')"
+          [ngClass]="getSize('phones')"
+        >
+          <div class="row mb-4 border-bottom">
+            <div class="col-6 d-md-none">
+              <h5 class="text-secondary">Phones</h5>
+            </div>
+            <div class="col-5 col-md-10 text-right align-self-center">
+              <label class="text-citric" for="idOrganization">
+                Add Phone
+              </label>
+            </div>
+            <div class="col-1 text-center align-self-center">
+              <button
+                (click)="addItem('phones')"
+                type="button"
+                class="btn btn-outline-success circular-button"
+              >
+                <mat-icon matPrefix>add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="col-12 p-0 mb-5 d-md-none"
+            *ngIf="displayEmptyMessage('phones')"
+          >
+            <h5 class="text-danger">There isn't any phone yet.</h5>
+            <hr />
+          </div>
+
+          <div
+            *ngFor="
+              let phone of phones.controls;
+              let i = index;
+              let last = last
+            "
+          >
+            <div
+              formArrayName="phones"
+              class="p-0 col-12"
+              style="padding-top: 5px"
+            >
+              <div [formGroupName]="i" [hidden]="!phone.get('status').value">
+                <div class="row">
+                  <div
+                    [ngClass]="{ 'col-md-4': !show_as_minimal }"
+                    class="p-0 col-12"
+                  >
+                    <div
+                      [ngClass]="{ 'mb-0': show_as_minimal }"
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label for=""> Name </label>
+                      <input
+                        formControlName="name"
+                        class="form-control mb-1"
+                        placeholder="Add a phone name"
+                        type="text"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class="p-0 col-12"
+                    [ngClass]="{ 'col-md-6 px-md-2': !show_as_minimal }"
+                  >
+                    <div class="form-group">
+                      <label for="estimated">
+                        Country Code <span class="text-danger">*</span>
+                      </label>
+                      <app-custom-select-country
+                        [return_value]="'callingCode'"
+                        formControlName="country_code"
+                        [idOrganization]="idIglesia"
+                        [preselected_country_code]="phone.get('country_code').value"
+                      >
+                      </app-custom-select-country>
+                    </div>
+                  </div>
+                  <div class="p-0 col-10">
+                    <div
+                      [ngClass]="{ 'mb-0': show_as_minimal }"
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label for=""> Phone </label>
+                      <input
+                        formControlName="phone"
+                        class="form-control mb-1"
+                        placeholder="(999) 999-9999."
+                        type="tel"
+                        [dropSpecialCharacters]="false"
+                        mask="(000) 000-0000"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-2 align-self-center">
+                    <button
+                      [ngClass]="{
+                        'mt-2': !show_as_minimal,
+                        'mt-4': show_as_minimal
+                      }"
+                      type="button"
+                      (click)="removeItem('phones', i)"
+                      class="btn btn-outline-danger circular-button"
+                    >
+                      <mat-icon matPrefix>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <hr *ngIf="!last" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="inputs_to_show.includes('emails')"
+          [ngClass]="getSize('emails')"
+        >
+          <div class="row mb-4 border-bottom">
+            <div class="col-6 d-md-none">
+              <h5 class="text-secondary">Emails</h5>
+            </div>
+            <div class="col-5 col-md-10 text-right align-self-center">
+              <label class="text-citric" for="idOrganization">
+                Add Email
+              </label>
+            </div>
+
+            <div class="col-1 text-center align-self-center">
+              <button
+                (click)="addItem('emails')"
+                type="button"
+                class="btn btn-outline-success circular-button"
+              >
+                <mat-icon matPrefix>add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="col-12 p-0 mb-5 d-md-none"
+            *ngIf="displayEmptyMessage('emails')"
+          >
+            <h5 class="text-danger">There isn't any email yet.</h5>
+            <hr />
+          </div>
+
+          <div
+            *ngFor="
+              let email of emails.controls;
+              let i = index;
+              let last = last
+            "
+          >
+            <div
+              formArrayName="emails"
+              class="p-0 col-12"
+              style="padding-top: 5px"
+            >
+              <div [formGroupName]="i" [hidden]="!email.get('status').value">
+                <div class="row">
+                  <div class="p-0 col-12 col-md-4">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label for=""> Name </label>
+                      <input
+                        formControlName="name"
+                        class="form-control mb-1"
+                        placeholder="Add an email name"
+                        type="text"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="p-0 px-md-2 col-10 col-md-6">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <label for=""> Email </label>
+                      <input
+                        formControlName="email"
+                        class="form-control mb-1"
+                        placeholder="your@mail.com"
+                        type="email"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-2 align-self-center">
+                    <button
+                      type="button"
+                      (click)="removeItem('emails', i)"
+                      class="btn btn-outline-danger circular-button mt-2"
+                    >
+                      <mat-icon matPrefix>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <hr *ngIf="!last" />
+
+                <!-- <div class="row">
+                  <div class="col-2">
+                    <span class="span-for-select"> Email </span>
+                  </div>
+                  <div class="col-8">
+                    <div
+                      class="form-group"
+                      style="display: flex; flex-direction: column"
+                    >
+                      <input
+                        formControlName="email"
+                        class="form-control mb-1"
+                        placeholder="your@mail.com"
+                        type="email"
+                      />
+                    </div>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mt-2 text-center">
+          <button class="btn btn-sm btn-success">Submit</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div *ngIf="view_mode !== 'edition'" style="width: 100%">
+    <div class="row">
+      <div
+        *ngIf="inputs_to_show.includes('phones')"
+        [ngClass]="getSize('phones')"
+      >
+        <div
+          class="row m-0 p-0"
+          *ngFor="let phone of active_phones; let last = last"
+        >
+          <div class="col-2 text-left align-self-center">
+            <i class="noColor fa fa-phone" aria-hidden="true"></i>
+          </div>
+          <div class="col-10 text-left">
+            <p class="card-text">
+              <span class="text-secondary">
+                {{ phone.get("name").value }}
+              </span>
+              <br />
+              <a
+                [href]="
+                  'tel:' +
+                  phone.get('country_code').value +
+                  phone.get('phone').value
+                "
+              >
+                <small
+                  >{{
+                    phone.get("country_code").value +
+                      " " +
+                      phone.get("phone").value
+                  }}
+                </small>
+              </a>
+            </p>
+          </div>
+          <div *ngIf="!last" class="col-12 text-center">
+            <hr class="m-0" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <small class="text-danger bold" *ngIf="contact_form.dirty">
+    * Remember save your changes.
+  </small>
+</div>

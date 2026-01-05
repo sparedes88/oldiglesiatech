@@ -1,0 +1,36 @@
+.scroll-x {
+    overflow-x: scroll;
+    flex-wrap: nowrap;
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.roundedDiv {
+    background-color: white;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.active {
+    .roundedDiv {
+        background-color: rgb(228, 228, 228);
+    }
+}
+
+.scroll-button {
+    top: 28px;
+    font-size: 33px;
+    z-index: 1000;
+    position: absolute;
+}
+
+#scroll-right {
+    right: 15px;
+}
+#scroll-left {
+    left: 15px;
+}

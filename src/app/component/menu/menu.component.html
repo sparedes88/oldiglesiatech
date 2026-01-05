@@ -1,0 +1,612 @@
+<nav
+  class="navbar navbar-expand-lg navbar-light"
+  *ngIf="currentUser"
+  [ngClass]="
+    currentUser?.idTipoServicio === 1 ? 'bg-citric' : 'navbar-business'
+  "
+>
+  <a class="navbar-brand" [routerLink]="getRouterHome(currentUser)">
+    <img id="logo" [src]="getLogo()" />
+  </a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul
+      class="navbar-nav mr-auto"
+      data-toggle="collapse"
+      data-target=".navbar-collapse.show"
+    >
+      <li
+        class="nav-item"
+        *ngIf="
+          currentUser.isSuperUser ||
+          (currentUser.idUserType === 1 &&
+            (!iglesia?.free_version || is_possible_client))
+        "
+      >
+        <a class="nav-link" routerLink="/dashboard">Dashboard</a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="
+          currentUser.isSuperUser ||
+          (currentUser.idUserType === 1 &&
+            !iglesia?.free_version &&
+            !is_possible_client &&
+            organization_checked)
+        "
+      >
+        <a class="nav-link" routerLink="/contact">Contact</a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="
+          currentUser.isSuperUser ||
+          (currentUser.idUserType === 1 &&
+            !iglesia?.free_version &&
+            !is_possible_client &&
+            organization_checked)
+        "
+      >
+        <a class="nav-link" routerLink="/groups">Groups</a>
+      </li>
+      <!-- <li class="nav-item">
+        <a class="nav-link" routerLink="/ministries">Ministries</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/events">Events</a>
+      </li> -->
+      <li
+        class="nav-item"
+        *ngIf="
+          currentUser.isSuperUser ||
+          (currentUser.idUserType === 1 &&
+            !iglesia?.free_version &&
+            !is_possible_client &&
+            organization_checked)
+        "
+      >
+        <a class="nav-link" routerLink="/process">Process</a>
+      </li>
+      <li class="nav-item">
+        <!-- id="navbarDropdown" -->
+        <a
+          class="nav-link"
+          role="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+          routerLink="/content"
+          (click)="consolelog()"
+          target="_blank"
+          *ngIf="
+            currentUser.isSuperUser ||
+            (currentUser.idUserType === 1 &&
+              !iglesia?.free_version &&
+              !is_possible_client &&
+              organization_checked)
+          "
+          data-toggle="collapse"
+          data-target=".navbar-collapse.show"
+        >
+          Content
+        </a>
+
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#"
+            ><i class="fa fa-user-circle"></i> Tab & Article</a
+          >
+          <a class="dropdown-item" href="#" s
+            ><i class="fa fa-user-circle"></i> Menu Builder</a
+          >
+          <a class="dropdown-item" href="#"
+            ><i class="fa fa-user-circle"></i> Footer Manager</a
+          >
+          <a class="dropdown-item" href="#"
+            ><i class="fa fa-user-circle"></i> My Designs</a
+          >
+        </div>
+      </li>
+
+      <li
+        class="nav-item"
+        *ngIf="currentUser.isSuperUser && userService.getCurrentUser()?.iglesia"
+      >
+        <a class="nav-link" routerLink="/admin/notes">
+          Notes
+          <span
+            class="badge badge-pill badge-primary"
+            *ngIf="noteService.assignedCount"
+          >
+            {{ noteService.assignedCount }}
+          </span>
+        </a>
+      </li>
+      <!-- <li
+        class="nav-item"
+        *ngIf="currentUser.isSuperUser && userService.getCurrentUser().iglesia"
+      >
+        <a
+          class="nav-link"
+          routerLink="/design-request/{{ currentUser.idIglesia }}/list"
+        >
+          Tickets
+        </a>
+      </li> -->
+
+      <li
+        class="nav-item"
+        *ngIf="currentUser.isSuperUser && userService.getCurrentUser()?.iglesia"
+      >
+        <a class="nav-link" routerLink="/report-builder"> Reports </a>
+      </li>
+
+      <li
+        class="nav-item"
+        *ngIf="
+          currentUser.isSuperUser ||
+          (currentUser.idUserType === 1 &&
+            !iglesia?.free_version &&
+            !is_possible_client &&
+            organization_checked)
+        "
+      >
+        <a class="nav-link" routerLink="/messenger/chats">
+          Chats
+          <messages-counter></messages-counter>
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="currentUser.isSuperUser">
+        <a class="nav-link" routerLink="/admin/help-request">
+          Requests
+          <span
+            class="badge badge-pill badge-primary"
+            *ngIf="groupService.helpRequestCount"
+          >
+            {{ groupService.helpRequestCount }}
+          </span>
+        </a>
+      </li>
+
+      <!-- <li
+        class="nav-item"
+        *ngIf="currentUser.isSuperUser|| (currentUser.idUserType === 1 && !iglesia?.free_version)"
+      >
+        <a class="nav-link" routerLink="/content/photo-editor">
+          Photo editor
+        </a>
+      </li> -->
+
+      <li
+        class="nav-item"
+        *ngIf="currentUser.isSuperUser && userService.getCurrentUser()?.iglesia"
+      >
+        <a
+          class="nav-link"
+          role="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <u> Using {{ userService.getCurrentUser().iglesia }} </u>
+        </a>
+      </li>
+      <!-- <li class="nav-item" *ngIf="currentUser.isSuperUser && userService.getCurrentUser().iglesia">
+        <ng-multiselect-dropdown [placeholder]="'Select an Organization'" [data]="iglesias || []" [settings]="selectOpts"
+          (onSelect)="changeIglesia($event)" [(ngModel)]="selectedIglesia" style="border: none !important;">
+        </ng-multiselect-dropdown>
+      </li> -->
+    </ul>
+    <!-- <div
+      *ngIf="currentUser.idUserType === 2 && !currentUser.isSuperUser"
+      id="settingsContainer"
+      class="form-inline my-2 my-lg-0 col-md-6"
+    >
+      <ul
+        class="navbar-nav mr-auto"
+        style="justify-content: flex-end; width: 100%"
+      >
+        <li class="nav-item" *ngIf="currentUser.idUserType === 2">
+          <a
+            class="nav-link"
+            routerLink="/user-profile/details/{{ currentUser.idUsuario }}"
+          >
+            <i class="fa fa-user-circle"></i> My Profile
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="currentUser.idUserType === 2">
+          <a id="logout-user-type-2" class="nav-link" (click)="logout()"
+            ><i class="fa fa-sign-out-alt"></i> Log Out</a
+          >
+        </li>
+      </ul>
+    </div> -->
+    <div
+      *ngIf="currentUser"
+      id="settingsContainer"
+      class="form-inline my-2 my-lg-0 col-md-2"
+    >
+      <div class="nav-item dropdown">
+        <a
+          id="settings"
+          class="nav-link dropdown-toggle"
+          role="button"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <i class="fa fa-users-cog"></i> Settings
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a
+            class="dropdown-item"
+            routerLink="/user-profile/details/{{ currentUser.idUsuario }}"
+            ><i class="fa fa-user-circle"></i> My Profile</a
+          >
+          <a class="dropdown-item" [routerLink]="getOrganizationProfile()"
+            ><i class="fa fa-user-tie"></i> My Organization</a
+          >
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            class="dropdown-item"
+            (click)="openLanguageModal()"
+          >
+            <i class="fa fa-globe"></i> Language & <br />
+            Timezone
+          </a>
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            class="dropdown-item"
+            [ngClass]="{ disabled: currentUser.idUserType === 2 }"
+            (click)="makePushNotification()"
+          >
+            <i class="fa fa-bell"></i>
+            Push Notifications
+          </a>
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                (!iglesia?.free_version || is_possible_client))
+            "
+            class="dropdown-item"
+            routerLink="/email-manager"
+          >
+            <i class="fa fa-mail-bulk"></i>
+            My emails
+          </a>
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            class="dropdown-item"
+            routerLink="/network-manager"
+          >
+            <i class="fa fa-sitemap"></i>
+            Networks
+          </a>
+          <!-- <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 && !iglesia?.free_version)
+              && !is_possible_client
+            "
+            class="dropdown-item disabled"
+            href="#"
+          >
+            <i class="fa fa-chalkboard-teacher"></i> Tutorials
+          </a> -->
+          <a
+            class="dropdown-item"
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            [routerLink]="getRouterTimesheet(currentUser)"
+          >
+            <i class="fa fa-stopwatch"></i>
+            Time Sheet
+          </a>
+          <!-- <a
+            class="dropdown-item"
+            *ngIf="currentUser.isSuperUser|| (currentUser.idUserType === 1 && !iglesia?.free_version)"
+            [routerLink]="getRouterDesign(currentUser)"
+          >
+            <i class="fa fa-clipboard-check"></i>
+            Design request
+          </a> -->
+          <a
+            class="dropdown-item"
+            *ngIf="currentUser.isSuperUser"
+            routerLink="/admin/organization"
+          >
+            <i class="fa fa-store"></i>
+            Organizations
+          </a>
+          <!-- <a
+            *ngIf="currentUser.isSuperUser|| (currentUser.idUserType === 1 && !iglesia?.free_version)"
+            class="dropdown-item"
+            routerLink="/salon"
+          >
+            <i class="fa fa-warehouse"></i> Rooms
+          </a> -->
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            class="dropdown-item"
+            routerLink="/inventory"
+          >
+            <i class="fa fa-dolly-flatbed"></i> Inventory
+          </a>
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            class="dropdown-item"
+            routerLink="/booking"
+          >
+            <i class="fa fa-calendar-check"></i> Booking
+          </a>
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            class="dropdown-item"
+            (click)="openAnalyticsModal(analytics_modal)"
+          >
+            <i class="fa fa-chart-line"></i> Analytics
+          </a>
+          <a
+            *ngIf="currentUser.isSuperUser"
+            class="dropdown-item"
+            routerLink="/plans"
+          >
+            <i class="fa fa-dolly"></i> Plans
+          </a>
+          <a
+            *ngIf="currentUser.isSuperUser"
+            class="dropdown-item"
+            routerLink="/organization-categories"
+          >
+            <i class="fas fa-th-list"></i> Categories
+          </a>
+          <a
+            *ngIf="currentUser.isSuperUser"
+            class="dropdown-item"
+            routerLink="/denominations"
+          >
+            <i class="fas fa-place-of-worship"></i> Denominations
+          </a>
+          <a
+            *ngIf="currentUser.isSuperUser"
+            class="dropdown-item"
+            routerLink="/admin/pipeline"
+          >
+            <i class="fa fa-chart-area"></i> Pipeline
+          </a>
+          <a
+            *ngIf="currentUser.isSuperUser"
+            class="dropdown-item"
+            routerLink="/admin/contacts"
+          >
+            <i class="fa fa-book-open"></i> Contacts
+          </a>
+          <a
+            *ngIf="
+              currentUser.isSuperUser ||
+              (currentUser.idUserType === 1 &&
+                !iglesia?.free_version &&
+                !is_possible_client &&
+                organization_checked)
+            "
+            class="dropdown-item"
+            routerLink="/groups/reports"
+          >
+            <i class="fa fa-chart-pie"></i> Group reports
+          </a>
+          <a
+            *ngIf="currentUser.isSuperUser"
+            class="dropdown-item"
+            routerLink="/admin/versions"
+          >
+            <i class="fa fa-code-branch"></i> Versions
+          </a>
+
+          <a
+            *ngIf="currentUser.isSuperUser"
+            class="dropdown-item"
+            (click)="openEventsBanner()"
+          >
+            <i class="fa fa-globe"></i> Events Banner
+          </a>
+
+          <div class="dropdown-divider"></div>
+          <a id="logout" class="dropdown-item" (click)="logout()"
+            ><i class="fa fa-sign-out-alt"></i> Log Out</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<ngx-smart-modal
+  #makePushModal_1
+  identifier="makePushModal_1"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-push-notification (onDismiss)="dismissPushModal($event)">
+  </app-push-notification>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #language_modal
+  identifier="language_modal"
+  [dismissable]="false"
+  [closable]="true"
+>
+  <div class="row justify-content-center">
+    <div class="col-10 text-center" *ngIf="iglesia">
+      <div class="form-group text-left">
+        <label for="name">Language: <span class="text-danger">*</span> </label>
+        <select
+          class="form-control"
+          name="body"
+          cols="30"
+          rows="10"
+          [(ngModel)]="iglesia.idIdioma"
+        >
+          <option value="1">Español</option>
+          <option value="2">English</option>
+        </select>
+      </div>
+      <div class="text-left form-group mb-0">
+        <label class="mb-0" for="name">
+          Choose your timezone:
+          <br />
+          <small class="text-secondary">Country</small>
+        </label>
+        <ng-multiselect-dropdown
+          [placeholder]="'Select an country'"
+          [data]="countries"
+          [settings]="select_country_options"
+          (onSelect)="setCountry($event)"
+          [(ngModel)]="selected_country"
+          style="border: none !important"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+      <div class="text-left form-group">
+        <label class="mb-0" for="name"
+          ><small class="text-secondary">Timezone</small>
+        </label>
+        <ng-multiselect-dropdown
+          [placeholder]="'Select a timezone'"
+          [data]="zones"
+          [settings]="select_zone_options"
+          (onSelect)="setZone($event)"
+          [(ngModel)]="selected_zone"
+          style="border: none !important"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+      <div class="text-center">
+        <button class="btn btn-sm btn-success" (click)="updateLanguage()">
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #banner_modal
+  identifier="banner_modal"
+  [dismissable]="false"
+  [closable]="true"
+>
+  <div class="row justify-content-center">
+    <div class="col-10 text-center">
+      <img #img_tag class="card-img-top" [src]="fixUrl()" />
+
+      <div class="form-group">
+        <input
+          class="form-control"
+          type="file"
+          accept="image/*"
+          id="file"
+          (change)="addEventBannerPhoto($event.target.files[0])"
+        />
+      </div>
+      <div class="text-center">
+        <button [disabled]="submit_loading" class="btn btn-sm btn-success" (click)="updateBanner()">
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #analytics_modal
+  identifier="analytics_modal"
+  [dismissable]="false"
+  [closable]="true"
+>
+  <div class="row justify-content-center">
+    <h2 class="col-8 text-citric">Analytics</h2>
+    <div class="col-4">
+      <button (click)="getVisitsInfo()" class="btn btn-sm btn-outline-success">
+        <i class="fa fa-repeat"></i>
+      </button>
+    </div>
+    <div class="col-6 text-center">
+      <small class="text-secondary"> Your redirection link was visited </small>
+      <span class="number-visits text-citric">
+        {{ visits_info?.visits }}
+      </span>
+      <small class="text-secondary"> times </small>
+    </div>
+    <div class="col-6 text-center">
+      <small class="text-secondary"> Your domain was visited </small>
+      <span class="number-visits text-citric">
+        {{ visits_info?.domain_visits }}
+      </span>
+      <small class="text-secondary"> times </small>
+    </div>
+    <div class="col-12" *ngIf="currentUser">
+      <h5>
+        Please paste this code in your ready function inside your index.html
+      </h5>
+      <pre style="background-color: whitesmoke; padding: 8px">
+        {{ visit_domain_code }}
+      </pre>
+      <h5>Example.</h5>
+      <pre style="background-color: whitesmoke; padding: 8px">
+        {{ example_visit_domain_code }}
+      </pre>
+    </div>
+  </div>
+</ngx-smart-modal>

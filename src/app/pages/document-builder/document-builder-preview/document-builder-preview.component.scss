@@ -1,0 +1,22 @@
+.logo_container_ad {
+    min-height: 90px;
+    max-height: 90px;
+    height: auto;
+}
+
+.title-container {
+    margin: 160px 0;
+    h1 {
+        font-size: 80px;
+        font-weight: bolder;
+    }
+}
+
+.cover-page {
+    min-height: 750px;
+    position: relative;
+    .cover-page-footer {
+        position: absolute;
+        bottom: 20px;
+    }
+}

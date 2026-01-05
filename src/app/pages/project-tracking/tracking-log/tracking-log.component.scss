@@ -1,0 +1,14 @@
+.table {
+  th,
+  td {
+    font-size: 11pt;
+  }
+}
+
+::ng-deep {
+  .dtrg-group {
+    background-color: rgb(223, 223, 223);
+    font-weight: bold;
+    text-align: center;
+  }
+}

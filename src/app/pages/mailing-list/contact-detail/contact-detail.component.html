@@ -1,0 +1,289 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row mt-2">
+        <div class="col-2 mt-3">
+          <button
+            class="btn btn-sm btn-citric"
+            type="button"
+            [routerLink]="back_url"
+          >
+            <i class="fa fa-arrow-left"></i> Back
+          </button>
+        </div>
+        <div class="offset-7 col-xs-3 col-sm-3 col-md-3 col-lg-2 col-md-2 mt-3">
+          <button
+            *ngIf="!contact.converted_to_user"
+            style="min-width: 100%"
+            class="btn btn-outline-success btn-sm tooltip_"
+            [disabled]="loading_events || loading_groups"
+            (click)="openConvertToContact()"
+          >
+            <span class="tooltiptext" *ngIf="loading_events || loading_groups">
+              Please wait... Getting groups and events.
+            </span>
+            <span
+              class="tooltiptext"
+              *ngIf="!loading_events && !loading_groups"
+            >
+              This button will help you to create a contact.
+            </span>
+            <i class="fa fa-address-card"> </i>
+          </button>
+          <div *ngIf="contact.converted_to_user" class="text-success">
+            Converted to member
+          </div>
+        </div>
+      </div>
+
+      <h1 class="mt-3 md-3">
+        Contact Info:
+        <span class="text-secondary">
+          {{ contact.first_name }} {{ contact.last_name }}
+        </span>
+      </h1>
+      <div class="row mt-5 mb-5">
+        <h3 class="col-12">About the contact</h3>
+        <div *ngIf="!is_v2" class="col-12 col-md-6">
+          <div class="w-100">
+            <h5 class="mb-0">Full name:</h5>
+            <span class="text-secondary">
+              {{ contact.first_name }} {{ contact.last_name }}
+            </span>
+          </div>
+          <div class="w-100">
+            <h5 class="mb-0">Email:</h5>
+            <span class="text-secondary"> {{ contact.email || "None" }} </span>
+          </div>
+          <div class="w-100">
+            <h5 class="mb-0">Phone:</h5>
+            <span class="text-secondary">
+              {{ contact.country_code }} {{ contact.phone }}
+            </span>
+          </div>
+          <div class="w-100">
+            <h5 class="mb-0">Register at:</h5>
+            <span class="text-secondary">
+              {{ contact.created_at || "N/A" }}
+            </span>
+          </div>
+
+          <div class="w-100">
+            <div class="row justify-content-center">
+              <div class="col-5 text-center">
+                <button
+                  *ngIf="!contact.converted_to_user"
+                  style="width: 100%"
+                  class="btn btn-outline-success btn-sm tooltip_"
+                  [disabled]="loading_events || loading_groups"
+                  (click)="openConvertToContact()"
+                >
+                  <span
+                    class="tooltiptext"
+                    *ngIf="loading_events || loading_groups"
+                  >
+                    Please wait... Getting groups and events.
+                  </span>
+                  <span
+                    class="tooltiptext"
+                    *ngIf="!loading_events && !loading_groups"
+                  >
+                    This button will help you to create a contact.
+                  </span>
+                  <i class="fa fa-address-card"> </i>
+                </button>
+                <div *ngIf="contact.converted_to_user" class="text-success">
+                  Converted to member
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!is_v2" class="col-12 col-md-6">
+          <h2>Answers</h2>
+          <div class="w-100" *ngIf="contact.selected_groups?.length > 0">
+            <h5 class="mb-0">Groups</h5>
+            <span class="text-secondary">
+              {{ contact.selected_groups_name }}
+            </span>
+          </div>
+          <div class="w-100" *ngIf="contact.selected_events?.length > 0">
+            <h5 class="mb-0">Events</h5>
+            <span class="text-secondary">
+              {{ contact.selected_events_name }}
+            </span>
+          </div>
+          <div class="w-100" *ngIf="mailingList?.setup?.question_1_text">
+            <h5 class="mb-0">
+              {{
+                mailingList?.setup?.question_1_text || "Question 1 not setup"
+              }}
+            </h5>
+            <span class="text-secondary">
+              {{ contact.question_1_answer }}
+            </span>
+          </div>
+          <div class="w-100" *ngIf="mailingList?.setup?.question_2_text">
+            <h5 class="mb-0">
+              {{
+                mailingList?.setup?.question_2_text || "Question 2 not setup"
+              }}
+            </h5>
+            <span class="text-secondary">
+              {{ contact.question_2_answer }}
+            </span>
+          </div>
+          <div class="w-100" *ngIf="mailingList?.setup?.message_text">
+            <h5 class="mb-0">
+              {{
+                mailingList?.setup?.message_text || "Message label not setup"
+              }}
+            </h5>
+            <span class="text-secondary">
+              {{ contact.message }}
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="is_v2" class="col-12">
+          <small class="text-secondary float-right">
+            <i> N/A = Not answer </i>
+          </small>
+          <div class="row">
+            <div
+              *ngFor="let answer of contact?.answers"
+              class="col-12 col-md-6"
+            >
+              <div class="w-100">
+                <h5 class="mb-0">{{ answer.label }}:</h5>
+                <span class="text-secondary">
+                  {{ answer.value || "N/A" }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <hr />
+        </div>
+
+        <div class="col-12">
+          <h2>
+            SMS & Emails sent to
+            <span class="text-secondary">
+              {{ contact.first_name }}
+              {{ contact.last_name }}
+            </span>
+          </h2>
+
+          <table class="table-bordered">
+            <thead *ngIf="contact.messages?.length > 0">
+              <th>Date</th>
+              <th>Type</th>
+              <th>Message</th>
+              <th>Response</th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let message of contact.messages">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr *ngIf="contact.messages?.length === 0">
+                <td class="text-center" colspan="4">
+                  <h5 class="text-danger">
+                    You didn't sent any SMS or email to this contact.
+                  </h5>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-12">
+          <h2>
+            Notes about
+            <span class="text-secondary">
+              {{ contact.first_name }}
+              {{ contact.last_name }}
+            </span>
+            <button
+              (click)="addNote(contact_note_note__form_1)"
+              class="btn btn-sm btn-success float-right mt-2"
+            >
+              Add note
+            </button>
+          </h2>
+
+          <table class="table-bordered">
+            <thead>
+              <th>Date</th>
+              <th width="30%">Note</th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let message of notes">
+                <td class="p-2">
+                  <span [innerHtml]="addClass(message.content)"> </span>
+                </td>
+                <td class="p-2">
+                  {{ message.created_at_format }}
+                  <div class="ml-2 btn-group float-right">
+                    <button
+                      class="btn btn-sm btn-outline-citric"
+                      (click)="updateNote(message, contact_note_note__form_1)"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      (click)="deleteNote(message)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="notes?.length === 0">
+                <td class="text-center" colspan="2">
+                  <h5 class="text-danger">This contact hasn't any note.</h5>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ngx-smart-modal
+  identifier="convert_to_user_detail"
+  #convert_to_user_detail
+  (onAnyCloseEvent)="selected_contact = undefined"
+  customClass="large-modal"
+>
+  <app-convert-to-user
+    *ngIf="selected_contact"
+    #convert_to_user_form
+    [contact]="selected_contact"
+    [mailing_list]="mailingList"
+    [currentUser]="currentUser"
+    (already_finished)="updateUser($event)"
+  ></app-convert-to-user>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #contact_note_formModal_1
+  identifier="contact_note_formModal_1"
+  [dismissable]="false"
+  [closable]="false"
+  customClass="large-modal"
+>
+  <app-contact-note-form
+    #contact_note_note__form_1
+    (onDismiss)="onModalDidDismiss($event)"
+  >
+  </app-contact-note-form>
+</ngx-smart-modal>

@@ -1,0 +1,183 @@
+<div class="container page">
+  <div class="row">
+    <h4 class="col-11">
+      Viewing Categories |
+    </h4>
+    <div *ngIf="show_dismiss" class="col-1">
+      <button
+        class="btn btn-outline-citric"
+        (click)="dismiss()"
+      >
+        X
+      </button>
+    </div>
+
+    <!-- <span *ngIf="show_editable" class="col-12 text-citric text-right">
+      This button is disabled because you are editing a category.
+    </span> -->
+
+    <div class="col-12 row">
+      <div class="col-3 offset-9">
+        <button
+          *ngIf="!getPermissions() && !show_editable"
+          class="btn btn-sm btn-outline-success mt-3 mb-3"
+          (click)="activateForm()"
+          [disabled]="show_editable"
+        >
+          Add Category
+        </button>
+      </div>
+      <div *ngIf="show_editable" class="col-12 p-0">
+        <form
+          #review_form="ngForm"
+          [formGroup]="reviewForm"
+          style="width: 100%;"
+          class="row"
+        >
+          <div class="col-8">
+            <div class="form-group">
+              <label for="estimated">
+                Name
+                <span class="text-danger"> * </span>
+              </label>
+              <input
+                class="form-control"
+                placeholder="Category Name."
+                type="text"
+                formControlName="name"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="col-8">
+            <div class="form-group">
+              <label>
+                Description (optional)
+              </label>
+              <textarea
+                class="form-control"
+                placeholder="Place here the description for this category."
+                type="text"
+                formControlName="description"
+              >
+              </textarea>
+            </div>
+          </div>
+        </form>
+
+        <hr />
+
+        <span
+          style="display: block; text-align: right; width: 100%;"
+          class="mb-2"
+        >
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            class="btn btn-sm btn-muted"
+            (click)="deactivateForm()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            *ngIf="!getPermissions()"
+            [disabled]="reviewForm.invalid && !getPermissions()"
+            (click)="addReview(reviewForm)"
+            class="btn btn-sm btn-success"
+          >
+            Save
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12" [hidden]="!show_loading">
+      <ng-template [ngIf]="show_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px;">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem;"
+            role="category"
+          ></div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div [hidden]="show_loading || show_editable" class="col-12 p-0" style="min-height: 500px;">
+      <table class="table row-border hover table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th *ngIf="!getPermissions()">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let review of categories; let i = index">
+            <td>
+              {{ review.name }}
+            </td>
+            <td>
+              {{ review.description }}
+            </td>
+            <td *ngIf="!getPermissions()">
+              <div class="btn-group">
+                <button
+                  (click)="updateReview(review)"
+                  [disabled]="show_editable"
+                  class="btn btn-sm btn-info fixed-padding"
+                >
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-danger fixed-padding"
+                  (click)="deleteReview(review)"
+                  [disabled]="show_editable"
+                >
+                  <i class="fa fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal QR -->
+
+<div
+  class="modal fade"
+  id="exampleModalCenter"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+  *ngIf="qr_code"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Qr code</h5>
+        </div>
+        <div class="row mt-3">
+          <div class="col-2"></div>
+          <div class="col-7">
+            <qrcode [qrdata]="qr_code" [size]="256" [level]="'Q'"></qrcode>
+          </div>
+          <div class="col-2"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

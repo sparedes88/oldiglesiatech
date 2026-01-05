@@ -1,0 +1,97 @@
+<div class="container mt-2">
+  <h4>Gallery Form</h4>
+  <form (ngSubmit)="saveGallery()" #form="ngForm">
+    <div class="row">
+      <div class="col-xs-12 col-md-4">
+        <div class="form-group">
+          <label for="nameInput">Title</label>
+          <input
+            type="text"
+            class="form-control"
+            id="nameInput"
+            placeholder="Title"
+            name="name"
+            [(ngModel)]="galleryForm.name"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-8">
+        <div class="form-group">
+          <label for="descriptionInput">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            id="descriptionInput"
+            placeholder="Description"
+            name="description"
+            [(ngModel)]="galleryForm.description"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-12">
+        <button
+          class="btn btn-success"
+          type="submit"
+          [disabled]="uploading || form.invalid || !galleryForm?.photos?.length"
+        >
+          Save gallery
+          <span *ngIf="saving" class="spinner-grow spinner-grow-sm mb-1"></span>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="form-group">
+    <input
+      type="file"
+      name="file"
+      id="file"
+      class="input-file"
+      accept="image/*"
+      multiple
+      (change)="handlePhotos($event.target.files)"
+      [disabled]="uploading"
+    />
+    <label for="file" class="btn btn-tertiary js-labelFile">
+      <i class="icon fa fa-check"></i>
+      <span class="js-fileName">
+        Add Photos
+        <i class="fa fa-circle-o-notch fa-spin" *ngIf="uploading"></i>
+      </span>
+    </label>
+  </div>
+
+  <div class="text-center">
+    <span *ngIf="uploading" class="spinner-grow spinner-grow-lg mb-1"></span>
+  </div>
+
+  <sam-drag-and-drop-grid
+    [items]="galleryForm.photos"
+    [columnNumber]="3"
+    *ngIf="!uploading"
+  >
+    <div
+      *samDragAndDropListData="let photo; let i = index"
+      class="gallery-item text-right"
+      [ngStyle]="{ 'background-image': getBgImage(photo) }"
+    >
+      <button class="btn btn-danger btn-sm" (click)="deletePhoto(i)">
+        <i class="fa fa-trash"></i>
+      </button>
+    </div>
+  </sam-drag-and-drop-grid>
+</div>
+
+<ngx-smart-modal #submitModal identifier="submitModal">
+  <div class="text-center">
+    <h4>Gallery Saved</h4>
+    <div class="buttons text-center">
+      <a class="btn btn-success" [routerLink]="['/galleries/home']" [queryParams]="{ tab: 'galleries'}">
+        Return to list
+      </a>
+      <button class="btn btn-primary" (click)="submitModal.close()">
+        Keep editing
+      </button>
+    </div>
+  </div>
+</ngx-smart-modal>

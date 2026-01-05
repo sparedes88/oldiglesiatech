@@ -1,0 +1,167 @@
+<div class="container" style="min-height: 700px">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row">
+          <!-- <span class="col-12 span-number">
+            {{ totalEvents || 0 }}
+          </span>
+          <h4 class="col-12 card-title text-center text-citric span-number">Events</h4> -->
+        </div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/events_banner_new.png"
+        />
+        <!-- <div class="card-body"> -->
+        <!-- <h4 class="card-title text-center text-citric">Events</h4> -->
+        <!-- </div> -->
+      </div>
+    </div>
+
+    <!-- <div class="col-12" [hidden]="!show_detail_loading">
+      <ng-template [ngIf]="show_detail_loading">
+        <div class="d-flex justify-content-center" style="margin: 140px">
+          <div
+            class="spinner-border text-citric"
+            style="width: 6rem; height: 6rem"
+            role="status"
+          ></div>
+        </div>
+      </ng-template>
+    </div> -->
+
+    <div class="col-xs-12 col-md-12 mt-2 table-responsive-sm" [hidden]="false">
+      <table
+        style="width: 100%"
+        datatable
+        [dtOptions]="dtOptions"
+        [dtTrigger]="dtTrigger"
+        class="table row-border hover mt-4"
+      >
+        <thead>
+          <tr>
+            <th width="100px"></th>
+            <th>Church</th>
+            <th>Title</th>
+            <th>Events</th>
+            <th>Publish Status</th>
+            <th>Date</th>
+            <th>Need Help?</th>
+            <th>Upload</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let event of requests">
+            <td>
+              <img
+                [src]="fixUrl(event.picture)"
+                [alt]="event.name"
+                class="responsive"
+                onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+              />
+            </td>
+            <td>
+              <b>{{ event.Nombre }}</b>
+            </td>
+            <td>
+              <b>{{ event.name }}</b>
+            </td>
+            <td>
+              {{ event.events_count }}
+            </td>
+            <td>
+              <select
+              style="min-width: 100px;"
+                (change)="updateStatus($event.target.value, event)"
+                [(ngModel)]="event.publish_status"
+                class="form-control"
+                required
+              >
+                <!-- [class.is-invalid]="
+                      eventFormGroup.get('publish_status').touched &&
+                      eventFormGroup.get('publish_status').invalid
+                    " -->
+                <!-- <option value="0">-- Select one option --</option> -->
+                <option value="publish">Publish</option>
+                <option value="draft">Draft</option>
+              </select>
+            </td>
+            <td>
+              <b>{{ event.event_date | date: "shortDate" }}</b>
+            </td>
+            <td>
+              <b></b>
+              <div class="form-check text-center">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [value]="event.is_active"
+                  [(ngModel)]="event.is_active"
+                  [ngModelOptions]="{ standalone: true }"
+                  [id]="'defaultCheck' + event.idGroupEvent"
+                  [disabled]="event.publish_status == 'draft'"
+                  (ngModelChange)="
+                    showAlert(
+                      event.is_active,
+                      event.idGroupEvent,
+                      event.idGroup
+                    )
+                  "
+                />
+                <label
+                  class="form-check-label"
+                  [for]="'defaultCheck' + event.idGroupEvent"
+                >
+                  <b>{{ event.is_active ? "Yes" : "No" }}</b>
+                </label>
+              </div>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="
+                    uploadPicture(input_file, event.idGroupEvent, event.idGroup)
+                  "
+                >
+                  Upload image
+                </button>
+                <button
+                  *ngIf="event.idDesignRequest"
+                  type="button"
+                  class="btn btn-sm btn-outline-citric"
+                  routerLink=""
+                  (click)="goToDesignRequest(event.idDesignRequest)"
+                >
+                  View Design request
+                </button>
+              </div>
+              <div class="col-12 col-md-4" [hidden]="true">
+                <div class="custom-file mb-4">
+                  <input
+                    #input_file
+                    accept="image/*"
+                    type="file"
+                    class="custom-file-input"
+                    id="customFile"
+                  />
+                  <label class="custom-file-label" for="customFile"
+                    >Choose file</label
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-xs-12">
+      <!-- <button class="btn btn-primary mb-2" (click)="iframeCodeModal.open()">
+        Get iframe code
+      </button> -->
+    </div>
+  </div>
+</div>

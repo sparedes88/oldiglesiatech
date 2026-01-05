@@ -1,0 +1,415 @@
+<div class="app-preview">
+  <h1 *ngIf="!tab.template?.grid_info?.display_header" ion-text class="title-header">
+    {{ tab.name | titlecase }}
+  </h1>
+  <div *ngIf="tab.template?.grid_info?.display_header" class="card-background-page">
+    <div class="card">
+      <img
+        [src]="
+          organization?.portadaArticulos
+            ? fixUrl(organization?.portadaArticulos)
+            : 'assets/img/default-image.jpg'
+        "
+      />
+      <div *ngIf="configuracionesExtra?.show_Header_Template">
+        <div ion-text color="white" class="card-title">
+          {{ tab.tabTitle | titlecase }}
+        </div>
+        <div ion-text color="white" class="card-subtitle">
+          {{ organization?.Nombre }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center px-2 py-3">
+    <div class="col-12">
+      <div class="row">
+        <div
+          class="col-12"
+          *ngFor="let article of tab.articulos"
+          style="display: flex"
+        >
+          <div
+            class="card mx-0"
+            *ngIf="!article.articulos.length"
+            style="display: flex; flex-wrap: wrap; position: relative"
+            [ngStyle]="{
+              'box-shadow':
+                '0 0 ' +
+                tab.template?.grid_info?.shadow_blur +
+                'em ' +
+                tab.template?.grid_info?.shadow_spread +
+                'em ' +
+                tab.template?.grid_info?.shadow_color,
+              'border-radius': fixed_border_radius + '%',
+              width: tab.template?.grid_info?.button_spacing
+                ? 100 - tab.template?.grid_info?.button_spacing * 2 + '%'
+                : '',
+              'margin-top': tab.template?.grid_info?.button_spacing + '%',
+              'margin-left': tab.template?.grid_info?.button_spacing + '%',
+              'margin-right': tab.template?.grid_info?.button_spacing + '%'
+            }"
+          >
+            <img
+              *ngIf="article.header_style?.design_style == 'graphic'"
+              class="card-image-container"
+              [ngStyle]="{
+                background: '#ffffff url(' + fixUrl(article.slider) + ')'
+              }"
+              [ngClass]="{ 'standalone-height': true }"
+            />
+            <div
+              *ngIf="article.header_style?.design_style != 'graphic'"
+              class="color-header-div standalone-height"
+              [ngStyle]="{
+                background: sub_background_style(article),
+                'margin-top': (article?.header_style?.margin?.top || 0) + 'px',
+                'margin-bottom':
+                  (article?.header_style?.margin?.bottom || 0) + 'px',
+                'margin-left':
+                  (article?.header_style?.margin?.left || 0) + 'px',
+                'margin-right':
+                  (article?.header_style?.margin?.right || 0) + 'px',
+                'padding-top':
+                  (article?.header_style?.padding?.top || 0) + 'px',
+                'padding-bottom':
+                  (article?.header_style?.padding?.bottom || 0) + 'px',
+                'padding-left':
+                  (article?.header_style?.padding?.left || 0) + 'px',
+                'padding-right':
+                  (article?.header_style?.padding?.right || 0) + 'px'
+              }"
+            ></div>
+
+            <div class="flex-header" *ngIf="article.header_style?.show_title">
+              <p
+                class="custom-title-text"
+                [ngClass]="
+                  'align-self-' +
+                  (article.header_style?.title_vertical_position || 'center')
+                "
+                [innerHtml]="getTitle(article)"
+              ></p>
+            </div>
+            <div
+              class="card-body"
+              *ngIf="
+                tab.template?.grid_info?.display_article_titles ||
+                tab.template?.grid_info?.display_description ||
+                tab.template?.grid_info?.display_more_button
+              "
+              style="width: 100%"
+            >
+              <div
+                class="card-title"
+                *ngIf="tab.template?.grid_info?.display_article_titles"
+                [ngStyle]="{
+                  'text-align':
+                    tab.template?.grid_info?.title_text_align || 'left'
+                }"
+                class="title-style"
+              >
+                <span
+                  [ngStyle]="{
+                    color:
+                      tab.template?.grid_info?.title_text_color || '#000000',
+                    'font-weight':
+                      tab.template?.grid_info?.title_text_bold || 'bolder'
+                  }"
+                >
+                  {{ article.titulo }}
+                </span>
+              </div>
+              <p
+                *ngIf="tab.template?.grid_info?.display_description"
+                [ngStyle]="{
+                  color:
+                    tab.template?.grid_info?.description_text_color || '#666'
+                }"
+                class="short_description"
+              >
+                {{
+                  article.summary ? article.summary : "No description provided"
+                }}
+              </p>
+              <p
+                *ngIf="tab.template?.grid_info?.display_more_button"
+                style="text-align: left"
+                class="show_more_p"
+              >
+                <span
+                  [ngStyle]="{
+                    color:
+                      tab.template?.grid_info?.button_more_color || '#e65100'
+                  }"
+                  ion-text
+                >
+                  {{
+                    (article.show_more_text ? article.show_more_text : "More")
+                      | uppercase
+                  }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div
+            *ngIf="article.articulos.length"
+            #scroll_container
+            id="scroll-x-main"
+            class="scroll-x row mx-0 slides-image-fixer scroller"
+            no-bounce
+            scrollCatcher
+            no-padding
+          >
+            <!-- [ngStyle]="{ height: scroll_height || 'calc(375px/2)' }" -->
+            <div
+              class="col-12 row horizontal-scroll mx-0 px-0 my-1"
+              #row_container
+            >
+              <div class="col-6 px-0" style="display: flex">
+                <div
+                  class="card mx-0"
+                  style="display: flex; flex-wrap: wrap; position: relative"
+                  [ngStyle]="{
+                    'box-shadow':
+                      '0 0 ' +
+                      tab.template?.grid_info?.shadow_blur +
+                      'em ' +
+                      tab.template?.grid_info?.shadow_spread +
+                      'em ' +
+                      tab.template?.grid_info?.shadow_color,
+                    'border-radius': fixed_border_radius + '%',
+                    width: tab.template?.grid_info?.button_spacing
+                      ? 100 - tab.template?.grid_info?.button_spacing * 2 + '%'
+                      : '',
+                    'margin-top': tab.template?.grid_info?.button_spacing + '%',
+                    'margin-left':
+                      tab.template?.grid_info?.button_spacing + '%',
+                    'margin-right':
+                      tab.template?.grid_info?.button_spacing + '%'
+                  }"
+                >
+                  <img
+                    *ngIf="article.header_style?.design_style == 'graphic'"
+                    class="card-image-container"
+                    [ngStyle]="{
+                      background: '#ffffff url(' + fixUrl(article.slider) + ')'
+                    }"
+                  />
+
+                  <div
+                    *ngIf="article.header_style?.design_style != 'graphic'"
+                    class="color-header-div"
+                    [ngStyle]="{
+                      background: sub_background_style(article),
+                      'margin-top':
+                        (article?.header_style?.margin?.top || 0) + 'px',
+                      'margin-bottom':
+                        (article?.header_style?.margin?.bottom || 0) + 'px',
+                      'margin-left':
+                        (article?.header_style?.margin?.left || 0) + 'px',
+                      'margin-right':
+                        (article?.header_style?.margin?.right || 0) + 'px',
+                      'padding-top':
+                        (article?.header_style?.padding?.top || 0) + 'px',
+                      'padding-bottom':
+                        (article?.header_style?.padding?.bottom || 0) + 'px',
+                      'padding-left':
+                        (article?.header_style?.padding?.left || 0) + 'px',
+                      'padding-right':
+                        (article?.header_style?.padding?.right || 0) + 'px'
+                    }"
+                  ></div>
+
+                  <div
+                    class="flex-header"
+                    *ngIf="article.header_style?.show_title"
+                  >
+                    <p
+                      class="custom-title-text"
+                      [ngClass]="
+                        'align-self-' +
+                        (article.header_style?.title_vertical_position ||
+                          'center')
+                      "
+                      [innerHtml]="getTitle(article)"
+                    ></p>
+                  </div>
+                  <div
+                    class="card-body"
+                    *ngIf="
+                      tab.template?.grid_info?.display_article_titles ||
+                      tab.template?.grid_info?.display_description ||
+                      tab.template?.grid_info?.display_more_button
+                    "
+                    style="width: 100%"
+                  >
+                    <div
+                      *ngIf="tab.template?.grid_info?.display_article_titles"
+                      [ngStyle]="{
+                        'text-align':
+                          tab.template?.grid_info?.title_text_align || 'left'
+                      }"
+                      class="card-title title-style"
+                    >
+                      <span
+                        [ngStyle]="{
+                          color:
+                            tab.template?.grid_info?.title_text_color ||
+                            '#000000',
+                          'font-weight':
+                            tab.template?.grid_info?.title_text_bold || 'bolder'
+                        }"
+                      >
+                        {{ article.titulo }}
+                      </span>
+                    </div>
+                    <p
+                      *ngIf="tab.template?.grid_info?.display_description"
+                      [ngStyle]="{
+                        color:
+                          tab.template?.grid_info?.description_text_color ||
+                          '#666'
+                      }"
+                      class="short_description"
+                    >
+                      {{
+                        article.summary
+                          ? article.summary
+                          : "No description provided"
+                      }}
+                    </p>
+                    <p
+                      *ngIf="tab.template?.grid_info?.display_more_button"
+                      style="text-align: left"
+                      class="show_more_p"
+                    >
+                      <span
+                        [ngStyle]="{
+                          color:
+                            tab.template?.grid_info?.button_more_color ||
+                            '#e65100'
+                        }"
+                        ion-text
+                      >
+                        {{
+                          (article.show_more_text
+                            ? article.show_more_text
+                            : "More"
+                          ) | uppercase
+                        }}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="col-6 pr-0"
+                style="display: flex"
+                *ngFor="let article_2 of article.articulos"
+              >
+                <div
+                  class="card mx-0"
+                  style="display: flex; flex-wrap: wrap"
+                  [ngStyle]="{
+                    'box-shadow':
+                      '0 0 ' +
+                      tab.template?.grid_info?.shadow_blur +
+                      'em ' +
+                      tab.template?.grid_info?.shadow_spread +
+                      'em ' +
+                      tab.template?.grid_info?.shadow_color,
+                    'border-radius': fixed_border_radius + '%',
+                    width: tab.template?.grid_info?.button_spacing
+                      ? 100 - tab.template?.grid_info?.button_spacing * 2 + '%'
+                      : '',
+                    'margin-top': tab.template?.grid_info?.button_spacing + '%',
+                    'margin-left':
+                      tab.template?.grid_info?.button_spacing + '%',
+                    'margin-right':
+                      tab.template?.grid_info?.button_spacing + '%'
+                  }"
+                >
+                  <img
+                    class="card-image-container"
+                    [ngStyle]="{
+                      background:
+                        '#ffffff url(' + fixUrl(article_2.slider) + ')'
+                    }"
+                  />
+                  <div
+                    class="card-body"
+                    *ngIf="
+                      tab.template?.grid_info?.display_article_titles ||
+                      tab.template?.grid_info?.display_description ||
+                      tab.template?.grid_info?.display_more_button
+                    "
+                    style="width: 100%"
+                  >
+                    <div
+                      *ngIf="tab.template?.grid_info?.display_article_titles"
+                      [ngStyle]="{
+                        'text-align':
+                          tab.template?.grid_info?.title_text_align || 'left'
+                      }"
+                      class="card-title title-style"
+                    >
+                      <span
+                        [ngStyle]="{
+                          color:
+                            tab.template?.grid_info?.title_text_color ||
+                            '#000000',
+                          'font-weight':
+                            tab.template?.grid_info?.title_text_bold || 'bolder'
+                        }"
+                      >
+                        {{ article_2.titulo }}
+                      </span>
+                    </div>
+                    <p
+                      *ngIf="tab.template?.grid_info?.display_description"
+                      [ngStyle]="{
+                        color:
+                          tab.template?.grid_info?.description_text_color ||
+                          '#666'
+                      }"
+                      class="short_description"
+                    >
+                      {{
+                        article_2.summary
+                          ? article_2.summary
+                          : "No description provided"
+                      }}
+                    </p>
+                    <p
+                      *ngIf="tab.template?.grid_info?.display_more_button"
+                      style="text-align: left"
+                      class="show_more_p"
+                    >
+                      <span
+                        [ngStyle]="{
+                          color:
+                            tab.template?.grid_info?.button_more_color ||
+                            '#e65100'
+                        }"
+                        ion-text
+                      >
+                        {{
+                          (article_2.show_more_text
+                            ? article_2.show_more_text
+                            : "More"
+                          ) | uppercase
+                        }}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

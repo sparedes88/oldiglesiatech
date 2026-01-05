@@ -1,0 +1,278 @@
+::ng-deep {
+  .cal-header {
+    color: white;
+    background: var(--subheader_background_color) !important;
+    > .cal-cell:hover {
+      background: var(--subheader_background_color_hover) !important;
+    }
+  }
+  .dataTables_length {
+    float: right;
+    margin-top: 1em;
+  }
+  .dt-buttons {
+    text-align: right;
+  }
+  #DataTables_Table_0_filter {
+    top: 0px;
+    position: absolute;
+    width: 70%;
+    text-align: left;
+    label {
+      width: 100%;
+      input {
+        width: 100%;
+      }
+    }
+  }
+
+  // Events
+  .cal-has-events .cal-cell-top {
+    min-height: 20px !important;
+    flex: 1;
+  }
+  .cal-month-view .cal-day-cell {
+    min-height: 40px;
+    // max-height: 40px;
+  }
+  .cal-month-view .cal-day-badge {
+    margin-top: unset !important;
+    margin-left: unset !important;
+  }
+
+  .cal-month-view .cal-day-number {
+    // font-size: 1.2em;
+    font-size: unset !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .cal-month-view .cal-cell-top {
+    max-height: 40px;
+    min-height: 40px;
+  }
+  .table td.fixed {
+    padding: 10px !important;
+    text-align: justify;
+  }
+}
+
+.btn-color-fixed {
+  color: white !important;
+}
+.row.text-center.cal-header-custom {
+  margin: 0;
+}
+// Fix calendar buttons
+.col-1.align-items-center {
+  padding: 0;
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes example {
+  from {
+    background-color: #fcfcc3;
+  }
+  to {
+    // background-color: red;
+  }
+}
+
+/* Standard syntax */
+@keyframes example {
+  from {
+    background-color: #fcfcc3;
+  }
+  to {
+    // background-color: red;
+  }
+}
+
+.tag-color {
+  display: inline-block;
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #acacad;
+}
+
+.management-tags-panel {
+  .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 5px;
+    cursor: pointer;
+  }
+}
+
+.filtered {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.header-div {
+  padding: 15px 0px;
+}
+
+/** SEARCH */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-container input {
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: none;
+  -webkit-box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.25);
+}
+
+.no-shadow {
+  box-shadow: unset !important;
+}
+
+/** CARD */
+.card {
+  background-color: white;
+  text-align: left;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  -webkit-box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.element-card {
+  /* height: 360px; */
+  height: calc(100% - 15px);
+}
+
+.element-card:hover {
+  transform: scale(1.015);
+}
+
+.card-body {
+  padding: 12px;
+}
+
+.card-cover-standalone{
+  height: 100%;
+  width: auto;
+  border-radius: 0.25rem 0.25rem 0px 0px;
+}
+
+.card-cover img {
+  width: 100%;
+  height: 240px;
+  border-radius: 0.25rem 0.25rem 0px 0px;
+  object-position: center;
+  object-fit: cover;
+}
+
+.card-title {
+  color: #2e2e2e;
+}
+
+.card-body .card-sub-title {
+  color: #727272;
+  line-height: 15px;
+  font-size: 10pt;
+}
+
+.bottom-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.element-card:nth-of-type(odd) {
+  margin: 0 10px 15px 0;
+}
+
+.element-card.large {
+  min-height: 350px;
+  height: 100%;
+}
+
+img.responsive {
+  width: 100%;
+  height: auto;
+}
+
+.details-title {
+  display: flex;
+  align-items: center;
+}
+
+.back-button {
+  background-color: transparent;
+  border: none;
+  font-size: 24pt;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.card-title {
+  color: #2e2e2e;
+}
+
+@media (min-width: 110px) {
+  .search-container {
+    height: 50px;
+  }
+  .fixed-span-sunday {
+    top: 25px;
+  }
+  h1.header-element {
+    font-size: 1.5rem !important;
+  }
+  .resized-fa-icon::after {
+    font-size: 30x !important;
+    /* color: coral !important; */
+  }
+  .resized-fa-icon::before {
+    font-size: 30px !important;
+    /* color: coral !important; */
+  }
+}
+
+@media (min-width: 768px) {
+  .offset-md-6 {
+    margin-left: 50% !important;
+  }
+  h1.header-element {
+    font-size: 2.2rem !important;
+  }
+  .search-container {
+    height: 120px;
+  }
+  img.card-cover-most-recent {
+    // height: 444px;
+    height: 100% !important;
+    width: auto !important;
+  }
+}
+
+img.card-cover {
+  border-radius: 0.25rem 0.25rem 0px 0px;
+  width: 100%;
+  height: 148px;
+  object-position: center;
+  object-fit: cover;
+}
+img.card-cover-standalone {
+  border-radius: 0.25rem 0.25rem 0px 0px;
+  width: 100%;
+  // height: 270px;
+  height: auto;
+  object-position: center;
+  object-fit: cover;
+}
+
+.cal-header-custom {
+  background-color: var(--header_background_color);
+}

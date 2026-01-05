@@ -1,0 +1,91 @@
+<div class="row mx-0" [formGroup]="contact_filters_form">
+  <h2 class="col-12 col-md-3 text-citric">
+    {{ step?.name }}
+  </h2>
+  <div [hidden]="loading" class="col-12 col-md-3">
+    <div class="form-group" style="display: flex; flex-direction: column">
+      <label for="idUserType"> Dates <small>(MM-DD, YYYY)</small></label>
+      <ng-multiselect-dropdown
+        #multi_date_select
+        placeholder="Select a date"
+        [data]="filters.dates"
+        [settings]="selectUserTypeOptions"
+        formControlName="dates"
+      ></ng-multiselect-dropdown>
+    </div>
+  </div>
+  <div [hidden]="loading" class="col-12 col-md-3">
+    <div class="form-group" style="display: flex; flex-direction: column">
+      <label for="idUserType"> Users</label>
+      <ng-multiselect-dropdown
+        #multi_user_type_select
+        placeholder="Select an user"
+        [data]="filters.users"
+        [settings]="selectUserTypeOptions"
+        formControlName="users"
+      ></ng-multiselect-dropdown>
+    </div>
+  </div>
+  <div [hidden]="loading" class="col-12 col-md-3">
+    <div class="form-group" style="display: flex; flex-direction: column">
+      <label for="idUserType"> Reason</label>
+      <input class="form-control" type="text" formControlName="reason" />
+    </div>
+  </div>
+</div>
+
+<ng-template [ngIf]="loading">
+  <div
+    class="d-flex justify-content-center col-12"
+    style="margin-top: 10%; margin-bottom: 10%"
+  >
+    <div
+      style="height: 120px; width: 120px; font-size: 15px; border-width: 0.45em"
+      class="spinner-border text-citric"
+      role="status"
+    ></div>
+  </div>
+</ng-template>
+
+<div [hidden]="loading" class="scroll-y">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Action</th>
+        <th>Date</th>
+        <th>User</th>
+        <th>Action by</th>
+        <th width="300px">Result</th>
+        <th>Created from</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs_filtered">
+        <td>{{ log.action_name }}</td>
+        <td>
+          {{ log.created_at }}
+        </td>
+        <td>
+          {{ log.user_name }}
+        </td>
+        <td>
+          {{ log.user_created_by }}
+        </td>
+        <td>
+          <span [ngClass]="log.result_name | lowercase">
+            <b>
+              {{ log.result_name }}
+            </b>
+          </span>
+          <br />
+          <small class="text-secondary" *ngIf="log.result_id > 1">
+            {{ log.reason }}
+          </small>
+        </td>
+        <td>
+          {{ log.origin_name }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

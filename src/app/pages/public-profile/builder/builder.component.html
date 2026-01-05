@@ -1,0 +1,256 @@
+<div class="header-container">
+  <app-header
+    [iglesia]="iglesia"
+    [lang]="publicProfileConfig.profile_data.lang || 'en'"
+    [socialLinks]="publicProfileConfig?.profile_data?.social_links"
+    [tabs]="tabsByLang"
+    [headerStyle]="publicProfileConfig?.profile_data?.header_style"
+    [currentTabIndex]="currentTabIndex"
+    (onAdd)="tabForm.open(); currentTabIndex = undefined"
+    (onUpdate)="tabOrderModal.open()"
+    (onChangeTab)="currentTabIndex = $event; selectedSubPageIndex = undefined; currentSubPageIndex = undefined"
+    (onSocialLinkAdd)="socialLinksForm.open()"
+    (onStyleUpdate)="headerStyleModal.open()"
+    (onChangeSubPage)="changeSubPage($event)"
+    (onChangeLang)="changeLang($event)"
+  ></app-header>
+</div>
+
+<!-- Fixed cover -->
+<div
+  class="banner-container"
+  [ngStyle]="{ 'background-image': getCover() }"
+  *ngIf="publicProfileConfig.profile_data?.cover_mode == 'cover'"
+>
+  <div class="logo-container">
+    <div class="logo-container-overflow">
+      <img
+        [src]="iglesia?.Logo"
+        alt=""
+        onerror="this.onerror=null; this.src='/assets/img/logoColor.png'"
+      />
+    </div>
+  </div>
+  <h2 class="organization-name-h2">{{ iglesia?.Nombre }}</h2>
+</div>
+
+<!-- Slider editor -->
+<slider-editor
+  class="mt-1"
+  *ngIf="publicProfileConfig.profile_data?.cover_mode == 'slider'"
+  [slides]="publicProfileConfig.profile_data.slides"
+  [lang]="publicProfileConfig.profile_data.lang || 'en'"
+></slider-editor>
+
+<!-- Cover mode toggle -->
+<!-- <div class="text-right">
+  <div class="btn-group mt-1">
+    <button class="btn btn-outline-primary btn-sm" (click)="toggleCoverMode()">
+      <i class="fa fa-image"></i>
+      Cover mode:
+      {{
+        publicProfileConfig.profile_data?.cover_mode == "slider"
+          ? "Slider"
+          : "Cover"
+      }}
+    </button>
+  </div>
+</div> -->
+
+<!-- Tab selector -->
+<div class="tabs-container container mt-5">
+  <div class="tab-content mt-2">
+    <div
+      *ngFor="let tab of tabsByLang; let i = index"
+      class="tab-pane fade"
+      [ngClass]="{ show: i == currentTabIndex, active: i == currentTabIndex }"
+    >
+      <div class="text-centered">
+        <h2>
+          {{ tab.title }}
+          {{ currentSubPage ? "> " + currentSubPage.title : "" }}
+        </h2>
+
+        <div class="btn-group">
+          <button
+            class="btn btn-outline-info btn-sm"
+            (click)="openUpdateTab(i)"
+          >
+            <i class="fa fa-edit"></i>
+            Edit Tab
+          </button>
+          <button
+            *ngIf="!currentSubPage"
+            class="btn btn-outline-success btn-sm"
+            (click)="openSubPageForm()"
+          >
+            <i class="fa fa-plus"></i>
+            Add sub-page
+          </button>
+          <button
+            *ngIf="currentSubPage"
+            class="btn btn-outline-success btn-sm"
+            (click)="openUpdateSubPage(currentSubPage)"
+          >
+            <i class="fa fa-edit"></i>
+            Edit sub-page
+          </button>
+          <button class="btn btn-outline-danger btn-sm" (click)="deleteTab(i)">
+            <i class="fa fa-trash"></i>
+            Delete tab
+          </button>
+        </div>
+      </div>
+      <!-- Section list -->
+      <ng-container *ngIf="!currentSubPage">
+        <app-section
+          *ngFor="
+            let section of tab.sections;
+            let idx = index;
+            trackBy: trackSections
+          "
+          [section]="section"
+          (onDelete)="deleteSection(idx)"
+          (onSelectUpdate)="openUpdateSection(idx)"
+          (onChangeOrder)="sectionOrderModal.open()"
+        ></app-section>
+      </ng-container>
+
+      <!-- Current tab sections -->
+      <ng-container *ngIf="currentSubPage">
+        <app-section
+          *ngFor="
+            let section of currentSubPage?.sections;
+            let idx = index;
+            trackBy: trackSections
+          "
+          [section]="section"
+          (onDelete)="deleteSection(idx)"
+          (onSelectUpdate)="openUpdateSection(idx)"
+          (onChangeOrder)="sectionOrderModal.open()"
+        ></app-section>
+      </ng-container>
+
+      <!-- Add section button -->
+      <div
+        class="add-section-btn"
+        (click)="sectionForm_1.open(); selectedSection = undefined"
+      >
+        <div class="title">Add section</div>
+        <i class="fa fa-plus fa-lg"></i>
+      </div>
+
+      <hr />
+
+      <!-- Footer section -->
+      <div
+        *ngIf="!publicProfileConfig?.profile_data?.footer"
+        class="add-section-btn"
+        (click)="addFooter()"
+      >
+        <div class="title">Add Footer</div>
+        <i class="fa fa-plus fa-lg"></i>
+      </div>
+
+      <footer-editor
+        *ngIf="publicProfileConfig?.profile_data?.footer"
+        [footer]="publicProfileConfig?.profile_data?.footer"
+        (onDelete)="publicProfileConfig.profile_data.footer = null"
+      ></footer-editor>
+    </div>
+  </div>
+</div>
+
+<!-- Float save -->
+<div class="float-save">
+  <div class="btn-group">
+    <button
+      type="button"
+      class="btn btn-primary btn-md"
+      [disabled]="saving"
+      (click)="saveProfileSettings()"
+    >
+      {{ saving ? "Saving..." : "Save page" }}
+      <i class="fa fa-save"></i>
+    </button>
+    <button class="btn btn-success btn-md" (click)="openPage()">
+      Preview
+      <i class="fa fa-eye"></i>
+    </button>
+  </div>
+</div>
+
+<!-- MODALS -->
+<ngx-smart-modal identifier="tabForm" #tabForm>
+  <tab-form
+    *ngIf="tabForm.isVisible()"
+    (onSubmit)="submitTab($event)"
+    [tab]="selectedTab"
+  ></tab-form>
+</ngx-smart-modal>
+
+<!-- SUB PAGE FORM -->
+<ngx-smart-modal identifier="subPageForm" #subPageForm>
+  <!-- <tab-form
+    *ngIf="subPageForm.isVisible()"
+    (onSubmit)="submitSubPage($event)"
+    [tab]="selectedSubPage"
+  ></tab-form> -->
+</ngx-smart-modal>
+
+<!-- Section form modal -->
+<ngx-smart-modal identifier="sectionForm" #sectionForm_1>
+  <section-form
+    *ngIf="sectionForm_1.isVisible()"
+    (onSubmit)="submitSection($event)"
+    [idIglesia]="idIglesia"
+    [section]="selectedSectionInstance"
+  ></section-form>
+</ngx-smart-modal>
+
+<!-- Tab order -->
+<ngx-smart-modal identifier="tabOrderModal" #tabOrderModal>
+  <h4>Reorder tabs</h4>
+  <div cdkDropList class="drag-list" (cdkDropListDropped)="dropTab($event)">
+    <div class="drag-box" *ngFor="let tab of tabsByLang" cdkDrag>
+      <div class="drag-custom-placeholder" *cdkDragPlaceholder></div>
+      {{ tab.title }}
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<!-- Section order -->
+<ngx-smart-modal identifier="sectionOrderModal" #sectionOrderModal>
+  <h4>Reorder Sections</h4>
+  <div
+    *ngIf="currentTabIndex != undefined"
+    cdkDropList
+    class="drag-list"
+    (cdkDropListDropped)="dropSection($event)"
+  >
+    <div class="drag-box" *ngFor="let section of currentTab?.sections" cdkDrag>
+      <div class="drag-custom-placeholder" *cdkDragPlaceholder></div>
+      {{ section.title }}
+    </div>
+  </div>
+</ngx-smart-modal>
+
+<!-- Social links -->
+<ngx-smart-modal identifier="socialLinksForm" #socialLinksForm>
+  <h4>Social media links</h4>
+  <social-links-form
+    *ngIf="socialLinksForm.isVisible()"
+    (onSubmit)="addSocialLinks($event)"
+    [socialLinks]="publicProfileConfig?.profile_data?.social_links"
+  ></social-links-form>
+</ngx-smart-modal>
+
+<!-- nav style -->
+<ngx-smart-modal identifier="headerStyleModal" #headerStyleModal>
+  <h4>Change header style</h4>
+  <header-style-form
+    *ngIf="headerStyleModal.isVisible()"
+    (onSubmit)="updateHeaderStyle($event)"
+    [headerStyle]="publicProfileConfig?.profile_data?.header_style"
+  ></header-style-form>
+</ngx-smart-modal>

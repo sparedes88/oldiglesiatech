@@ -1,0 +1,97 @@
+<div class="row mb-4">
+  <div class="col-md-6">
+    <h5>
+      <b>Levels</b>
+    </h5>
+  </div>
+  <div class="col-md-6 text-right">
+    <!-- <button class="btn btn-sm btn-success" (click)="levelFormModal.open()">
+      Add a new Level
+    </button> -->
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-3">
+    <b>Description</b>
+  </div>
+  <div class="col-md-3">
+    <b>Status</b>
+  </div>
+  <div class="col-md-3">
+    <b>Requirements</b>
+  </div>
+  <div class="col-md-3 text-right">
+    <b>Options</b>
+  </div>
+</div>
+<hr>
+<div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+  <div class="example-box" *ngFor="let level of levels" cdkDrag>
+    <div class="row" style="width: 100%;">
+      <div class="col-md-3">
+        {{ level.descripcion }}
+      </div>
+      <div class="col-md-3">
+        <span
+          class="badge"
+          [ngClass]="{
+            'badge-success': level.estatus,
+            'badge-warning': !level.estatus
+          }"
+        >
+          {{ level.estatus ? "Active" : "Inactive" }}
+        </span>
+      </div>
+      <div class="col-md-3">
+        <span class="badge badge-info">
+          {{ countActiveSteps(level.requisitos) }} Requirements
+        </span>
+      </div>
+      <div class="col-md-3 text-right">
+        <div class="btn-group">
+          <button
+            class="btn btn-sm btn-primary"
+            routerLink="/levels/details/{{ level.idNivel }}"
+          >
+            <i class="fa fa-eye"></i>
+          </button>
+          <button
+            class="btn btn-success btn-sm"
+            (click)="selectedLevel = level; editFormModal.open()"
+          >
+            <i class="fa fa-edit"></i>
+          </button>
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="deleteLevel(level.idNivel)"
+          >
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal identifier="levelFormModal" #levelFormModal>
+  <h4>Create a new Level</h4>
+  <level-form
+    (onSubmit)="createLevel($event)"
+    [order]="levels?.length"
+  ></level-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  identifier="editFormModal"
+  #editFormModal
+  (onAnyCloseEvent)="selectedLevel = undefined"
+>
+  <ng-container *ngIf="selectedLevel">
+    <h4>Edit: {{ selectedLevel.descricion }}</h4>
+    <level-form
+      [level]="selectedLevel"
+      (onSubmit)="updateLevel($event)"
+    ></level-form>
+  </ng-container>
+</ngx-smart-modal>

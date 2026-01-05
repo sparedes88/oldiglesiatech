@@ -1,0 +1,139 @@
+:host {
+  display: block;
+}
+
+$b: 1em; // border-width
+$blur: blur(6px);
+$border_size: 6px;
+
+
+.selected {
+  box-shadow: 0px 0px 3px 2px rgba(0, 123, 255, 1);
+  -webkit-box-shadow: 0px 0px 3px 2px rgba(0, 123, 255, 1);
+  -moz-box-shadow: 0px 0px 3px 2px rgba(0, 123, 255, 1);
+}
+
+.main-img-container {
+  background: #eaeaea;
+}
+.img-container {
+  // height: calc(200px + 1em + 6px);
+  overflow: hidden;
+  border: $border_size/2 solid white;
+}
+
+.img-display {
+  position: relative;
+  // margin: 15px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.5s;
+  transform: scale(1);
+
+  // &:hover {
+  //   transform: scale(1.2);
+  // }
+}
+
+.bg-img {
+  position: relative;
+  // border: solid $b rgba(#000, 0.03);
+  border-left: solid $b rgba(#000, 0.03);
+  border-right: solid $b rgba(#000, 0.03);
+  border-top: solid $b / 1.777777776 rgba(#000, 0.03);
+  border-bottom: solid $b / 1.777777776 rgba(#000, 0.03);
+  height: 50vmin;
+  // max-width: 13em;
+  width: 100%;
+  max-height: 7em;
+  // background: $url 50%/ cover
+  // 							border-box /* background-origin */
+  // 							padding-box /* background-clip */;
+  font-size: 2em;
+  background-size: cover;
+  box-sizing: border-box;
+  background-position-x: center;
+  background-position-y: center;
+  background-clip: padding-box;
+  background-size: 125%;
+
+  &:before,
+  &:after {
+    position: absolute;
+    z-index: -1; /* put it *behind* parent */
+    /* go outside padding-box by
+		 * a border-width ($b) in every direction */
+    top: -$b * 2;
+    right: -$b * 2;
+    bottom: -$b * 2;
+    left: -$b * 2;
+    border: inherit;
+    border-color: transparent;
+    background: inherit;
+    background-clip: border-box;
+    /* -webkit-prefixed version
+		 * still needed for
+		 * some mobile browsers 💔😭 */
+    -webkit-filter: $blur;
+    filter: $blur;
+    content: "";
+  }
+}
+
+.example-container {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 600px;
+  max-width: 900px;
+}
+
+.example-box {
+  width: 200px;
+  height: 200px;
+  border: solid 1px #ccc;
+  font-size: 30pt;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.87);
+  cursor: move;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: #fff;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
+  transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+  0 2px 2px 0 rgba(0, 0, 0, 0.14),
+  0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.example-box:active {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+  0 8px 10px 1px rgba(0, 0, 0, 0.14),
+  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  opacity: .6;
+}
+
+// .cdk-drop-list {
+//   display: flex;
+//   padding-right: 10px;
+//   padding-bottom: 10px;
+// }
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+  0 8px 10px 1px rgba(0, 0, 0, 0.14),
+  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: .3;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

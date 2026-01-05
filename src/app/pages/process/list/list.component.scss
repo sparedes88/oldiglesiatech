@@ -1,0 +1,62 @@
+.example-headers-align .mat-expansion-panel-header-title,
+.example-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.example-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.colorletra
+{
+  color:  #ffff;
+}
+
+.colorCNumber
+{
+  background-color: #1dbcd2;
+  height: 80px;
+}
+.colorCDetalle
+{
+  background-color: #15abc3;
+  height: 80px;
+}
+
+.brIz
+{
+  border-radius: 5px 0px  0px 5px;
+}
+.brDe
+{
+  border-radius: 0px  5px 5px  0px ;
+}
+
+.ColorPrimero
+{
+  background-color: #d8b700;
+}
+.ColorSegundo
+{
+  background-color: #1a00a0;
+}
+.ColorTres
+{
+  background-color: #f53d3d;
+}
+
+.status {
+  padding: 5px;
+  color: #ffffff;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.summary {
+  display: inline-block;
+  width: 90%;
+  font-weight: 600;
+  font-size: 50px;
+}

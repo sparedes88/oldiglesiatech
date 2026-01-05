@@ -1,0 +1,50 @@
+<div class="container page">
+  <input
+    [hidden]="true"
+    #input_file_use
+    multiple
+    type="file"
+    class="custom-file-input"
+    id="customFile"
+  />
+  <div class="row">
+    <h3 class="col-8 col-md-10 text-citric">
+      Add a note.
+    </h3>
+    <div class="col-2 col-md-1">
+      <button class="btn btn-citric" (click)="updateContent()">
+        Add
+      </button>
+    </div>
+    <div class="col-2 col-md-1">
+      <button class="btn btn-outline-danger" (click)="dismiss()">
+        X
+      </button>
+    </div>
+  </div>
+
+  <hr />
+  <div class="row">
+    <div *ngIf="currentUser.isSuperUser || currentUser.idUserType === 1" class="col-9 offset-3 col-md-3 offset-md-9">
+      <div class="from-group">
+        <label class="text-muted" for="type"> Note type </label>
+        <ng-toggle
+          id="type"
+          name="type"
+          class="form-control"
+          onColor="warning"
+          onText="Private"
+          offColor="light"
+          offText="Reply"
+          [(ngModel)]="designRequestNote.is_private"
+        >
+          <!-- (valueChange)="checkCriteria($event)" -->
+        </ng-toggle>
+      </div>
+    </div>
+  </div>
+  <div class="col-12" style="min-height: 250px;">
+    <div id="toolbar"></div>
+    <div #editor id="editor"></div>
+  </div>
+</div>

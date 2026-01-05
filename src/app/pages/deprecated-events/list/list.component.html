@@ -1,0 +1,113 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="mt-2">Events</h1>
+      <div class="row">
+        <div class="col-md-2">
+          <button class="btn-danger" (click)="eventFormModal.open()">
+            <i class="fa fa-calendar"></i> Add event
+          </button>
+        </div>
+      </div>
+
+      <div class="row mt-5 mb-5">
+        <div class="col-md-12">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table row-border hover table-striped"
+          >
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th>Frecuency</th>
+                <th>Level of Access</th>
+                <th>Finish date</th>
+                <th>Time</th>
+                <th width="12%">Options</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let event of events">
+                <td>
+                  <img
+                    class="responsive-img foto"
+                    [src]="event.foto || '/assets/img/default-image.jpg'"
+                    onerror="this.onerror=null; this.src='/assets/img/default-image.jpg'"
+                  />
+                </td>
+                <td>{{ event.titulo }}</td>
+                <td>{{ event.descripcion }}</td>
+                <td>
+                  {{ event.provincia }}, {{ event.cuidad }}, {{ event.calle }},
+                  {{ event.zip }}
+                </td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'badge-success': event.estatus,
+                      'badge-warning': !event.estatus
+                    }"
+                  >
+                    {{ event.estatus ? "Active" : "Inactive" }}
+                  </span>
+                </td>
+                <td>{{ event.frecuencia }}</td>
+                <td>{{ event.nivelAcceso }}</td>
+                <td>{{ event.fechaFin | date: "mediumDate" }}</td>
+                <td>{{ event.hora }}</td>
+                <td>
+                  <div class="btn-group">
+                    <a
+                      routerLink="details/{{ event.idEvento }}"
+                      class="btn btn-sm btn-primary"
+                    >
+                      <i class="fa fa-eye"> </i>
+                    </a>
+                    <button
+                      class="btn btn-sm btn-info"
+                      (click)="openEditModal(event)"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteEvent(event)"
+                    >
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal #eventFormModal identifier="eventFormModal">
+  <h4>Add a new Event</h4>
+  <event-form (onSubmit)="addEvent($event)"></event-form>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #eventEditModal
+  identifier="eventEditModal"
+  (onAnyCloseEvent)="selectedEvent = undefined"
+>
+  <ng-container *ngIf="selectedEvent">
+    <h4>{{ selectedEvent.titulo }}</h4>
+    <event-form
+      (onSubmit)="updateEvent($event)"
+      [event]="selectedEvent"
+    ></event-form>
+  </ng-container>
+</ngx-smart-modal>

@@ -1,0 +1,358 @@
+<div class="row" [formGroup]="form">
+  <div class="col-12">
+    <h2><i class="far fa-calendar-check text-green"></i> Información Básica</h2>
+    <h6 class="text-secondary">
+      Nombre sy evento y explique a los asistentes por qué deben acudir. Añada
+      detalles que destaquen lo que lo hace único.
+    </h6>
+
+    <div class="form-group">
+      <label> Título del evento </label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="title"
+        placeholder="Sea claro y descriptivo"
+      />
+    </div>
+  </div>
+
+  <hr class="col-12" />
+  <div class="col-12">
+    <!-- Fecha y Hora -->
+    <h2><i class="far fa-clock text-green"></i> Fecha y Hora</h2>
+    <h6 class="text-secondary">
+      Indique a los asistentes cuándo empieza y termina su evento para que
+      puedan planificar su asistencia.
+    </h6>
+    <div class="row">
+      <div class="col-6 col-md-3">
+        <button
+          [ngClass]="
+            form.get('is_unique').value === true
+              ? 'btn-outline-green'
+              : 'btn-outline-secondary'
+          "
+          (click)="setFrequency(true)"
+          class="btn btn-block"
+        >
+          Evento único
+        </button>
+      </div>
+      <div class="col-6 col-md-3">
+        <button
+          [ngClass]="
+            form.get('is_unique').value === false
+              ? 'btn-outline-green'
+              : 'btn-outline-secondary'
+          "
+          (click)="setFrequency(false)"
+          class="btn btn-block"
+        >
+          Evento Recurrente
+        </button>
+      </div>
+
+      <!-- Unico -->
+      <div
+        class="col-12 mt-3"
+        *ngIf="form.get('is_unique').touched && is_unique"
+      >
+        <h6>Un evento único ocurre una vez y puede durar varios días</h6>
+        <div class="row">
+          <div class="col-6">
+            <div class="form-group">
+              <label>Fecha de Inicio</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="start_date"
+              />
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label>Hora de inicio</label>
+              <input
+                type="time"
+                class="form-control"
+                formControlName="start_time"
+              />
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label
+                ><span class="tooltip_">
+                  <span class="tooltiptext">
+                    Si el evento transcurre en el mismo día. Deje este campo
+                    vacío.
+                  </span>
+                  <i class="text-secondary fa fa-info-circle"></i>
+                  Fecha de culminación
+                </span>
+              </label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="end_date"
+              />
+              <button
+                class="btn btn-sm btn-light mt-1"
+                *ngIf="form.get('end_date').dirty"
+                (click)="cleanEnd('end_date')"
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label
+                ><span class="tooltip_">
+                  <span class="tooltiptext">
+                    Si no sabe a qué hora termina el evento. Deje este campo
+                    vacío.
+                  </span>
+                  <i class="text-secondary fa fa-info-circle"></i>
+                  Hora de culminación
+                </span>
+              </label>
+              <input
+                type="time"
+                class="form-control"
+                formControlName="end_time"
+              />
+              <button
+                class="btn btn-sm btn-light mt-1"
+                *ngIf="form.get('end_time').dirty"
+                (click)="cleanEnd('end_time')"
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--  Virtual -->
+      <div
+        class="col-12 mt-3"
+        *ngIf="form.get('is_unique').touched && !is_unique"
+      >
+        <div class="row">
+          <div class="col-6 col-md-3">
+            <button
+              [ngClass]="
+                form.get('is_weekly').value === true
+                  ? 'btn-outline-green'
+                  : 'btn-outline-secondary'
+              "
+              (click)="setFrequencyTime(true)"
+              class="btn btn-block"
+            >
+              Semanal
+            </button>
+          </div>
+          <div class="col-6 col-md-3">
+            <button
+              [ngClass]="
+                form.get('is_weekly').value === false
+                  ? 'btn-outline-green'
+                  : 'btn-outline-secondary'
+              "
+              (click)="setFrequencyTime(false)"
+              class="btn btn-block"
+            >
+              Mensual
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <h6>Seleccionar hora del evento</h6>
+        <div class="form-group mb-3">
+          <label> País</label>
+          <select
+            (change)="setCountry($event)"
+            [(ngModel)]="timezone_options.country"
+            [ngModelOptions]="{ standalone: true }"
+            class="form-control"
+          >
+            <option
+              *ngFor="let country of countries"
+              [value]="country.alpha2Code"
+            >
+              {{ country.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group mb-3">
+          <label> Zona horaria</label>
+          <select class="form-control" formControlName="timezone">
+            <option *ngFor="let zone of zones" [value]="zone.value">
+              {{ zone.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label> Idioma de la página del Evento</label>
+          <select class="form-control" formControlName="language">
+            <option value="" disabled checked>
+              -- Seleccione un idioma --
+            </option>
+            <option value="en">English (US)</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr class="col-12" />
+  <div class="col-12">
+    <!-- Ubicación -->
+
+    <h2><i class="fa fa-map-marked text-green"></i> Ubicación</h2>
+    <h6 class="text-secondary">
+      Ayude a la gente de la zona a descubrir su evento y haga que los
+      asistentes sepan dónde acudir.
+    </h6>
+    <div class="row">
+      <div class="col-6 col-md-3">
+        <button
+          [ngClass]="
+            form.get('is_location_virtual').value === false
+              ? 'btn-outline-green'
+              : 'btn-outline-secondary'
+          "
+          (click)="setLocation(false)"
+          class="btn btn-block"
+        >
+          Dirección
+        </button>
+      </div>
+      <div class="col-6 col-md-3">
+        <button
+          [ngClass]="
+            form.get('is_location_virtual').value === true
+              ? 'btn-outline-green'
+              : 'btn-outline-secondary'
+          "
+          (click)="setLocation(true)"
+          class="btn btn-block"
+        >
+          Evento virtual
+        </button>
+      </div>
+
+      <!-- Address -->
+      <div
+        class="col-12 mt-3"
+        *ngIf="form.get('is_location_virtual').touched && !is_location_virtual"
+      >
+        <google-address-component
+          #address_component
+          [readonly]="form.value.same_address_as_church"
+          *ngIf="init_map"
+          placeholder="Escriba la dirección del evento."
+          adressType="address"
+          (setAddress)="getAddress($event)"
+        ></google-address-component>
+        <!-- [value]="group_event.location" -->
+        <label>
+          <div class="text-center">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                formControlName="same_address_as_church"
+                id="defaultCheck2"
+                (change)="setOrganizationAddress()"
+              />
+              <label class="form-check-label" for="defaultCheck2">
+                <span class="tooltip_">
+                  <span class="tooltiptext">
+                    Marque esta opción para usar la misma dirección de la
+                    organización.
+                  </span>
+                  Dirección de la organización
+                  <i class="text-secondary fa fa-info-circle"></i>
+                </span>
+              </label>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <!--  Virtual -->
+      <div class="col-12 mt-3" *ngIf="is_location_virtual">
+        <div class="row">
+          <div class="col-6 col-md-3">
+            <button
+              [ngClass]="
+                form.get('site_type').value === 'Zoom'
+                  ? 'btn-outline-green'
+                  : 'btn-outline-secondary'
+              "
+              (click)="setSiteType('Zoom')"
+              class="btn btn-block"
+            >
+              Zoom
+            </button>
+          </div>
+          <div class="col-6 col-md-3">
+            <button
+              [ngClass]="
+                form.get('site_type').value === 'GoToMeetings'
+                  ? 'btn-outline-green'
+                  : 'btn-outline-secondary'
+              "
+              (click)="setSiteType('GoToMeetings')"
+              class="btn btn-block"
+            >
+              GoToMeetings
+            </button>
+          </div>
+          <div class="col-6 col-md-3">
+            <button
+              [ngClass]="
+                form.get('site_type').value === 'Other'
+                  ? 'btn-outline-green'
+                  : 'btn-outline-secondary'
+              "
+              (click)="setSiteType('Other')"
+              class="btn btn-block"
+            >
+              Other
+            </button>
+          </div>
+
+          <div class="col-12">
+            <div class="form-group">
+              <label class="text-secondary"> Enlace </label>
+              <input type="url" class="form-control" formControlName="link" />
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-group">
+              <label class="text-secondary"> Instrucciones </label>
+              <textarea class="form-control" formControlName="instructions">
+              </textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr class="col-12" />
+  <div class="col-12 text-center my-3">
+    <div class="row justify-content-center">
+      <div class="col-8">
+        <button (click)="submit()" class="btn btn-citric btn-block">
+          CONTINUAR
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

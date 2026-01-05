@@ -1,0 +1,243 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-fixed-text opacity-layer"></div>
+        <div class="card-fixed-text row"></div>
+        <img
+          class="card-img-top card-img-top-fixed"
+          src="/assets/img/chat_banner_new.png"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="currentUser.isSuperUser" class="mt-3 pt-3 col-12 row">
+    <div class="col-4">
+      <h2 class="text-center">
+        <span class="text-muted fs-60">
+          {{ iglesia.sms_count }}
+          <small style="font-size: 45% !important">
+            (
+            <span [ngClass]="{ 'text-danger': iglesia.total_cost > 15 }">{{
+              iglesia.total_cost | currency
+            }}</span
+            >/$15)</small
+          >
+        </span>
+        <br />
+        <h5>SMS Sent this month</h5>
+      </h2>
+    </div>
+    <div class="col-4">
+      <h2 class="text-center">
+        <span class="text-muted fs-60">
+          {{ iglesia.email_count }}
+        </span>
+        <br />
+        <h5>Emails Sent this month</h5>
+      </h2>
+    </div>
+    <div class="col-4">
+      <h2 class="text-center">
+        <span class="text-muted fs-60">
+          {{ iglesia.chat_count }}
+        </span>
+        <br />
+        <h5>Chats Sent this month</h5>
+      </h2>
+    </div>
+  </div>
+
+  <mat-accordion *ngIf="iglesia?.weeks.length > 0 && !loading">
+    <mat-expansion-panel class="mb-2" #accordion hideToggle>
+      <!-- [expanded]="item.show_opened" -->
+      <mat-expansion-panel-header>
+        <mat-panel-title> Summary per week </mat-panel-title>
+        <mat-icon>
+          {{ accordion.expanded ? "remove" : "add" }}
+        </mat-icon>
+      </mat-expansion-panel-header>
+      <div
+        class="row justify-content-center mx-0 border-bottom"
+        *ngFor="let week of iglesia.weeks"
+      >
+        <div class="col-12 col-md-3 align-self-center">
+          <span class="bold">
+            {{ week.description }}
+          </span>
+        </div>
+        <div class="col-8 col-md-3 align-self-center">
+          <div class="row justify-content-center">
+            <div class="col-4 text-center">
+              <span
+                [ngClass]="
+                  week.email_count === 0 ? 'text-muted' : 'text-citric'
+                "
+              >
+                {{ week.email_count }}
+              </span>
+              <br />
+              <small> Emails </small>
+            </div>
+            <div class="col-4 text-center">
+              <span
+                [ngClass]="week.chat_count === 0 ? 'text-muted' : 'text-citric'"
+              >
+                {{ week.chat_count }}
+              </span>
+              <br />
+              <small> Chats </small>
+            </div>
+            <div class="col-4 text-center">
+              <span
+                [ngClass]="week.sms_count === 0 ? 'text-muted' : 'text-citric'"
+              >
+                {{ week.sms_count }}
+              </span>
+              <br />
+              <small> SMS </small>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 col-md-2 align-self-center">
+          {{ week.total_cost | currency }}
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <div *ngIf="!show_form">
+    <div class="row mt-2 mb-3">
+      <div class="col-xs-6 col-md-6">
+        <h3>Log</h3>
+      </div>
+      <div class="col-xs-6 col-md-6 text-right">
+        <button
+          *ngIf="currentUser.isSuperUser"
+          class="btn btn-secondary mr-2"
+          routerLink="/messenger/dashboard"
+        >
+          Dashboard
+        </button>
+        <button class="btn btn-primary" (click)="openForm()">
+          Send message
+          <i class="fa fa-send"></i>
+        </button>
+      </div>
+      <div class="col-12" [formGroup]="filter_form">
+        <h6 class="font-weight-bold text-muted">Periods</h6>
+        <ng-multiselect-dropdown
+          [placeholder]="'Select a period'"
+          [data]="dates"
+          [settings]="selectOpts"
+          (onSelect)="setPeriod($event)"
+          formControlName="period"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <ng-template [ngIf]="loading">
+      <div class="d-flex justify-content-center" style="margin: 140px">
+        <div
+          class="spinner-border text-citric"
+          style="width: 6rem; height: 6rem"
+          role="status"
+        ></div>
+      </div>
+    </ng-template>
+
+    <div class="scroll-x" *ngIf="!loading">
+      <table class="table">
+        <thead>
+          <tr>
+            <th width="200px">Message</th>
+            <th>Type</th>
+            <th width="150px">Summary</th>
+            <th>Created by</th>
+            <th>Created at</th>
+            <th width="90px">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let log of logs">
+            <td width="200px">
+              <div class="wrap-div">
+                {{ log.message }}
+              </div>
+            </td>
+            <td>{{ log.messageType }}</td>
+            <td>
+              <b> Sent to </b>
+              <br />
+              <small class="text-secondary">
+                {{ log.contacts_count || 0 }} Contacts
+              </small>
+              <span *ngIf="log.messageType === 'sms'">
+                <br />
+                <b> Size </b>
+                <br />
+                <small class="text-citric">{{ log.num_segments }} SMS </small>
+                <br />
+                <p *ngIf="log.responses_count > 0">
+                  <span>
+                    <b> Answers </b>
+                    <br />
+                  </span>
+                  <span class="tooltip_">
+                    <span class="tooltiptext">
+                      <!-- <b> Last response:</b> {{ log.last_response }}
+                      <br />
+                      <br /> -->
+                      All the responses
+                      <p class="mb-0" *ngFor="let response of log.responses">
+                        <b> {{ response.phone_number }}: </b>
+                        {{ response.response }} at
+                        <small>
+                          {{
+                            response.created_at | date : "MMM. dd, yyyy hh:mm A"
+                          }}
+                        </small>
+                      </p>
+                    </span>
+                    <small class="text-secondary">
+                      {{ log.responses_count }}
+                      {{ log.responses_count === 1 ? "response" : "responses" }}
+                      <i class="text-secondary fa fa-info-circle"></i>
+                    </small>
+                  </span>
+                </p>
+              </span>
+            </td>
+            <td>{{ log.userName }}</td>
+            <td>
+              {{ log.createdAt }}
+            </td>
+            <td>
+              <button
+                *ngIf="log.messageType == 'sms'"
+                class="btn btn-sm"
+                [routerLink]="log.id"
+              >
+                <i class="fa fa-eye text-info"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <app-message-form
+    *ngIf="show_form"
+    (onSubmit)="reloadLogs()"
+    (on_close)="show_form = false"
+  >
+  </app-message-form>
+</div>
+
+<ngx-smart-modal #messageModal identifier="messageModal">
+  <h4>Send a new Message</h4>
+</ngx-smart-modal>

@@ -1,0 +1,148 @@
+<div *ngIf="is_preview" #pdfTable>
+  <div *ngIf="showing_page === 'cover'" class="cover-page">
+    <div class="row">
+      <div class="col-12 text-center">
+        <img
+          [src]="iglesia?.Logo"
+          class="logo_container_ad"
+          alt=""
+          onerror="this.onerror=null; this.src='/assets/img/logoColor.png'"
+        />
+      </div>
+    </div>
+    <h6
+      class="mt-1"
+      [ngStyle]="{
+        color: settings?.cover_date_color,
+        'text-align': settings?.cover_date_alignment,
+        'font-size': settings?.cover_date_size
+      }"
+      style="font-weight: bolder"
+    >
+      {{ document?.created_at | date: "MMMM dd, yyyy" }}
+    </h6>
+    <div class="title-container">
+      <h1
+        [ngStyle]="{
+          color: settings?.cover_name_color,
+          'text-align': settings?.cover_name_alignment,
+          'font-size': settings?.cover_name_size
+        }"
+      >
+        {{ document?.name }}
+      </h1>
+    </div>
+    <h4
+      class="cover-page-footer"
+      [ngStyle]="{
+        color: settings?.cover_description_color,
+        'text-align': settings?.cover_description_alignment,
+        'font-size': settings?.cover_description_size
+      }"
+    >
+      <b [innerHTML]="document?.description | safe: 'html'"> </b>
+    </h4>
+  </div>
+  <div *ngIf="showing_page === 'body'">
+    <app-document-paragraph
+      *ngFor="let paragraph of document?.paragraphs"
+      [paragraph]="paragraph"
+      [settings]="settings"
+      [deep_level]="0"
+    >
+    </app-document-paragraph>
+  </div>
+</div>
+
+<div *ngIf="!is_preview" class="container">
+  <div class="row mt-2">
+    <div class="col-xs-7 col-md-7">
+      <h2 class="text-citric mt-2">View Document</h2>
+    </div>
+    <div class="col-5 text-center align-self-center">
+      <button
+        class="btn btn-sm btn-outline-citric"
+        routerLink="/document-builder"
+      >
+        Back
+      </button>
+      <button class="btn btn-sm btn-outline-citric" (click)="printPdf(pdf)">
+        Print
+      </button>
+    </div>
+  </div>
+  <hr />
+  <div class="row m-0">
+    <div class="col-12">
+      <div class="row justify-content-center m-0">
+        <div class="col-10">
+          <div class="card">
+            <kendo-pdf-export
+              forcePageBreak=".page-break"
+              #pdf
+              paperSize="A4"
+              margin="2cm"
+            >
+              <div class="card-body" #pdfTable>
+                <div class="cover-page">
+                  <div class="row">
+                    <div class="col-12 text-center">
+                      <img
+                        [src]="iglesia?.Logo"
+                        class="logo_container_ad"
+                        alt=""
+                        onerror="this.onerror=null; this.src='/assets/img/logoColor.png'"
+                      />
+                    </div>
+                  </div>
+                  <h6
+                    class="mt-1"
+                    [ngStyle]="{
+                      color: settings?.cover_date_color,
+                      'text-align': settings?.cover_date_alignment,
+                      'font-size': settings?.cover_date_size
+                    }"
+                    style="font-weight: bolder"
+                  >
+                    {{ document?.created_at | date: "MMMM dd, yyyy" }}
+                  </h6>
+                  <div class="title-container">
+                    <h1
+                      [ngStyle]="{
+                        color: settings?.cover_name_color,
+                        'text-align': settings?.cover_name_alignment,
+                        'font-size': settings?.cover_name_size
+                      }"
+                    >
+                      {{ document?.name }}
+                    </h1>
+                  </div>
+                  <h4
+                    class="cover-page-footer"
+                    [ngStyle]="{
+                      color: settings?.cover_description_color,
+                      'text-align': settings?.cover_description_alignment,
+                      'font-size': settings?.cover_description_size
+                    }"
+                  >
+                    <b [innerHTML]="document?.description | safe: 'html'"> </b>
+                  </h4>
+                </div>
+                <div class="page-break">
+                  <hr />
+                </div>
+                <app-document-paragraph
+                  *ngFor="let paragraph of document?.paragraphs"
+                  [paragraph]="paragraph"
+                  [settings]="settings"
+                  [deep_level]="0"
+                >
+                </app-document-paragraph>
+              </div>
+            </kendo-pdf-export>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

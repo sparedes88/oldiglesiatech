@@ -1,0 +1,125 @@
+<div class="entry-container">
+  <div class="head-tag">
+    <h5 *ngIf="selectedEntry?.featured">
+      <span
+        [ngStyle]="{
+          'background-color': community?.style_settings?.button_color
+        }"
+        class="badge badge-secondary"
+      >
+        {{
+          community?.style_settings?.featured_entries
+            ? community?.style_settings?.featured_entries
+            : "Featured"
+        }}
+      </span>
+    </h5>
+  </div>
+  <div class="avatar-container">
+    <img
+      [src]="getAvatar(selectedEntry)"
+      [alt]="selectedEntry?.business_name"
+      class="avatar"
+    />
+  </div>
+  <div
+    class="main-title"
+    [ngStyle]="{
+      color: community?.style_settings?.title_color
+    }"
+  >
+    {{ selectedEntry?.business_name }}
+  </div>
+  <div
+    class="sub-title"
+    [ngStyle]="{
+      color: community?.style_settings?.sub_title_color
+    }"
+  >
+    {{ selectedEntry?.contact_first_name }}
+    {{ selectedEntry?.contact_last_name }}
+
+    <div class="mt-1" *ngIf="selectedEntry?.phone">
+      <i class="fa fa-phone-alt"></i>
+      {{ selectedEntry?.phone | mask: '(999) 999-9999' }}
+    </div>
+  </div>
+  <div class="categories bd-example">
+    <span
+      *ngFor="let category of selectedEntry?.industry"
+      class="badge badge-pill badge-primary"
+      [ngStyle]="{
+        'background-color': community?.style_settings?.button_color
+      }"
+    >
+      {{ category }}
+    </span>
+  </div>
+  <p
+    class="description"
+    [ngStyle]="{
+      color: community?.style_settings?.text_color
+    }"
+  >
+    {{ selectedEntry?.business_summary }}
+  </p>
+
+  <div
+    class="location"
+    *ngIf="selectedEntry?.locations"
+    [ngStyle]="{
+      color: community?.style_settings?.text_color
+    }"
+  >
+    <i class="fa fa-map-marker-alt"></i>
+    {{ selectedEntry?.locations }}
+  </div>
+  <div *ngIf="selectedEntry?.website">
+    <a [href]="selectedEntry?.website" target="_blank">
+      {{ selectedEntry?.website }}
+    </a>
+  </div>
+  <div class="social-links text-center">
+    <a
+      class="btn btn-light social-icon"
+      target="_blank"
+      [href]="'https://www.facebook.com/' + selectedEntry?.facebook"
+      *ngIf="selectedEntry?.facebook"
+    >
+      <i
+        [ngStyle]="{
+          color: community?.style_settings?.social_links_color
+        }"
+        class="socicon-facebook"
+      ></i>
+    </a>
+
+    <a
+      class="btn btn-light social-icon"
+      target="_blank"
+      [href]="'https://www.instagram.com/' + selectedEntry?.instagram"
+      *ngIf="selectedEntry?.instagram"
+    >
+      <i
+        [ngStyle]="{
+          color: community?.style_settings?.social_links_color
+        }"
+        class="socicon-instagram"
+      ></i>
+    </a>
+
+    <a
+      class="btn btn-light social-icon"
+      target="_blank"
+      [href]="'https://twitter.com/' + selectedEntry?.twitter"
+      *ngIf="selectedEntry?.twitter"
+    >
+      <i
+        [ngStyle]="{
+          color: community?.style_settings?.social_links_color
+        }"
+        class="socicon-twitter"
+      ></i>
+    </a>
+  </div>
+</div>

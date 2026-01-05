@@ -1,0 +1,11 @@
+::ng-deep {
+  .pac-container {
+    z-index: 3000;
+  }
+  google-address-component {
+    flex-grow: 1 !important;
+  }
+}
+.form-control[readonly] {
+  pointer-events: none;
+}

@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <style>
+      iframe {
+        width: 1px;
+        min-width: 100%;
+      }
+    </style>
+  </head>
+  <body style="background-color: black">
+    <style>
+      iframe {
+        width: 1px;
+        min-width: 100%;
+        min-height: 300px;
+      }
+    </style>
+    <script src="http://localhost:9999/api/iglesiaTechApp/public/scripts/resizer"></script>
+    <iframe
+      src="http://localhost:4200/sync-site/frame?idOrganization=10536&site_id=none&module=galleries&id=4463"
+      id="id_5mexJ"
+    ></iframe>
+
+    <script>
+      setTimeout(() => {
+        iFrameResize({ log: false }, "#id_5mexJ");
+      }, 100);
+      setInterval(iFrameResize({ log: false }, "#id_5mexJ"), 1000);
+    </script>
+  </body>
+</html>

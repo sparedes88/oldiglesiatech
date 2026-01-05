@@ -1,0 +1,23 @@
+.wp-logo {
+  max-height: 64px;
+  width: auto;
+}
+div button.only-show-on-hover {
+  visibility: hidden;
+}
+div:hover button.only-show-on-hover  {
+  visibility: visible;
+}
+.e-grid .e-headercell {
+  padding: 10px 21px 10px;
+}
+.ql-toolbar {
+  position: sticky;
+}
+.e-grid .e-rowcell.customcss{
+  vertical-align: top;
+}
+.ql-container {
+  overflow-x:auto;
+  height: 300px; /* whatever you what */
+}

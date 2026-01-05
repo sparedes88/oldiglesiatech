@@ -1,0 +1,1109 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h4 class="text-citric mb-3 mt-2">Community | {{ community.name }}</h4>
+    </div>
+  </div>
+
+  <ul *ngIf="!haveLimitedPermission()" class="nav nav-tabs">
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ active: tabIndex == 0 }"
+        (click)="tabIndex = 0"
+      >
+        Entries
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ active: tabIndex == 1 }"
+        (click)="tabIndex = 1"
+      >
+        Look & Feel
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ active: tabIndex == 2 }"
+        (click)="tabIndex = 2"
+      >
+        Design
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ active: tabIndex == 3 }"
+        (click)="tabIndex = 3"
+      >
+        Settings
+      </a>
+    </li>
+  </ul>
+
+  <div [hidden]="tabIndex != 0">
+    <div class="mt-2 mb-2 text-right">
+      <div class="btn-group">
+        <button
+          *ngIf="!haveLimitedPermission()"
+          class="btn btn-outline-citric btn-sm mt-1"
+          (click)="openAddForm(community)"
+        >
+          <i class="fa fa-plus"></i>
+          Add Entry
+        </button>
+        <a
+          class="btn btn-outline-citric btn-sm mt-1"
+          routerLink="/community-box/view/{{ communityId }}"
+        >
+          <i class="fa fa-eye"></i>
+          View
+        </a>
+        <button
+          class="btn btn-outline-citric btn-sm mt-1"
+          (click)="insertModal.open()"
+        >
+          <i class="fa fa-code"></i>
+          Embed
+        </button>
+        <!-- <button
+          class="btn btn-outline-citric btn-sm mt-1"
+          (click)="showEntryGroups(manage_groups)"
+        >
+          <i class="fa fa-th"></i>
+          Manage groups
+        </button> -->
+        <!-- <button
+          class="btn btn-outline-citric btn-sm mt-1"
+          (click)="openSortModal(sort_modal)"
+        >
+          <i class="fa fa-sort"></i>
+          Sort entries
+        </button> -->
+      </div>
+    </div>
+
+    <div cdkDropListGroup>
+      <div class="example-container" *ngFor="let group of entry_containers">
+        <h2>{{ group.name }}</h2>
+
+        <div
+          cdkDropList
+          [cdkDropListData]="group.entries"
+          class="example-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <div class="example-box" *ngFor="let item of group.entries" cdkDrag>
+            {{ item.business_name }}
+            <div class="btn-group text-right">
+              <button class="btn btn-sm btn-info" (click)="openEditForm(item)">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-primary"
+                (click)="openEntryDetails(item)"
+              >
+                <i class="fa fa-eye"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="deleteEntry(item)">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <table
+      datatable
+      [dtOptions]="dtOptions"
+      [dtTrigger]="dtTrigger"
+      class="table row-border hover table-striped mt-2"
+    >
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Created at</th>
+          <th>Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of entries; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>
+            {{ entry.business_name }}
+          </td>
+          <td>
+            {{ entry.created_at | date: "mediumDate" }}
+          </td>
+          <td style="text-align: right">
+            <div class="btn-group text-right">
+              <button class="btn btn-sm btn-info" (click)="openEditForm(entry)">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-primary"
+                (click)="openEntryDetails(entry)"
+              >
+                <i class="fa fa-eye"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteEntry(entry)"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table> -->
+  </div>
+  <div *ngIf="tabIndex == 1">
+    <div class="row">
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Button</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.button_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Social Links</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.social_links_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Title</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.title_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Sub Title</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.sub_title_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Text</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.text_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Name color</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.main_title_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Header background</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.header_background"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Header text color</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.header_text_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Entry text color</label>
+          <input
+            type="color"
+            [(ngModel)]="communityStyleSettings.entry_text_color"
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-md-6">
+        <div
+          class="text-centered"
+          *ngIf="communityStyleSettings.default_entry_picture"
+        >
+          <img
+            [src]="communityStyleSettings.default_entry_picture"
+            alt=""
+            class="responsive-img rounded-circle"
+            style="max-width: 150px"
+          />
+        </div>
+        <div class="form-group">
+          <label>Default Entry Picture</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="photo">
+                <i class="fa fa-image"></i>
+              </span>
+            </div>
+            <input
+              type="file"
+              name="photo"
+              class="form-control"
+              accept="image/*"
+              (change)="addDefaultEntryPhoto($event.target.files[0])"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="text-centered" *ngIf="communityStyleSettings.logo_picture">
+          <img
+            [src]="communityStyleSettings.logo_picture"
+            alt=""
+            class="responsive-img rounded-circle"
+            style="max-width: 150px"
+          />
+        </div>
+        <div class="form-group">
+          <label>Logo</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="photo">
+                <i class="fa fa-image"></i>
+              </span>
+            </div>
+            <input
+              type="file"
+              name="photo"
+              class="form-control"
+              accept="image/*"
+              (change)="addDefaultLogo($event.target.files[0])"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label>Banner</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="photo">
+                <i class="fa fa-image"></i>
+              </span>
+            </div>
+            <input
+              type="file"
+              name="photo"
+              class="form-control"
+              accept="image/*"
+              (change)="addDefaultBanner($event.target.files[0])"
+            />
+          </div>
+        </div>
+        <div
+          class="text-centered"
+          *ngIf="communityStyleSettings.banner_picture"
+        >
+          <img
+            [src]="fixUrl(communityStyleSettings.banner_picture)"
+            alt=""
+            class="responsive-img"
+            style="max-width: 100%"
+          />
+        </div>
+      </div>
+      <div class="col-12 text-center mb-2">
+        <button
+          class="btn btn-success"
+          [disabled]="uploading"
+          (click)="updateCommunity()"
+        >
+          <i class="fa fa-paper-plane"></i>
+          {{ uploading ? "Please wait..." : "Save settings" }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="tabIndex == 2">
+    <div class="row">
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label
+            >What would you like the banner on featured entries to read?
+          </label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="featured_entries">
+                <i class="fa fa-edit"></i>
+              </span>
+            </div>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Set label"
+              name="featured_entries"
+              required
+              [(ngModel)]="communityStyleSettings.featured_entries"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="form-group">
+          <label> Default order </label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="featured_entries">
+                <i class="fa fa-sort"></i>
+              </span>
+            </div>
+            <select
+              name="sorting"
+              class="form-control"
+              [(ngModel)]="communityStyleSettings.order_by"
+            >
+              <option [value]="undefined" disabled>Select an option</option>
+              <option value="created_at">Created at</option>
+              <option value="business_name">Name</option>
+              <option value="business_summary">Description</option>
+              <option value="contact_first_name">Contact Name</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 text-center mb-2">
+        <button
+          class="btn btn-success"
+          [disabled]="uploading"
+          (click)="updateCommunity()"
+        >
+          <i class="fa fa-paper-plane"></i>
+          {{ uploading ? "Please wait..." : "Save settings" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="tabIndex == 3">
+    <div class="row mx-0">
+      <div class="col-xs-12 col-md-6">
+        <div class="card mt-2">
+          <div class="card-content">
+            <div class="row mx-0" [formGroup]="settings_form">
+              <div class="col-12 mt-2">
+                <h4 class="my-0">Columns</h4>
+                <h6 class="m-0 text-secondary">
+                  Select which columns you want to show.
+                </h6>
+              </div>
+              <div class="col-12 mt-2">
+                <div class="form-group form-check mb-2">
+                  <input
+                    formControlName="show_name"
+                    type="checkbox"
+                    class="form-check-input"
+                    id="show_name"
+                  />
+                  <label class="form-check-label" for="show_name">
+                    Business Name
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group form-check mb-2">
+                  <input
+                    formControlName="show_contact"
+                    type="checkbox"
+                    class="form-check-input"
+                    id="show_contact"
+                  />
+                  <label class="form-check-label" for="show_contact">
+                    Contact
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group form-check mb-2">
+                  <input
+                    formControlName="show_phone"
+                    type="checkbox"
+                    class="form-check-input"
+                    id="show_phone"
+                  />
+                  <label class="form-check-label" for="show_phone">
+                    Phone
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group form-check mb-2">
+                  <input
+                    formControlName="show_email"
+                    type="checkbox"
+                    class="form-check-input"
+                    id="show_email"
+                  />
+                  <label class="form-check-label" for="show_email">
+                    Email
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group form-check mb-2">
+                  <input
+                    formControlName="show_address"
+                    type="checkbox"
+                    class="form-check-input"
+                    id="show_address"
+                  />
+                  <label class="form-check-label" for="show_address">
+                    Address
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <div class="card mt-2">
+          <div class="card-content">
+            <div class="row mx-0" [formGroup]="settings_form">
+              <div class="col-12 mt-2">
+                <h4 class="my-0">Users</h4>
+                <h6 class="m-0 text-secondary">
+                  Select which users can access to this directory.
+                </h6>
+              </div>
+              <div [formGroup]="settings_form" class="col-12 col-md-6">
+                <ng-multiselect-dropdown
+                  placeholder="Select your users"
+                  [data]="users"
+                  [settings]="selectCatOptions"
+                  formControlName="users"
+                  (onSelect)="setAvailableUsers()"
+                  (onSelectAll)="setAvailableUsers()"
+                  (onDeSelect)="setAvailableUsers()"
+                  (onDeSelectAll)="setAvailableUsers()"
+                ></ng-multiselect-dropdown>
+              </div>
+              <small class="col-12 text-citric">*Only members are available.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 text-center mb-2 mt-2">
+        <button
+          class="btn btn-success"
+          [disabled]="uploading"
+          (click)="updateCommunity()"
+        >
+          <i class="fa fa-paper-plane"></i>
+          {{ uploading ? "Please wait..." : "Save settings" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="community.uId" [hidden]="tabIndex != 0">
+    <!-- <mat-card>
+      <mat-card-header> Nested Drag And Drop Cards</mat-card-header>
+      <mat-card-content
+        cdkDropList
+        dragAndDropManagerRoot
+        [cdkDropListData]="community.containers"
+        (cdkDropListDropped)="onDragDrop$.next($event)"
+      >
+        <ng-container *ngFor="let item of community.containers">
+          <app-item
+            [item]="item"
+            [invert]="invert"
+            [onDragDrop]="onDragDrop$"
+          ></app-item>
+        </ng-container>
+      </mat-card-content>
+    </mat-card> -->
+
+    <div class="row">
+      <div class="col-12 text-right">
+        <button
+          class="btn btn-sm btn-secondary mb-3"
+          (click)="sorting = !sorting"
+        >
+          {{ sorting ? "Handle elements" : "Sort groups" }}
+        </button>
+      </div>
+    </div>
+    <div class="w-100"></div>
+    <list-item
+      [item]="community"
+      [has_limited_permission]="haveLimitedPermission()"
+      [connectedDropListsIds]="connectedDropListsIds"
+      (itemDrop)="onDragDropV1($event)"
+      (sortItem)="sortElement($event)"
+      [sort_mode]="sorting"
+      (makeAction)="handleAction($event)"
+      (makeActionContainer)="handleActionContainer($event)"
+    >
+    </list-item>
+    <h6 *ngIf="community.entries?.length > 0">Entries</h6>
+    <div
+      *ngIf="community.entries?.length > 0"
+      cdkDropList
+      class="example-list"
+      [id]="community.uId"
+      [cdkDropListConnectedTo]="connectedDropListsIds"
+      [cdkDropListData]="community"
+      (cdkDropListDropped)="onDragDropV1($event)"
+    >
+      <div
+        [cdkDragData]="entry"
+        class="example-box"
+        *ngFor="let entry of community.entries"
+        cdkDrag
+      >
+        {{ entry.business_name }}
+
+        <div class="item-drag-preview" *cdkDragPreview>
+          <!-- {{ item.name }} with {{ item.containers.length }} child item(s) -->
+          Drop this item inside an any drop-zone.
+        </div>
+
+        <div class="btn-group text-right">
+          <button class="btn btn-sm btn-info" (click)="openEditForm(entry)">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button
+            class="btn btn-sm btn-primary"
+            (click)="openEntryDetails(entry)"
+          >
+            <i class="fa fa-eye"></i>
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="deleteEntry(entry)">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-smart-modal
+  #entryFormModal
+  identifier="entryFormModal"
+  (onAnyCloseEvent)="entryFormGroup.reset()"
+>
+  <h4>Add community</h4>
+  <form (ngSubmit)="submitEntry(entryFormGroup)" #entryFormGroup="ngForm">
+    <div class="text-center" *ngIf="entryForm.photo">
+      <img [src]="entryForm.photo" alt="" class="img-circle" />
+    </div>
+    <div class="form-group">
+      <label>Profile Photo</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="photo">
+            <i class="fa fa-image"></i>
+          </span>
+        </div>
+        <input
+          type="file"
+          name="photo"
+          class="form-control"
+          accept="image/*"
+          (change)="addPhoto($event.target.files[0])"
+          #photo_input
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="business_name">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Name"
+          name="business_name"
+          required
+          [(ngModel)]="entryForm.business_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact First Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_first_name">
+            <i class="fa fa-user-alt"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Contact First Name"
+          name="contact_first_name"
+          required
+          [(ngModel)]="entryForm.contact_first_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact Last Name*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_last_name">
+            <i class="fa fa-user-alt"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Contact last Name"
+          name="contact_last_name"
+          required
+          [(ngModel)]="entryForm.contact_last_name"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Summary*</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="business_summary">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="business_summary"
+          name="business_summary"
+          required
+          [(ngModel)]="entryForm.business_summary"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Categories</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="industry">
+            <i class="fa fa-building"></i>
+          </span>
+        </div>
+        <ng-select
+          [items]="categories"
+          [multiple]="true"
+          [closeOnSelect]="false"
+          [searchable]="true"
+          placeholder="Select categories"
+          [(ngModel)]="entryForm.industry"
+          [ngModelOptions]="{ standalone: true }"
+          [addTag]="true"
+        >
+        </ng-select>
+      </div>
+    </div>
+
+    <!-- <div class="form-group">
+      <label>Group entry by</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="entry_groups">
+            <i class="fa fa-building"></i>
+          </span>
+        </div>
+        <ng-select
+          bindLabel="name"
+          bindValue="idEntryGroup"
+          [items]="entry_groups"
+          [multiple]="false"
+          [closeOnSelect]="true"
+          [searchable]="true"
+          placeholder="Select a group"
+          [(ngModel)]="entryForm.idEntryGroup"
+          [ngModelOptions]="{ standalone: true }"
+          [addTag]="false"
+        >
+        </ng-select>
+      </div>
+    </div> -->
+
+    <div class="form-group">
+      <label>Phone</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="phone">
+            <i class="fa fa-phone"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Phone"
+          name="phone"
+          [(ngModel)]="entryForm.phone"
+          [dropSpecialCharacters]="false"
+          mask="(000) 000-0000"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contact email</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="contact_email">
+            <i class="fa fa-at"></i>
+          </span>
+        </div>
+        <input
+          type="email"
+          class="form-control"
+          placeholder="Contact email"
+          name="contact_email"
+          [(ngModel)]="entryForm.contact_email"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Location</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="locations">
+            <i class="fa fa-map-marker"></i>
+          </span>
+        </div>
+        <google-address-component
+          *ngIf="entryFormModal.isVisible()"
+          (setAddress)="getAddress($event)"
+          adressType="geocode"
+          [value]="entryForm.locations"
+        ></google-address-component>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Radius (miles)</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="radius">
+            <i class="fa fa-circle"></i>
+          </span>
+        </div>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          class="form-control"
+          placeholder="Range radius"
+          name="radius"
+          [(ngModel)]="entryForm.radius"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Website</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="website">
+            <i class="fa fa-address-card"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Website"
+          name="website"
+          [(ngModel)]="entryForm.website"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Instagram</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="instagram">
+            <i class="socicon-instagram"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Instagram"
+          name="instagram"
+          [(ngModel)]="entryForm.instagram"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Twitter</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="twitter">
+            <i class="socicon-twitter"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Twitter"
+          name="twitter"
+          [(ngModel)]="entryForm.twitter"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Facebook</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="facebook">
+            <i class="socicon-facebook"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Facebook"
+          name="facebook"
+          [(ngModel)]="entryForm.facebook"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-12">
+        <ng-multiselect-dropdown
+          placeholder="Select your users"
+          [data]="available_users"
+          [settings]="selectCatOptions"
+          [(ngModel)]="entryForm.assigned_users"
+          [ngModelOptions]="{standalone: true}"
+        ></ng-multiselect-dropdown>
+      </div>
+      <small class="col-12 text-citric">*Only members unassigned to directory are available.</small>
+    </div>
+
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        name="featured"
+        [(ngModel)]="entryForm.featured"
+        id="featuredCheck"
+      />
+      <label class="form-check-label" for="featuredCheck">Featured</label>
+    </div>
+    <div class="form-group">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="entryFormGroup.invalid || saving"
+      >
+        <i class="fa fa-paper-plane"></i>
+        {{ saving ? "Please wait..." : "Save entry" }}
+      </button>
+    </div>
+  </form>
+</ngx-smart-modal>
+
+<ngx-smart-modal #insertModal identifier="insertModal">
+  <h4>Insert on your website</h4>
+  <p>Entry point</p>
+  <pre
+    style="background-color: #555555; color: white; padding: 8px"
+    [innerText]="embedCode.entry_point"
+  ></pre>
+
+  <p>Scripts</p>
+  <pre
+    style="background-color: #555555; padding: 8px; color: white"
+    [innerText]="embedCode.scripts"
+  ></pre>
+</ngx-smart-modal>
+
+<ngx-smart-modal #entryModal identifier="entryModal">
+  <community-entry
+    *ngIf="selectedEntry && entryModal.isVisible()"
+    [community]="community"
+    [selectedEntry]="selectedEntry"
+  ></community-entry>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #manage_groups
+  identifier="manage_groups"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <ng-template [ngIf]="show_categories">
+    <app-entry-groups
+      [idOrganization]="currentUser?.idIglesia"
+      [display_as_modal]="true"
+      (reload_groups)="reload($event)"
+    ></app-entry-groups>
+  </ng-template>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #sort_modal
+  identifier="sort_modal"
+  [dismissable]="false"
+  customClass="large-modal"
+>
+  <ng-template [ngIf]="show_categories">
+    <div
+      cdkDropList
+      class="example-list mb-5"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <div
+        class="example-box"
+        *ngFor="let entry of entries; let i = index"
+        cdkDrag
+      >
+        <div class="row" style="width: 100%">
+          <div class="col-md-4">
+            {{ entry.business_name }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ngx-smart-modal>
+
+<ngx-smart-modal
+  #containerFormModal
+  identifier="containerFormModal"
+  (onAnyCloseEvent)="containerFormGroup.reset()"
+>
+  <h4>Add Group</h4>
+  <form
+    (ngSubmit)="submitContainer(containerFormGroup)"
+    #containerFormGroup="ngForm"
+  >
+    <div class="text-center" *ngIf="containerForm.picture">
+      <img [src]="containerForm.picture" alt="" class="img-circle" />
+    </div>
+    <div class="form-group">
+      <label>Group Photo</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="photo">
+            <i class="fa fa-image"></i>
+          </span>
+        </div>
+        <input
+          type="file"
+          name="photo"
+          class="form-control"
+          accept="image/*"
+          (change)="addPhotoContainer($event.target.files[0])"
+          #photo_input
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Name <span class="danger">*</span></label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="name">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Name"
+          name="name"
+          required
+          [(ngModel)]="containerForm.name"
+        />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="description">
+            <i class="fa fa-align-left"></i>
+          </span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Description (optional)"
+          name="description"
+          [(ngModel)]="containerForm.description"
+        />
+      </div>
+    </div>
+    <div class="form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        name="featured"
+        [(ngModel)]="containerForm.show_opened"
+        id="featuredCheck"
+      />
+      <label class="form-check-label" for="featuredCheck">Show opened?</label>
+    </div>
+    <div class="form-group">
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="containerFormGroup.invalid || saving"
+      >
+        <i class="fa fa-paper-plane"></i>
+        {{ saving ? "Please wait..." : "Save group" }}
+      </button>
+    </div>
+  </form>
+</ngx-smart-modal>

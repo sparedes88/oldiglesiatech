@@ -1,0 +1,287 @@
+<form [formGroup]="memberFormGroup" (submit)="submitForm(memberFormGroup)">
+  <div class="row">
+    <div class="col-xs-12 col-md-6">
+      <h4 class="mt-4">Personal Information</h4>
+      <div class="row">
+        <div class="col-xs-12 col-md-12">
+          <div class="form-group">
+            <label for="file">Choose File</label>
+            <input
+              class="form-control"
+              type="file"
+              accept="image/*"
+              id="file"
+              (change)="handleFileInput($event.target.files)"
+            />
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              placeholder="Name"
+              formControlName="nombre"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="last_name">Last name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="last_name"
+              placeholder="Last name"
+              formControlName="apellido"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-12">
+          <div class="form-group">
+            <label for="sex">Sex</label>
+            <select
+              class="form-control"
+              name="sex"
+              id="sex"
+              placeholder="Sex"
+              formControlName="sexo"
+            >
+              <option value="Masculino">Male</option>
+              <option value="Femenino">Female</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-group">
+              <input
+                [type]="passInputType"
+                class="form-control"
+                [ngClass]="{
+                  'is-invalid':
+                    memberFormGroup.get('pass')['invalid'] && !member
+                }"
+                id="password"
+                placeholder="Type your new password"
+                formControlName="pass"
+                minlength="6"
+                [required]="!member"
+              />
+              <div class="input-group-append">
+                <button
+                  (click)="togglePassInput()"
+                  class="btn btn-primary"
+                  type="button"
+                >
+                  <i class="fa fa-eye fa-lg"></i>
+                </button>
+              </div>
+            </div>
+            <small id="help" class="form-text text-muted" *ngIf="member">
+              Leave blank if you don't want to change password
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-6">
+      <h4 class="mt-4">Contact Information</h4>
+      <div class="row">
+        <div class="col-12 col-md-6 align-items-center">
+          <div class="form-group">
+            <label for="estimated">
+              Country Code <span class="text-danger">*</span>
+            </label>
+            <app-custom-select-country
+              #custom_select_country
+              [return_value]="'callingCode'"
+              formControlName="country_code"
+              [idOrganization]="member?.idIglesia"
+              [preselected_country_code]="user?.country_code"
+            >
+            </app-custom-select-country>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 align-items-center">
+          <div class="form-group">
+            <label for="estimated">
+              Cell Phone <span class="text-danger">*</span>
+            </label>
+            <input
+              class="form-control"
+              placeholder="(999) 999-9999."
+              type="tel"
+              formControlName="telefono"
+              [dropSpecialCharacters]="false"
+              mask="(000) 000-0000"
+            />
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="birth_day">Birth date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="birth_day"
+              placeholder="Phone"
+              formControlName="fechaNacimiento"
+            />
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="Email"
+              formControlName="email"
+              [readonly]="disable_mail"
+              [disabled]="disable_mail"
+              required
+            />
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="marital">Marital status</label>
+            <select
+              class="form-control"
+              formControlName="estadoCivil"
+              id="marital"
+            >
+              <option value="Soltero">Single</option>
+              <option value="Casado">Married</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="idUserType">User Type</label>
+            <select
+              class="form-control"
+              formControlName="idUserType"
+              id="idUserType"
+            >
+              <option value="1">Organization Admin</option>
+              <option value="2">Member</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-group">
+            <label class="col-12">
+              <span style="pointer-events: none"> Address </span>
+            </label>
+            <div class="input-group">
+              <google-address-component
+                #google_address_component
+                *ngIf="init_map"
+                [value]="memberFormGroup.get('full_address').value"
+                placeholder="Please type the location info about this member."
+                adressType="address"
+                (setAddress)="getAddress(memberFormGroup, $event)"
+              ></google-address-component>
+            </div>
+            <span
+              class="text-danger error-span"
+              *ngIf="memberFormGroup.get('ciudad').invalid"
+            >
+              * Please fill this info
+            </span>
+          </div>
+        </div>
+
+        <!-- <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="provincia">State *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="provincia"
+              placeholder="State"
+              formControlName="provincia"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="ciudad">City</label>
+            <input
+              type="text"
+              class="form-control"
+              id="ciudad"
+              placeholder="City"
+              formControlName="ciudad"
+            />
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="calle">Street</label>
+            <input
+              type="text"
+              class="form-control"
+              id="calle"
+              placeholder="Street"
+              formControlName="calle"
+            />
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6">
+          <div class="form-group">
+            <label for="zip">ZIP</label>
+            <input
+              type="text"
+              class="form-control"
+              id="zip"
+              placeholder="ZIP"
+              formControlName="zip"
+            />
+          </div>
+        </div> -->
+      </div>
+    </div>
+    <div class="col-xs-12 col-md-12">
+      <h4 class="mt-4">Levels and requirements</h4>
+      <div class="row">
+        <div class="col-xs-12 col-md-6">
+          <ng-multiselect-dropdown
+            placeholder="Select categories"
+            [data]="categories"
+            [settings]="selectCatOptions"
+            formControlName="categorias"
+          ></ng-multiselect-dropdown>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <ng-multiselect-dropdown
+            placeholder="Select levels"
+            [data]="levels"
+            [settings]="selectLevelOptions"
+            formControlName="niveles"
+          ></ng-multiselect-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    type="submit"
+    class="btn btn-primary mt-2"
+    [disabled]="loading || memberFormGroup.invalid"
+  >
+    <ng-template [ngIf]="loading"> Loading... </ng-template>
+    <ng-template [ngIf]="!loading"> Submit </ng-template>
+  </button>
+</form>

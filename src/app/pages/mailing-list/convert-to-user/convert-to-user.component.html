@@ -1,0 +1,264 @@
+<div [hidden]="loading" [formGroup]="contact_form" class="row">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label> Name </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="Name"
+            formControlName="name"
+            [class.is-invalid]="
+              contact_form.get('name').dirty && contact_form.get('name').invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label> Last Name </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="Last Name"
+            formControlName="last_name"
+            [class.is-invalid]="
+              contact_form.get('last_name').dirty &&
+              contact_form.get('last_name').invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="form-group">
+          <label> Email </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="Email"
+            formControlName="email"
+            [class.is-invalid]="
+              contact_form.get('email').dirty &&
+              contact_form.get('email').invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="form-group">
+          <label for="estimated">
+            Country Code <span class="text-danger">*</span>
+          </label>
+          <app-custom-select-country
+            [return_value]="'callingCode'"
+            formControlName="country_code"
+            [idOrganization]="mailing_list?.idIglesia"
+            [preselected_country_code]="contact_form.get('country_code').value"
+          >
+          </app-custom-select-country>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="form-group">
+          <label> Phone </label>
+          <input
+            type="text"
+            required
+            class="form-control mb-1"
+            placeholder="(000) 000-0000"
+            formControlName="phone"
+            mask="(000) 000-0000"
+            [dropSpecialCharacters]="false"
+            [class.is-invalid]="
+              contact_form.get('phone').dirty &&
+              contact_form.get('phone').invalid
+            "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="col-12 col-md-6"
+    *ngIf="groups.first_row.length > 0 || groups.second_row.length > 0"
+  >
+    <h4 class="text-muted">
+      Groups
+      <h6>
+        <small> Please select the groups to assign this user. </small>
+      </h6>
+    </h4>
+    <div class="row mx-2" formGroupName="groups">
+      <div formArrayName="first_row" class="col-6 text-left mb-4">
+        <div
+          *ngFor="let group of groups.first_row; let i = index"
+          [formGroupName]="i"
+          style="position: relative"
+        >
+          <input
+            type="checkbox"
+            [id]="'acceptance_1_' + i"
+            name="customRadio"
+            class="custom-control-input"
+            formControlName="checked"
+            [checked]="groups_first_row.at(i).get('checked').value"
+            (click)="toggleAcceptace('groups', 'first_row', i)"
+          />
+          <span
+            class="checkmark"
+            (click)="toggleAcceptace('groups', 'first_row', i)"
+          ></span>
+          <label
+            style="cursor: pointer"
+            class="custom-control-label"
+            [for]="'acceptance_1_' + i"
+          >
+            {{ group.title }}
+          </label>
+        </div>
+      </div>
+      <div formArrayName="second_row" class="col-6 text-left mb-4">
+        <div
+          *ngFor="let group of groups.second_row; let i = index"
+          [formGroupName]="i"
+          style="position: relative"
+        >
+          <input
+            type="checkbox"
+            [id]="'acceptance_2_' + i"
+            name="customRadio"
+            class="custom-control-input"
+            formControlName="checked"
+            [checked]="groups_second_row.at(i).get('checked').value"
+            (click)="toggleAcceptace('groups', 'second_row', i)"
+          />
+          <span
+            class="checkmark"
+            (click)="toggleAcceptace('groups', 'second_row', i)"
+          ></span>
+          <label
+            style="cursor: pointer"
+            class="custom-control-label"
+            [for]="'acceptance_2_' + i"
+          >
+            {{ group.title }}
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="col-12 col-md-6"
+    *ngIf="events.first_row.length > 0 || events.second_row.length > 0"
+  >
+    <h4 class="text-muted">
+      Events
+      <h6>
+        <small> Please select the events to assign this user. </small>
+      </h6>
+    </h4>
+    <div class="row mx-2" formGroupName="events">
+      <div formArrayName="first_row" class="col-6 text-left mb-4">
+        <div
+          *ngFor="let event of events.first_row; let i = index"
+          [formGroupName]="i"
+          style="position: relative"
+        >
+          <input
+            type="checkbox"
+            [id]="'events_acceptance_1_' + i"
+            name="customRadio"
+            class="custom-control-input"
+            formControlName="checked"
+            [checked]="events_first_row.at(i).get('checked').value"
+            (click)="toggleAcceptace('events', 'first_row', i)"
+          />
+          <span
+            class="checkmark"
+            (click)="toggleAcceptace('events', 'first_row', i)"
+          ></span>
+          <label
+            style="cursor: pointer"
+            class="custom-control-label"
+            [for]="'events_acceptance_1_' + i"
+          >
+            {{ event.name }}
+          </label>
+        </div>
+      </div>
+      <div formArrayName="second_row" class="col-6 text-left mb-4">
+        <div
+          *ngFor="let event of events.second_row; let i = index"
+          [formGroupName]="i"
+          style="position: relative"
+        >
+          <input
+            type="checkbox"
+            [id]="'events_acceptance_2_' + i"
+            name="customRadio"
+            class="custom-control-input"
+            formControlName="checked"
+            [checked]="events_second_row.at(i).get('checked').value"
+            (click)="toggleAcceptace('events', 'second_row', i)"
+          />
+          <span
+            class="checkmark"
+            (click)="toggleAcceptace('events', 'second_row', i)"
+          ></span>
+          <label
+            style="cursor: pointer"
+            class="custom-control-label"
+            [for]="'events_acceptance_2_' + i"
+          >
+            {{ event.name }}
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="form-group">
+      <label> Notes </label>
+      <textarea
+        type="text"
+        required
+        class="form-control mb-1"
+        placeholder="Please add a note about this user."
+        formControlName="notes"
+        rows="7"
+        [class.is-invalid]="
+          contact_form.get('notes').dirty && contact_form.get('notes').invalid
+        "
+      ></textarea>
+    </div>
+  </div>
+</div>
+<div class="col-xs-12">
+  <ng-template [ngIf]="loading">
+    <div class="d-flex justify-content-center" style="margin-top: 15%">
+      <div
+        class="spinner-border text-citric"
+        style="width: 6rem; height: 6rem"
+        role="status"
+      ></div>
+    </div>
+    <div class="col-12 text-center text-citric" style="margin-bottom: 15%">
+      Performing actions... Please wait.
+    </div>
+  </ng-template>
+</div>
+
+<div class="col-12 text-right">
+  <button
+    (click)="submit()"
+    class="btn btn-sm btn-success"
+    [disabled]="contact_form.invalid || loading"
+  >
+    <ng-template [ngIf]="loading"> Loading... </ng-template>
+    <ng-template [ngIf]="!loading"> Submit </ng-template>
+  </button>
+</div>

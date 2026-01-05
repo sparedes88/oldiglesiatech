@@ -1,0 +1,29 @@
+.footer-editor {
+  margin-bottom: 10em;
+}
+@media (min-width: 768px) {
+  .col-md-2_4 {
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
+  .col-md-1_7 {
+    flex: 0 0 14.28%;
+    max-width: 14.28%;
+  }
+  .col-md-1_5 {
+    flex: 0 0 12.5%;
+    max-width: 12.5%;
+  }
+  .col-md-1_3 {
+    flex: 0 0 11.11%;
+    max-width: 11.11%;
+  }
+  .col-md-1_2 {
+    flex: 0 0 10%;
+    max-width: 10%;
+  }
+  .col-md-1_0 {
+    flex: 0 0 9.09%;
+    max-width: 9.09%;
+  }
+}

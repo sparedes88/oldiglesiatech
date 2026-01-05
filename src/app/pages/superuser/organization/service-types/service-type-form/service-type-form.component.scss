@@ -1,0 +1,36 @@
+.slide-image {
+    height: 100%;
+    // width: 50%;
+    display: inline-block;
+    position: relative;
+    z-index: 1;
+    img {
+        z-index: 1;
+        height: 100px;
+        width: auto;
+        padding: 0 10px;
+    }
+    button {
+        max-width: 28px !important;
+        max-height: 28px !important;
+        width: 28px !important;
+        height: 28px;
+        padding: 0 !important;
+    }
+}
+.front-element {
+    position: absolute !important;
+    // top: 5px !important;
+    right: 10px !important;
+    z-index: 3 !important;
+    background-color: red !important;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+}
+a.front-element {
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    margin-top: 2px;
+}
