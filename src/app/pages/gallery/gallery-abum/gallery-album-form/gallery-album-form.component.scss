@@ -1,3 +1,5 @@
+@use "sass:math";
+
 :host {
   display: block;
 }
@@ -19,7 +21,7 @@ $border_size: 6px;
 .img-container {
   // height: calc(200px + 1em + 6px);
   overflow: hidden;
-  border: $border_size/2 solid white;
+  border: $border_size*0.5 solid white;
 }
 
 .img-display {
@@ -40,8 +42,8 @@ $border_size: 6px;
   // border: solid $b rgba(#000, 0.03);
   border-left: solid $b rgba(#000, 0.03);
   border-right: solid $b rgba(#000, 0.03);
-  border-top: solid $b / 1.777777776 rgba(#000, 0.03);
-  border-bottom: solid $b / 1.777777776 rgba(#000, 0.03);
+  border-top: solid math.div($b, 1.777777776) rgba(#000, 0.03);
+  border-bottom: solid math.div($b, 1.777777776) rgba(#000, 0.03);
   height: 50vmin;
   // max-width: 13em;
   width: 100%;

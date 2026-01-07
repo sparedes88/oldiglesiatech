@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .gallery-item {
   min-height: 250px;
   border: 1px solid #e0e0e0;
@@ -48,8 +50,8 @@
   border: 2px solid #555;
   &:hover,
   &:focus {
-    color: lighten(#555, 20%);
-    border-color: lighten(#555, 20%);
+    color: color.adjust(#555, $lightness: 20%, $space: hsl);
+    border-color: color.adjust(#555, $lightness: 20%, $space: hsl);
   }
 }
 
@@ -134,7 +136,7 @@
     width: 444.44px;
     height: 250px;
     &-view-box {
-      outline-color: transparentize(#e65100, 0.75);
+      outline-color: color.adjust(#e65100, $alpha: -0.75);
       outline: 1px solid #e65100;
     }
 

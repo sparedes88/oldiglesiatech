@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .custom-control-input:checked ~ .custom-control-label::before {
     border-color: #e65100;
     background-color: #e65100;
@@ -37,10 +39,10 @@ a.text-citric:focus {
 }
 
 .bg-citric {
-    background: lighten(#e65100, 13%) !important;
+    background: color.adjust(#e65100, $lightness: 13%, $space: hsl) !important;
 }
 .navbar-business {
-    background: lighten(#a82703, 3%) !important;
+    background: color.adjust(#a82703, $lightness: 3%, $space: hsl) !important;
 }
 
 .menu-container_check {

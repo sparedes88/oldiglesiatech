@@ -43,7 +43,7 @@ import { NgxQRCodeModule } from 'ngx-qrcode2';
 import { RegisterModule } from './pages/register/register.module';
 import { ChatModule } from './component/chat/chat.module';
 import { BookingModule } from './pages/booking/booking.module';
-import { AngularFireMessagingModule } from '@angular/fire/messaging';
+// import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
@@ -201,7 +201,7 @@ export class CustomTranslateLoader implements TranslateLoader {
     BookingModule,
     AngularFireDatabaseModule,
     AngularFireAuthModule,
-    AngularFireMessagingModule,
+    // AngularFireMessagingModule, // Temporarily disabled due to webpack dynamic import issue
     AngularFireModule.initializeApp(environment.firebase),
     //RichTextEditorAllModule,//Importando cualquiera de estos 3, se produce el error
     NotesModule,//Pero no se puede acceder a OrganizationsModule a menos que se importe

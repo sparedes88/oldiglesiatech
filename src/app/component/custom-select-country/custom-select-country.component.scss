@@ -1,17 +1,24 @@
 mat-select-country {
     display: grid;
 }
+
 .select-country {
     --be-divider-default: #ced4da;
-    /deep/ .mat-form-field-appearance-outline .mat-form-field-infix {
+
+    // Example usage of the variable (add if needed, e.g., for a divider border)
+    border-bottom: 1px solid var(--be-divider-default);
+
+    ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
         padding: 0.678em 0 !important;
         border-top: solid 0.34375em transparent !important;
     }
-    /deep/ .mat-form-field-wrapper {
+
+    ::ng-deep .mat-form-field-wrapper {
         padding-bottom: 0;
         margin: 0;
     }
-    /deep/ .mat-form-field-suffix {
+
+    ::ng-deep .mat-form-field-suffix {
         top: 0;
     }
 }

@@ -6,7 +6,7 @@ import { UserService } from "./user.service";
 import { v4 as uuidv4 } from "uuid";
 import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+// import { AngularFireMessaging } from '@angular/fire/messaging';
 import { mergeMapTo } from 'rxjs/operators';
 import { take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs'
@@ -25,11 +25,12 @@ export class ChatService {
   currentMessage = new BehaviorSubject(null);
   constructor(private currentUser: UserService, private angularFireDB: AngularFireDatabase,
     private angularFireAuth: AngularFireAuth,
-    private angularFireMessaging: AngularFireMessaging,
+    // private angularFireMessaging: AngularFireMessaging, // Temporarily disabled
     public groupService: GroupsService,
     private api: ApiService,
   ) {
-    this.angularFireMessaging.messaging.subscribe(
+    // Temporarily disabled due to webpack dynamic import issue
+    /* this.angularFireMessaging.messaging.subscribe(
       (_messaging) => {
         _messaging.onMessage(payload => {
           //console.log('Message received. ', payload);
@@ -37,7 +38,7 @@ export class ChatService {
         _messaging.onMessage = _messaging.onMessage.bind(_messaging);
         _messaging.onTokenRefresh = _messaging.onTokenRefresh.bind(_messaging);
       }
-    )
+    ) */
   }
   getGroups() {
     this.groupService.getGroups().subscribe(
@@ -151,7 +152,8 @@ export class ChatService {
   requestPermission(userId) {
     if (window != window.top) {
     } else {
-      this.angularFireMessaging.requestToken.subscribe(
+      // Temporarily disabled
+      /* this.angularFireMessaging.requestToken.subscribe(
         (token) => {
           //console.log(token);
           this.fcm_token = token
@@ -160,13 +162,14 @@ export class ChatService {
         (err) => {
           console.error('Unable to get permission to notify.');
         }
-      );
+      ); */
     }
   }
   receiveMessage() {
     if (window != window.top) {
     } else {
-      this.angularFireMessaging.messages.subscribe(
+      // Temporarily disabled
+      /* this.angularFireMessaging.messages.subscribe(
         (payload: any) => {
           //console.log("new message received. ", payload);
           this.currentMessage.next(payload);
@@ -183,7 +186,7 @@ export class ChatService {
           });
         }, (error: any) => {
           //console.log(error)
-        })
+        }) */
     }
   }
   public chatClient: Client;

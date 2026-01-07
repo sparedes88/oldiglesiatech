@@ -1,5 +1,7 @@
+@use "sass:color";
+
 @function set-text-color($color) {
-  @if (lightness($color) > 50) {
+  @if (color.channel($color, 'lightness', $space: hsl) > 50) {
     @return $black; // Lighter color, return black
   } @else {
     @return $white; // Darker color, return white

@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build:prod": "node --max_old_space_size=6048 ./node_modules/@angular/cli/bin/ng build --prod --aot --vendor-chunk --common-chunk --delete-output-path --buildOptimizer --sourceMap=false",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "start": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng serve --open",
+    "dev": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng serve --open",
+    "build:prod": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider node --max_old_space_size=6048 ./node_modules/@angular/cli/bin/ng build --prod --aot --vendor-chunk --common-chunk --delete-output-path --buildOptimizer --sourceMap=false",
+    "build": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider npx ng build",
+    "test": "npx ng test",
+    "lint": "npx ng lint",
+    "e2e": "npx ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -94,7 +95,7 @@
     "ngx-smart-modal": "^7.3.0",
     "ngx-socket-io": "^3.3.1",
     "ngx-toastr": "^10.2.0",
-    "node-sass": "^4.14.1",
+    "sass": "^1.32.0",
     "npm": "^9.4.2",
     "papaparse": "^5.1.0",
     "pdfmake": "^0.2.0",
@@ -121,6 +122,7 @@
     "@types/jasminewd2": "^2.0.8",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
+    "cross-env": "^7.0.3",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.0.0",

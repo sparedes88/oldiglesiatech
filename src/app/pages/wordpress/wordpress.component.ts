@@ -267,7 +267,7 @@ export class WordpressComponent implements OnInit {
               height: 160,
               contents: [
                 {
-                  type: 'Text',
+                  type: 'Text' as any,
                   value: 'CONTACTS REPORT',
                   position: {
                     x: 10,
@@ -278,13 +278,13 @@ export class WordpressComponent implements OnInit {
                     width: 1100
                   },
                   style: {
-                    hAlign: 'Left',
+                    hAlign: 'Left' as any,
                     fontSize: 22
                   },
-                  font: new PdfStandardFont(PdfFontFamily.Helvetica, 20, PdfFontStyle.Bold)
+                  font: new PdfStandardFont(PdfFontFamily.Helvetica, 20, PdfFontStyle.Bold) as any
                 },
                 {
-                  type: 'Text',
+                  type: 'Text' as any,
                   value: `DATE: ${moment().format('MMM/DD/YYYY')}`,
                   position: {
                     x: 10,
@@ -295,14 +295,14 @@ export class WordpressComponent implements OnInit {
                     width: 1100
                   },
                   style: {
-                    hAlign: 'Left',
+                    hAlign: 'Left' as any,
                     fontSize: 12,
                     textBrushColor: '#808080'
                   },
-                  font: new PdfStandardFont(PdfFontFamily.Helvetica, 12, PdfFontStyle.Regular)
+                  font: new PdfStandardFont(PdfFontFamily.Helvetica, 12, PdfFontStyle.Regular) as any
                 },
                 {
-                  type: 'Image',
+                  type: 'Image' as any,
                   src: base_64,
                   position: {
                     x: 1000,
@@ -320,7 +320,7 @@ export class WordpressComponent implements OnInit {
               height: 80,
               contents: [
                 {
-                  type: 'Image',
+                  type: 'Image' as any,
                   src: iglesia_tech_base_64,
                   position: {
                     x: 0,
